@@ -353,3 +353,17 @@ html body :is(.pr-i,.pr-card .sj-btn,.pr-form .sj-btn,.pr-box .sj-btn){font-size
 html body .pr-i::placeholder{font-size:13.5px;color:var(--g2,#646D7C);opacity:.85}
 html body .pr-card .sj-list .sj-opt,html body .sj-list .sj-opt{font-size:13.5px}
 @media(max-width:560px){html body :is(.pr-i,.pr-card .sj-btn,.pr-form .sj-btn,.pr-box .sj-btn){font-size:13px!important}html body .pr-i::placeholder{font-size:13px}}
+
+/* Fenêtre « Ajouter au devis » : rien ne dépasse, pas de défilement horizontal */
+html body .vm{overflow-x:hidden!important}
+html body .vm,html body .vm *{box-sizing:border-box}
+html body .vm>*{max-width:calc(100% - 44px)}
+html body .vm>.vm-head{max-width:100%}
+html body .vm img,html body .vm select,html body .vm input,html body .vm .sj-wrap{max-width:100%}
+html body .vm-variants,html body #vmOptions,html body #vmBody{min-width:0}
+html body .vm>.btn-p{max-width:calc(100% - 44px)!important}
+@media(min-width:900px){html body .vm>*{max-width:calc(100% - 68px)}html body .vm>.btn-p{max-width:calc(100% - 68px)!important}}
+
+/* En-tête de l'accueil : le contenu de chaque diapo est centré verticalement (plus de grand vide sous les boutons) */
+html body .hero-slide .hero-content{justify-content:center!important;min-height:0!important;height:100%}
+html body .hero-slide .hero-h.hs-t,html body .hero-slide:first-child .hero-h{min-height:0!important}
