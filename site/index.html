@@ -879,7 +879,19 @@ transform:none!important;stroke-dashoffset:0!important}}
       </div>
     </div>
   </div>
-  <div class="hero-dots" role="group" aria-label="Choisir une diapositive"><button type="button" class="hd hd-on" aria-label="Diapositive 1"></button><button type="button" class="hd" aria-label="Diapositive 2"></button><button type="button" class="hd" aria-label="Diapositive 3"></button><button type="button" class="hd" aria-label="Diapositive 4"></button><button type="button" class="hd" aria-label="Diapositive 5"></button><button type="button" class="hd" aria-label="Diapositive 6"></button><button type="button" class="hd" aria-label="Diapositive 7"></button><button type="button" class="hd" aria-label="Diapositive 8"></button><button type="button" class="hd" aria-label="Diapositive 9"></button><span class="hd-sep" aria-hidden="true"></span><span class="hd-bar" aria-hidden="true"><i></i></span><button type="button" class="hd-pp" aria-label="Mettre en pause le défilement" aria-pressed="false"><svg viewBox="0 0 10 10" width="10" height="10" aria-hidden="true"><path class="pp-pause" d="M2.2 1.5h1.8v7H2.2zM6 1.5h1.8v7H6z"/><path class="pp-play" d="M2.6 1.4 8.4 5 2.6 8.6z"/></svg></button></div>
+    <div class="hero-slide hs-droite" data-bg="nous-organisons.webp" aria-hidden="true" style="--pos:center 55%">
+    <div class="hs-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-eye" style="text-transform:none"><span></span> Organisation de A à Z</div>
+      <div class="hero-h hs-t" role="presentation">NOUS ORGANISONS<br>VOTRE ÉVÉNEMENT</div>
+      <p class="hs-sub">Matériel, prestations et intervenants : nous vous accompagnons de A à Z pour que vous profitiez de votre événement.</p>
+      <div class="hs-cta">
+        <a href="rendez-vous.html" class="hs-btn hs-btn-main">Prendre rendez-vous</a>
+      </div>
+    </div>
+  </div>
+  <div class="hero-dots" role="group" aria-label="Choisir une diapositive"><button type="button" class="hd hd-on" aria-label="Diapositive 1"></button><button type="button" class="hd" aria-label="Diapositive 2"></button><button type="button" class="hd" aria-label="Diapositive 3"></button><button type="button" class="hd" aria-label="Diapositive 4"></button><button type="button" class="hd" aria-label="Diapositive 5"></button><button type="button" class="hd" aria-label="Diapositive 6"></button><button type="button" class="hd" aria-label="Diapositive 7"></button><button type="button" class="hd" aria-label="Diapositive 8"></button><button type="button" class="hd" aria-label="Diapositive 9"></button><button type="button" class="hd" aria-label="Diapositive 10"></button><span class="hd-sep" aria-hidden="true"></span><span class="hd-bar" aria-hidden="true"><i></i></span><button type="button" class="hd-pp" aria-label="Mettre en pause le défilement" aria-pressed="false"><svg viewBox="0 0 10 10" width="10" height="10" aria-hidden="true"><path class="pp-pause" d="M2.2 1.5h1.8v7H2.2zM6 1.5h1.8v7H6z"/><path class="pp-play" d="M2.6 1.4 8.4 5 2.6 8.6z"/></svg></button></div>
 </section>
 
 <section class="evs" id="evenements">
@@ -2284,8 +2296,8 @@ setTimeout(typeCity,4000);
     catch(e){try{n=parseInt(sessionStorage.getItem('vespra_hero_n'),10)||0;sessionStorage.setItem('vespra_hero_n',String(n+1));}catch(e2){}}
     n=Math.abs(n);
     var produits=[4,3,2,1,5,6],P=produits[Math.floor(n/3)%produits.length];
-    var T={A:0,B:7,C:P,D:8};
-    var ordres=['ABCD','ABCD','DCAB','ABCD','ABCD','BADC'];
+    var T={A:0,B:7,C:P,D:8,E:9};
+    var ordres=['ABCDE','AEBCD','DCAEB','ABECD','AEBDC','BADCE'];
     var ordre=ordres[n%ordres.length].split('').map(function(c){return T[c]});
     var tous=sl.slice(),pts=dots.slice();
     var gardes=ordre.map(function(k){return tous[k]});
@@ -3263,7 +3275,7 @@ html:root:root:root:root:root body .lnk-fl{font-size:10.2px!important}
  html:root:root:root:root:root body .cart-btn,html:root:root:root:root:root body .reserver-btn{font-size:9.4px!important}
 }
 </style>
-<link rel="stylesheet" href="/coherence.css?v=9">
+<link rel="stylesheet" href="/coherence.css?v=10">
 <script src="/coherence.js?v=5" defer></script>
 
 <script>
