@@ -1,0 +1,17 @@
+{
+ "slug": "argentre-du-plessis",
+ "name": "Argentré-du-Plessis",
+ "dept": "Ille-et-Vilaine",
+ "km": null,
+ "min": null,
+ "fee": 20,
+ "plus": false,
+ "communes": [
+  "Étrelles",
+  "Vitré",
+  "Châteaubourg"
+ ],
+ "salles": null,
+ "domaines": null,
+ "tranche": "de 5 à 16 km"
+}

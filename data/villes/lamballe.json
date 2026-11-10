@@ -1,0 +1,18 @@
+{
+ "slug": "lamballe",
+ "name": "Lamballe",
+ "dept": "Côtes-d'Armor",
+ "km": 120,
+ "min": "1 h 35",
+ "fee": 50,
+ "plus": true,
+ "communes": [
+  "Planguenoual",
+  "Pommeret",
+  "Andel",
+  "Coëtmieux",
+  "Quessoy"
+ ],
+ "salles": "la salle La Corne de Cerf ou la salle Louis Fourchon à Maroué",
+ "domaines": "le Manoir des Portes ou le Domaine des Bléseaubois"
+}

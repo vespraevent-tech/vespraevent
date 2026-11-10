@@ -1,0 +1,19 @@
+{
+ "slug": "la-guerche-de-bretagne",
+ "name": "La Guerche-de-Bretagne",
+ "dept": "Ille-et-Vilaine",
+ "km": 22,
+ "min": "25 min",
+ "fee": 25,
+ "plus": false,
+ "communes": [
+  "Rannée",
+  "Availles-sur-Seiche",
+  "Moutiers",
+  "Domalain",
+  "Bais",
+  "Visseiche"
+ ],
+ "salles": "la salle polyvalente La Vannerie",
+ "domaines": "le Domaine de Neuville à Domagné ou Le Clos du Chatelier à Janzé"
+}

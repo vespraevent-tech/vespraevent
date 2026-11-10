@@ -1,0 +1,20 @@
+{
+ "slug": "vitre",
+ "name": "Vitré",
+ "dept": "Ille-et-Vilaine",
+ "km": 0,
+ "min": null,
+ "fee": 0,
+ "plus": false,
+ "communes": [
+  "Argentré-du-Plessis",
+  "Étrelles",
+  "Châteaubourg",
+  "Val-d'Izé",
+  "Erbrée",
+  "Pocé-les-Bois",
+  "Saint-M'Hervé"
+ ],
+ "salles": "le Centre culturel Jacques-Duhamel ou le Parc des Expositions",
+ "domaines": "Le Trempe-Sec, La Grenouillère ou Ar Milin' à Châteaubourg"
+}

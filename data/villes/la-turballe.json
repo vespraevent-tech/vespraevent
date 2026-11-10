@@ -1,0 +1,18 @@
+{
+ "slug": "la-turballe",
+ "name": "La Turballe",
+ "dept": "Loire-Atlantique",
+ "km": 161,
+ "min": "2 h 17",
+ "fee": 50,
+ "plus": true,
+ "communes": [
+  "Guérande",
+  "Piriac-sur-Mer",
+  "Le Croisic",
+  "Batz-sur-Mer",
+  "Mesquer"
+ ],
+ "salles": "la salle François-Marie Lebrun ou le Centre culturel Saint-Pierre",
+ "domaines": "le Domaine de Lauvergnac"
+}

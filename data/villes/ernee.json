@@ -1,0 +1,18 @@
+{
+ "slug": "ernee",
+ "name": "Ernée",
+ "dept": "Mayenne",
+ "km": 31,
+ "min": "31 min",
+ "fee": 30,
+ "plus": false,
+ "communes": [
+  "Larchamp",
+  "Juvigné",
+  "Chailland",
+  "Montenay",
+  "La Pellerine"
+ ],
+ "salles": "l'Espace Clair de Lune ou la salle des Randonneurs",
+ "domaines": "le Haras de la Chaîne à Saint-Pierre-des-Landes ou le Château de Fontenaille"
+}

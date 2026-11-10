@@ -1,0 +1,18 @@
+{
+ "slug": "cosse-le-vivien",
+ "name": "Cossé-le-Vivien",
+ "dept": "Mayenne",
+ "km": 35,
+ "min": "44 min",
+ "fee": 30,
+ "plus": false,
+ "communes": [
+  "Quelaines-Saint-Gault",
+  "Astillé",
+  "Courbeveille",
+  "Craon",
+  "Simplé"
+ ],
+ "salles": "la salle Saint-Exupéry ou la salle FCC",
+ "domaines": "La Maison de Julise ou La Raimbaudière à Courbeveille"
+}

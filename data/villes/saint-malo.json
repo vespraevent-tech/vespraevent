@@ -1,0 +1,18 @@
+{
+ "slug": "saint-malo",
+ "name": "Saint-Malo",
+ "dept": "Ille-et-Vilaine",
+ "km": 109,
+ "min": "1 h 26",
+ "fee": 50,
+ "plus": true,
+ "communes": [
+  "Saint-Jouan-des-Guérets",
+  "Cancale",
+  "Dinard",
+  "Saint-Méloir-des-Ondes",
+  "Châteauneuf-d'Ille-et-Vilaine"
+ ],
+ "salles": "la salle de Rocabey",
+ "domaines": "le Domaine du Montmarin à Pleurtuit ou le Manoir de Pontbriand"
+}

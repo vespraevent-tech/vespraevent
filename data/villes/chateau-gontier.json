@@ -1,0 +1,18 @@
+{
+ "slug": "chateau-gontier",
+ "name": "Château-Gontier",
+ "dept": "Mayenne",
+ "km": 75,
+ "min": "1 h 05",
+ "fee": 40,
+ "plus": false,
+ "communes": [
+  "Azé",
+  "Bazouges",
+  "Saint-Fort",
+  "Loigné-sur-Mayenne",
+  "Ménil"
+ ],
+ "salles": "la salle festive de l'Espace Saint-Fiacre ou l'Espace Jacques Brel",
+ "domaines": "le Domaine des Mille Oiseaux à Villiers-Charlemagne ou le Domaine du Petit Moiré"
+}

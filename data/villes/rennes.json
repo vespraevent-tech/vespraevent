@@ -1,0 +1,19 @@
+{
+ "slug": "rennes",
+ "name": "Rennes",
+ "dept": "Ille-et-Vilaine",
+ "km": 41,
+ "min": "34 min",
+ "fee": 35,
+ "plus": false,
+ "communes": [
+  "Cesson-Sévigné",
+  "Saint-Grégoire",
+  "Chantepie",
+  "Betton",
+  "Pacé",
+  "Vezin-le-Coquet"
+ ],
+ "salles": "la Salle de la Cité ou la Maison de quartier La Touche",
+ "domaines": "le Manoir du Plessis au Rheu ou le Manoir de la Haute Pilais à Chantepie"
+}

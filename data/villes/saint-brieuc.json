@@ -1,0 +1,18 @@
+{
+ "slug": "saint-brieuc",
+ "name": "Saint-Brieuc",
+ "dept": "Côtes-d'Armor",
+ "km": 141,
+ "min": "1 h 50",
+ "fee": 50,
+ "plus": true,
+ "communes": [
+  "Ploufragan",
+  "Langueux",
+  "Trégueux",
+  "Plérin",
+  "Yffiniac"
+ ],
+ "salles": "la salle de Robien ou la salle Steredenn",
+ "domaines": "le Château de Bogard à Quessoy ou le Manoir Le 4 Saisons"
+}

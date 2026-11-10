@@ -1,0 +1,18 @@
+{
+ "slug": "guingamp",
+ "name": "Guingamp",
+ "dept": "Côtes-d'Armor",
+ "km": 175,
+ "min": "2 h 12",
+ "fee": 50,
+ "plus": true,
+ "communes": [
+  "Ploumagoar",
+  "Pabu",
+  "Grâces",
+  "Saint-Agathon",
+  "Plouisy"
+ ],
+ "salles": "les salles communales de Ploumagoar, Pabu et Grâces",
+ "domaines": "l'Abbaye de Sainte-Croix"
+}

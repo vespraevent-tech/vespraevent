@@ -118,6 +118,11 @@ function carrousel(o){
   wrap.addEventListener('scroll',majDots,{passive:true});
   var VIT=30,rafId=null,dernier=0,enPause=false,visible=true,reste=0,rep=null,attendu=0;
   function pause(d){enPause=true;clearTimeout(rep);rep=setTimeout(function(){enPause=false;dernier=0;},d||500);}
+  /* souris posée dessus ou doigt posé : le défilement s'arrête, il reprend peu après */
+  wrap.addEventListener('pointerenter',function(e){if(e.pointerType==='mouse'){enPause=true;clearTimeout(rep);}});
+  wrap.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')pause(350);});
+  wrap.addEventListener('touchstart',function(){enPause=true;clearTimeout(rep);},{passive:true});
+  ['touchend','touchcancel'].forEach(function(ev){wrap.addEventListener(ev,function(){pause(1600);},{passive:true});});
   prev&&prev.addEventListener('click',function(){pause(1200);wrap.scrollBy({left:-Math.max(240,wrap.clientWidth*.82),behavior:'smooth'});});
   next&&next.addEventListener('click',function(){pause(1200);wrap.scrollBy({left:Math.max(240,wrap.clientWidth*.82),behavior:'smooth'});});
   var reduit=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -150,12 +155,16 @@ function carrousel(o){
 /* bandeau « Quel événement préparez-vous ? » */
 function defile(w,cards,copies,vit){
  if(!w||cards.length<copies*3)return;
- var P=0,lo=0,pos=0,pause=0,last=0,drag=null,bouge=false,pose=0;
+ var P=0,lo=0,pos=0,pause=0,last=0,drag=null,bouge=false,pose=0,tient=false;
  var reduit=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
  function mesure(){var n=cards.length/copies;P=cards[n].offsetLeft-cards[0].offsetLeft;lo=P*.25;}
  function ecrire(x){w.scrollLeft=x;pose=w.scrollLeft;}
  function boucle(){if(!P)return;var x=w.scrollLeft;if(x<lo)x+=P;else if(x>=lo+P)x-=P;if(x!==w.scrollLeft){ecrire(x);pos=x;}}
  function arret(ms){pause=Date.now()+ms;}
+ w.addEventListener('pointerenter',function(e){if(e.pointerType==='mouse')tient=true;});
+ w.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse'){tient=false;arret(350);}});
+ w.addEventListener('touchstart',function(){tient=true;},{passive:true});
+ ['touchend','touchcancel'].forEach(function(ev){w.addEventListener(ev,function(){tient=false;arret(1600);},{passive:true});});
  var tx=0,ty=0;
  w.addEventListener('touchstart',function(e){var t=e.touches[0];tx=t.clientX;ty=t.clientY;arret(250);},{passive:true});
  w.addEventListener('touchmove',function(e){var t=e.touches[0],dx=t.clientX-tx,dy=t.clientY-ty;if(Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy))arret(450);},{passive:true});
@@ -168,7 +177,7 @@ function defile(w,cards,copies,vit){
  w.addEventListener('click',function(e){if(bouge){e.preventDefault();e.stopPropagation();bouge=false;}},true);
  w.addEventListener('dragstart',function(e){e.preventDefault();});
  function pas(t){var dt=Math.min(64,t-(last||t));last=t;
-  if(P&&!reduit&&!document.hidden&&!drag&&Date.now()>=pause){var r=w.getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight){pos+=dt*vit;ecrire(pos);boucle();}}
+  if(P&&!reduit&&!document.hidden&&!drag&&!tient&&Date.now()>=pause){var r=w.getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight){pos+=dt*vit;ecrire(pos);boucle();}}
   requestAnimationFrame(pas);}
  function init(){mesure();if(!P)return;ecrire(P);pos=P;requestAnimationFrame(pas);}
  if(document.readyState==='complete')init();else addEventListener('load',init);

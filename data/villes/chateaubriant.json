@@ -1,0 +1,18 @@
+{
+ "slug": "chateaubriant",
+ "name": "Châteaubriant",
+ "dept": "Loire-Atlantique",
+ "km": 54,
+ "min": "56 min",
+ "fee": 35,
+ "plus": false,
+ "communes": [
+  "Erbray",
+  "Louisfert",
+  "Soudan",
+  "Rougé",
+  "Moisdon-la-Rivière"
+ ],
+ "salles": "la Halle de Béré ou la salle Xavier Hunault",
+ "domaines": "le domaine de La Ferrière"
+}

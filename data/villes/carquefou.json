@@ -1,0 +1,18 @@
+{
+ "slug": "carquefou",
+ "name": "Carquefou",
+ "dept": "Loire-Atlantique",
+ "km": 135,
+ "min": "1 h 45",
+ "fee": 50,
+ "plus": true,
+ "communes": [
+  "Sainte-Luce-sur-Loire",
+  "Thouaré-sur-Loire",
+  "La Chapelle-sur-Erdre",
+  "Sucé-sur-Erdre",
+  "Nantes"
+ ],
+ "salles": "l'Espace Jules Verne ou la salle du Puy d'Arlèze",
+ "domaines": "les Gîtes Bel des Prés ou le Manoir de la Boulaie à Haute-Goulaine"
+}

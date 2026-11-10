@@ -1,0 +1,18 @@
+{
+ "slug": "guipry-messac",
+ "name": "Guipry-Messac",
+ "dept": "Ille-et-Vilaine",
+ "km": 79,
+ "min": "1 h 07",
+ "fee": 40,
+ "plus": false,
+ "communes": [
+  "Pipriac",
+  "Bain-de-Bretagne",
+  "Lohéac",
+  "Saint-Malo-de-Phily",
+  "Lieuron"
+ ],
+ "salles": "la salle des fêtes ou l'Espace Claude Michel",
+ "domaines": "le Château du Boschet à Bourg-des-Comptes ou le Château du Val à Saint-Just"
+}

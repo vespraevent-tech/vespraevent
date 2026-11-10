@@ -1,0 +1,18 @@
+{
+ "slug": "dinard",
+ "name": "Dinard",
+ "dept": "Ille-et-Vilaine",
+ "km": null,
+ "min": null,
+ "fee": 50,
+ "plus": true,
+ "communes": [
+  "Saint-Malo",
+  "Saint-Jouan-des-Guérets",
+  "Pleurtuit",
+  "Dinan"
+ ],
+ "salles": null,
+ "domaines": "le Domaine du Montmarin à Pleurtuit",
+ "tranche": "80 km et plus"
+}

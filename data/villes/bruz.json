@@ -1,0 +1,18 @@
+{
+ "slug": "bruz",
+ "name": "Bruz",
+ "dept": "Ille-et-Vilaine",
+ "km": 52,
+ "min": "48 min",
+ "fee": 35,
+ "plus": false,
+ "communes": [
+  "Chartres-de-Bretagne",
+  "Noyal-Châtillon-sur-Seiche",
+  "Pont-Péan",
+  "Laillé",
+  "Saint-Jacques-de-la-Lande"
+ ],
+ "salles": "l'Espace Vau Gaillard ou Le Grand Logis",
+ "domaines": "le Domaine de la Pommeraie ou le Manoir du Plessis au Rheu"
+}

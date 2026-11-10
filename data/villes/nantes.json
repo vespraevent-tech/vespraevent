@@ -1,0 +1,18 @@
+{
+ "slug": "nantes",
+ "name": "Nantes",
+ "dept": "Loire-Atlantique",
+ "km": 142,
+ "min": "1 h 51",
+ "fee": 50,
+ "plus": true,
+ "communes": [
+  "Orvault",
+  "Rezé",
+  "Saint-Herblain",
+  "Vertou",
+  "Carquefou"
+ ],
+ "salles": "les salles municipales de quartier",
+ "domaines": "le Manoir de Procé ou le Manoir Le Petit Plessis à Sainte-Luce-sur-Loire"
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "dinan",
+ "name": "Dinan",
+ "dept": "Côtes-d'Armor",
+ "km": 105,
+ "min": "1 h 20",
+ "fee": 50,
+ "plus": true,
+ "communes": [
+  "Léhon",
+  "Quévert",
+  "Taden",
+  "Lanvallay",
+  "Trélivan"
+ ],
+ "salles": "la salle André Labbé",
+ "domaines": "le Manoir de Pontbriand à Pleurtuit"
+}

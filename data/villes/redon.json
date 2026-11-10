@@ -1,0 +1,18 @@
+{
+ "slug": "redon",
+ "name": "Redon",
+ "dept": "Ille-et-Vilaine",
+ "km": 108,
+ "min": "1 h 12",
+ "fee": 50,
+ "plus": true,
+ "communes": [
+  "Bains-sur-Oust",
+  "Saint-Nicolas-de-Redon",
+  "Sainte-Marie",
+  "Renac",
+  "Allaire"
+ ],
+ "salles": "la salle Saint-Conwoïon",
+ "domaines": "le Château du Val à Saint-Just"
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "mayenne",
+ "name": "Mayenne",
+ "dept": "Mayenne",
+ "km": 65,
+ "min": "56 min",
+ "fee": 40,
+ "plus": false,
+ "communes": [
+  "Aron",
+  "Moulay",
+  "Saint-Baudelle",
+  "Marcillé-la-Ville",
+  "Placé"
+ ],
+ "salles": "la salle des Châteliers ou la salle de La Visitation",
+ "domaines": "le Manoir des Loges ou le Château de la Basmaignée à Montenay"
+}

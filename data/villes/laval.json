@@ -1,0 +1,19 @@
+{
+ "slug": "laval",
+ "name": "Laval",
+ "dept": "Mayenne",
+ "km": 38,
+ "min": "38 min",
+ "fee": 30,
+ "plus": false,
+ "communes": [
+  "Changé",
+  "Saint-Berthevin",
+  "Bonchamp-lès-Laval",
+  "L'Huisserie",
+  "Louverné",
+  "Entrammes"
+ ],
+ "salles": "la salle polyvalente et l'auditorium de la place de Hercé",
+ "domaines": "le Domaine des Assis à Astillé ou EcHologia à Louverné"
+}

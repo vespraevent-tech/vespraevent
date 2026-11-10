@@ -1,0 +1,18 @@
+{
+ "slug": "la-gravelle",
+ "name": "La Gravelle",
+ "dept": "Mayenne",
+ "km": 16,
+ "min": "19 min",
+ "fee": 20,
+ "plus": false,
+ "communes": [
+  "Saint-Pierre-la-Cour",
+  "Port-Brillet",
+  "Le Bourgneuf-la-Forêt",
+  "Launay-Villiers",
+  "Bourgon"
+ ],
+ "salles": "les salles communales du secteur de Port-Brillet et Saint-Pierre-la-Cour",
+ "domaines": "Le Clos du Parigné à La Brûlatte ou La Raimbaudière à Courbeveille"
+}

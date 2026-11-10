@@ -1,0 +1,19 @@
+{
+ "slug": "fougeres",
+ "name": "Fougères",
+ "dept": "Ille-et-Vilaine",
+ "km": 29,
+ "min": "33 min",
+ "fee": 25,
+ "plus": false,
+ "communes": [
+  "Lécousse",
+  "Javené",
+  "Beaucé",
+  "Romagné",
+  "Saint-Sauveur-des-Landes",
+  "La Selle-en-Luitré"
+ ],
+ "salles": "l'Espace Aumaillerie, à La Selle-en-Luitré",
+ "domaines": "le Château du Rocher Portail à Maen Roch ou le Domaine de la Morissais à Saint-Ouen-la-Rouërie"
+}
