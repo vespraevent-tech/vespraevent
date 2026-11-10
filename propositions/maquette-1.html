@@ -1,0 +1,54 @@
+<!doctype html><html lang="fr"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maquette 1 — Vespra Event</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&family=Fraunces:ital,opsz,wght@1,9..144,400&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#2B4A6B;--deep:#14253A;--ink:#0C0F14;--sand:#F6F3EE;--mist:#EEF1F5;--gold:#F59E0B;--g2:#646D7C;--e:cubic-bezier(.2,.7,.2,1)}
+*{box-sizing:border-box;margin:0}body{font-family:Inter,sans-serif;background:var(--sand);color:var(--ink)}
+img{display:block;width:100%;height:100%;object-fit:cover}
+.lab{font:600 11px Inter;letter-spacing:.18em;text-transform:uppercase;color:var(--navy)}
+.big{font-family:'Bebas Neue';line-height:.92;letter-spacing:.01em}
+em{font-family:Fraunces,serif;font-style:italic;font-weight:400;letter-spacing:0;color:var(--gold)}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:15px 26px;border-radius:999px;font:600 13px Inter;letter-spacing:.04em;text-decoration:none;transition:.35s var(--e)}
+.b1{background:var(--gold);color:var(--ink)}.b1:hover{transform:translateY(-2px);box-shadow:0 12px 28px -8px #F59E0B99}
+.b2{border:1px solid #ffffff66;color:#fff;backdrop-filter:blur(8px)}.b2:hover{background:#fff;color:var(--ink)}
+nav{position:absolute;inset:18px 32px auto;display:flex;align-items:center;justify-content:space-between;padding:10px 12px 10px 26px;border-radius:999px;background:#ffffffd9;backdrop-filter:blur(14px);z-index:3;box-shadow:0 8px 30px -12px #0004}
+nav b{font:400 24px 'Bebas Neue';color:var(--navy);letter-spacing:.03em}nav span{font-size:13px;font-weight:500;color:#3D4452;margin:0 14px}
+.hero{position:relative;height:760px;margin:0 16px;border-radius:32px;overflow:hidden;color:#fff;background:var(--deep)}
+.hero img{position:absolute;inset:0}.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(95deg,#0b1522ee 15%,#0b152255 55%,transparent)}
+.hc{position:absolute;z-index:2;left:72px;bottom:96px;max-width:640px}
+.hc h1{font-size:112px;margin:18px 0 22px}.hc p{font-size:17px;line-height:1.6;color:#ffffffcc;max-width:460px;margin-bottom:32px}
+.stats{position:absolute;z-index:2;right:40px;bottom:40px;display:flex;gap:0;background:#ffffff1f;backdrop-filter:blur(16px);border:1px solid #ffffff33;border-radius:22px}
+.stats div{padding:18px 28px;border-right:1px solid #ffffff33}.stats div:last-child{border:0}.stats b{font:400 34px 'Bebas Neue';display:block}.stats small{font-size:12px;color:#ffffffbb}
+section{padding:120px 72px 0}
+.head{display:flex;justify-content:space-between;align-items:end;margin-bottom:48px}.head h2{font-size:72px;margin-top:12px}
+.ev{display:grid;grid-template-columns:1.25fr 1fr 1fr;grid-template-rows:300px 300px;gap:18px}
+.ev a{position:relative;border-radius:26px;overflow:hidden;color:#fff;text-decoration:none}.ev a:first-child{grid-row:span 2}
+.ev img{transition:transform .9s var(--e)}.ev a:hover img{transform:scale(1.05)}
+.ev a:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#0b1522cc,transparent 55%)}
+.ev div{position:absolute;z-index:2;left:26px;bottom:24px;right:26px;display:flex;justify-content:space-between;align-items:end}.ev h3{font:400 40px 'Bebas Neue'}.ev p{font-size:13px;color:#ffffffcc}
+.ev i{width:44px;height:44px;border-radius:50%;background:#fff;color:var(--ink);display:grid;place-items:center;font-style:normal;transition:.35s var(--e)}.ev a:hover i{background:var(--gold);transform:rotate(-45deg)}
+.pr{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{background:#fff;border-radius:28px;padding:14px;transition:.4s var(--e)}.card:hover{transform:translateY(-6px);box-shadow:0 30px 50px -28px #14253a66}
+.card .im{height:300px;border-radius:20px;overflow:hidden;background:var(--mist)}.card .im img{object-fit:contain;padding:18px}
+.card .tx{padding:20px 12px 10px;display:flex;justify-content:space-between;align-items:end}.card small{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--g2)}
+.card h4{font:600 19px Inter;margin:6px 0}.card .p{font:400 30px 'Bebas Neue';color:var(--navy)}.card .p small{font:500 11px Inter;letter-spacing:0;text-transform:none;margin-right:6px}
+.card button{width:48px;height:48px;border-radius:50%;border:0;background:var(--navy);color:#fff;font-size:22px;transition:.35s var(--e)}.card:hover button{background:var(--gold);color:var(--ink)}
+.form{margin:120px 16px 60px;border-radius:32px;background:var(--deep);color:#fff;padding:72px;display:grid;grid-template-columns:1fr 1.2fr;gap:64px}
+.form h2{font-size:84px;margin:14px 0 18px}.form p{color:#ffffffaa;line-height:1.6;max-width:380px}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:14px}.f span{display:block;padding:18px 20px;border-radius:16px;background:#ffffff12;border:1px solid #ffffff22;color:#ffffff88;font-size:14px;transition:.3s}.f span:hover{border-color:var(--gold)}.f .w{grid-column:span 2}.f .btn{grid-column:span 2;justify-content:center}
+</style>
+<div class="hero"><img src="../site/photobooth-lifestyle.webp" alt="">
+<nav><b>VESPRA EVENT</b><div><span>Accueil</span><span>Catalogue</span><span>Prestataires</span><span>Blog</span><span>FAQ</span></div><a class="btn b1" style="padding:12px 22px">Réserver</a></nav>
+<div class="hc"><span class="lab" style="color:#fff">● Location à Vitré &amp; grand Ouest</span><h1 class="big">Des soirées dont on <em>se souvient</em></h1><p>Photobooth, sono, lumières, barnums : du matériel livré et installé chez vous, pour tous vos événements.</p><a class="btn b1">Voir le catalogue →</a> <a class="btn b2">Demander un devis</a></div>
+<div class="stats"><div><b>5/5</b><small>Note Google</small></div><div><b>+1000</b><small>Clients</small></div><div><b>24H</b><small>Réponse devis</small></div></div></div>
+<section><div class="head"><div><span class="lab">Par où commencer</span><h2 class="big">Quel événement <em>préparez-vous ?</em></h2></div></div>
+<div class="ev"><a><img src="../site/ambiance-soiree.webp" alt=""><div><span><h3>Anniversaire</h3><p>Son, lumière, karaoké</p></span><i>→</i></div></a>
+<a><img src="../site/panneau-bienvenue.webp" alt=""><div><span><h3>Mariage</h3><p>Photobooth, panneaux, lumières</p></span><i>→</i></div></a>
+<a><img src="../site/etincelles-froides-situation.webp" alt=""><div><span><h3>Moments forts</h3><p>Étincelles froides</p></span><i>→</i></div></a>
+<a style="grid-column:span 2"><img src="../site/canon-poudre-gender-reveal-plein.webp" alt=""><div><span><h3>Gender reveal</h3><p>Feux d'artifice de jour, canons de poudre</p></span><i>→</i></div></a></div></section>
+<section><div class="head"><div><span class="lab">Les préférés de nos clients</span><h2 class="big">Meilleures <em>locations</em></h2></div><a class="btn" style="border:1px solid #14253a33">Tout le catalogue →</a></div>
+<div class="pr"><div class="card"><div class="im"><img src="../site/photobooth-detoure.webp" alt=""></div><div class="tx"><div><small>Photobooth</small><h4>Photobooth bois</h4><span class="p"><small>dès</small>130 €</span></div><button>+</button></div></div>
+<div class="card"><div class="im"><img src="../site/panneau-bienvenue.webp" alt=""></div><div class="tx"><div><small>Décoration</small><h4>Panneau de bienvenue</h4><span class="p"><small>dès</small>190 €</span></div><button>+</button></div></div>
+<div class="card"><div class="im"><img src="../site/etincelles-froides-t.webp" alt=""></div><div class="tx"><div><small>Effets</small><h4>Étincelles froides</h4><span class="p"><small>dès</small>85 €</span></div><button>+</button></div></div></div></section>
+<div class="form"><div><span class="lab" style="color:var(--gold)">Gratuit &amp; sans engagement</span><h2 class="big">Parlons de votre <em>événement</em></h2><p>Décrivez votre projet, devis sous 24 h.</p></div>
+<div class="f"><span>Prénom et nom</span><span>Email</span><span>Téléphone</span><span>Date</span><span class="w">Type d'événement</span><span class="w" style="height:110px">Décrivez votre projet…</span><a class="btn b1">Envoyer ma demande →</a></div></div>
