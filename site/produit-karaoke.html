@@ -1201,7 +1201,7 @@ document.addEventListener('DOMContentLoaded',function(){
 <div class="pg-ov" id="pgOv" onclick="if(event.target===this)pgClose()" role="dialog" aria-label="Photos du produit">
   <button class="pg-close" onclick="pgClose()" aria-label="Fermer">×</button>
   <button class="pg-nav pg-prev" id="pgPrev" onclick="pgStep(-1)" aria-label="Photo précédente">‹</button>
-  <figure class="pg-fig"><img id="pgImg" src="" alt=""></figure>
+  <figure class="pg-fig"><img id="pgImg" src="" alt="" loading="lazy" decoding="async"></figure>
   <button class="pg-nav pg-next" id="pgNext" onclick="pgStep(1)" aria-label="Photo suivante">›</button>
   <div class="pg-cap" id="pgCap"></div>
   <div class="pg-dots" id="pgDots"></div>

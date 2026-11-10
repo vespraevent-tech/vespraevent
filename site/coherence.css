@@ -233,3 +233,10 @@ html body :is(.cat-hero,.article-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero){
   margin:12px 16px 0;border-radius:32px;overflow:hidden}
 @media(max-width:960px){html body :is(.cat-hero,.article-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero){margin:10px 10px 0;border-radius:24px}}
 @media(max-width:560px){html body :is(.cat-hero,.article-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero){margin:8px 8px 0;border-radius:20px}}
+
+/* ===== Sémantique : titres de section en <h2> sans changer leur aspect ===== */
+h2.sec-h{margin-top:0;font-weight:400}
+div.hero-h.hs-t{margin-top:.83em}
+
+/* Les images avec width/height gardent leurs proportions (zéro saut de mise en page) sans écraser les tailles fixées par les classes */
+img:where([width][height]){height:auto}
