@@ -87,3 +87,4 @@
 .vcb-in{max-width:none!important;border-radius:32px!important;box-shadow:none!important;overflow:hidden;background:#fff!important}
 .vcb-tx{padding:clamp(28px,4vw,56px)!important}.vcb-map{min-height:360px}.vcb-map iframe{min-height:360px}
 @media(max-width:800px){.vcb-in{grid-template-columns:1fr!important}.vcb-map{min-height:280px}}
+.v-pg a.v-btn.v-b2{color:#fff}.v-pg a.v-btn.v-b1{color:var(--v-ink)}.v-pg a.v-lnk{color:var(--v-navy)}

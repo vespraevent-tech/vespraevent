@@ -5,7 +5,7 @@
   --edge:max(64px,calc((100% - 1312px)/2));   /* marge latérale commune à toutes les sections */
   --sec-y:96px;                                /* hauteur d'air haut/bas d'une section */
   --sec-y-sm:56px;                             /* bandeaux légers (confiance, recherches) */
-  --head-gap:40px;                             /* espace sous un titre de section */
+  --head-gap:28px;                             /* espace sous un titre de section */
 }
 @media(max-width:960px){:root{--edge:32px;--sec-y:72px;--sec-y-sm:44px;--head-gap:28px}}
 @media(max-width:560px){:root{--edge:20px;--sec-y:56px;--sec-y-sm:36px;--head-gap:22px}}
@@ -237,7 +237,7 @@ html body :is(.cat-hero,.article-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero){
 
 /* ===== Sémantique : titres de section en <h2> sans changer leur aspect ===== */
 h2.sec-h{margin-top:0;font-weight:400}
-div.hero-h.hs-t{margin-top:.83em}
+div.hero-h.hs-t{margin-top:0}
 
 /* Les images avec width/height gardent leurs proportions (zéro saut de mise en page) sans écraser les tailles fixées par les classes */
 img:where([width][height]){height:auto}
@@ -270,3 +270,10 @@ html body :is(.article-hero,.cta-engage,.hero,.off,.cat-hero,.dk,.footer,.ft) em
   html body #vmOptions label{padding:16px 20px!important;font-size:15px!important}
   html body .vm>.btn-p{width:calc(100% - 68px)!important;margin:10px 34px 30px;padding:18px!important;font-size:15px!important}
 }
+
+/* ===== Espacements compacts entre pastille, titre et contenu ===== */
+html body .hero-eye{margin-bottom:18px!important}
+html body .hero-h,html body .hero-slide:first-child .hero-h{margin-bottom:14px}
+html body .sec-tag{margin-bottom:12px}
+html body .sec-h{margin-bottom:var(--head-gap)}
+@media(max-width:560px){html body .hero-eye{margin-bottom:12px!important}}

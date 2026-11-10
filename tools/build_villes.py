@@ -143,13 +143,31 @@ def ld_graph(d, url, name, faq, product=None):
 
 
 # ───────────────────────── blocs communs ─────────────────────────
-def az_block(d):
-    lead = pick(d['slug'], 'az', [
-        "Vespra Event peut aussi organiser votre événement et vous entourer des bons intervenants. Selon vos besoins, nous vous accompagnons de A à Z.",
-        "Au-delà de la location, nous pouvons vous aider à organiser votre événement : service, pâtisserie et autres intervenants que nous connaissons, de A à Z.",
-        "Vous cherchez plus que du matériel ? Nous pouvons organiser votre événement avec vous et vous mettre en relation avec nos prestataires, de A à Z."])
-    n = d['name']
-    return f'''<section class="sec"><div class="az"><div><span class="lab">Organisation de A à Z</span><h2 class="t">On ne fait pas que <em>louer du matériel</em></h2><p>{lead}</p><a class="lnk" href="nos-prestataires.html">Découvrir nos prestataires</a></div>
+def az_block(d, mode='materiel'):
+    """Bloc « Organisation de A à Z » : angle propre à chaque famille de pages (matériel, soirées privées, professionnels)."""
+    n = d['name']; sl = d['slug']
+    M = {
+        'materiel': dict(
+            lab="Organisation d'événements de A à Z",
+            ttl=["On ne fait pas que <em>louer du matériel</em>", "Location de matériel et <em>prestations événementielles</em>", "Votre événement, <em>de A à Z</em>"],
+            lead=["Vespra Event peut aussi organiser votre événement et vous entourer des bons intervenants : une organisation complète avec prestataires, selon vos besoins.",
+                  "Au-delà de la location, nous organisons et accompagnons votre événement de A à Z : service, pâtisserie et autres intervenants que nous connaissons.",
+                  "Matériel, prestations et intervenants : nous pouvons organiser votre événement avec vous, de la première idée à la reprise du matériel."]),
+        'prive': dict(
+            lab="Organisation de soirées et événements privés",
+            ttl=["Mariage, anniversaire : <em>on organise avec vous</em>", "Organisation de soirées <em>et événements privés</em>", "Au-delà du photobooth, <em>votre fête de A à Z</em>"],
+            lead=["Mariage, anniversaire, fête de famille : Vespra Event peut organiser votre soirée de A à Z, avec le matériel et les intervenants qu'il vous faut.",
+                  "Le photobooth n'est qu'une partie de la fête. Nous pouvons organiser votre événement privé avec vous et vous entourer de nos prestataires.",
+                  "Vous préparez une soirée privée à " + n + " ? Nous vous accompagnons : matériel, service, pâtisserie et organisation complète avec prestataires."]),
+        'pro': dict(
+            lab="Organisation d'événements professionnels",
+            ttl=["Un événement d'entreprise ? <em>On l'organise avec vous</em>", "Organisation d'événements <em>professionnels</em>", "Matériel, prestations <em>et intervenants</em>"],
+            lead=["Séminaire, inauguration, soirée d'entreprise : Vespra Event organise votre événement professionnel de A à Z, avec ses prestations et ses intervenants.",
+                  "Location de matériel et prestations événementielles : une organisation complète avec prestataires, pour les entreprises, associations et collectivités.",
+                  "Vous confiez le matériel, la logistique et les intervenants à un seul interlocuteur : nous organisons, vous vous concentrez sur vos invités."]),
+    }[mode]
+    ttl = pick(sl, 'azt' + mode, M['ttl']); lead = pick(sl, 'az' + mode, M['lead'])
+    return f'''<section class="sec"><div class="az"><div><span class="lab">{M['lab']}</span><h2 class="t">{ttl}</h2><p>{lead}</p><div style="display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center"><a class="btn b2" href="rendez-vous.html">Prendre rendez-vous</a><a class="lnk" href="nos-prestataires.html">Découvrir nos prestataires</a></div></div>
 <div class="azc"><a class="azp" href="article-serveuse-privee.html"><img src="prestation-serveuse.webp" alt="Serveuse privée pour un événement à {esc(n)}" loading="lazy"><div><h3>Serveuse privée</h3><p>Présentation, service, mise en place. Sur devis.</p></div></a><a class="azp" href="article-chef-patissier.html"><img src="prestation-patissier.webp" alt="Chef pâtissier pour un événement à {esc(n)}" loading="lazy"><div><h3>Chef pâtissier</h3><p>Gâteau de mariage, desserts, mignardises sur mesure.</p></div></a><a class="azp more" href="nos-prestataires.html"><div><h3>Et d'autres intervenants</h3><p>Nos prestataires recommandés, pour une organisation complète.</p></div></a></div></div></section>'''
 
 
@@ -303,7 +321,7 @@ def photobooth_page(d):
     situation = f'<section class="sec"><span class="lab">Le photobooth en situation</span><h2 class="t">{sit_ttl}</h2></section><div class="mq" style="margin-top:-18px"><div class="tr">{sit}{sit}</div></div><div style="height:clamp(30px,5vw,60px)"></div>'
     pratique = '''<section class="sec g"><span class="lab">En pratique</span><h2 class="t">Ce qu'il faut <em>prévoir</em></h2><div class="pra"><div><b>≈ 2 m²</b><span>d'espace au sol</span></div><div><b>1 prise</b><span>standard</span></div><div><b>4 jours</b><span>du vendredi au lundi</span></div><div><b>Vous ou nous</b><span>pour l'installation</span></div></div></section>'''
     faq = faq_items(d, 'photobooth')
-    sections = {'formules': formules, 'situation': situation, 'local': local_block(d, 'photobooth', flip), 'steps': steps_block(d), 'az': az_block(d), 'pratique': pratique, 'faq': faq_block(d, 'photobooth', faq)}
+    sections = {'formules': formules, 'situation': situation, 'local': local_block(d, 'photobooth', flip), 'steps': steps_block(d), 'az': az_block(d, 'prive'), 'pratique': pratique, 'faq': faq_block(d, 'photobooth', faq)}
     orders = [['formules', 'situation', 'local', 'steps', 'pratique', 'az', 'faq'], ['situation', 'formules', 'az', 'local', 'steps', 'pratique', 'faq'], ['formules', 'local', 'situation', 'steps', 'az', 'pratique', 'faq']]
     order = pick(sl, 'ord', orders)
     hero = f'''<section class="hero{' flip' if flip else ''}"><div class="tx"><div class="crumb"><a href="/">Accueil</a> › <b>{esc(n)}</b></div><h1>Location de photobooth à <em>{esc(n)}</em></h1><p class="sub">{sub}</p><div><a class="btn b1" href="#vrb">Voir les formules</a></div></div>
@@ -315,7 +333,7 @@ def photobooth_page(d):
     desc_opts = [
         f"Location de photobooth à {n} dès 130 € : photos numériques illimitées, tirages 10×15 ou bandelette. Livraison possible, devis sous 24 h.",
         f"Louez le photobooth en bois de Vespra Event à {n} : 5 formules de 130 à 420 €, cadre et déguisement en option. Livraison possible.",
-        f"Photobooth à {n} pour mariage, anniversaire ou soirée : dès 130 €, photos illimitées, installation possible. Réponse sous 24 h."]
+        f"Photobooth à {n} pour mariage, anniversaire ou soirée privée : dès 130 €, photos illimitées. Organisation de A à Z possible avec nos prestataires."]
     desc = pick(sl, 'dsc', desc_opts)
     prod = {'@type': 'Product', 'name': f'Location de photobooth à {n}', 'brand': {'@type': 'Brand', 'name': 'Vespra Event'},
             'description': f'Photobooth en bois : photos numériques illimitées, tirages 10×15 cm ou bandelette, livraison à {n}.',
@@ -357,7 +375,8 @@ def materiel_page(d):
     subs = [
         f"Photobooth, son, lumière, barnums, restauration, animations. {'Livraison offerte à Vitré.' if sl == 'vitre' else 'Livraison à ' + esc(n) + ' sur devis.'}",
         f"Tout le matériel de votre événement, livré à {esc(n)}" + (f" et à {esc(join_fr(com[:3]))}." if com else '.'),
-        f"Du photobooth aux barnums, nous livrons et installons à {esc(n)} depuis notre dépôt de Vitré."]
+        f"Du photobooth aux barnums, nous livrons et installons à {esc(n)} depuis notre dépôt de Vitré.",
+        f"Location de matériel et prestations événementielles à {esc(n)} : nous pouvons aussi organiser votre événement de A à Z."]
     sub = pick(sl, 'subm', subs)
     hero = f'''<section class="hero{' flip' if flip else ''}"><div class="tx"><div class="crumb"><a href="/">Accueil</a> › <b>{esc(n)}</b></div><h1>Location de matériel événementiel à <em>{esc(n)}</em></h1><p class="sub">{sub}</p><div><a class="btn b1" href="catalogue.html">Voir le catalogue</a></div></div>
 <div class="ph"><img src="{h_main}" alt="Location de matériel événementiel à {esc(n)}" fetchpriority="high"><div class="pol b"><img src="{h1_}" alt="" loading="lazy"></div><div class="pol a"><img src="{h2_}" alt="" loading="lazy"></div></div></section>'''
@@ -377,7 +396,7 @@ def materiel_page(d):
     inc = '<div class="inc">' + ''.join(f'<div><b>{t}</b><p>{p}</p></div>' for t, p in inc_items) + '</div>'
     inclus = f'<section class="sec"><span class="lab">Nos prestations</span><h2 class="t">Ce qui est <em>inclus</em></h2>{inc}</section>'
     faq = faq_items(d, 'materiel')
-    sec = {'apercu': apercu, 'events': evs, 'inclus': inclus, 'local': local_block(d, 'materiel', not flip), 'steps': steps_block(d, True), 'az': az_block(d), 'faq': faq_block(d, 'materiel', faq)}
+    sec = {'apercu': apercu, 'events': evs, 'inclus': inclus, 'local': local_block(d, 'materiel', not flip), 'steps': steps_block(d, True), 'az': az_block(d, 'materiel'), 'faq': faq_block(d, 'materiel', faq)}
     orders = [['apercu', 'events', 'inclus', 'local', 'steps', 'az', 'faq'], ['events', 'apercu', 'steps', 'local', 'inclus', 'az', 'faq'], ['apercu', 'local', 'events', 'steps', 'az', 'inclus', 'faq']]
     order = pick(sl, 'ordm', orders)
     # les blocs « site » (apercu/events) ne reçoivent pas le préfixe v-
@@ -388,8 +407,8 @@ def materiel_page(d):
     cross = prefix_classes(f'<section class="sec g"><div class="cl" style="margin-top:0"><span>Un photobooth pour votre événement à {esc(n)} ?</span><a class="lnk" href="location-photobooth-{sl}.html">Voir la location de photobooth à {esc(n)}</a></div></section>')
     title = f"Location de matériel événementiel à {n} | Vespra Event"
     desc_opts = [
-        f"Location de matériel événementiel à {n} : photobooth, sono, lumière, barnums, restauration. Livraison {'offerte' if sl == 'vitre' else 'sur devis'}, devis sous 24 h.",
-        f"Louez photobooth, son, lumière, barnums et animations à {n}. Livraison et installation depuis Vitré, sur devis. Devis gratuit sous 24 h.",
+        f"Location de matériel et prestations événementielles à {n} : photobooth, sono, barnums, et organisation d'événements de A à Z. Devis sous 24 h.",
+        f"Louez photobooth, son, lumière et barnums à {n}, ou confiez-nous l'organisation complète avec prestataires. Devis gratuit sous 24 h.",
         f"Tout le matériel de votre fête à {n} : barnums, tente étoile, photobooth, sonorisation, effets. Vespra Event livre à {n} sur devis, réponse sous 24 h."]
     desc = pick(sl, 'dscm', desc_opts)
     ld = ld_graph(d, url, f'Location de matériel événementiel à {n}', faq)
@@ -421,16 +440,16 @@ def pro_page():
            ("Combien de temps pour recevoir un devis ?", "Nous répondons sous 24 heures, avec un prix ferme et la livraison détaillée.")]
     det = ''.join(f'<details{" open" if i == 0 else ""}><summary>{esc(q)}</summary><p>{esc(a)}</p></details>' for i, (q, a) in enumerate(faq))
     villes = ''.join(f'<a class="city" href="{v["slug"]}.html">{esc(v["name"])}</a>' for v in VILLES.values())
-    hero = f'''<section class="hero" style="grid-template-columns:1fr;min-height:min(620px,86vh)"><img src="barnum-situation.webp" alt="Barnum installé pour un événement professionnel" style="position:absolute;inset:0;object-position:center 60%" fetchpriority="high"><div class="tx" style="background:linear-gradient(90deg,#14253af2 12%,#14253ab0 50%,#14253a55);width:100%"><div class="crumb"><a href="/">Accueil</a> › <b>Événements professionnels</b></div><h1 style="max-width:11em">Le matériel de vos événements <em>professionnels</em></h1><p class="sub" style="max-width:520px">Entreprises, associations, collectivités : nous livrons, installons et reprenons. Devis sous 24 h, facture à votre nom.</p><div><a class="btn b1" href="reservation.html?demande=devis">Demander un devis</a></div></div></section>'''
+    hero = f'''<section class="hero" style="grid-template-columns:1fr;min-height:min(620px,86vh)"><img src="barnum-situation.webp" alt="Barnum installé pour un événement professionnel" style="position:absolute;inset:0;object-position:center 60%" fetchpriority="high"><div class="tx" style="background:linear-gradient(90deg,#14253af2 12%,#14253ab0 50%,#14253a55);width:100%"><div class="crumb"><a href="/">Accueil</a> › <b>Événements professionnels</b></div><h1 style="max-width:11em">Le matériel de vos événements <em>professionnels</em></h1><p class="sub" style="max-width:520px">Organisation d'événements professionnels, location de matériel et prestations : nous livrons, installons et reprenons. Devis sous 24 h, facture à votre nom.</p><div><a class="btn b1" href="reservation.html?demande=devis">Demander un devis</a></div></div></section>'''
     logos = f'<section class="sec center" style="padding-block:clamp(70px,10vw,130px) clamp(50px,7vw,90px)"><span class="lab">Ils nous ont fait confiance</span><h2 class="t">Entreprises, associations, <em>collectivités</em></h2><div class="mq logos" style="margin-top:44px"><div class="tr">{lg}{lg}</div></div></section>'
     events = f'<section class="sec g"><span class="lab">Vos événements</span><h2 class="t">Du séminaire à <em>la fête de fin d\'année</em></h2><div class="car" data-auto id="vpe" style="margin-top:22px">{evc}</div></section>'
     big = '''<section class="sec n"><div class="big2"><div><h2>Nous organisons.<em>Vous profitez de votre événement.</em></h2><p style="color:#ffffffc4;margin-top:22px;max-width:46ch">Du matériel, mais aussi l'organisation de votre événement et les bons intervenants : nous vous accompagnons de A à Z, selon vos besoins.</p></div><div class="tiles"><div><i>⚙</i><p><b>Installé et repris</b><span>aux horaires convenus</span></p></div><div><i>✎</i><p><b>Devis sous 24 h</b><span>prix ferme, livraison détaillée</span></p></div><div><i>€</i><p><b>Facture à votre nom</b><span>société ou association, virement</span></p></div><div><i>◎</i><p><b>Voir avant de choisir</b><span>à Vitré, sur rendez-vous</span></p></div></div></div></section>'''
     devis = '<section class="sec"><span class="lab">Obtenir un devis</span><h2 class="t">Trois informations <em>suffisent</em></h2><div class="strip3"><div><i>1</i><p><b>La date</b><span>de votre événement</span></p></div><div><i>2</i><p><b>Le lieu</b><span>pour calculer la livraison</span></p></div><div><i>3</i><p><b>Le nombre de personnes</b><span>pour choisir le bon matériel</span></p></div></div><div class="cl"><span>Vous recevez un devis détaillé sous 24 h.</span><a class="btn b1" href="reservation.html?demande=devis">Demander un devis professionnel</a></div></section>'
     faqs = f'<section class="sec g"><span class="lab">Questions de professionnels</span><h2 class="t">Avant de <em>commander</em></h2><div style="margin-top:22px">{det}</div></section>'
     zones = f'<section class="sec"><span class="lab">Où nous livrons</span><h2 class="t">Toutes les villes desservies <em>et bien plus !</em></h2><div class="mq" style="margin-top:34px"><div class="tr">{villes}{villes}</div></div></section>'
-    main = prefix_classes(hero + logos + events) + best + prefix_classes(big) + prefix_classes(az_block({'slug': 'pro', 'name': 'votre entreprise'})) + prefix_classes(devis + faqs + zones)
-    title = "Location de matériel événementiel pour entreprises et collectivités | Vespra Event"
-    desc = "Matériel pour séminaires, inaugurations, soirées d'entreprise et événements d'associations : livraison, installation, reprise, devis sous 24 h, facture à votre nom."
+    main = prefix_classes(hero + logos + events) + best + prefix_classes(big) + prefix_classes(az_block({'slug': 'pro', 'name': 'votre entreprise'}, 'pro')) + prefix_classes(devis + faqs + zones)
+    title = "Organisation d'événements professionnels et location de matériel | Vespra Event"
+    desc = "Organisation d'événements professionnels : séminaires, inaugurations, soirées. Location de matériel, prestations et intervenants. Devis sous 24 h."
     d = {'name': 'Événements professionnels', 'slug': 'evenements-pro'}
     ld = ld_graph(d, url, 'Matériel événementiel pour les professionnels', faq)
     head, foot = head_for(title, desc, url, ld, 'barnum-situation.webp')
