@@ -342,3 +342,9 @@ html body .hx-d{width:8px;height:8px;border-radius:99px;border:0;padding:0;backg
 html body .hx-d.hx-don{width:26px;background:#fff}
 @media(max-width:700px){html body .hx{margin:8px;border-radius:20px;min-height:420px}html body .hx-sub{font-size:14px}html body .hx-s:before{background:linear-gradient(0deg,rgba(12,15,20,.94) 20%,rgba(12,15,20,.55) 70%,rgba(12,15,20,.25))}html body .hx-s{align-items:flex-end}html body .hx-c{padding:24px 20px 56px}}
 @media(prefers-reduced-motion:reduce){html body .hx-s,html body .hx-s.hx-on{transition:none}html body .hx-s.hx-on .hx-c>*{animation:none}}
+
+/* Bouton seul dans une entête : petit, jamais étiré sur toute la largeur */
+@media(max-width:480px){
+  html body :is(.hero-cta,.hs-cta,.hx-cta)>*:only-child{flex:0 0 auto!important;width:auto!important;max-width:100%;padding:11px 18px!important;font-size:11px!important}
+  html body .hx-cta .hs-btn{padding:11px 18px;font-size:11px}
+}
