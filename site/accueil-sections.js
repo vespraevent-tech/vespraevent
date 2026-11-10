@@ -121,14 +121,13 @@ function carrousel(o){
   /* souris posée dessus ou doigt posé : le défilement s'arrête, il reprend peu après */
   wrap.addEventListener('pointerenter',function(e){if(e.pointerType==='mouse'){enPause=true;clearTimeout(rep);}});
   wrap.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')pause(350);});
-  wrap.addEventListener('touchstart',function(){enPause=true;clearTimeout(rep);},{passive:true});
-  ['touchend','touchcancel'].forEach(function(ev){wrap.addEventListener(ev,function(){pause(1600);},{passive:true});});
+
   prev&&prev.addEventListener('click',function(){pause(1200);wrap.scrollBy({left:-Math.max(240,wrap.clientWidth*.82),behavior:'smooth'});});
   next&&next.addEventListener('click',function(){pause(1200);wrap.scrollBy({left:Math.max(240,wrap.clientWidth*.82),behavior:'smooth'});});
   var reduit=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
   function image(t){
     if(!wrap.isConnected){return;}
-    if(enPause||!visible||document.hidden){dernier=t;rafId=requestAnimationFrame(image);return;}
+    if(enPause||!visible||document.hidden||(window.__vespraPopup&&window.__vespraPopup())){dernier=t;rafId=requestAnimationFrame(image);return;}
     if(!dernier)dernier=t;var dt=Math.min(100,t-dernier)/1000;dernier=t;reste+=VIT*dt;var pas=Math.floor(reste);
     if(pas>0){reste-=pas;wrap.scrollLeft+=pas;var m=track.scrollWidth/2;if(m>0&&wrap.scrollLeft>=m)wrap.scrollLeft-=m;attendu=wrap.scrollLeft;}
     rafId=requestAnimationFrame(image);
@@ -163,10 +162,9 @@ function defile(w,cards,copies,vit){
  function arret(ms){pause=Date.now()+ms;}
  w.addEventListener('pointerenter',function(e){if(e.pointerType==='mouse')tient=true;});
  w.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse'){tient=false;arret(350);}});
- w.addEventListener('touchstart',function(){tient=true;},{passive:true});
- ['touchend','touchcancel'].forEach(function(ev){w.addEventListener(ev,function(){tient=false;arret(1600);},{passive:true});});
+
  var tx=0,ty=0;
- w.addEventListener('touchstart',function(e){var t=e.touches[0];tx=t.clientX;ty=t.clientY;arret(250);},{passive:true});
+ w.addEventListener('touchstart',function(e){var t=e.touches[0];tx=t.clientX;ty=t.clientY;},{passive:true});
  w.addEventListener('touchmove',function(e){var t=e.touches[0],dx=t.clientX-tx,dy=t.clientY-ty;if(Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy))arret(450);},{passive:true});
  w.addEventListener('wheel',function(e){if(Math.abs(e.deltaX)>Math.abs(e.deltaY))arret(450);},{passive:true});
  w.addEventListener('scroll',function(){if(Math.abs(w.scrollLeft-pose)>2)arret(450);pos=w.scrollLeft;pose=pos;boucle();},{passive:true});
@@ -177,7 +175,7 @@ function defile(w,cards,copies,vit){
  w.addEventListener('click',function(e){if(bouge){e.preventDefault();e.stopPropagation();bouge=false;}},true);
  w.addEventListener('dragstart',function(e){e.preventDefault();});
  function pas(t){var dt=Math.min(64,t-(last||t));last=t;
-  if(P&&!reduit&&!document.hidden&&!drag&&!tient&&Date.now()>=pause){var r=w.getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight){pos+=dt*vit;ecrire(pos);boucle();}}
+  if(P&&!reduit&&!document.hidden&&!drag&&!tient&&!(window.__vespraPopup&&window.__vespraPopup())&&Date.now()>=pause){var r=w.getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight){pos+=dt*vit;ecrire(pos);boucle();}}
   requestAnimationFrame(pas);}
  function init(){mesure();if(!P)return;ecrire(P);pos=P;requestAnimationFrame(pas);}
  if(document.readyState==='complete')init();else addEventListener('load',init);

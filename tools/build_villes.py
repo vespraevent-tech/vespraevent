@@ -119,7 +119,7 @@ def head_for(title, desc, url, ld, img='photobooth.webp'):
     return head, SCRIPTS + foot
 
 
-SCRIPTS = '<script src="/carrousel.js"></script>\n<script src="/nav-actif.js" defer></script>\n<script src="/accueil-sections.js?v=5" defer></script>\n<script src="/contact-bloc.js" defer></script>\n'
+SCRIPTS = '<script src="/carrousel.js"></script>\n<script src="/nav-actif.js" defer></script>\n<script src="/accueil-sections.js?v=6" defer></script>\n<script src="/contact-bloc.js" defer></script>\n'
 LB = None
 def local_business():
     global LB
@@ -341,7 +341,7 @@ def photobooth_page(d):
             'offers': [{'@type': 'Offer', 'name': nom, 'price': str(prix), 'priceCurrency': 'EUR', 'availability': 'https://schema.org/InStock', 'url': url} for nom, prix, _, _ in TIERS]}
     ld = ld_graph(d, url, f'Location de photobooth à {n}', faq, prod)
     head, foot = head_for(title, desc, url, ld)
-    body = f'<main class="v-pg">{main}</main>\n<script src="/ville-pages.js?v=1" defer></script>\n'
+    body = f'<main class="v-pg">{main}</main>\n<script src="/ville-pages.js?v=2" defer></script>\n'
     return head + body + foot
 
 
@@ -413,7 +413,7 @@ def materiel_page(d):
     desc = pick(sl, 'dscm', desc_opts)
     ld = ld_graph(d, url, f'Location de matériel événementiel à {n}', faq)
     head, foot = head_for(title, desc, url, ld, 'ambiance-soiree.webp')
-    return head + f'<main class="v-pg">{main}{cross}</main>\n<script src="/ville-pages.js?v=1" defer></script>\n' + foot
+    return head + f'<main class="v-pg">{main}{cross}</main>\n<script src="/ville-pages.js?v=2" defer></script>\n' + foot
 
 
 # ───────────────────────── page professionnels ─────────────────────────
@@ -453,7 +453,7 @@ def pro_page():
     d = {'name': 'Événements professionnels', 'slug': 'evenements-pro'}
     ld = ld_graph(d, url, 'Matériel événementiel pour les professionnels', faq)
     head, foot = head_for(title, desc, url, ld, 'barnum-situation.webp')
-    return head + f'<main class="v-pg">{main}</main>\n<script src="/ville-pages.js?v=1" defer></script>\n' + foot
+    return head + f'<main class="v-pg">{main}</main>\n<script src="/ville-pages.js?v=2" defer></script>\n' + foot
 
 
 # ───────────────────────── écriture ─────────────────────────

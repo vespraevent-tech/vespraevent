@@ -1976,7 +1976,7 @@ window.addEventListener('vespra-produits-ready',function(){
   cards.forEach(p=>{ const c=makeCard(p); c.setAttribute('aria-hidden','true'); track.appendChild(c); });
 
   function image(t){
-    if(enPause||!visible||document.hidden){ dernier=t; rafId=requestAnimationFrame(image); return; }
+    if(enPause||!visible||document.hidden||(window.__vespraPopup&&window.__vespraPopup())){ dernier=t; rafId=requestAnimationFrame(image); return; }
     if(!dernier) dernier=t;
     const dt=Math.min(100,t-dernier)/1000;
     dernier=t;
@@ -2011,8 +2011,7 @@ window.addEventListener('vespra-produits-ready',function(){
   /* souris posée dessus ou doigt posé : le défilement s'arrête, il reprend peu après le départ */
   wrap.addEventListener('pointerenter',e=>{ if(e.pointerType==='mouse'){ enPause=true; clearTimeout(repriseTimer); } });
   wrap.addEventListener('pointerleave',e=>{ if(e.pointerType==='mouse') pause(350); });
-  wrap.addEventListener('touchstart',()=>{ enPause=true; clearTimeout(repriseTimer); },{passive:true});
-  ['touchend','touchcancel'].forEach(ev=>wrap.addEventListener(ev,()=>pause(1600),{passive:true}));
+
   wrap.addEventListener('pointerdown',e=>{ if(e.pointerType==='mouse')pause(450); },{passive:true});
   let tx=0,ty=0;
   wrap.addEventListener('touchstart',e=>{ const t=e.touches[0]; tx=t.clientX; ty=t.clientY; },{passive:true});
@@ -2145,7 +2144,7 @@ const GOOGLE_REVIEWS=(window.VESPRA_AVIS_GOOGLE||[]).slice();
     const moitie=()=>track.scrollWidth/2;
 
     function image(t){
-      if(arret||!visible||document.hidden){dernier=t;rafId=requestAnimationFrame(image);return;}
+      if(arret||!visible||document.hidden||(window.__vespraPopup&&window.__vespraPopup())){dernier=t;rafId=requestAnimationFrame(image);return;}
       if(!dernier)dernier=t;
       const dt=Math.min(100,t-dernier)/1000; dernier=t;
       reste+=VITESSE*dt;
@@ -2167,10 +2166,9 @@ const GOOGLE_REVIEWS=(window.VESPRA_AVIS_GOOGLE||[]).slice();
     const stop=(ms)=>{arret=true;clearTimeout(rep);rep=setTimeout(()=>{arret=false;dernier=0},ms||450)};
     wrap.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'){arret=true;clearTimeout(rep)}});
     wrap.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')stop(350)});
-    wrap.addEventListener('touchstart',()=>{arret=true;clearTimeout(rep)},{passive:true});
-    ['touchend','touchcancel'].forEach(ev=>wrap.addEventListener(ev,()=>stop(1600),{passive:true}));
+
     let tx=0,ty=0;
-    wrap.addEventListener('touchstart',e=>{const t=e.touches[0];tx=t.clientX;ty=t.clientY;stop(250)},{passive:true});
+    wrap.addEventListener('touchstart',e=>{const t=e.touches[0];tx=t.clientX;ty=t.clientY},{passive:true});
     wrap.addEventListener('touchmove',e=>{const t=e.touches[0],dx=t.clientX-tx,dy=t.clientY-ty;if(Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy))stop(450)},{passive:true});
     wrap.addEventListener('wheel',e=>{if(Math.abs(e.deltaX)>Math.abs(e.deltaY))stop(450)},{passive:true});
     wrap.addEventListener('scroll',()=>{if(Math.abs(wrap.scrollLeft-attendu)>2)stop(450);attendu=wrap.scrollLeft},{passive:true});
@@ -3226,8 +3224,6 @@ html:root:root:root:root body .off-cta a.btn-w{background:#fff!important;backgro
   var tient=false,relache=0;
   box.addEventListener('pointerenter',function(e){if(e.pointerType==='mouse')tient=true});
   box.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')tient=false});
-  box.addEventListener('touchstart',function(){tient=true},{passive:true});
-  ['touchend','touchcancel'].forEach(function(ev){box.addEventListener(ev,function(){clearTimeout(relache);relache=setTimeout(function(){tient=false},2500)},{passive:true})});
   function auto(){clearInterval(t);t=setInterval(function(){
     if(tient||document.hidden)return;
     var r=box.getBoundingClientRect();if(r.bottom<0||r.top>innerHeight)return;
@@ -3275,8 +3271,8 @@ html:root:root:root:root:root body .lnk-fl{font-size:10.2px!important}
  html:root:root:root:root:root body .cart-btn,html:root:root:root:root:root body .reserver-btn{font-size:9.4px!important}
 }
 </style>
-<link rel="stylesheet" href="/coherence.css?v=16">
-<script src="/coherence.js?v=5" defer></script>
+<link rel="stylesheet" href="/coherence.css?v=17">
+<script src="/coherence.js?v=6" defer></script>
 
 <script>
 (function(){
@@ -3292,10 +3288,9 @@ function defile(w,cards,copies,vit){
  /* souris ou doigt posé sur la rangée : elle s'arrête, puis repart peu après */
  w.addEventListener('pointerenter',function(e){if(e.pointerType==='mouse')tient=true;});
  w.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse'){tient=false;arret(350);}});
- w.addEventListener('touchstart',function(){tient=true;},{passive:true});
- ['touchend','touchcancel'].forEach(function(ev){w.addEventListener(ev,function(){tient=false;arret(1600);},{passive:true});});
+
  var tx=0,ty=0;
- w.addEventListener('touchstart',function(e){var t=e.touches[0];tx=t.clientX;ty=t.clientY;arret(250);},{passive:true});
+ w.addEventListener('touchstart',function(e){var t=e.touches[0];tx=t.clientX;ty=t.clientY;},{passive:true});
  w.addEventListener('touchmove',function(e){var t=e.touches[0],dx=t.clientX-tx,dy=t.clientY-ty;if(Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy))arret(450);},{passive:true});
  w.addEventListener('wheel',function(e){if(Math.abs(e.deltaX)>Math.abs(e.deltaY))arret(450);},{passive:true});
  /* tout déplacement qui ne vient pas du défilement automatique (doigt, élan, trackpad, souris) le suspend un instant */
@@ -3308,7 +3303,7 @@ function defile(w,cards,copies,vit){
  w.addEventListener('click',function(e){if(bouge){e.preventDefault();e.stopPropagation();bouge=false;}},true);
  w.addEventListener('dragstart',function(e){e.preventDefault();});
  function pas(t){var dt=Math.min(64,t-(last||t));last=t;
-  if(P&&!reduit&&!document.hidden&&!drag&&!tient&&Date.now()>=pause){var r=w.getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight){pos+=dt*vit;ecrire(pos);boucle();}}
+  if(P&&!reduit&&!document.hidden&&!drag&&!tient&&!(window.__vespraPopup&&window.__vespraPopup())&&Date.now()>=pause){var r=w.getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight){pos+=dt*vit;ecrire(pos);boucle();}}
   requestAnimationFrame(pas);}
  function init(){mesure();if(!P)return;ecrire(P);pos=P;requestAnimationFrame(pas);}
  if(document.readyState==='complete')init();else addEventListener('load',init);
