@@ -65,7 +65,18 @@ html body .bc{transition:transform .4s cubic-bezier(.2,.7,.2,1),box-shadow .4s c
 }
 html body .bc-add{transition:background .3s,color .3s,transform .3s}
 
-
+/* D. Chiffres clés : bloc en verre dépoli sur le hero */
+html body .hero-proof{position:absolute;z-index:3;right:32px;bottom:32px;display:flex;
+  background:rgba(255,255,255,.14);backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);
+  border:1px solid rgba(255,255,255,.28);border-radius:22px;color:#fff;pointer-events:none}
+html body .hero-proof div{padding:16px 26px;text-align:center;border-right:1px solid rgba(255,255,255,.25)}
+html body .hero-proof div:last-child{border-right:0}
+html body .hero-proof b{display:block;font:400 32px/1 'Bebas Neue',sans-serif;letter-spacing:.02em}
+html body .hero-proof span{display:block;margin-top:4px;font-size:12px;color:rgba(255,255,255,.85);white-space:nowrap}
+/* Reste à droite et compact à toutes les largeurs (jamais pleine largeur) */
+@media(max-width:960px){html body .hero-proof{right:14px;bottom:52px;border-radius:16px}html body .hero-proof div{padding:10px 14px}html body .hero-proof b{font-size:24px}html body .hero-proof span{font-size:10.5px}}
+@media(max-width:560px){html body .hero-proof{right:10px;bottom:46px;left:auto;width:auto;border-radius:14px}
+  html body .hero-proof div{padding:7px 10px}html body .hero-proof b{font-size:19px}html body .hero-proof span{font-size:9px;margin-top:2px}}
 
 /* Boutons côte à côte : une seule ligne tant que la largeur le permet */
 html body .hero-cta,html body .hs-cta,html body .off-cta,html body .cta-engage .cta-btns,html body .bests-cta{display:flex;flex-wrap:nowrap;justify-content:flex-start;align-items:center;gap:10px}
@@ -83,6 +94,7 @@ html body .hero-cta>*,html body .hs-cta>*,html body .off-cta>*,html body .cta-en
   html.mv [data-mv]{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1);transition-delay:var(--d,0s)}
   html.mv [data-mv].in{opacity:1;transform:none}
   /* pastille de chiffres : très légère flottaison */
+  html body .hero-proof{animation:mvfloat 7s ease-in-out infinite}
   @keyframes mvfloat{50%{transform:translateY(-4px)}}
   /* boutons : appui et reflet doux */
   html body .btn-p,html body .btn-w,html body .btn-o,html body .reserver-btn{transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s,background .3s,color .3s}
@@ -125,6 +137,8 @@ html body .bests-carousel .bc{backface-visibility:hidden}
 
 /* Pastille de chiffres : un peu plus grande sur petits écrans, toujours à droite et compacte */
 @media(max-width:560px){
+  html body .hero-proof{right:10px;bottom:44px;border-radius:16px}
+  html body .hero-proof div{padding:9px 12px}html body .hero-proof b{font-size:24px}html body .hero-proof span{font-size:10px}}
 @media(prefers-reduced-motion:no-preference){
 }
 
@@ -162,6 +176,7 @@ html.am-sombre :is(.vm-ov,.c-overlay,#devisPopup,.devis-popup,.pop-ov,.modal-ov)
 /* ===== Bandeau « Offre événement » : phrase d'accroche plus discrète ===== */
 html body .off-k{font-size:12px;letter-spacing:.14em;margin-bottom:12px;opacity:.9}
 @media(max-width:700px){html body .off-k{font-size:10.5px;letter-spacing:.12em;margin-bottom:10px}}
+html body .off-s .hero-proof{display:none}
 
 /* ===== Pop-ups : fenêtre d'ajout au devis, panier, notification ===== */
 html body :is(.vm-ov,.c-overlay){background:rgba(12,22,36,.45)!important;backdrop-filter:blur(10px) saturate(120%);-webkit-backdrop-filter:blur(10px) saturate(120%);transition:opacity .35s ease!important}
@@ -321,6 +336,7 @@ html body:has(.pr-in) .vcb{background:var(--g4,#F0F2F5);max-width:none;padding:1
 html body:has(.pr-in) .vcb-in{max-width:1080px;margin:0 auto}
 @media(max-width:700px){html body:has(.pr-in) .vcb{padding:10px 12px 32px}}
 
+/* Bloc « 5/5 · +1000 · 24H » supprimé partout */
 html body .hero-proof{display:none!important}
 
 /* « À louer en complément » sur téléphone : le carrousel va jusqu'aux bords, comme sur l'accueil */

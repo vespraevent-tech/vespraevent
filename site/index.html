@@ -1063,7 +1063,7 @@ transform:none!important;stroke-dashoffset:0!important}}
   <div class="faq-list">
     <div class="faq-item">
       <button class="faq-q" onclick="toggleFaq(this)">Comment est calculé le prix d'une location ?<span class="faq-icon">+</span></button>
-      <div class="faq-a"><div class="faq-a-inner">Nos tarifs couvrent toute la durée de votre événement, sans supplément : vous pouvez venir chercher le matériel dès le jeudi soir ou le vendredi et le rapporter le lundi ou le mardi, le prix ne change pas. Pour une location à la journée ou plus longue, contactez-nous directement pour un devis personnalisé.</div></div>
+      <div class="faq-a"><div class="faq-a-inner">Nos tarifs couvrent toute la durée de votre événement, sans supplément : vous pouvez venir chercher le matériel le vendredi et le rapporter le lundi, le prix ne change pas. Pour une location à la journée ou plus longue, contactez-nous directement pour un devis personnalisé.</div></div>
     </div>
     <div class="faq-item">
       <button class="faq-q" onclick="toggleFaq(this)">Faut-il réserver à l'avance ?<span class="faq-icon">+</span></button>
@@ -3160,7 +3160,7 @@ html body .powder-picker.open .powder-picker-card{transform:translateY(0);}
 .evc div{position:relative;z-index:1;padding:22px}.evc h3{font-size:21px;font-weight:700;line-height:1.2}.evc p{font-size:13px;color:rgba(255,255,255,.82);margin-top:6px;line-height:1.5}
 .off{position:relative;background:var(--navy);color:#fff;overflow:hidden}
 .off-box{position:relative;height:480px}
-.off-s{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;transform:translateX(100%);transition:transform .8s cubic-bezier(.4,0,.2,1)}
+.off-s{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;transform:translateX(100%);transition:transform .5s cubic-bezier(.4,0,.2,1)}
 .off-s.nt{transition:none!important}.off-s.on{transform:none}.off-s.prev{transform:translateX(-100%)}
 .off-s img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .off-s:before{content:"";position:absolute;inset:0;background:rgba(27,50,76,.78);z-index:1}
@@ -3209,6 +3209,13 @@ html:root:root:root:root body .off-cta a.btn-w{background:#fff!important;backgro
 <script>
 (function(){
   var box=document.getElementById('offBox'); if(!box)return;
+  /* ordre aléatoire des diapositives (et de leurs points) à chaque visite */
+  (function(){var ks=[].slice.call(box.querySelectorAll('.off-s')),ds=[].slice.call(document.querySelectorAll('#offDots button'));
+    if(ks.length<2||ks.length!==ds.length)return;
+    var idx=ks.map(function(_,i){return i});for(var i=idx.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),x=idx[i];idx[i]=idx[j];idx[j]=x}
+    ks.forEach(function(k){k.classList.remove('on','prev')});ds.forEach(function(d){d.classList.remove('on')});
+    idx.forEach(function(k){box.appendChild(ks[k]);ds[0].parentNode.appendChild(ds[k])});
+    box.querySelector('.off-s').classList.add('on');document.querySelector('#offDots button').classList.add('on');})();
   var sl=box.querySelectorAll('.off-s'),dots=document.querySelectorAll('#offDots button'),n=0,t;
   var mob=function(){return window.matchMedia('(max-width:700px)').matches};
   function marque(i){dots.forEach(function(d,k){d.classList.toggle('on',k===i)})}
@@ -3219,7 +3226,7 @@ html:root:root:root:root body .off-cta a.btn-w{background:#fff!important;backgro
     sl[n].classList.add('nt');sl[n].classList.remove('on','prev');void sl[n].offsetWidth;sl[n].classList.remove('nt');
     sl[o].classList.remove('on');sl[o].classList.add('prev');
     sl[n].classList.add('on');marque(n);
-    setTimeout(function(){if(o!==n){sl[o].classList.add('nt');sl[o].classList.remove('prev');void sl[o].offsetWidth;sl[o].classList.remove('nt');}},900);
+    setTimeout(function(){if(o!==n){sl[o].classList.add('nt');sl[o].classList.remove('prev');void sl[o].offsetWidth;sl[o].classList.remove('nt');}},650);
   }
   var tient=false,relache=0;
   box.addEventListener('pointerenter',function(e){if(e.pointerType==='mouse')tient=true});
@@ -3229,7 +3236,7 @@ html:root:root:root:root body .off-cta a.btn-w{background:#fff!important;backgro
     var r=box.getBoundingClientRect();if(r.bottom<0||r.top>innerHeight)return;
     if(mob()){var i=(Math.round(box.scrollLeft/box.clientWidth)+1)%sl.length;box.scrollTo({left:i*box.clientWidth,behavior:'smooth'})}
     else go((n+1)%sl.length);
-  },5000);}
+  },3200);}
   dots.forEach(function(b,i){b.addEventListener('click',function(){
     if(mob()){box.scrollTo({left:i*box.clientWidth,behavior:'smooth'})}else{go(i);auto();}
   })});
@@ -3271,7 +3278,7 @@ html:root:root:root:root:root body .lnk-fl{font-size:10.2px!important}
  html:root:root:root:root:root body .cart-btn,html:root:root:root:root:root body .reserver-btn{font-size:9.4px!important}
 }
 </style>
-<link rel="stylesheet" href="/coherence.css?v=17">
+<link rel="stylesheet" href="/coherence.css?v=18">
 <script src="/coherence.js?v=6" defer></script>
 
 <script>
