@@ -11,3 +11,17 @@
     setTimeout(function(){els.forEach(function(e){e.classList.add('in')})},6000); // filet de sécurité
   }catch(e){}
 })();
+
+/* Pastille de chiffres : un petit rebond à chaque changement de diapo du hero (contenu inchangé). */
+(function(){
+  try{
+    var hp=document.querySelector('.hero-proof'),h=document.getElementById('hero');
+    if(!hp||!h||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+    var t=0;
+    new MutationObserver(function(m){
+      if(!m.some(function(x){return x.target.classList&&x.target.classList.contains('hs-on')}))return;
+      clearTimeout(t);hp.classList.remove('mv-pulse');void hp.offsetWidth;hp.classList.add('mv-pulse');
+      t=setTimeout(function(){hp.classList.remove('mv-pulse')},1000);
+    }).observe(h,{attributes:true,attributeFilter:['class'],subtree:true});
+  }catch(e){}
+})();

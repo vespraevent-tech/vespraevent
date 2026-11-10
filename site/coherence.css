@@ -118,3 +118,55 @@ html body :is(.btn-p,.btn-w,.btn-o,.btn-submit,.reserver-btn,.cart-btn,.hero-cat
   html body :is(.btn-p,.btn-w,.btn-o,.reserver-btn,.cart-btn,button[type=submit]):active{transform:translateY(0) scale(.97)!important;box-shadow:none!important}
 }
 html body .lnk-fl{display:inline-flex;align-items:center;gap:8px}
+
+/* ===== Lot 2 : corrections et finitions ===== */
+
+/* Cartes « Meilleures locations » : la zone de défilement rognait l'ombre et le bas des cartes
+   (trait net en bas pendant le survol et le défilement). On lui laisse de la place autour. */
+html body .bests-carousel{padding-top:20px;padding-bottom:64px;margin-top:-20px;margin-bottom:-48px}
+html body .bests-carousel .bc{backface-visibility:hidden}
+
+/* Boutons : jamais de débordement. Sur petits écrans ils se partagent la largeur et le texte peut passer sur 2 lignes. */
+@media(max-width:480px){
+  html body :is(.hero-cta,.hs-cta,.off-cta,.cta-engage .cta-btns){width:100%;max-width:100%;flex-wrap:nowrap;gap:8px}
+  html body :is(.hero-cta,.hs-cta,.off-cta,.cta-engage .cta-btns)>*{flex:1 1 0!important;min-width:0!important;max-width:100%;white-space:normal!important;text-align:center;line-height:1.2;
+    padding:12px 8px!important;font-size:10.5px!important;letter-spacing:.03em!important;display:flex;align-items:center;justify-content:center}
+}
+@media(max-width:340px){html body :is(.hero-cta,.hs-cta,.off-cta,.cta-engage .cta-btns)>*{font-size:9.5px!important;padding:11px 6px!important}}
+
+/* Pastille de chiffres : un peu plus grande sur petits écrans, toujours à droite et compacte */
+@media(max-width:560px){
+  html body .hero-proof{right:10px;bottom:44px;border-radius:16px}
+  html body .hero-proof div{padding:9px 12px}html body .hero-proof b{font-size:24px}html body .hero-proof span{font-size:10px}}
+@media(prefers-reduced-motion:no-preference){
+  html body .hero-proof.mv-pulse{animation:mvpulse .9s cubic-bezier(.2,.7,.2,1),mvfloat 7s ease-in-out .9s infinite}
+  @keyframes mvpulse{0%{transform:translateY(0) scale(1)}35%{transform:translateY(-7px) scale(1.04)}100%{transform:translateY(0) scale(1)}}
+}
+
+/* Menu mobile : le panneau s'ouvre et se ferme en douceur, les liens arrivent l'un après l'autre */
+@media(max-width:960px){
+  html body .nav-links{display:flex!important;visibility:hidden;opacity:0;pointer-events:none;clip-path:inset(0 0 100% 0);
+    transition:clip-path .45s cubic-bezier(.2,.7,.2,1),opacity .3s ease,visibility 0s linear .45s}
+  html body .nav-links.open{visibility:visible;opacity:1;pointer-events:auto;clip-path:inset(0 0 0 0);
+    transition:clip-path .5s cubic-bezier(.2,.7,.2,1),opacity .25s ease,visibility 0s}
+  html body .nav-links>*{opacity:0;transform:translateY(-8px);transition:opacity .25s ease,transform .25s ease}
+  html body .nav-links.open>*{opacity:1;transform:none;transition:opacity .45s ease calc(var(--i,0)*.05s + .12s),transform .5s cubic-bezier(.2,.7,.2,1) calc(var(--i,0)*.05s + .12s)}
+  html body .nav-links>*:nth-child(1){--i:0}html body .nav-links>*:nth-child(2){--i:1}html body .nav-links>*:nth-child(3){--i:2}
+  html body .nav-links>*:nth-child(4){--i:3}html body .nav-links>*:nth-child(5){--i:4}html body .nav-links>*:nth-child(6){--i:5}
+  html body .nav-links>*:nth-child(n+7){--i:6}
+}
+@media(prefers-reduced-motion:reduce){html body .nav-links,html body .nav-links>*{transition:none!important}}
+
+/* Mode sombre : logos transparents. Les logos noirs (restaurés par le double filtre) restent noirs sur fond noir :
+   on les laisse suivre l'inversion de la page pour qu'ils passent en blanc. */
+html.am-sombre .trust-marquee-img[src*="t-logo-animal-trak"],
+html.am-sombre .trust-marquee-img[src*="t-logo-libre-inspi"],
+html.am-sombre .trust-marquee-img[src*="t-logo-viva-tattoo"]{filter:none!important;opacity:.85}
+html.am-sombre em.ac{filter:invert(1) hue-rotate(180deg)}
+
+/* ===== Animations saisonnières : calque sous l'en-tête, les fenêtres et les chiffres clés ===== */
+html body #am-calque,html body #hw-calque{z-index:90!important}
+html body .hero-proof{z-index:95}
+html body .nav{z-index:100}
+html body #am-calque *,html body #hw-calque *{pointer-events:none!important}
+@media(max-width:560px){html body #am-calque .am-coin,html body #hw-calque .hw-cit,html body #hw-calque .hw-cit2{transform-origin:bottom left;scale:.7}}
