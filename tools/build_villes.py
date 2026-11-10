@@ -59,7 +59,7 @@ def prefix_classes(block):
 
 def fee_label(d):
     if d['slug'] == 'vitre': return 'offerte'
-    return ('à partir de ' if d.get('plus') else '') + f"{d['fee']} €"
+    return 'sur devis'
 
 
 def dist_phrase(d):
@@ -67,14 +67,13 @@ def dist_phrase(d):
     if d['slug'] == 'vitre': return "Vitré est la ville de notre dépôt : le matériel part de chez nous, il n'y a pas de trajet à payer."
     if d.get('km'):
         return f"{n} est à {d['km']} km de notre dépôt de Vitré, soit environ {d['min']} de route."
-    return f"{n} fait partie de notre secteur de livraison autour de Vitré ({d.get('tranche', 'selon la distance')})."
+    return f"{n} fait partie de notre secteur de livraison autour de Vitré."
 
 
 def fee_phrase(d):
     n = d['name']
     if d['slug'] == 'vitre': return "La livraison et l'installation sont offertes à Vitré."
-    t = f" ({d['tranche']})" if d.get('tranche') else ''
-    return f"La livraison et l'installation à {n} sont facturées {fee_label(d)}{t}, aller-retour compris."
+    return f"La livraison et l'installation à {n} se font sur devis, selon la distance : le montant exact vous est communiqué avec votre devis."
 
 
 def voisins(d, n=14):
@@ -176,10 +175,9 @@ def steps_block(d, four=False):
 def faq_items(d, kind):
     n = d['name']; sl = d['slug']; com = d['communes']
     c3 = join_fr(com[:3]) if com else ''
-    tot = lambda p: (f"{p + d['fee']} €" if not d.get('plus') else f"{p + d['fee']} € environ") if d['slug'] != 'vitre' else f"{p} €"
     L = {}
     L['livre'] = (f"Livrez-vous à {n} ?", f"Oui. {dist_phrase(d)} {fee_phrase(d)}" + (" Vous pouvez aussi venir chercher le matériel au dépôt de Vitré." if sl != 'vitre' else " Vous pouvez aussi venir chercher le matériel au dépôt, 1 bis allée de la Haute Gasniais."))
-    L['cout'] = (f"Combien coûte la livraison à {n} ?", fee_phrase(d) + " Le montant exact figure sur votre devis, sans supplément ensuite." if sl != 'vitre' else "Elle est offerte à Vitré. Ailleurs, le tarif dépend de la distance : de 20 € (5 à 16 km) à 50 € et plus (80 km et plus).")
+    L['cout'] = (f"Combien coûte la livraison à {n} ?", fee_phrase(d) + " Aucun supplément ne s'ajoute ensuite." if sl != 'vitre' else "Elle est offerte à Vitré. Ailleurs, elle est sur devis, selon la distance.")
     if com:
         L['communes'] = (f"Livrez-vous aussi à {c3} ?", f"Oui, nous desservons tout le secteur de {n}, notamment {join_fr(com[:4])}. Indiquez-nous l'adresse de la salle et nous confirmons le tarif de livraison sous 24 heures.")
     if d.get('salles'):
@@ -187,7 +185,7 @@ def faq_items(d, kind):
     if d.get('domaines'):
         L['domaines'] = (f"Livrez-vous dans les domaines et châteaux près de {n} ?", f"Oui, par exemple {d['domaines']}. Indiquez le nom du lieu sur votre demande de devis : nous vérifions l'accès camion et le point de branchement électrique.")
     if kind == 'photobooth':
-        L['prix'] = (f"Quel est le prix d'un photobooth à {n}, livraison comprise ?", f"La location va de 130 € (numérique) à 420 € (tirages illimités). Avec la livraison à {n} ({fee_label(d)}), comptez de {tot(130)} à {tot(420)}." if sl != 'vitre' else "De 130 € (numérique) à 420 € (tirages illimités), livraison offerte à Vitré.")
+        L['prix'] = (f"Quel est le prix d'un photobooth à {n} ?", f"La location va de 130 € (numérique) à 420 € (tirages illimités). La livraison à {n} est sur devis, selon la distance." if sl != 'vitre' else "De 130 € (numérique) à 420 € (tirages illimités), livraison offerte à Vitré.")
         L['photos'] = ("Les photos numériques sont-elles limitées ?", "Non, elles sont illimitées dans toutes les formules, disponibles par QR code et sur une galerie en ligne. Seul le nombre de tirages papier change.")
         L['format'] = ("Quels formats de tirage ?", "10 × 15 cm ou bandelette, au choix, selon la formule choisie.")
         L['duree'] = ("Pour combien de temps loue-t-on le photobooth ?", "La location court du vendredi au lundi (4 jours), pour un seul prix.")
@@ -239,9 +237,9 @@ def local_block(d, kind, flip=False):
     if sl == 'vitre':
         facts = '<div class="facts"><div><b>Offerte</b><span>livraison et installation</span></div><div><b>Dépôt</b><span>1 bis allée de la Haute Gasniais</span></div></div>'
     elif d.get('km'):
-        facts = f'<div class="facts"><div><b>{d["km"]} km</b><span>depuis notre dépôt de Vitré</span></div><div><b>{esc(d["min"])}</b><span>de route environ</span></div><div><b>{esc(fee_label(d))}</b><span>livraison et installation</span></div></div>'
+        facts = f'<div class="facts"><div><b>{d["km"]} km</b><span>depuis notre dépôt de Vitré</span></div><div><b>{esc(d["min"])}</b><span>de route environ</span></div><div><b>Possible</b><span>livraison, sur devis</span></div></div>'
     else:
-        facts = f'<div class="facts"><div><b>{esc(fee_label(d))}</b><span>livraison et installation</span></div><div><b>{esc(d.get("tranche", ""))}</b><span>depuis notre dépôt de Vitré</span></div></div>'
+        facts = '<div class="facts"><div><b>Possible</b><span>livraison, sur devis</span></div><div><b>Vitré</b><span>notre dépôt, à proximité</span></div></div>'
     com = d['communes']
     intro_opts = [
         f"{dist_phrase(d)} {fee_phrase(d)}",
@@ -285,7 +283,7 @@ def photobooth_page(d):
     subs = [
         f"Photos numériques illimitées, tirages en 10 secondes. <b>Dès 130 €</b> l'événement, {'livraison offerte à Vitré' if sl == 'vitre' else 'livré à ' + esc(n)}.",
         f"Le photobooth en bois de Vespra Event, livré à {esc(n)}" + (f" et dans les communes voisines : {esc(join_fr(com[:3]))}." if com else '.'),
-        (f"À {d['km']} km de notre dépôt, {esc(n)} est livrée en {esc(d['min'])}. Photobooth <b>dès 130 €</b>, installation comprise dans la livraison." if d.get('km') else f"Photobooth en bois <b>dès 130 €</b>, livré et installé à {esc(n)} : {esc(fee_label(d))} de livraison."),
+        (f"À {d['km']} km de notre dépôt, {esc(n)} est livrée en {esc(d['min'])}. Photobooth <b>dès 130 €</b>, livraison possible." if d.get('km') else f"Photobooth en bois <b>dès 130 €</b>, livraison possible à {esc(n)}."),
     ]
     sub = pick(sl, 'sub', subs)
     cards = ''
@@ -316,8 +314,8 @@ def photobooth_page(d):
     other = prefix_classes(other)
     title = f"Location photobooth à {n} dès 130 € | Vespra Event"
     desc_opts = [
-        f"Location de photobooth à {n} dès 130 € : photos numériques illimitées, tirages 10×15 ou bandelette. Livraison {fee_label(d)}, devis sous 24 h.",
-        f"Louez le photobooth en bois de Vespra Event à {n} : 5 formules de 130 à 420 €, cadre et déguisement en option. Livraison {fee_label(d)}.",
+        f"Location de photobooth à {n} dès 130 € : photos numériques illimitées, tirages 10×15 ou bandelette. Livraison possible, devis sous 24 h.",
+        f"Louez le photobooth en bois de Vespra Event à {n} : 5 formules de 130 à 420 €, cadre et déguisement en option. Livraison possible.",
         f"Photobooth à {n} pour mariage, anniversaire ou soirée : dès 130 €, photos illimitées, installation possible. Réponse sous 24 h."]
     desc = pick(sl, 'dsc', desc_opts)
     prod = {'@type': 'Product', 'name': f'Location de photobooth à {n}', 'brand': {'@type': 'Brand', 'name': 'Vespra Event'},
@@ -358,7 +356,7 @@ def materiel_page(d):
     flip = seed(sl, 'fm') % 2 == 0
     com = d['communes']
     subs = [
-        f"Photobooth, son, lumière, barnums, restauration, animations. {'Livraison offerte à Vitré.' if sl == 'vitre' else 'Livraison à ' + esc(n) + ' : ' + esc(fee_label(d)) + '.'}",
+        f"Photobooth, son, lumière, barnums, restauration, animations. {'Livraison offerte à Vitré.' if sl == 'vitre' else 'Livraison à ' + esc(n) + ' sur devis.'}",
         f"Tout le matériel de votre événement, livré à {esc(n)}" + (f" et à {esc(join_fr(com[:3]))}." if com else '.'),
         f"Du photobooth aux barnums, nous livrons et installons à {esc(n)} depuis notre dépôt de Vitré."]
     sub = pick(sl, 'subm', subs)
@@ -374,7 +372,7 @@ def materiel_page(d):
     apercu = best.replace('</div>\n  <div class="bests-shell">', '</div>\n  <p style="padding:0 clamp(16px,4vw,56px);margin:-10px 0 18px;max-width:74ch;color:#3D4452">' + esc(local_lead(d, 'le matériel')) + '</p>\n  <div class="bests-shell">', 1)
     evs = EVS_BLOCK
     inc_items = [
-        ('Livraison offerte à Vitré' if sl == 'vitre' else f'Livraison à {esc(n)}', ("Retrait possible au dépôt. Ailleurs, de 20 € à 50 € et plus selon la distance." if sl == 'vitre' else f"{esc(fee_phrase(d))}")),
+        ('Livraison offerte à Vitré' if sl == 'vitre' else f'Livraison à {esc(n)}', ("Retrait possible au dépôt. Ailleurs, la livraison est possible, sur devis." if sl == 'vitre' else f"{esc(fee_phrase(d))}")),
         ('Installation et reprise', "Nous installons et reprenons le matériel. Montage des barnums, de la tente étoile et de la buvette en option."),
         pick(sl, 'inc3', [('Suivi et assistance', 'Service client 7j/7, réponse à votre demande sous 24 h, assistance pendant votre événement.'), ('Un interlocuteur', 'Service client 7j/7 et un devis ferme sous 24 h, livraison détaillée.'), ('−10 % dès 5 produits', "La remise s'applique toute seule sur votre devis. Service client 7j/7.")])]
     inc = '<div class="inc">' + ''.join(f'<div><b>{t}</b><p>{p}</p></div>' for t, p in inc_items) + '</div>'
@@ -391,9 +389,9 @@ def materiel_page(d):
     cross = prefix_classes(f'<div class="cl" style="margin:36px 12px 10px"><span>Un photobooth pour votre événement à {esc(n)} ?</span><a class="lnk" href="location-photobooth-{sl}.html">Voir la location de photobooth à {esc(n)}</a></div>')
     title = f"Location de matériel événementiel à {n} | Vespra Event"
     desc_opts = [
-        f"Location de matériel événementiel à {n} : photobooth, sono, lumière, barnums, restauration. Livraison {fee_label(d)} depuis Vitré, devis sous 24 h.",
-        f"Louez photobooth, son, lumière, barnums et animations à {n}. Livraison et installation depuis Vitré ({fee_label(d)}). Devis gratuit sous 24 h.",
-        f"Tout le matériel de votre fête à {n} : barnums, tente étoile, photobooth, sonorisation, effets. Vespra Event livre à {n} dès {fee_label(d).replace('à partir de ', '')}."]
+        f"Location de matériel événementiel à {n} : photobooth, sono, lumière, barnums, restauration. Livraison {'offerte' if sl == 'vitre' else 'sur devis'}, devis sous 24 h.",
+        f"Louez photobooth, son, lumière, barnums et animations à {n}. Livraison et installation depuis Vitré, sur devis. Devis gratuit sous 24 h.",
+        f"Tout le matériel de votre fête à {n} : barnums, tente étoile, photobooth, sonorisation, effets. Vespra Event livre à {n} sur devis, réponse sous 24 h."]
     desc = pick(sl, 'dscm', desc_opts)
     ld = ld_graph(d, url, f'Location de matériel événementiel à {n}', faq)
     head, foot = head_for(title, desc, url, ld, 'ambiance-soiree.webp')
@@ -418,7 +416,7 @@ def pro_page():
     best = BESTS_BLOCK.replace('data-ids="p3,p8,p36,p9"', 'data-ids="' + ','.join(PRO_IDS) + '"').replace('bestsDem', 'bestsPro')
     best = re.sub(r'<h2 class="sec-h">.*?</h2>', '<h2 class="sec-h">CE QUE NOUS INSTALLONS<br>LE PLUS SOUVENT</h2>', best, flags=re.S).replace('Sur le secteur', 'Le matériel qui marque vos événements')
     faq = [("Pouvez-vous établir une facture au nom de notre entreprise ou association ?", "Oui. Dans le formulaire de demande, choisissez « Entreprise ou association » et indiquez la raison sociale, le SIRET et, si vous en avez un, le numéro de TVA. Le paiement se fait par virement."),
-           ("Livrez-vous en dehors de Vitré ?", "Oui, dans tout le grand Ouest : Ille-et-Vilaine, Mayenne, Côtes-d'Armor et Loire-Atlantique. La livraison est offerte à Vitré ; ailleurs, le tarif dépend de la distance et figure sur le devis."),
+           ("Livrez-vous en dehors de Vitré ?", "Oui, dans tout le grand Ouest : Ille-et-Vilaine, Mayenne, Côtes-d'Armor et Loire-Atlantique. La livraison est offerte à Vitré ; ailleurs, elle est possible sur devis."),
            ("Le matériel est-il monté et repris par vos soins ?", "Oui. Nous livrons, installons et reprenons le matériel après l'événement, aux horaires convenus avec vous."),
            ("Peut-on voir le matériel avant de réserver ?", "Oui, sur rendez-vous à Vitré, sans engagement."),
            ("Combien de temps pour recevoir un devis ?", "Nous répondons sous 24 heures, avec un prix ferme et la livraison détaillée.")]
