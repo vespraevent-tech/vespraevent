@@ -271,12 +271,6 @@ html body :is(.article-hero,.cta-engage,.hero,.off,.cat-hero,.dk,.footer,.ft) em
   html body .vm>.btn-p{width:calc(100% - 68px)!important;margin:10px 34px 30px;padding:18px!important;font-size:15px!important}
 }
 
-/* ===== Espacements compacts entre pastille, titre et contenu ===== */
-html body .hero-eye{margin-bottom:18px!important}
-html body .hero-h,html body .hero-slide:first-child .hero-h{margin-bottom:14px}
-html body .sec-tag{margin-bottom:12px}
-html body .sec-h{margin-bottom:var(--head-gap)}
-@media(max-width:560px){html body .hero-eye{margin-bottom:12px!important}}
 
 /* ===== Page « Prestations » (serveuse privée, chef pâtissier) : « À louer en complément » et « Questions fréquentes » ===== */
 html body .pr-more{margin-top:14px!important;gap:14px!important}
@@ -299,14 +293,6 @@ html body:has(.pr-in) .vcb{max-width:1128px;padding-left:24px;padding-right:24px
 html body:has(.pr-in) .pr{padding-bottom:12px}
 @media(max-width:700px){html body .pr-sec{border-radius:24px}html body:has(.pr-in) .vcb{padding-left:12px;padding-right:12px}}
 
-/* ===== En-têtes de toutes les pages : mêmes proportions que l'accueil ===== */
-html body :is(.hero:not(#hero),.cat-hero,.article-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero) :is(h1,.hero-h:not(.hs-t),.cat-hero-h,.faq-hero-h,.blog-hero-h,.art-h1){
-  font-size:clamp(40px,5.2vw,80px)!important;line-height:.92!important;letter-spacing:.01em;margin-bottom:14px!important}
-html body :is(.hero:not(#hero),.cat-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero) :is(.hero-eye,.cat-hero-tag,.faq-hero-tag,.blog-hero-tag,.res-hero-tag,.lg-tag){margin-bottom:14px!important}
-html body :is(.hero:not(#hero),.cat-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero) :is(.hero-sub,.cat-hero-sub,.faq-hero-sub,.blog-hero-sub,.res-hero-sub){font-size:16px!important;line-height:1.6!important;max-width:560px;margin-bottom:22px!important}
-html body .hero:not(#hero){min-height:clamp(340px,46vw,520px)}
-html body .hero:not(#hero) .hero-content{padding-block:clamp(36px,5vw,64px)}
-@media(max-width:640px){html body :is(.hero:not(#hero),.cat-hero,.article-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero) :is(h1,.hero-h:not(.hs-t),.cat-hero-h,.faq-hero-h,.blog-hero-h,.art-h1){font-size:clamp(34px,10.5vw,46px)!important}html body :is(.hero-sub,.cat-hero-sub,.faq-hero-sub,.blog-hero-sub){font-size:14px!important}}
 
 /* ===== En-tête défilant des pages (hero-defile.js) : même rendu que l'accueil ===== */
 html body .hx{position:relative;margin:12px 16px 0;border-radius:32px;overflow:hidden;background:#0C0F14;min-height:clamp(380px,44vw,520px);isolation:isolate}
@@ -364,9 +350,6 @@ html body .vm-variants,html body #vmOptions,html body #vmBody{min-width:0}
 html body .vm>.btn-p{max-width:calc(100% - 44px)!important}
 @media(min-width:900px){html body .vm>*{max-width:calc(100% - 68px)}html body .vm>.btn-p{max-width:calc(100% - 68px)!important}}
 
-/* En-tête de l'accueil : le contenu de chaque diapo est centré verticalement (plus de grand vide sous les boutons) */
-html body .hero-slide .hero-content{justify-content:center!important;min-height:0!important;height:100%}
-html body .hero-slide .hero-h.hs-t,html body .hero-slide:first-child .hero-h{min-height:0!important}
 
 /* ===== Fenêtre « Ajouter au devis » : bouton compact, centré, avec de l'air autour ===== */
 html body .vm{padding-bottom:0}
@@ -375,11 +358,3 @@ html body .vm{display:block}
 html body .vm>a.vmLink,html body .vm>#vmLink{text-align:center}
 @media(min-width:900px){html body .vm>.btn-p,html body .vm>.btn-submit{max-width:calc(100% - 68px)!important;margin:16px auto 34px!important;padding:16px 40px!important}}
 
-/* ===== Entêtes : hauteur raisonnable sur ordinateur (accueil et toutes les pages) ===== */
-@media(min-width:961px){
-  html body .hero{height:min(calc(100svh - 150px),620px)!important;min-height:480px!important}
-  html body .hero-slide .hero-content{padding-block:48px}
-  html body .hx{min-height:clamp(360px,34vw,470px)}
-  html body :is(.cat-hero,.article-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero){padding-top:48px!important;padding-bottom:48px!important}
-  html body .hero:not(#hero){min-height:clamp(320px,32vw,440px)!important;height:auto!important}
-}
