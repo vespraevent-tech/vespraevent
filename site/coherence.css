@@ -1,0 +1,42 @@
+/* Vespra Event — couche de cohérence visuelle (chargée en dernier).
+   Une seule règle pour : les marges latérales, le rythme vertical, les fonds alternés. */
+:root{
+  --edge:max(64px,calc((100% - 1312px)/2));   /* marge latérale commune à toutes les sections */
+  --sec-y:96px;                                /* hauteur d'air haut/bas d'une section */
+  --sec-y-sm:56px;                             /* bandeaux légers (confiance, recherches) */
+  --head-gap:40px;                             /* espace sous un titre de section */
+}
+@media(max-width:960px){:root{--edge:32px;--sec-y:72px;--sec-y-sm:44px;--head-gap:28px}}
+@media(max-width:560px){:root{--edge:20px;--sec-y:56px;--sec-y-sm:36px;--head-gap:22px}}
+
+/* 1. Même rythme vertical pour toutes les grandes sections */
+html body .evs,html body .bests,html body .blog,html body .reviews,
+html body .faq,html body .contact-section{padding-top:var(--sec-y);padding-bottom:var(--sec-y)}
+html body .trust,html body .rv{padding-top:var(--sec-y-sm);padding-bottom:var(--sec-y-sm)}
+html body .rf{padding-top:var(--sec-y-sm);padding-bottom:var(--sec-y-sm)}
+html body .cta-engage{padding-top:calc(var(--sec-y) * .8);padding-bottom:calc(var(--sec-y) * .8)}
+
+/* 2. Même bord gauche/droit : titres, cartes, carrousels, hero */
+html body .blog,html body .reviews,html body .faq,html body .contact-section,
+html body .cta-engage,html body .rv,html body .rf{padding-left:var(--edge);padding-right:var(--edge)}
+html body .evs-head,html body .bests-head,html body .bests-cta{padding-left:var(--edge);padding-right:var(--edge)}
+html body .bests-track{padding-left:var(--edge);padding-right:var(--edge)}
+html body .faq{max-width:none}
+html body .rv-in,html body .rf-in{max-width:none;margin:0;width:100%}
+html body .hero-content{padding-left:var(--edge)}
+
+/* 3. Même espace entre un titre de section et son contenu */
+html body .evs-head,html body .bests-head,html body .blog-head{margin-bottom:var(--head-gap)}
+html body .sec-h{margin-bottom:var(--head-gap)}
+html body .evs-head .sec-h,html body .bests-head .sec-h,html body .blog-head .sec-h{margin-bottom:0}
+html body .reviews-wrap,html body .contact-grid{margin-top:var(--head-gap)}
+
+/* 4. Fonds alternés : blanc / gris clair, sans deux sections grises collées */
+html body .rf{background:var(--white,#fff)}
+html body .contact-section{background:var(--g4,#F0F2F5)}
+
+/* Les anciennes règles « !important » de l'accueil fixaient 110px : on les remplace. */
+@media(min-width:701px){
+  html body .bests{padding-top:var(--sec-y)!important;padding-bottom:var(--sec-y)!important}
+  html body .blog{padding:var(--sec-y) var(--edge)!important}
+}

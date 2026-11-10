@@ -1,0 +1,284 @@
+/* ─────────────────────────────────────────────────────────────
+   Ajustements téléphone — Vespra Event
+
+   Le site s'adapte déjà à toutes les largeurs d'écran. Ce fichier ne
+   corrige qu'un point : quelques titres et prix restaient dimensionnés
+   pour l'ordinateur et paraissaient trop imposants sur un téléphone.
+
+   Rien n'est modifié au-dessus de 560 px de large : l'affichage sur
+   tablette et sur ordinateur reste exactement le même qu'avant.
+   ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 560px) {
+
+  /* Titre d'accueil : la ville défile dedans, c'est l'accroche de la page,
+     elle garde donc une taille affirmée sur téléphone. */
+  /* Trois lignes bien remplies plutôt que cinq lignes courtes :
+     « VOTRE SPÉCIALISTE / DE LA LOCATION / À <ville> ». La taille est
+     calée sur la ligne la plus longue pour qu'aucune ne se coupe. */
+  .hero-h { font-size: clamp(27px, 8.8vw, 40px) !important; margin-bottom: 20px !important;
+            min-height: calc(3 * .92em) !important; }
+  .hero-h .hero-br-pc { display: none !important; }
+  .hero-h .hero-br-tel { display: inline !important; }
+  /* en bloc, la partie dorée tomberait seule à la ligne : elle doit
+     suivre « DE LA » sur la même ligne */
+  .hero-h em { display: inline !important; }
+  .hero-eye { margin-bottom: 14px !important; }
+
+  /* Les deux boutons du haut restent côte à côte sur une seule ligne :
+     le texte est réduit juste ce qu'il faut pour que « Demander un devis »
+     tienne dans son contour, même sur un écran de 320 px. */
+  .hero-cta { flex-direction: row !important; flex-wrap: nowrap !important; gap: 8px !important; }
+  .hero-cta .btn-p,
+  .hero-cta .btn-o {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    width: auto !important;
+    padding: 11px 14px !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+
+  /* Titres de section */
+  .sec-h,
+  .prods-section .sec-h,
+  .why .sec-h,
+  .cta-engage h2 { font-size: clamp(24px, 6.8vw, 30px) !important; }
+
+  /* Fiches produit : le prix principal était fixé à 52 px, quelle que
+     soit la largeur de l'écran. */
+  .prod-title { font-size: clamp(26px, 7.6vw, 34px) !important; }
+  .prod-article h2 { font-size: 25px !important; margin-top: 28px !important; }
+  .prod-article h3 { font-size: 19px !important; }
+  .prod-price-main { font-size: 38px !important; }
+  .prod-price-main small { font-size: 16px !important; }
+
+  /* Articles de blog */
+  .art-h1 { font-size: clamp(26px, 7.6vw, 34px) !important; }
+  .art-main h2 { font-size: 25px !important; margin-top: 30px !important; }
+  .art-main h3 { font-size: 19px !important; }
+  .related h2,
+  .art-cta h2 { font-size: 28px !important; }
+
+  /* Pages « villes » et pages d'information : mêmes titres surdimensionnés */
+  .ville-h1, .zone-h1, .page-h1 { font-size: clamp(26px, 7.6vw, 34px) !important; }
+
+  /* Notices */
+  .notices-h1, .nc-title { font-size: clamp(24px, 7vw, 32px) !important; }
+
+  /* Zones tactiles : liens du fil d'Ariane et du pied de page trop fins
+     pour être visés au doigt (recommandation Apple/Google : 44 px). */
+  .breadcrumb a,
+  .foot-link,
+  .hdr-back { display: inline-block; padding: 6px 0 !important; }
+}
+
+/* Très petits téléphones (iPhone SE et équivalents) */
+@media (max-width: 360px) {
+  /* le titre garde la formule des autres téléphones : trois lignes pleines */
+  .prod-price-main { font-size: 34px !important; }
+  /* « Demander un devis » est le plus long des deux libellés : c'est lui
+     qui fixe la taille à laquelle les deux boutons tiennent sur une ligne. */
+  .hero-cta .btn-p,
+  .hero-cta .btn-o { font-size: 11px !important; padding: 11px 10px !important; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   RYTHME VERTICAL SUR TÉLÉPHONE
+
+   D'une page à l'autre, les sections respiraient entre 12 et 64 px :
+   la page d'accueil à 40, les zones de livraison à 52, la FAQ à 56,
+   la grille du catalogue à 20 en haut et 56 en bas. Vu au doigt, cela
+   donnait des blocs tantôt serrés tantôt flottants.
+
+   Une seule échelle maintenant, et elle ne vaut qu'en dessous de
+   640 px — l'affichage sur ordinateur n'est pas touché :
+     • grande section        40 en haut, 40 en bas  (80 entre deux)
+     • bande compacte        24 / 24                (filtres, bandeaux
+                                                     défilants, liens)
+     • pied de page          40 / 40
+   Seule la hauteur est fixée : les marges latérales de chaque section
+   restent celles qu'elles avaient.
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+
+  .bests, .why, .why-section, .prods-section, .prod-section, .trust,
+  .reviews, .blog, .blog-main, .featured, .newsletter, .cta-engage,
+  .cta-section, .contact-section, .faq, .faq-content, .faq-cta,
+  .zones-section, .no-limits, .map-section, .tarifs-section,
+  .city-local, .city-mesh, .cat-grid-wrap, .catalogue-bottom-cta,
+  .cat-cta, .prod-video, .prod-article, .related, .prod-reviews,
+  .art-cta, .art-layout, .reco-section, .reco-partenaire, .vq, .rv,
+  .sv, .page-body {
+    padding-top: 40px !important;
+    padding-bottom: 40px !important;
+  }
+
+  /* bandes compactes : elles ponctuent la page, elles ne la découpent pas */
+  .rf, .rfv, .city-ticker, .filters, .rea-bar, .reco-intro {
+    padding-top: 24px !important;
+    padding-bottom: 24px !important;
+  }
+  /* la note d'aiguillage ouvre la page : elle reste collée au bandeau */
+  .reco-intro { padding-top: 22px !important; padding-bottom: 0 !important; }
+
+  /* bandeaux de tête des pages secondaires : haut et bas identiques */
+  .cat-hero, .blog-hero, .faq-hero, .article-hero, .res-hero {
+    padding-top: 40px !important;
+    padding-bottom: 40px !important;
+  }
+
+  footer { padding-top: 40px !important; padding-bottom: 40px !important; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CHAPÔ DES PAGES VILLES
+
+   Sous le titre, le paragraphe gris tenait quatre lignes, juste
+   avant les deux pastilles de livraison : trois blocs de texte
+   empilés avant le bouton. Il est réduit, pas supprimé — c'est lui
+   qui dit ce que nous faisons dans la commune.
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .hero-sub {
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    margin-bottom: 18px !important;
+    color: rgba(255,255,255,.55) !important;
+  }
+  .tarif-badges { gap: 8px !important; margin-bottom: 20px !important; }
+  .tarif-badge { font-size: 12px !important; padding: 7px 14px !important; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   FIN DES ARTICLES SUR TÉLÉPHONE
+
+   Les encarts produits sous l'article étaient dimensionnés pour la
+   colonne de droite de l'ordinateur : nom à 20 px, prix à 22 px.
+   Passés en pleine largeur sur téléphone, ils écrasaient tout.
+   Et un grand vide les séparait des deux boutons du catalogue.
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .sp-body { padding: 16px 16px 18px !important; }
+  .sp-name { font-size: 16px !important; margin-bottom: 6px !important; }
+  .sp-price { font-size: 17px !important; margin-bottom: 3px !important; }
+  .sp-desc { font-size: 12.5px !important; line-height: 1.55 !important;
+             margin-bottom: 14px !important; }
+  .sp-cat { margin-bottom: 6px !important; }
+  .sidebar-product { margin-bottom: 14px !important; }
+  .sidebar-product .btn-gold { padding: 10px 16px !important; font-size: 12.5px !important; }
+
+  /* l'article et sa colonne produits se terminent au ras des boutons */
+  .art-layout { gap: 26px !important; padding-bottom: 20px !important; }
+  .catalogue-bottom-cta { padding-top: 6px !important; padding-bottom: 26px !important;
+                          margin: 0 auto !important; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TITRES DES ARTICLES SUR TÉLÉPHONE
+
+   Les titres portent des retours à la ligne écrits pour l'ordinateur
+   (« GENDER REVEAL : / COMMENT RÉUSSIR / LA RÉVÉLATION ? »). Sur un
+   écran étroit, ils imposaient trois lignes là où deux suffisent.
+   On laisse le texte se répartir tout seul, un cran plus petit, et
+   le navigateur équilibre les lignes.
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .art-h1 br { display: none; }
+  .art-h1 {
+    font-size: clamp(23px, 7vw, 34px) !important;
+    line-height: .98 !important;
+    text-wrap: balance;
+    /* « D'ENTREPRISE », « RASSEMBLEMENT » : un mot long doit pouvoir
+       se couper plutôt que dépasser du bord de l'écran */
+    overflow-wrap: break-word;
+    margin-bottom: 16px !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   PIED DE PAGE — deux rubriques dans la même colonne
+
+   « Société » ne garde que les pages légales ; « Informations »,
+   juste en dessous, rassemble les lieux de réception, les
+   prestataires, la FAQ et le parrainage. Les espacements sont
+   resserrés pour que le pied de page ne s'allonge pas, et les
+   liens passent sur deux colonnes sur téléphone plutôt qu'en
+   une seule longue file.
+   ───────────────────────────────────────────────────────────── */
+/* « Informations » est une rubrique à part entière : l'espace qui la
+   sépare du dernier lien de « Société » doit se voir tout de suite,
+   sinon les deux listes se lisent comme une seule. */
+.ft-col h4.ft-h4-suite{margin-top:36px}
+.ft-col li{margin-bottom:8px}
+.ft-col h4{margin-bottom:14px}
+.ft{gap:36px 32px;padding-bottom:40px;margin-bottom:26px}
+
+@media (max-width: 960px) and (min-width: 561px){
+  /* trois colonnes deviennent deux : les rubriques restent lisibles */
+  .ft{gap:30px 26px}
+}
+
+@media (max-width: 560px){
+  /* La marque occupe toute la largeur, les listes se partagent
+     l'écran en deux : le pied de page tient alors sur un écran au
+     lieu de trois. */
+  footer{padding:36px 18px 26px}
+  /* La marque en haut sur toute la largeur ; en dessous, deux colonnes
+     équilibrées : « Société » et « Informations » à gauche, les deux
+     autres rubriques l'une sous l'autre à droite. */
+  .ft{display:grid;grid-template-columns:1fr 1fr;gap:24px 16px;
+      padding-bottom:26px;margin-bottom:20px;align-items:start}
+  .ft > :first-child{grid-column:1 / -1}
+  .ft > :nth-child(2){grid-column:1;grid-row:2}
+  .ft > :nth-child(3){grid-column:1;grid-row:3}
+  .ft > :nth-child(4){grid-column:2;grid-row:2}
+  .ft > :nth-child(5){grid-column:2;grid-row:3}
+  .ft-desc{font-size:12.5px}
+  .ft-col h4{font-size:10px;margin-bottom:10px;letter-spacing:.1em}
+  .ft-col h4.ft-h4-suite{margin-top:28px}
+  .ft-col li{margin-bottom:7px}
+  .ft-col a{font-size:13px;line-height:1.45;display:inline-block}
+  .ft-contact a{font-size:13.5px}
+  .ft-social{margin-top:14px}
+  .ft-social a{width:34px;height:34px}
+  .ft-bot{font-size:11.5px}
+}
+
+@media (max-width: 359px){
+  /* écrans très étroits : une seule colonne, sinon les intitulés
+     se coupent au milieu d'un mot */
+  .ft{grid-template-columns:1fr;gap:20px}
+  .ft > :nth-child(2),.ft > :nth-child(3),.ft > :nth-child(4){grid-column:1;grid-row:auto}
+}
+
+/* ── Page parrainage : le bouton clair sur fond bleu ──────────
+   La règle générale .pr-btn:hover l'emportait sur la variante
+   claire : au survol, le fond redevenait bleu marine alors que le
+   texte l'était déjà, et le libellé disparaissait. */
+.pr-btn.pr-btn-clair:hover:not(:disabled),
+.pr-btn.pr-btn-clair:focus-visible{
+  background:var(--g4,#F0F2F5);
+  color:var(--navy,#2B4A6B);
+}
+
+/* Pied de page : cinq colonnes équilibrées (marque, Informations,
+   Société, locations favorites, zone desservie). */
+html body .ft{grid-template-columns:1.25fr 1.05fr 1.2fr 1.15fr 1fr;gap:36px 28px}
+@media (max-width:1100px) and (min-width:761px){
+  html body .ft{grid-template-columns:repeat(4,1fr)}
+  html body .ft > :first-child{grid-column:1 / -1}
+  html body .ft-desc{max-width:560px}
+}
+@media (max-width:760px) and (min-width:561px){
+  html body .ft{grid-template-columns:1fr 1fr}
+  html body .ft > :first-child{grid-column:1 / -1}
+}
+@media (max-width:560px){html body .ft{grid-template-columns:1fr 1fr;gap:24px 16px}}
+@media (max-width:359px){
+  html body .ft{grid-template-columns:1fr;gap:20px}
+  html body .ft > *{grid-column:1 !important;grid-row:auto !important}
+}

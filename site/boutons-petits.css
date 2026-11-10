@@ -1,0 +1,141 @@
+/* Boutons en majuscules : texte un cran plus petit sur tout le site */
+html:root:root:root:root:root:root:root body .btn-add-cart,html:root:root:root:root:root:root:root body .btn-cta,html:root:root:root:root:root:root:root body .btn-dl,html:root:root:root:root:root:root:root body .btn-gold,html:root:root:root:root:root:root:root body .btn-nl,html:root:root:root:root:root:root:root body .btn-o,html:root:root:root:root:root:root:root body .btn-p,html:root:root:root:root:root:root:root body .btn-submit,html:root:root:root:root:root:root:root body .btn-view,html:root:root:root:root:root:root:root body .btn-w,html:root:root:root:root:root:root:root body .c-checkout,html:root:root:root:root:root:root:root body .catalogue-bottom-btn,html:root:root:root:root:root:root:root body .ch-btn,html:root:root:root:root:root:root:root body .cn-ajouter,html:root:root:root:root:root:root:root body .cn-suivant,html:root:root:root:root:root:root:root body .ez-btn,html:root:root:root:root:root:root:root body .featured-link,html:root:root:root:root:root:root:root body .lg-dl,html:root:root:root:root:root:root:root body .nl-btn,html:root:root:root:root:root:root:root body .pa-btn,html:root:root:root:root:root:root:root body .pm-send,html:root:root:root:root:root:root:root body .pr-btn,html:root:root:root:root:root:root:root body .pr-submit,html:root:root:root:root:root:root:root body .pro-b1,html:root:root:root:root:root:root:root body .pro-b2,html:root:root:root:root:root:root:root body .rdv-b,html:root:root:root:root:root:root:root body .re-next-btn,html:root:root:root:root:root:root:root body .rv-b,html:root:root:root:root:root:root:root body .va-btn,html:root:root:root:root:root:root:root body .vh-a,html:root:root:root:root:root:root:root body .home-form-catalogue-download,html:root:root:root:root:root:root:root body .devis-success-home{font-size:9.4px!important}
+html:root:root:root:root:root:root:root body .cart-btn,html:root:root:root:root:root:root:root body .reserver-btn,html:root:root:root:root:root:root:root body .nav-reserver-mobile{font-size:9.4px!important}
+@media(max-width:700px){
+html:root:root:root:root:root:root:root body .btn-add-cart,html:root:root:root:root:root:root:root body .btn-cta,html:root:root:root:root:root:root:root body .btn-dl,html:root:root:root:root:root:root:root body .btn-gold,html:root:root:root:root:root:root:root body .btn-nl,html:root:root:root:root:root:root:root body .btn-o,html:root:root:root:root:root:root:root body .btn-p,html:root:root:root:root:root:root:root body .btn-submit,html:root:root:root:root:root:root:root body .btn-view,html:root:root:root:root:root:root:root body .btn-w,html:root:root:root:root:root:root:root body .c-checkout,html:root:root:root:root:root:root:root body .catalogue-bottom-btn,html:root:root:root:root:root:root:root body .ch-btn,html:root:root:root:root:root:root:root body .cn-ajouter,html:root:root:root:root:root:root:root body .cn-suivant,html:root:root:root:root:root:root:root body .ez-btn,html:root:root:root:root:root:root:root body .featured-link,html:root:root:root:root:root:root:root body .lg-dl,html:root:root:root:root:root:root:root body .nl-btn,html:root:root:root:root:root:root:root body .pa-btn,html:root:root:root:root:root:root:root body .pm-send,html:root:root:root:root:root:root:root body .pr-btn,html:root:root:root:root:root:root:root body .pr-submit,html:root:root:root:root:root:root:root body .pro-b1,html:root:root:root:root:root:root:root body .pro-b2,html:root:root:root:root:root:root:root body .rdv-b,html:root:root:root:root:root:root:root body .re-next-btn,html:root:root:root:root:root:root:root body .rv-b,html:root:root:root:root:root:root:root body .va-btn,html:root:root:root:root:root:root:root body .vh-a,html:root:root:root:root:root:root:root body .home-form-catalogue-download,html:root:root:root:root:root:root:root body .devis-success-home{font-size:8.4px!important}
+html:root:root:root:root:root:root:root body .cart-btn,html:root:root:root:root:root:root:root body .reserver-btn,html:root:root:root:root:root:root:root body .nav-reserver-mobile{font-size:9.4px!important}
+}
+
+
+html:root:root:root:root:root:root:root:root:root body .btn-add-cart,html:root:root:root:root:root:root:root:root:root body #vmOv .btn-submit{font-size:11px!important;letter-spacing:.07em!important}
+
+/* Appui long sur un produit : le téléphone ne doit pas sélectionner un mot
+   (« rouge » proposé à la recherche Google) ; un appui ouvre simplement le produit. */
+.prod-card,.prod-card *,.pc,.pc *,.rel-card,.rel-card *,.pcard,.pcard *,.col-chip,.fo-card,.fo-card *,button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+
+/* Téléphone : tous les boutons à 11 px */
+@media(max-width:700px){
+html:root:root:root:root:root:root:root:root:root body .btn-add-cart,html:root:root:root:root:root:root:root:root:root body .btn-cta,html:root:root:root:root:root:root:root:root:root body .btn-dl,html:root:root:root:root:root:root:root:root:root body .btn-gold,html:root:root:root:root:root:root:root:root:root body .btn-nl,html:root:root:root:root:root:root:root:root:root body .btn-o,html:root:root:root:root:root:root:root:root:root body .btn-p,html:root:root:root:root:root:root:root:root:root body .btn-submit,html:root:root:root:root:root:root:root:root:root body .btn-view,html:root:root:root:root:root:root:root:root:root body .btn-w,html:root:root:root:root:root:root:root:root:root body .c-checkout,html:root:root:root:root:root:root:root:root:root body .catalogue-bottom-btn,html:root:root:root:root:root:root:root:root:root body .ch-btn,html:root:root:root:root:root:root:root:root:root body .cn-ajouter,html:root:root:root:root:root:root:root:root:root body .cn-suivant,html:root:root:root:root:root:root:root:root:root body .ez-btn,html:root:root:root:root:root:root:root:root:root body .featured-link,html:root:root:root:root:root:root:root:root:root body .lg-dl,html:root:root:root:root:root:root:root:root:root body .nl-btn,html:root:root:root:root:root:root:root:root:root body .pa-btn,html:root:root:root:root:root:root:root:root:root body .pm-send,html:root:root:root:root:root:root:root:root:root body .pr-btn,html:root:root:root:root:root:root:root:root:root body .pr-submit,html:root:root:root:root:root:root:root:root:root body .pro-b1,html:root:root:root:root:root:root:root:root:root body .pro-b2,html:root:root:root:root:root:root:root:root:root body .rdv-b,html:root:root:root:root:root:root:root:root:root body .re-next-btn,html:root:root:root:root:root:root:root:root:root body .rv-b,html:root:root:root:root:root:root:root:root:root body .va-btn,html:root:root:root:root:root:root:root:root:root body .vh-a,html:root:root:root:root:root:root:root:root:root body .home-form-catalogue-download,html:root:root:root:root:root:root:root:root:root body .devis-success-home,html:root:root:root:root:root:root:root:root:root body .cart-btn,html:root:root:root:root:root:root:root:root:root body .reserver-btn,html:root:root:root:root:root:root:root:root:root body .nav-reserver-mobile,html:root:root:root:root:root:root:root:root:root body .hs-btn,html:root:root:root:root:root:root:root:root:root body .vc-btn-primary,html:root:root:root:root:root:root:root:root:root body #vmOv .btn-submit{font-size:11px!important;letter-spacing:.07em!important}
+}
+
+/* ── Fenêtre « Mon devis » : version épurée ── */
+html:root:root:root:root:root:root body .c-head{padding:22px 28px 18px;border-bottom:1px solid #eceef2}
+html:root:root:root:root:root:root body .c-head h2{font-size:22px;letter-spacing:.14em;font-weight:400}
+html:root:root:root:root:root:root body .c-cls{width:32px;height:32px;background:none;font-size:22px;font-weight:300;color:#8a94a3}
+html:root:root:root:root:root:root body .c-items{padding:6px 28px}
+html:root:root:root:root:root:root body .c-item{padding:18px 0;border-bottom:1px solid #f0f1f4;gap:16px;align-items:center}
+html:root:root:root:root:root:root body .c-item-img{width:56px;height:56px;border-radius:6px;border:none;background:#f4f5f7}
+html:root:root:root:root:root:root body .c-item-name{font-size:14px;font-weight:500;line-height:1.35;margin-bottom:3px;color:#0C0F14}
+html:root:root:root:root:root:root body .c-item-price{font-size:13px;font-weight:500;color:#646D7C}
+html:root:root:root:root:root:root body .c-rm{font-size:18px;font-weight:300;color:#b4bac5}
+html:root:root:root:root:root:root body .c-foot{padding:16px 28px 22px;border-top:1px solid #eceef2}
+html:root:root:root:root:root:root body .vc-livr{padding:0 0 14px;border:none;border-radius:0;background:none;margin:0 0 14px;border-bottom:1px solid #f0f1f4;align-items:center;gap:10px;font-size:12.5px}
+html:root:root:root:root:root:root body .vc-livr.on,html:root:root:root:root:root:root body .vc-livr.locked{border:none;background:none;border-bottom:1px solid #f0f1f4;opacity:1}
+html:root:root:root:root:root:root body .vc-livr input{width:15px;height:15px;margin:0}
+html:root:root:root:root:root:root body .vc-livr-txt strong{font-weight:500;font-size:12.5px;color:#4a5262}
+html:root:root:root:root:root:root body .vc-livr-txt br,html:root:root:root:root:root:root body .vc-livr-txt > span:not(.vc-livr-note){display:none}
+html:root:root:root:root:root:root body .vc-livr-price{font-size:11.5px;font-weight:400;color:#8a94a3}
+html:root:root:root:root:root:root body .vp-msg{font-size:11.5px;font-weight:400;color:#646D7C}
+html:root:root:root:root:root:root body .vp-msg b,html:root:root:root:root:root:root body .vp-msg strong{font-weight:600;color:#2B4A6B}
+html:root:root:root:root:root:root body .vp-msg a{font-size:11.5px;font-weight:500;text-decoration:none;color:#2B4A6B}
+html:root:root:root:root:root:root body .vp-bar{height:2px;border-radius:2px;margin:0 0 16px}
+html:root:root:root:root:root:root body .vp-ligne{font-size:12px;font-weight:400}
+html:root:root:root:root:root:root body .c-total{align-items:baseline;margin-bottom:14px;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;color:#646D7C}
+html:root:root:root:root:root:root body .c-total span:last-child{font-size:21px;letter-spacing:0;text-transform:none;font-weight:600;color:#0C0F14}
+html:root:root:root:root:root:root body .c-checkout{padding:15px;min-height:0;box-shadow:none;font-weight:500;letter-spacing:.14em;text-transform:uppercase}
+
+/* ── Page réservation : récapitulatif et suggestions épurés ── */
+html:root:root:root:root:root:root body .cart-summary,html:root:root:root:root:root:root body .cart-more{background:#fff;border:1px solid #eceef2;border-radius:14px;padding:22px 22px}
+html:root:root:root:root:root:root body .cs-head{margin-bottom:8px}
+html:root:root:root:root:root:root body .cs-title,html:root:root:root:root:root:root body .cart-more-title{font-size:11px;font-weight:500;letter-spacing:.16em;color:#646D7C}
+html:root:root:root:root:root:root body .cart-more-title{margin-bottom:8px}
+html:root:root:root:root:root:root body .cs-edit{font-size:12px;font-weight:500;color:#2B4A6B}
+html:root:root:root:root:root:root body .cs-items,html:root:root:root:root:root:root body .comp-products{gap:0;margin-bottom:14px}
+html:root:root:root:root:root:root body .comp-products{margin-bottom:0}
+html:root:root:root:root:root:root body .cs-item,html:root:root:root:root:root:root body .comp-product{background:none;border-radius:0;padding:14px 0;border-bottom:1px solid #f0f1f4;gap:14px;box-shadow:none}
+html:root:root:root:root:root:root body .comp-product:hover{box-shadow:none}
+html:root:root:root:root:root:root body .cs-item-img,html:root:root:root:root:root:root body .comp-img{width:52px;height:52px;border:none;border-radius:6px;background:#f4f5f7;padding:0;object-fit:cover}
+html:root:root:root:root:root:root body .cs-item-name,html:root:root:root:root:root:root body .comp-name{font-size:13.5px;font-weight:500;line-height:1.35;color:#0C0F14}
+html:root:root:root:root:root:root body .cs-item-price,html:root:root:root:root:root:root body .comp-price{font-size:13px;font-weight:500;color:#646D7C}
+html:root:root:root:root:root:root body .cs-item-del{width:24px;height:24px;background:none}
+html:root:root:root:root:root:root body .comp-add{width:28px;height:28px;background:none;border:1px solid #c5cad3;color:#2B4A6B;font-size:17px}
+html:root:root:root:root:root:root body .comp-added{width:28px;height:28px;background:none;border:1px solid #e0e3e8;color:#8a94a3}
+html:root:root:root:root:root:root body .cs-total{border-top:none;padding-top:6px;align-items:baseline;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;color:#646D7C}
+html:root:root:root:root:root:root body .cs-total span:last-child{font-size:21px;letter-spacing:0;text-transform:none;font-weight:600;color:#0C0F14}
+html:root:root:root:root:root:root body .pa-remise{font-size:12px;font-weight:400}
+
+/* ── Devis : cartes douces + progression en 5 segments ── */
+html:root:root:root:root:root:root body .c-drawer,html:root:root:root:root:root:root body .cart-summary,html:root:root:root:root:root:root body .cart-more{background:#f6f7f9;border:none}
+html:root:root:root:root:root:root body .cart-summary,html:root:root:root:root:root:root body .cart-more{border-radius:16px;padding:22px 20px}
+html:root:root:root:root:root:root body .c-items,html:root:root:root:root:root:root body .c-foot,html:root:root:root:root:root:root body .c-head{background:transparent}
+html:root:root:root:root:root:root body .c-head{border-bottom:none}
+html:root:root:root:root:root:root body .c-foot{border-top:none}
+html:root:root:root:root:root:root body .c-item,html:root:root:root:root:root:root body .cs-item,html:root:root:root:root:root:root body .comp-product{background:#fff;border:none;border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(12,15,20,.06),0 4px 12px rgba(12,15,20,.04)}
+html:root:root:root:root:root:root body .c-item:last-child,html:root:root:root:root:root:root body .cs-item:last-child,html:root:root:root:root:root:root body .comp-product:last-child{margin-bottom:0}
+html:root:root:root:root:root:root body .cs-items{gap:0;margin-bottom:16px}
+html:root:root:root:root:root:root body .vc-livr{background:#fff;border:none;border-radius:12px;padding:12px 14px;margin-bottom:16px;box-shadow:0 1px 3px rgba(12,15,20,.06),0 4px 12px rgba(12,15,20,.04)}
+html:root:root:root:root:root:root body .vc-livr.on,html:root:root:root:root:root:root body .vc-livr.locked{background:#fff;border:none;opacity:1}
+html:root:root:root:root:root:root body .c-checkout{border-radius:12px}
+html:root:root:root:root:root:root body .vp-seg{display:flex;gap:5px;margin:0 0 18px}
+html:root:root:root:root:root:root body .vp-seg i{flex:1;height:4px;border-radius:3px;background:rgba(43,74,107,.14);transition:background .3s}
+html:root:root:root:root:root:root body .vp-seg i.on{background:#2B4A6B}
+html:root:root:root:root:root:root body .vp-ok+.vp-seg i.on{background:#15803D}
+
+html:root:root:root:root:root:root body .vp-pill{font-style:normal;font-weight:600;font-size:11px;letter-spacing:.04em;color:#fff;background:#2B4A6B;padding:2px 8px;border-radius:999px;white-space:nowrap;margin-left:2px}
+html:root:root:root:root:root:root body .vp-pill-ok{background:#15803D;margin:0 4px 0 0}
+html:root:root:root:root:root:root body .vp-msg b{font-weight:600}
+
+html:root:root:root:root:root:root body .vp-pill{display:none}
+html:root:root:root:root:root:root body .vp-msg b{font-weight:600;color:#0C0F14}
+html:root:root:root:root:root:root body .vp-cpt{font-size:11.5px;color:#8a94a3;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+html:root:root:root:root:root:root body .vp-ok{color:#15803D;font-weight:500}
+
+html:root:root:root:root:root:root body .vp-rang{display:flex;align-items:center;gap:12px;margin:0 0 18px}
+html:root:root:root:root:root:root body .vp-rang .vp-seg{flex:1;margin:0}
+html:root:root:root:root:root:root body .vp-lbl{font-size:11.5px;color:#8a94a3;white-space:nowrap;font-variant-numeric:tabular-nums}
+html:root:root:root:root:root:root body .vp-ok+.vp-seg{margin-top:0}
+
+html:root:root:root:root:root:root body .vp-msg{font-size:12px;font-weight:400;color:#646D7C;margin-bottom:8px}
+
+/* ── Page panier : liste sans photo + suggestions en carrousel ── */
+html:root:root:root:root:root:root body .cs-item-img{display:none}
+html:root:root:root:root:root:root body .cs-items{background:#fff;border-radius:14px;padding:2px 18px;gap:0;box-shadow:0 1px 3px rgba(12,15,20,.06),0 4px 12px rgba(12,15,20,.04)}
+html:root:root:root:root:root:root body .cs-item{background:none;box-shadow:none;border-radius:0;margin:0;border-bottom:1px solid #f0f1f4;padding:15px 0}
+html:root:root:root:root:root:root body .cs-item:last-child{border-bottom:none}
+html:root:root:root:root:root:root body .cs-item-name{font-size:14px}
+html:root:root:root:root:root:root body .cs-item-opts{font-size:11.5px;color:#8a94a3}
+html:root:root:root:root:root:root body .comp-products{flex-direction:row;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;margin:0 -20px;padding:4px 20px 14px;scroll-padding:0 20px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+html:root:root:root:root:root:root body .comp-products::-webkit-scrollbar{display:none}
+html:root:root:root:root:root:root body .comp-product{flex:0 0 58%;max-width:230px;flex-direction:column;align-items:flex-start;scroll-snap-align:start;margin:0;padding:14px;position:relative;gap:10px}
+html:root:root:root:root:root:root body .comp-img{width:100%;height:96px;object-fit:contain;background:#fff;border-radius:10px}
+html:root:root:root:root:root:root body .comp-add,html:root:root:root:root:root:root body .comp-added{position:absolute;top:auto;bottom:14px;right:14px;background:#fff}
+html:root:root:root:root:root:root body .comp-info{flex:none}
+
+/* Suggestions : 2 cartes fixes ; carrousel seulement à partir de 3 */
+h,t,m,l,:,r,o,o,t,:,r,o,o,t,:,r,o,o,t,:,r,o,o,t,:,r,o,o,t,:,r,o,o,t, ,b,o,d,y, ,.,c,o,m,p,-,p,r,o,d,u,c,t,s,:,n,o,t,(,:,h,a,s,(,.,c,o,m,p,-,p,r,o,d,u,c,t,:,n,t,h,-,c,h,i,l,d,(,3,),),){display:grid;grid-template-columns:1fr 1fr;overflow:visible;margin:0;padding:4px 0 0;gap:12px}
+h,t,m,l,:,r,o,o,t,:,r,o,o,t,:,r,o,o,t,:,r,o,o,t,:,r,o,o,t,:,r,o,o,t, ,b,o,d,y, ,.,c,o,m,p,-,p,r,o,d,u,c,t,s,:,n,o,t,(,:,h,a,s,(,.,c,o,m,p,-,p,r,o,d,u,c,t,:,n,t,h,-,c,h,i,l,d,(,3,),),), ,.,c,o,m,p,-,p,r,o,d,u,c,t{flex:none;max-width:none;min-width:0}
+/* 2 suggestions : grille fixe, sans défilement */
+html:root:root:root:root:root:root body .comp-products:not(:has(.comp-product:nth-child(3))){display:grid;grid-template-columns:1fr 1fr;gap:12px;overflow:visible;scroll-snap-type:none;margin:0;padding:4px 0 14px}
+html:root:root:root:root:root:root body .comp-products:not(:has(.comp-product:nth-child(3))) .comp-product{flex:none;max-width:none;min-width:0;width:auto}
+html:root:root:root:root:root:root body .comp-products .comp-product{padding-bottom:62px}
+/* boutons du carrousel d'en-tête : plus petits */
+@media(max-width:768px){html:root:root:root:root:root:root:root:root:root body .hs-btn,html:root:root:root:root:root:root:root:root:root body .hero-cta .btn-p,html:root:root:root:root:root:root:root:root:root body .hero-cta .btn-o{height:30px;min-height:0;padding:0 12px;font-size:11px;letter-spacing:.06em}
+html:root:root:root:root:root:root:root:root:root body .hs-cta,html:root:root:root:root:root:root:root:root:root body .hero-cta{gap:8px;flex-wrap:nowrap}}
+@media(max-width:768px){html:root:root:root:root:root:root:root:root:root body .hs-btn,html:root:root:root:root:root:root:root:root:root body .hero-cta .btn-p,html:root:root:root:root:root:root:root:root:root body .hero-cta .btn-o{height:26px;padding:0 10px;font-size:10px!important;letter-spacing:.05em}}
+/* en-tête : bouton taille d'origine, texte plus petit */
+@media(max-width:768px){html:root:root:root:root:root:root:root:root:root body .hs-btn,html:root:root:root:root:root:root:root:root:root body .hero-cta .btn-p,html:root:root:root:root:root:root:root:root:root body .hero-cta .btn-o{height:34px;padding:0 14px;font-size:9px!important;letter-spacing:.06em}}
+
+/* Suggestions « Vous pourriez aussi aimer » : cartes compactes, titre sur une ligne, prix + petit plus sur la même ligne */
+html:root:root:root:root:root:root body .comp-products .comp-product{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:8px;row-gap:4px;padding:10px 12px 10px}
+html:root:root:root:root:root:root body .comp-products .comp-info{display:contents}
+html:root:root:root:root:root:root body .comp-products .comp-img{grid-column:1/-1;height:72px;width:100%}
+html:root:root:root:root:root:root body .comp-products .comp-name{grid-column:1/-1;font-size:13px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+html:root:root:root:root:root:root body .comp-products .comp-price{grid-column:1;font-size:11.5px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+html:root:root:root:root:root:root body .comp-products .comp-add,html:root:root:root:root:root:root body .comp-products .comp-added{grid-column:2;position:static;width:26px;height:26px;font-size:16px;border:1px solid #d9dee6;margin:0}
+html:root:root:root:root:root:root body .comp-products .comp-product{padding-bottom:10px}
+
+/* « + » des suggestions : tracé en CSS, centré au pixel près quelle que soit la police */
+html:root:root:root:root:root:root:root body .comp-add{position:relative;font-size:0;line-height:0;color:transparent}
+html:root:root:root:root:root:root:root body .comp-add::before,html:root:root:root:root:root:root:root body .comp-add::after{content:'';position:absolute;top:50%;left:50%;background:#2B4A6B;border-radius:1px;transform:translate(-50%,-50%)}
+html:root:root:root:root:root:root:root body .comp-add::before{width:12px;height:1.6px}
+html:root:root:root:root:root:root:root body .comp-add::after{width:1.6px;height:12px}

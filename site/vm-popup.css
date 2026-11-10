@@ -1,0 +1,296 @@
+:root{--black:#0C0F14;--navy:#2B4A6B;--navy-h:#1e3650;--g1:#3D4452;--g2:#646D7C;--g3:#C8CDD8;--g4:#F0F2F5;--white:#FFFFFF;--r:12px;--rl:20px;--pill:999px;--gold:#F59E0B}
+.vm-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.vm-ov.open{opacity:1;pointer-events:all}
+.vm{background:var(--white);border-radius:var(--rl);width:480px;max-width:94vw;padding:36px;max-height:90vh;overflow-y:auto;transform:translateY(18px);transition:transform .3s}
+.vm-ov.open .vm{transform:translateY(0)}
+.vm-head{display:flex;align-items:flex-start;gap:18px;margin-bottom:28px}
+.vm-img{width:86px;height:86px;border-radius:10px;object-fit:cover;background:var(--white);border:1px solid var(--g4);padding:0;flex-shrink:0}
+.vm-info{flex:1}
+.vm-info h3{font-size:19px;font-weight:700;margin-bottom:6px}
+.vm-info.vp{font-size:15px;color:var(--navy);font-weight:600}
+.vm-cls{width:32px;height:32px;border-radius:50%;background:var(--g4);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;flex-shrink:0}
+.vm-cls:hover{background:var(--g3)}
+.vm-variants{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 24px}
+.vm-variants p{width:100%}
+.vm-powder-note{font-size:12px;color:var(--g2);line-height:1.5;margin:0 0 14px}
+.vm-powder-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.vm-powder-slot{display:flex;flex-direction:column;gap:6px}
+.vm-powder-slot span{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--g2)}
+.vm-powder-slot select{width:100%;padding:11px 12px;border:2px solid var(--g3);border-radius:var(--r);background:var(--white);color:var(--black);font:inherit;font-size:13px;outline:none}
+.vm-powder-slot select:focus{border-color:var(--navy)}
+@media(max-width:520px){.vm-powder-grid{grid-template-columns:1fr}}
+/* ── champs de personnalisation de la fenêtre d'ajout ── */
+.vm-perso{margin:14px 0 4px}
+.vm-perso-t{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--g2);margin-bottom:4px}
+.vm-perso-note{font-size:12.5px;line-height:1.6;color:var(--g2);margin-bottom:12px}
+.vm-perso-f{display:block;margin-bottom:10px}
+.vm-perso-f span{display:block;font-size:12px;font-weight:600;color:var(--g1);margin-bottom:5px}
+.vm-perso-f input{width:100%;border:2px solid var(--g3);border-radius:var(--r,12px);
+  padding:11px 13px;font-family:inherit;font-size:14px;color:var(--black);background:var(--white)}
+.vm-perso-f input:focus{outline:none;border-color:var(--navy)}
+.vm-perso-f input[aria-invalid="true"]{border-color:#DC2626}
+.vm-perso-err{font-size:12.5px;font-weight:600;color:#B91C1C;background:#FEF2F2;
+  border:1px solid #FCA5A5;border-radius:var(--r,12px);padding:9px 11px;margin:2px 0 8px}
+.vm-perso-apercu{border:1px dashed var(--g3);border-radius:var(--r,12px);background:var(--g4);
+  padding:18px 16px;text-align:center;margin-top:6px}
+.vm-ap-1{font-size:12.5px;color:var(--g1);margin-bottom:4px;overflow-wrap:anywhere}
+.vm-ap-2{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1.05;
+  color:var(--black);letter-spacing:.02em;margin-bottom:4px;overflow-wrap:anywhere}
+.vm-ap-3{font-size:12.5px;color:var(--g1);overflow-wrap:anywhere}
+.vm-ap-4{font-size:12px;letter-spacing:.22em;color:var(--g2);margin-top:6px}
+/* ── Croix de fermeture dessinées géométriquement : centrage exact
+   quelles que soient les métriques de la police ── */
+.c-cls,.vc-close,.vm-cls,.xm-close,.drawer-close,.pg-close,.c-rm,.vc-item-del,.cs-item-del,#searchClear,.filter-search-clear{
+  position:relative;font-size:0!important;line-height:0!important;color:transparent!important}
+.c-cls::before,.c-cls::after,.vc-close::before,.vc-close::after,.vm-cls::before,.vm-cls::after,
+.xm-close::before,.xm-close::after,.drawer-close::before,.drawer-close::after,
+.pg-close::before,.pg-close::after,.c-rm::before,.c-rm::after,
+.vc-item-del::before,.vc-item-del::after,.cs-item-del::before,.cs-item-del::after,
+#searchClear::before,#searchClear::after,.filter-search-clear::before,.filter-search-clear::after{
+  content:'';position:absolute;top:50%;left:50%;width:42%;height:1.8px;background:currentColor;border-radius:2px}
+.c-cls::before,.vc-close::before,.vm-cls::before,.xm-close::before,.drawer-close::before,
+.pg-close::before,.c-rm::before,.vc-item-del::before,.cs-item-del::before,
+#searchClear::before,.filter-search-clear::before{transform:translate(-50%,-50%) rotate(45deg)}
+.c-cls::after,.vc-close::after,.vm-cls::after,.xm-close::after,.drawer-close::after,
+.pg-close::after,.c-rm::after,.vc-item-del::after,.cs-item-del::after,
+#searchClear::after,.filter-search-clear::after{transform:translate(-50%,-50%) rotate(-45deg)}
+/* la couleur du trait reprend celle du bouton */
+.c-cls,.vm-cls,.xm-close,.drawer-close{color:#0C0F14!important}
+
+/* ─────────────────────────────────────────────────────────────
+   FEUX D'ARTIFICE DE JOUR — fenêtre de composition en deux temps
+   1. la formule (nombre de canons) · 2. la répartition des couleurs
+   ───────────────────────────────────────────────────────────── */
+.cn-ov{
+  position:fixed; inset:0; z-index:340;
+  background:rgba(0,0,0,.55);
+  display:flex; align-items:center; justify-content:center; padding:12px;
+  opacity:0; pointer-events:none; transition:opacity .25s;
+}
+.cn-ov.on{opacity:1; pointer-events:auto}
+.cn-ov[hidden]{display:none}
+
+.cn-carte{
+  position:relative; box-sizing:border-box;
+  width:520px; max-width:94vw; max-height:90vh; overflow-y:auto;
+  background:var(--white,#fff); border-radius:var(--rl,20px);
+  padding:34px 32px 28px;
+  box-shadow:0 18px 50px rgba(0,0,0,.18);
+  transform:translateY(18px); transition:transform .25s;
+}
+.cn-ov.on .cn-carte{transform:translateY(0)}
+.cn-carte .cn-fenetre{margin:0 -2px}
+
+.cn-fermer{
+  position:absolute; right:18px; top:18px;
+  width:32px; height:32px; border:0; border-radius:50%;
+  background:var(--g4,#F0F2F5); color:#0C0F14;
+  font-size:18px; line-height:1; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+.cn-fermer:hover{background:var(--g3,#C8CDD8)}
+
+.cn-kicker{
+  font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--navy,#2B4A6B); margin:0 42px 8px 0;
+}
+.cn-titre{
+  font-size:20px; font-weight:700; line-height:1.2;
+  color:var(--black,#0C0F14); margin:0 42px 16px 0;
+}
+
+/* ——— fil des deux étapes ——— */
+.cn-etapes{display:flex; align-items:center; gap:10px; margin-bottom:18px}
+.cn-etape{
+  font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--g2,#7B8493); white-space:nowrap; transition:color .2s;
+}
+.cn-etape.on{color:var(--navy,#2B4A6B)}
+.cn-trait{flex:1; height:1px; background:var(--g4,#F0F2F5)}
+
+/* ——— le glissement entre les deux vues ——— */
+.cn-fenetre{overflow:hidden}
+.cn-piste{
+  display:flex; align-items:flex-start; width:200%;
+  transition:transform .32s cubic-bezier(.4,0,.2,1);
+}
+/* la vue masquée se replie : la hauteur du bloc suit l'étape affichée */
+.cn-vue{
+  width:50%; flex:0 0 50%; padding:1px 2px;
+  max-height:1200px; opacity:1;
+  transition:opacity .25s, max-height .32s cubic-bezier(.4,0,.2,1);
+}
+.cn-vue:not(.cn-vue-on){max-height:0; opacity:0; overflow:hidden; visibility:hidden}
+
+.cn-sub{font-size:13.5px; color:var(--g1,#4A5261); line-height:1.65; margin:0 0 18px}
+.cn-note{font-size:11.5px; color:var(--g2,#7B8493); line-height:1.55; margin:14px 0 0}
+
+/* ——— les formules ——— */
+.cn-formules{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.cn-f{
+  display:flex; flex-direction:column; align-items:flex-start; gap:3px;
+  padding:14px 15px; text-align:left; cursor:pointer;
+  border:2px solid var(--g4,#F0F2F5); border-radius:var(--r,14px);
+  background:var(--white,#fff); font:inherit;
+  transition:border-color .18s, background .18s;
+}
+.cn-f:hover{border-color:var(--g3,#C8CDD8)}
+.cn-f.on{border-color:var(--navy,#2B4A6B); background:var(--g4,#F0F2F5)}
+.cn-f-nb{font-size:14.5px; font-weight:700; color:var(--black,#0C0F14)}
+.cn-f-mot{font-size:11px; color:var(--g2,#7B8493)}
+.cn-f-prix{font-size:17px; font-weight:700; color:var(--navy,#2B4A6B); margin-top:4px}
+
+/* ——— les couleurs ——— */
+.cn-couleurs{display:flex; flex-direction:column; gap:7px}
+.cn-c{
+  display:flex; align-items:center; gap:11px;
+  padding:9px 11px;
+  border:1px solid var(--g4,#F0F2F5); border-radius:var(--r,14px);
+  transition:border-color .18s;
+}
+.cn-c.on{border-color:var(--navy,#2B4A6B)}
+.cn-pastille{
+  width:20px; height:20px; border-radius:50%; flex-shrink:0;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.18);
+}
+.cn-c-nom{
+  display:flex; flex-direction:column; gap:1px; flex:1; min-width:0;
+  font-size:13.5px; font-weight:600; color:var(--black,#0C0F14);
+}
+.cn-c-nom em{
+  font-style:normal; font-size:10px; font-weight:600;
+  letter-spacing:.05em; text-transform:uppercase; color:var(--g2,#7B8493);
+}
+.cn-c-prem .cn-c-nom em{color:var(--gold-d,#B45309)}
+
+.cn-cpt{display:flex; align-items:center; gap:2px; flex-shrink:0}
+.cn-cpt button{
+  width:30px; height:30px; flex-shrink:0;
+  border:1px solid var(--g3,#C8CDD8); border-radius:50%;
+  background:var(--white,#fff); color:var(--navy,#2B4A6B);
+  font-size:16px; line-height:1; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:border-color .15s, background .15s, opacity .15s;
+}
+.cn-cpt button:hover:not(:disabled){border-color:var(--navy,#2B4A6B); background:var(--g4,#F0F2F5)}
+.cn-cpt button:disabled{opacity:.3; cursor:default}
+.cn-q{
+  min-width:26px; text-align:center;
+  font-size:14px; font-weight:700; color:var(--black,#0C0F14);
+  font-variant-numeric:tabular-nums;
+}
+
+/* ——— bas de fenêtre ——— */
+.cn-bilan{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  margin-top:20px; padding:13px 15px;
+  background:var(--g4,#F0F2F5); border-radius:var(--r,14px);
+  font-size:12.5px; color:var(--g1,#4A5261);
+}
+.cn-bilan strong{font-size:20px; color:var(--navy,#2B4A6B); font-variant-numeric:tabular-nums}
+
+.cn-actions{display:flex; gap:9px; margin-top:12px}
+.cn-actions button{
+  flex:1; padding:14px 18px; border:0; border-radius:var(--pill,999px);
+  font:inherit; font-size:14.5px; font-weight:700; cursor:pointer;
+  transition:background .2s, opacity .2s;
+}
+.cn-suivant, .cn-ajouter{background:var(--navy,#2B4A6B); color:var(--white,#fff)}
+.cn-suivant:hover:not(:disabled), .cn-ajouter:hover:not(:disabled){background:var(--navy-h,#1E3C5C)}
+.cn-suivant:disabled, .cn-ajouter:disabled{opacity:.4; cursor:default}
+.cn-suivant.grise, .cn-ajouter.grise{opacity:.4; cursor:default}
+.cn-suivant.grise:hover, .cn-ajouter.grise:hover{background:var(--navy,#2B4A6B)}
+.cn-vibre{animation:cnVibre .45s}
+@keyframes cnVibre{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.cn-formules.cn-rouge .cn-f, .cn-couleurs.cn-rouge{border-color:#b91c1c!important}
+.cn-couleurs.cn-rouge{outline:1px solid #b91c1c; outline-offset:4px; border-radius:10px}
+@media (prefers-reduced-motion:reduce){.cn-vibre{animation:none}}
+.cn-retour{flex:0 0 34%; background:var(--g4,#F0F2F5); color:var(--g1,#4A5261)}
+.cn-retour:hover{background:var(--g3,#C8CDD8)}
+.cn-actions button[hidden]{display:none}
+
+@media(max-width:520px){
+  .cn-carte{width:calc(100vw - 20px); max-width:none; padding:24px 18px 20px}
+  .cn-titre{font-size:18px}
+  .cn-sub{font-size:12.5px; margin-bottom:16px}
+  .cn-formules{grid-template-columns:1fr 1fr; gap:8px}
+  .cn-f{padding:12px 12px}
+  .cn-f-nb{font-size:13.5px}
+  .cn-f-prix{font-size:16px}
+  .cn-c{padding:8px 10px; gap:9px}
+  .cn-c-nom{font-size:12.5px}
+  .cn-cpt button{width:28px; height:28px}
+  .cn-actions button{font-size:13.5px; padding:13px 12px}
+}
+
+/* ─────────────────────────────────────────────────────────────
+   LE MÊME CHOIX, DÉROULÉ SUR LA FICHE PRODUIT
+   ───────────────────────────────────────────────────────────── */
+.cn-bloc{margin:18px 0 4px}
+.cn-bloc-titre{
+  font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--g2,#7B8493); margin-bottom:10px;
+}
+.cn-bloc .cn-formules{margin-bottom:10px}
+.cn-bloc .cn-note{margin-top:10px}
+
+/* ——— le même choix, déroulé sur la fiche produit ——— */
+/* Pas d'encadré : le bloc se pose à plat sous son intitulé,
+   comme la liste des formules des autres fiches produits. */
+#canonsDeroule{margin:0 0 4px}
+#canonsDeroule .cn-etapes{margin-top:0; margin-bottom:14px}
+#canonsDeroule .cn-sub{margin-bottom:14px}
+#canonsDeroule .cn-actions{margin-top:12px}
+
+/* ——— le bouton d'ajout reste toujours accessible ———
+   La liste des huit couleurs peut dépasser la hauteur de la
+   fenêtre, sur téléphone comme sur un portable à écran bas : le
+   total et les boutons se collent au bas de la carte plutôt que
+   de disparaître sous la zone visible. */
+.cn-carte{padding-bottom:0}
+.cn-carte .cn-bilan{position:sticky; bottom:64px; z-index:2}
+.cn-carte .cn-actions{
+  position:sticky; bottom:0; z-index:2;
+  background:var(--white,#fff);
+  padding:6px 0 16px;
+  box-shadow:0 -10px 14px -10px rgba(0,0,0,.12);
+}
+@media(max-width:560px){
+  .cn-retour{flex:0 0 30%}
+  .cn-actions button{font-size:13px; padding:13px 8px}
+}
+
+@media(max-width:360px){
+  .cn-ov{padding:8px}
+  .cn-carte{padding-left:14px; padding-right:14px}
+  .cn-formules{gap:7px}
+  .cn-f{padding:11px 10px}
+  .cn-f-nb{font-size:13px}
+  .cn-f-mot{font-size:10px}
+  .cn-f-prix{font-size:15px}
+  .cn-c{gap:7px; padding:7px 9px}
+  .cn-c-nom{font-size:12px}
+  .cn-c-nom em{font-size:9px}
+  .cn-cpt button{width:27px; height:27px}
+  .cn-q{min-width:22px; font-size:13px}
+  .cn-bilan{padding:11px 12px}
+  .cn-bilan strong{font-size:18px}
+}
+
+/* ——— l'option installation et lancement ——— */
+.cn-lancement{
+  display:flex; align-items:flex-start; gap:11px;
+  margin-top:14px; padding:11px 13px; cursor:pointer;
+  border:2px solid var(--g3,#C8CDD8); border-radius:var(--r,14px);
+  transition:border-color .18s;
+}
+.cn-lancement:hover, .cn-lancement:has(input:checked){border-color:var(--navy,#2B4A6B)}
+.cn-lancement input{width:18px; height:18px; margin-top:1px; flex-shrink:0; accent-color:var(--navy,#2B4A6B)}
+.cn-lancement span{display:flex; flex-direction:column; gap:2px; font-size:13.5px; color:var(--black,#0C0F14)}
+.cn-lancement em{font-style:normal; font-size:12px; color:var(--g2,#7B8493); line-height:1.5}
+.cn-devis{
+  margin-left:auto; flex-shrink:0; white-space:nowrap;
+  font-size:13px; font-weight:700; color:var(--navy,#2B4A6B);
+}
+

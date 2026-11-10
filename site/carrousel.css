@@ -1,0 +1,48 @@
+/* ─────────────────────────────────────────────────────────────
+   CARROUSEL GLISSABLE — habillage commun
+
+   La bande défile horizontalement et chaque carte s'aligne au bord
+   gauche. Quand tout tient dans la largeur (classe « car-fige »),
+   la bande redevient une grille ordinaire et les flèches
+   disparaissent.
+   ───────────────────────────────────────────────────────────── */
+.car-bande{
+  display:flex; gap:18px;
+  overflow-x:auto; overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  scroll-padding-left:0;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:6px;
+  /* la barre de défilement grise sous les cartes fait sale */
+  scrollbar-width:none;
+}
+.car-bande::-webkit-scrollbar{display:none}
+.car-bande > *{flex:0 0 310px; scroll-snap-align:start; min-width:0}
+.car-bande.car-tire{cursor:grabbing; user-select:none; scroll-snap-type:none}
+.car-bande.car-tire *{cursor:grabbing}
+
+/* tout tient à l'écran : on revient à une grille, sans défilement */
+.car-bande.car-fige{overflow-x:visible; scroll-snap-type:none; flex-wrap:wrap}
+.car-bande.car-fige > *{flex:1 1 310px; max-width:420px}
+
+/* ——— les deux flèches ——— */
+.car-fleches{display:flex; gap:8px; margin-left:auto}
+/* display:flex l'emporterait sur l'attribut hidden : on le redit */
+.car-fleches[hidden]{display:none}
+.car-f{
+  width:36px; height:36px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--g3,#C8CDD8); background:var(--white,#fff);
+  border-radius:50%; cursor:pointer; color:var(--navy,#2B4A6B);
+  font-size:16px; line-height:1;
+  transition:border-color .15s, background .15s, opacity .15s;
+}
+.car-f:hover:not(:disabled){border-color:var(--navy,#2B4A6B); background:var(--g4,#F0F2F5)}
+.car-f:disabled{opacity:.3; cursor:default}
+.car-f:focus-visible{outline:2px solid var(--gold,#F59E0B); outline-offset:2px}
+
+@media(max-width:640px){
+  .car-bande{gap:12px}
+  .car-bande > *{flex:0 0 78%}
+  .car-bande.car-fige > *{flex:1 1 100%; max-width:none}
+}

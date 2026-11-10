@@ -1,0 +1,297 @@
+# ─────────────────────────────────────────────────────────────
+#  Vespra Event — redirections Netlify
+#  Format : /ancienne-adresse   /nouvelle-adresse   code
+#  301 = redirection permanente (transmet le référencement)
+# ─────────────────────────────────────────────────────────────
+
+
+# ── Domaines achetés en plus : redirection vers le site principal ──
+https://vespraevent.com/*      https://www.vespraevent.fr/:splat   301!
+https://www.vespraevent.com/*  https://www.vespraevent.fr/:splat   301!
+http://vespraevent.com/*       https://www.vespraevent.fr/:splat   301!
+http://www.vespraevent.com/*   https://www.vespraevent.fr/:splat   301!
+
+# ── 0. API INTERNE (avis produits) ───────────────────────────
+/api/avis/valider   /.netlify/functions/avis/valider   200
+/api/avis/demande   /.netlify/functions/avis/demande   200
+/api/avis           /.netlify/functions/avis           200
+
+# ── 0quater. Demande d'inscription d'une salle (page recommandations) ──
+/api/salle/demande  /.netlify/functions/salle           200
+
+# ── 0quinquies. Parrainage : création et vérification des codes ──
+/api/parrainage/*   /.netlify/functions/parrainage      200
+
+# ── 0bis. API INTERNE (back-office admin) ─────────────────────
+/api/media/*          /.netlify/functions/admin          200
+/api/site            /.netlify/functions/site           200
+/api/produits        /.netlify/functions/admin          200
+/api/blog            /.netlify/functions/admin          200
+/api/theme           /.netlify/functions/admin          200
+/api/textes          /.netlify/functions/admin          200
+/api/google          /.netlify/functions/admin          200
+/api/notices         /.netlify/functions/admin          200
+/api/admin/*         /.netlify/functions/admin          200
+/api/espace/*        /.netlify/functions/admin          200
+/espace-client       /espace-client.html                200
+
+# ── 0ter. FICHIERS INTERNES NON PUBLICS ───────────────────────
+# Documentation, code des fonctions et gabarits : rien de tout cela ne doit
+# être lisible publiquement. Le « ! » force la règle même quand le fichier
+# existe dans le site (sans lui, Netlify sert le fichier et ignore la règle).
+/modele-produit.html              /404.html   404!
+/INSTALLATION-ADMIN.md            /404.html   404!
+/INSTALLATION-EMAILS.md           /404.html   404!
+/AVIS-PRODUITS.md                 /404.html   404!
+/ADMIN-MODIFS-CLIENTS-PARAMETRES.md /404.html 404!
+/BLOBS-MIGRATION.md               /404.html   404!
+/MODIFICATIONS-V332.md            /404.html   404!
+/package.json                     /404.html   404!
+/package-lock.json                /404.html   404!
+/netlify.toml                     /404.html   404!
+/netlify/*                        /404.html   404!
+/studio/reservations-historique.json /404.html 404!
+# Ancienne adresse du back-office : n'existe plus
+/admin    /404.html  404!
+/admin/*  /404.html  404!
+/studio   /studio/index.html  200
+
+# ── 1. FICHES PRODUIT REGROUPÉES ────────────────────────────
+# Ces pages ont été fusionnées en une fiche unique à variantes.
+
+
+/produit-tente-etoile           /produit-tente-etoile-22m     301
+/produit-tente-etoile.html      /produit-tente-etoile-22m     301
+/produit-barnums                /produit-barnum-4x8           301
+/produit-barnums.html           /produit-barnum-4x8           301
+
+/produit-sono-20                 /produit-sonorisation         301
+/produit-sono-40-60              /produit-sonorisation         301
+/produit-sono-80-100             /produit-sonorisation         301
+/produit-sono-20.html            /produit-sonorisation         301
+/produit-sono-40-60.html         /produit-sonorisation         301
+/produit-sono-80-100.html        /produit-sonorisation         301
+
+/produit-pack-vespra-60          /produit-pack-vespra          301
+/produit-pack-vespra-100         /produit-pack-vespra          301
+/produit-pack-vespra-150         /produit-pack-vespra          301
+/produit-pack-vespra-60.html     /produit-pack-vespra          301
+/produit-pack-vespra-100.html    /produit-pack-vespra          301
+
+/produit-boite-nuit-essential    /produit-boite-nuit           301
+/produit-boite-nuit-ultimate     /produit-boite-nuit           301
+/produit-boite-nuit-essential.html  /produit-boite-nuit        301
+/produit-boite-nuit-ultimate.html   /produit-boite-nuit        301
+
+/produit-spots-ibiza             /produit-jeux-lumieres        301
+/produit-spots-eurolite          /produit-jeux-lumieres        301
+/produit-spots-ibiza.html        /produit-jeux-lumieres        301
+/produit-spots-eurolite.html     /produit-jeux-lumieres        301
+
+/produit-machine-bulles          /produit-machines-effets      301
+/produit-machine-fumee           /produit-machines-effets      301
+/produit-machine-bulles.html     /produit-machines-effets      301
+/produit-machine-fumee.html      /produit-machines-effets      301
+
+# Produit retiré du catalogue
+/produit-shampouineuse           /catalogue                    301
+
+
+# ── 2. ANCIENNES ADRESSES WORDPRESS ─────────────────────────
+# L'ancien site utilisait des adresses en /produit/... et des
+# pages de services qui n'existent plus.
+
+/produit/photobooth/                      /produit-photobooth        301
+/produit/barnums-tentes-buvettes/         /produit-barnum-4x8        301
+/produit/buvette-4x4m-4-comptoirs/        /produit-buvette           301
+/produit/video-projecteur/                /produit-videoprojecteur   301
+/produit/mega-ventilateur/                /produit-mega-ventilateur  301
+/produit/shampouineuse/                   /catalogue                 301
+/produit/*                                /catalogue                 301
+/boutique/*                               /catalogue                 301
+/categorie-produit/*                      /catalogue                 301
+
+/nos-services                    /catalogue                    301
+/nos-services/*                  /catalogue                    301
+/location                        /catalogue                    301
+/catalogue-location              /catalogue                    301
+/deroulement-location            /faq                          301
+/guide-pratique                  /blog                         301
+/captations-photos               /catalogue                    301
+/captations-video                /catalogue                    301
+/prestations-photos-videos/*     /catalogue                    301
+
+/panier                          /reservation                  301
+/commande                        /reservation                  301
+/mon-compte/*                    /reservation                  301
+/contact                         /reservation                  301
+/devis                           /reservation                  301
+
+/zones                           /zones-livraison              301
+/zone-de-livraison               /zones-livraison              301
+/livraison                       /zones-livraison              301
+
+
+# ── 3. PAGES LÉGALES ────────────────────────────────────────
+# Les slugs sont conservés, seule la forme change.
+
+/mentions-legales/               /mentions-legales             301
+/plan-du-site/                   /plan-du-site                 301
+/politique-de-confidentialite/   /politique-de-confidentialite 301
+/cgl                             /conditions-generales-location 301
+/cgl/                            /conditions-generales-location 301
+/cgv                             /conditions-generales-location 301
+/conditions-generales            /conditions-generales-location 301
+
+
+# ── 4. FLUX ET FICHIERS WORDPRESS ───────────────────────────
+/feed                            /blog                         301
+/feed/*                          /blog                         301
+/wp-content/*                    /                             301
+/wp-admin/*                      /                             301
+/wp-login.php                    /                             301
+/?p=:id                          /                             301
+
+# ── 5. COMPLÉMENTS BASCULE WORDPRESS ────────────────────────
+# Sitemaps et flux générés par WordPress / Yoast
+/wp-sitemap.xml                  /sitemap.xml                  301
+/wp-sitemap-*.xml                /sitemap.xml                  301
+/sitemap_index.xml               /sitemap.xml                  301
+/page-sitemap.xml                /sitemap.xml                  301
+/product-sitemap.xml             /sitemap.xml                  301
+/post-sitemap.xml                /sitemap.xml                  301
+/comments/feed/*                 /blog                         301
+
+# URL techniques WordPress
+/index.php                       /                             301
+/index.php/*                     /                             301
+/xmlrpc.php                      /                             301
+/wp-json/*                       /                             301
+/author/*                        /                             301
+/tag/*                           /blog                         301
+/category/*                      /blog                         301
+/etiquette-produit/*             /catalogue                    301
+/marque-produit/*                /catalogue                    301
+
+# Recherche interne WordPress
+/?s=:term                        /catalogue                    301
+/recherche                       /catalogue                    301
+
+# Pages de compte / tunnel WooCommerce
+/checkout/*                      /reservation                  301
+/cart                            /reservation                  301
+/validation-commande/*           /reservation                  301
+/commande-recue/*                /reservation                  301
+/mon-compte                      /reservation                  301
+/liste-de-souhaits               /catalogue                    301
+/wishlist                        /catalogue                    301
+
+# Anciennes pages villes éventuelles
+/location-photobooth-rennes      /rennes                       301
+/location-photobooth-laval       /laval                        301
+/location-photobooth-vitre       /produit-photobooth           301
+/location-barnum-vitre           /produit-barnum-4x8              301
+/location-sono-vitre             /produit-sonorisation         301
+/photobooth                      /produit-photobooth           301
+/barnum                          /produit-barnum-4x8              301
+/barnums                         /produit-barnum-4x8              301
+/sono                            /produit-sonorisation         301
+/tente-etoile                    /produit-tente-etoile-22m         301
+
+# ── 6. URL RÉELLES DE L'ANCIEN SITE (export Search Console) ──
+# Chaque adresse ci-dessous recevait des impressions ou des clics.
+
+/location-de-photobooth-son-et-lumiere-vitre/                  /                              301
+/location-de-photobooth-son-et-lumiere-bruz/                   /bruz                          301
+/location-de-photobooth-son-et-lumiere-carquefou/              /carquefou                     301
+/location-de-photobooth-son-et-lumiere-chateau-gontier/        /chateau-gontier               301
+/location-de-photobooth-son-et-lumiere-chateaubriant/          /chateaubriant                 301
+/location-de-photobooth-son-et-lumiere-cosse-le-vivien/        /cosse-le-vivien               301
+/location-de-photobooth-son-et-lumiere-dinan/                  /dinan                         301
+/location-de-photobooth-son-et-lumiere-ernee/                  /ernee                         301
+/location-de-photobooth-son-et-lumiere-fougeres/               /fougeres                      301
+/location-de-photobooth-son-et-lumiere-guingamp/               /guingamp                      301
+/location-de-photobooth-son-et-lumiere-guipry-messac/          /guipry-messac                 301
+/location-de-photobooth-son-et-lumiere-la-gravelle/            /la-gravelle                   301
+/location-de-photobooth-son-et-lumiere-la-guerche-de-bretagne/ /la-guerche-de-bretagne        301
+/location-de-photobooth-son-et-lumiere-la-turballe/            /la-turballe                   301
+/location-de-photobooth-son-et-lumiere-lamballe/               /lamballe                      301
+/location-de-photobooth-son-et-lumiere-laval/                  /laval                         301
+/location-de-photobooth-son-et-lumiere-mayenne/                /mayenne                       301
+/location-de-photobooth-son-et-lumiere-nantes/                 /nantes                        301
+/location-de-photobooth-son-et-lumiere-rennes/                 /rennes                        301
+/location-de-photobooth-son-et-lumiere-saint-brieuc/           /saint-brieuc                  301
+/location-de-photobooth-son-et-lumiere-saint-malo/             /saint-malo                    301
+/location-de-photobooth-son-et-lumiere-redon/                  /redon                         301
+
+/photobooth-a-vitre/                                           /produit-photobooth            301
+/location-de-photobooth/                                       /produit-photobooth            301
+/location-sono-a-vitre/                                        /produit-sonorisation          301
+/location-boule-a-facettes-a-vitre/                            /produit-boule-facettes        301
+/location-de-boite-de-nuit-gonflable-a-vitre/                  /produit-boite-nuit            301
+/location-machine-a-popcorn-a-vitre/                           /produit-popcorn               301
+
+/produit/photobooth/                                           /produit-photobooth            301
+/produit/pack-vespra/                                          /produit-pack-vespra           301
+/produit/sonorisation/                                         /produit-sonorisation          301
+/produit/boite-de-nuit-gonflable/                              /produit-boite-nuit            301
+/produit/boule-a-facettes/                                     /produit-boule-facettes        301
+/produit/jeux-de-lumieres/                                     /produit-jeux-lumieres         301
+/produit/jeux-en-bois/                                         /produit-jeux-bois             301
+/produit/livre-dor-audio/                                      /produit-livre-or-audio        301
+/produit/machine-a-pop-corn/                                   /produit-popcorn               301
+/produit/mega-ventilateur/                                     /produit-mega-ventilateur      301
+/produit/pack-karaoke-sur-batterie-avec-2-micros/              /produit-karaoke               301
+/produit/pyrotechnie/                                          /produit-machines-effets       301
+/produit/tente-etoile-22m/                                     /produit-tente-etoile-22m          301
+/produit/video-projecteur/                                     /produit-videoprojecteur       301
+/produit/barnums-tentes-buvettes/                              /produit-barnum-4x8               301
+/produit/buvette-4x4m-4-comptoirs/                             /produit-buvette               301
+/produit/shampouineuse/                                        /catalogue                     301
+
+/catalogue-location/                                           /catalogue                     301
+/categorie-produit/catalogue/                                  /catalogue                     301
+/categorie-produit/barnumbuvettetente/                         /catalogue?cat=barnums         301
+/quote-list/                                                   /reservation                   301
+/reserver/                                                     /reservation                   301
+/contact/formulaire-location                                   /reservation                   301
+/zones-de-livraison/                                           /zones-livraison               301
+/faq/                                                          /faq                           301
+
+/conseils-et-astuces-location/                                 /blog                          301
+/le-materiel-indispensable-pour-reussir-un-mariage/            /article-barnums               301
+
+/produit/canons-a-poudre-electriques/                         /produit-canons-poudre       301
+/produit-canons-poudre.html     /produit-canons-poudre.html       200
+/produit-canons-poudre/        /produit-canons-poudre.html       200
+/produit-canons-poudre         /produit-canons-poudre.html       200
+/location-canons-poudre-vitre/                                  /article-canons-poudre        301
+
+# ── PAGE PARRAINAGE ────────────────────────────────────────
+# La règle générale de fin de fichier envoie toute adresse inconnue à la
+# fonction des fiches produit : on désigne donc la page explicitement.
+/parrainage                     /parrainage.html              200
+/parrainage/                    /parrainage.html              200
+/parrainage.html                /parrainage.html              200
+/code-parrainage                /parrainage.html              301
+/parrain                        /parrainage.html              301
+
+# ── REDIRECTION PAGE NOTICES ───────────────────────────────
+/notice                         /notices                      301
+/notice/                        /notices                      301
+/notice.html                    /notices                      301
+/notices.html                  /notices                      301
+
+
+# ── 9. FICHES PRODUIT CRÉÉES DEPUIS LE BACK-OFFICE ────────────
+# Cette règle est la dernière de toutes, volontairement : Netlify
+# sert d'abord les fichiers existants, et n'arrive ici que pour une
+# adresse qui ne correspond à aucun fichier. Si c'est un produit
+# enregistré, la fonction construit sa page ; sinon elle rend la
+# page 404 du site. Les vingt fiches historiques ne passent donc
+# jamais par là et gardent leur adresse telle quelle.
+/*   /.netlify/functions/fiche   200
+
+# v748 : la cabine rouge est devenue un choix de couleur sur la fiche audio/vidéo
+/produit-cabine-telephonique-rouge   /produit-cabine-telephonique-audio-video.html?c=rouge   301
+/produit-cabine-telephonique-rouge.html   /produit-cabine-telephonique-audio-video.html?c=rouge   301

@@ -1,0 +1,81 @@
+/* ── Carrousel de l'accueil : la première diapositive est l'en-tête habituel,
+   les suivantes présentent une nouveauté. Elles défilent vers la gauche. ── */
+.hero{display:block}
+.hero-slide{position:absolute;inset:0;display:flex;align-items:center;background:#0c0f14 center/cover no-repeat;overflow:hidden;
+  transform:translateX(100%);visibility:hidden;will-change:transform}
+.hero-slide.hs-on,.hero-slide.hs-in,.hero-slide.hs-out{visibility:visible}
+.hero-slide:first-child{position:relative;height:100%;min-height:inherit;transform:none}
+.hero-slide:first-child:not(.hs-on):not(.hs-in):not(.hs-out){transform:translateX(100%)}
+.hero-slide.hs-on{transform:translateX(0)}
+.hero-slide.hs-go{transition:transform 1.4s cubic-bezier(.45,.05,.25,1)}
+.hero-slide .hero-content,.hero-slide .hero-overlay{z-index:1}
+.hero-slide .hero-overlay{position:absolute;inset:0}
+.hs-bg{position:absolute;inset:0;background:center/cover no-repeat}
+.hero-h.hs-t{min-height:0;margin-bottom:18px}
+.hero-slide:first-child .hero-h{margin-bottom:18px}
+.hs-sub{max-width:520px;color:rgba(255,255,255,.86);font-size:16px;line-height:1.55;margin:0 0 30px}
+.hero-dots{position:absolute;left:50%;right:auto;bottom:18px;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:0;padding:0 8px 0 6px;height:28px;border-radius:99px;background:rgba(14,16,20,.72);-webkit-backdrop-filter:none;backdrop-filter:none}
+.hd-sep{width:1px;height:12px;background:rgba(255,255,255,.22);margin:0 8px 0 4px}
+.hd-bar{width:30px;height:3px;border-radius:3px;background:rgba(255,255,255,.2);overflow:hidden;margin-right:4px}
+.hd-bar i{display:block;height:100%;width:100%;background:#fff;transform-origin:left;transform:scaleX(0)}
+@keyframes hdfill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.hd-pp{width:24px;height:24px;padding:0;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff}
+.hd-pp svg{fill:currentColor;opacity:.9}
+.hd-pp .pp-play{display:none}.hd-pp[aria-pressed="true"] .pp-play{display:block}.hd-pp[aria-pressed="true"] .pp-pause{display:none}
+.hd-pp:focus-visible{outline:2px solid #fff;outline-offset:-3px;border-radius:50%}
+.hd{width:24px;height:24px;padding:0;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.hd::before{content:'';width:6px;height:6px;border-radius:99px;background:rgba(200,205,214,.45);transition:width .3s,background .3s}
+.hd:hover::before{background:rgba(220,225,232,.8)}
+.hd.hd-on::before{width:16px;background:rgba(235,238,243,.85)}
+.hd:focus-visible{outline:2px solid #fff;outline-offset:-4px;border-radius:50%}
+.hs-bg{background-position:var(--pos,center)}
+/* photos carrées ou en hauteur : elles occupent la droite et se fondent dans le fond sombre */
+@media(min-width:901px){
+  .hs-droite .hs-bg{left:38%;right:var(--ext,0);-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 38%);mask-image:linear-gradient(90deg,transparent 0,#000 38%)}
+}
+/* boutons des nouveautés : fins, sobres */
+.hs-cta{display:flex;gap:10px;flex-wrap:wrap}
+.hs-btn{display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 18px;border-radius:8px;font:600 10px/1 Inter,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;text-decoration:none;transition:background .25s,color .25s,border-color .25s}
+.hs-btn-main{background:#fff;color:#10243a;border:1px solid #fff}
+.hs-btn-main:hover{background:rgba(255,255,255,.86)}
+.hs-btn-ghost{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.5);-webkit-backdrop-filter:none;backdrop-filter:none}
+.hs-btn-ghost:hover{background:rgba(255,255,255,.16);border-color:#fff}
+.hs-btn:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media(max-width:640px){
+  .hs-sub{font-size:14px;margin-bottom:22px}
+  .hs-cta{gap:8px;flex-wrap:nowrap}
+  .hs-btn{flex:0 1 auto;height:34px;padding:0 14px;font-size:9px;letter-spacing:.06em;min-width:0}
+  .hero-slide .hero-h.hs-t{font-size:clamp(30px,10vw,44px)!important;min-height:0!important;margin-bottom:12px!important}
+  .hero-slide:first-child .hero-h{margin-bottom:12px!important}
+  .hero-dots{bottom:10px;height:22px;padding:0 4px 0 2px}
+  .hd{width:16px;height:22px}.hd::before{width:5px;height:5px}.hd.hd-on::before{width:12px}
+  .hd-sep{height:9px;margin:0 5px 0 2px}.hd-bar{width:22px;height:2px;margin-right:2px}
+  .hd-pp{width:20px;height:22px}.hd-pp svg{width:8px;height:8px}
+  .hero-slide:not(:first-child) .hero-overlay{background:linear-gradient(180deg,rgba(12,15,20,.55) 0%,rgba(12,15,20,.82) 100%)}
+}
+@media(prefers-reduced-motion:reduce){.hero-slide.hs-go{transition:none}}
+
+/* ── Pages villes : même en-tête que l'accueil ── */
+#hero.hero{position:relative;display:block;height:min(calc(100svh - 100px),560px);min-height:440px;overflow:hidden;background:#0c0f14}
+#hero .hero-overlay{background:linear-gradient(105deg,rgba(12,15,20,.88) 0%,rgba(12,15,20,.65) 55%,rgba(12,15,20,.2) 100%)}
+#hero .hero-content{padding:64px 88px 72px;max-width:900px}
+#hero .hero-eye{margin-bottom:28px}
+#hero .hero-h{font-size:clamp(26px,calc(17px + 2vw),46px);line-height:1;letter-spacing:.01em;margin-bottom:20px;min-height:0}
+#hero .hero-h em{display:inline;min-height:0}
+#hero .hero-br-tel{display:none}
+#hero .hero-h .hero-br-pc{display:none}
+#hero .hero-slide:first-child .hero-h br:not(.hero-br-pc):not(.hero-br-tel){display:none}
+#hero .hero-h.ville-longue{font-size:clamp(24px,calc(15px + 1.7vw),38px)}
+#hero .tarif-badges{margin-bottom:26px}
+#hero .hero-slide:first-child .hero-sub{font-size:16px;line-height:1.55;color:rgba(255,255,255,.86);max-width:560px;margin:0 0 20px}
+@media(max-width:960px){#hero .hero-content{padding:60px 40px;max-width:100%}}
+@media(max-width:640px){
+  #hero.hero{height:auto;min-height:72svh}
+  #hero .hero-content{padding:44px 18px 56px!important}
+  #hero .hero-h{font-size:clamp(24px,7.4vw,32px)!important;margin-bottom:16px!important}
+  #hero .hero-slide:first-child .hero-sub{font-size:13.5px}
+  #hero .tarif-badges{gap:6px;margin-bottom:16px!important}
+  #hero .tarif-badge{padding:7px 12px;font-size:11.5px}
+}
+
+#hero .hd-bar i{background:#fff}

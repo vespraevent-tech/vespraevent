@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Migration Supabase — Vespra Event</title>
+<style>
+body{font:15px/1.5 system-ui,sans-serif;max-width:640px;margin:40px auto;padding:0 16px;color:#222}
+h1{font-size:20px}input,button{font:inherit;padding:9px 12px;border:1px solid #bbb;border-radius:6px}
+button{background:#222;color:#fff;border-color:#222;cursor:pointer}button.sec{background:#fff;color:#222}
+button:disabled{opacity:.5}pre{background:#f5f5f5;padding:12px;border-radius:6px;white-space:pre-wrap;min-height:120px;font-size:13px}
+.r{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+</style></head><body>
+<h1>Migration vers Supabase</h1>
+<p>Copie toutes les données du back-office (réservations, clients, devis, documents, photos, avis…) vers Supabase. Les données déjà copiées ne sont jamais écrasées.</p>
+<div class="r"><input id="cle" type="password" placeholder="Clé de migration (MIGRATION_KEY)" style="flex:1;min-width:240px"></div>
+<div class="r"><button id="go">1. Copier les données</button><button id="ver" class="sec">2. Vérifier les comptes</button></div>
+<pre id="log">En attente.</pre>
+<script>
+const $=id=>document.getElementById(id),log=t=>{$('log').textContent+='\n'+t;$('log').scrollTop=1e9};
+const F=async(q)=>{const r=await fetch('/.netlify/functions/migration-supabase?'+q,{headers:{'x-migration-key':$('cle').value.trim()}});
+ const j=await r.json().catch(()=>({erreur:'Réponse illisible (HTTP '+r.status+')'}));if(!r.ok)throw new Error(j.erreur||('HTTP '+r.status));return j};
+$('go').onclick=async()=>{$('go').disabled=true;$('log').textContent='Démarrage…';let i=0,d=0,tc=0,te=0;
+ try{for(;;){const j=await F('i='+i+'&depart='+d);tc+=j.copiees||0;te+=(j.erreurs||[]).length;
+  log(j.store+' : '+j.depart+'/'+j.total+' (copiées '+(j.copiees||0)+', déjà là '+(j.ignorees_deja_presentes||0)+')');
+  (j.erreurs||[]).forEach(e=>log('  ERREUR '+e));
+  if(j.fini||!j.suite)break;i=j.suite.i;d=j.suite.depart}
+  log('\nTerminé : '+tc+' éléments copiés, '+te+' erreur(s). Clique maintenant sur « Vérifier les comptes ».')}
+ catch(e){log('\nARRÊT : '+e.message)}$('go').disabled=false};
+$('ver').onclick=async()=>{try{const j=await F('action=etat');log('\nStockage actif : '+j.stockage_actif);
+ j.stores.forEach(s=>log((s.blobs===s.supabase?'OK  ':'ÉCART ')+s.store+' : Netlify '+s.blobs+' / Supabase '+s.supabase));
+ log(j.identique?'\nTout est identique.':'\nIl y a un écart : relance « Copier les données ».')}catch(e){log('\nERREUR : '+e.message)}};
+</script><script src="/centrer.js?v=1" defer></script>
+</body></html>

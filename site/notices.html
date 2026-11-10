@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Notices & Guides — Vespra Event</title>
+<link rel="stylesheet" href="/boutons-petits.css">
+<meta name="description" content="Notices d'utilisation et guides pratiques du matériel Vespra Event : machines, éclairage, sonorisation, barnums et brasero.">
+<script src="/donnees.js"></script><script src="/images-registre.js"></script><script src="/images.js"></script><script src="/mise-en-page.js"></script>
+<script src="/theme.js"></script>
+<link rel="icon" href="/favicon.ico?v=11" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=11">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png?v=11">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Bebas+Neue&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Bebas+Neue&display=swap"></noscript>
+<style>
+:root{color-scheme:light;
+  --navy:#1B2E4B;--navy-h:#162540;--gold:#F59E0B;
+  --bg:#F8FAFC;--white:#fff;--black:#0F1923;
+  --g1:#374151;--g2:#6B7280;--g3:#D1D5DB;--g4:#F3F4F6;
+  --r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--black);min-height:100vh}
+
+/* Header */
+.hdr{background:var(--navy);padding:24px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.hdr-logo{font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;letter-spacing:.04em;text-decoration:none}
+.hdr-badge{background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.18)}
+.hdr-back{color:rgba(255,255,255,.65);font-size:13px;text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .15s}
+.hdr-back:hover{color:#fff}
+.hdr-back svg{flex-shrink:0}
+
+/* Layout */
+.page{max-width:900px;margin:0 auto;padding:40px 24px 80px}
+
+/* Intro */
+.intro{margin-bottom:40px}
+.intro h1{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:.02em;color:var(--navy);line-height:1;margin-bottom:8px}
+.intro p{font-size:15px;color:var(--g2);line-height:1.6}
+
+/* Category */
+.cat-block{margin-bottom:48px}
+.cat-title{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid var(--g3)}
+.cat-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.cat-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.03em;color:var(--navy)}
+.cat-count{margin-left:auto;font-size:12px;font-weight:600;color:var(--g2);background:var(--g4);padding:3px 10px;border-radius:20px}
+
+/* Notice card */
+.notice-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.notice-card{background:var(--white);border-radius:14px;border:1.5px solid var(--g3);padding:20px;display:flex;flex-direction:column;gap:12px;transition:border-color .18s,box-shadow .18s}
+.notice-card:hover{border-color:#BFDBFE;box-shadow:0 4px 20px rgba(37,99,235,.08)}
+.nc-top{display:flex;align-items:flex-start;gap:12px}
+.nc-icon{width:44px;height:44px;border-radius:10px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.nc-info{flex:1;min-width:0}
+.nc-name{font-size:14px;font-weight:700;color:var(--black);line-height:1.35;margin-bottom:4px}
+.nc-desc{font-size:12px;color:var(--g2);line-height:1.5}
+.nc-tags{display:flex;flex-wrap:wrap;gap:5px}
+.nc-tag{font-size:11px;font-weight:600;color:#1E40AF;background:#DBEAFE;padding:3px 9px;border-radius:20px}
+.nc-tag.green{color:#166534;background:#DCFCE7}
+.nc-tag.orange{color:#9A3412;background:#FFEDD5}
+.nc-tag.grey{color:#374151;background:#F3F4F6}
+.nc-actions{display:flex;gap:8px;margin-top:4px}
+.btn-dl{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--navy);color:#fff;border-radius:8px;padding:9px 14px;font-size:12.5px;font-weight:700;text-decoration:none;transition:background .18s}
+.btn-dl:hover{background:var(--navy-h)}
+.btn-dl svg{flex-shrink:0}
+.btn-view{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#143A60;color:#fff;border-radius:9px;padding:9px 16px;font-size:12.5px;font-weight:700;text-decoration:none;white-space:nowrap;transition:background .18s,transform .18s}.btn-view:hover{background:#1e3650;transform:translateY(-1px)}
+/* Les liens de la partie descriptive sont bleus (.prod-article a) : cette
+   règle est plus spécifique que .btn-view et effaçait le texte blanc des
+   boutons, qui devenaient bleus sur fond bleu. On rétablit le blanc. */
+.prod-article .btn-view,.prod-article .btn-dl,.prod-article a.btn-view,.prod-article a.btn-dl{color:#fff}
+
+/* À venir */
+.coming-card{background:var(--white);border:1.5px dashed var(--g3);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;color:var(--g2)}
+.coming-card .cc-label{font-size:13px;font-weight:600}
+.coming-card .cc-sub{font-size:12px;margin-top:2px;font-weight:400}
+
+/* Footer */
+.foot{margin-top:60px;padding-top:24px;border-top:1px solid var(--g3);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.foot-note{font-size:12px;color:var(--g2)}
+.foot-link{font-size:12px;color:var(--navy);text-decoration:none;font-weight:600}
+.foot-link:hover{text-decoration:underline}
+
+@media(max-width:600px){
+  .hdr{padding:16px 20px}
+  .page{padding:28px 16px 60px}
+  .notice-grid{grid-template-columns:1fr}
+  .nc-actions{flex-direction:column}
+  .btn-dl,.btn-view{justify-content:center}
+}
+
+/* Vespra Event — header verre dépoli */
+.nav{
+  background:rgba(255,255,255,.68)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(180%)!important;
+  backdrop-filter:blur(18px) saturate(180%)!important;
+  border-bottom:1px solid rgba(255,255,255,.45)!important;
+  box-shadow:0 4px 18px rgba(12,15,20,.08)!important;
+}
+@media(max-width:960px){
+  .nav-links{
+    background:rgba(255,255,255,.72)!important;
+    -webkit-backdrop-filter:blur(18px) saturate(180%)!important;
+    backdrop-filter:blur(18px) saturate(180%)!important;
+    border-bottom:1px solid rgba(255,255,255,.42)!important;
+    box-shadow:0 10px 24px rgba(12,15,20,.10)!important;
+  }
+}
+
+</style>
+
+<style id="vespra-glass-header">
+/* Header effet verre dépoli */
+.nav{
+  background:rgba(255,255,255,.72)!important;
+  -webkit-backdrop-filter:blur(16px) saturate(140%)!important;
+  backdrop-filter:blur(16px) saturate(140%)!important;
+  border-bottom:1px solid rgba(255,255,255,.55)!important;
+  box-shadow:0 6px 24px rgba(20,58,96,.08)!important;
+}
+@media(max-width:960px){
+  .nav-links{
+    background:rgba(255,255,255,.78)!important;
+    -webkit-backdrop-filter:blur(16px) saturate(140%)!important;
+    backdrop-filter:blur(16px) saturate(140%)!important;
+    border-bottom:1px solid rgba(255,255,255,.55)!important;
+    box-shadow:0 10px 28px rgba(20,58,96,.10)!important;
+  }
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <a href="index.html" class="hdr-logo">Vespra Event</a>
+  <a href="index.html" class="hdr-back">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+    Retour au site
+  </a>
+</header>
+
+<div class="page">
+
+  <div class="intro">
+    <h1>Notices & Guides d'utilisation</h1>
+    <p>Toutes les notices de branchement, guides de mise en route et fiches techniques du parc Vespra Event, rangées par catégorie de produit. Page réservée à l'usage interne — non indexée par les moteurs de recherche.</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       CATÉGORIE : LUMIÈRE & EFFETS
+  ══════════════════════════════════════════════════ -->
+  <div class="cat-block" data-cat="Lumière & Effets">
+    <div class="cat-title">
+      <div class="cat-icon" style="background:#FEF3C7">💡</div>
+      <span class="cat-name">Lumière & Effets</span>
+      <span class="cat-count">2 notices</span>
+    </div>
+
+    <div class="notice-grid">
+      <!-- Notice : Ibiza 4 spots -->
+      <div class="notice-card">
+        <div class="nc-top">
+          <div class="nc-icon">📄</div>
+          <div class="nc-info">
+            <div class="nc-name">Ibiza 4 spots</div>
+            <div class="nc-desc">Guide de mise en route : passage du mode automatique AUT au mode musical SOU avec les boutons MENU, UP, DOWN et ENTER. Consignes de sécurité incluses.</div>
+          </div>
+        </div>
+        <div class="nc-tags">
+          <span class="nc-tag">Guide de mise en route</span><span class="nc-tag">Ibiza 4 spots</span>
+        </div>
+        <div class="nc-actions">
+          <a href="notice-ibiza-4-spots.pdf" download class="btn-dl">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Télécharger PDF
+          </a>
+          <a href="notice-ibiza-4-spots.pdf" target="_blank" rel="noopener" class="btn-view">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Voir
+          </a>
+        </div>
+      </div>
+
+      <!-- Notice : Eurolite 9 spots -->
+      <div class="notice-card">
+        <div class="nc-top">
+          <div class="nc-icon">📄</div>
+          <div class="nc-info">
+            <div class="nc-name">Eurolite 9 spots</div>
+            <div class="nc-desc">Guide de mise en route : passage du mode automatique AUT au mode musical SOU avec les boutons MENU, UP, DOWN et ENTER. Consignes de sécurité incluses.</div>
+          </div>
+        </div>
+        <div class="nc-tags">
+          <span class="nc-tag">Guide de mise en route</span><span class="nc-tag">Eurolite 9 spots</span>
+        </div>
+        <div class="nc-actions">
+          <a href="notice-eurolite-9-spots.pdf" download class="btn-dl">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Télécharger PDF
+          </a>
+          <a href="notice-eurolite-9-spots.pdf" target="_blank" rel="noopener" class="btn-view">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Voir
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       CATÉGORIE : SON & SONORISATION
+  ══════════════════════════════════════════════════ -->
+  <div class="cat-block" data-cat="Son & Sonorisation">
+    <div class="cat-title">
+      <div class="cat-icon" style="background:#DBEAFE">🔊</div>
+      <span class="cat-name">Son & Sonorisation</span>
+      <span class="cat-count">3 notices</span>
+    </div>
+
+    <div class="notice-grid">
+
+<!-- Notice 1 : Yamaha Stagepas 400BT -->
+      <div class="notice-card">
+        <div class="nc-top">
+          <div class="nc-icon">📄</div>
+          <div class="nc-info">
+            <div class="nc-name">Yamaha Stagepas 400BT (Pack Vespra 60 personnes / Sono 40–60 pers.)</div>
+            <div class="nc-desc">Guide de mise en route : 8 étapes : assemblage, câblage sources, séquence de démarrage, réglage du volume et appairage Bluetooth. Schéma de connexion inclus.</div>
+          </div>
+        </div>
+        <div class="nc-tags">
+          <span class="nc-tag">Guide de mise en route</span><span class="nc-tag">Yamaha Stagepas 400BT</span>
+        </div>
+        <div class="nc-actions">
+          <a href="notice-stagepas-400bt.pdf" download class="btn-dl">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Télécharger PDF
+          </a>
+          <a href="notice-stagepas-400bt.pdf" target="_blank" class="btn-view">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Voir
+          </a>
+        </div>
+      </div>
+
+<!-- Notice 2 : Syrincs D112SP -->
+      <div class="notice-card">
+        <div class="nc-top">
+          <div class="nc-icon">📄</div>
+          <div class="nc-info">
+            <div class="nc-name">Syrincs D112SP (Pack Vespra 100 pers. / Sono 80–100 pers.)</div>
+            <div class="nc-desc">Guide de mise en route : 7 étapes : appairage Bluetooth TWS entre 2 enceintes, connexion source, micro sans fil. Photo annotée du panneau arrière.</div>
+          </div>
+        </div>
+        <div class="nc-tags">
+          <span class="nc-tag">Guide de mise en route</span><span class="nc-tag">Syrincs D112SP</span>
+        </div>
+        <div class="nc-actions">
+          <a href="notice-syrincs-d112sp.pdf" download class="btn-dl">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Télécharger PDF
+          </a>
+          <a href="notice-syrincs-d112sp.pdf" target="_blank" class="btn-view">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Voir
+          </a>
+        </div>
+      </div>
+
+<!-- Notice 3 : Alto TS415 + TS18S + Yamaha AG06 -->
+      <div class="notice-card">
+        <div class="nc-top">
+          <div class="nc-icon">📄</div>
+          <div class="nc-info">
+            <div class="nc-name">Alto TS415 + TS18S + Yamaha AG06 (Pack Vespra 150 / 200 personnes)</div>
+            <div class="nc-desc">Guide de mise en route : couplage Bluetooth des 2 Alto TS415, branchement complet avec le caisson TS18S et la table Yamaha AG06S. Schéma de connexion inclus.</div>
+          </div>
+        </div>
+        <div class="nc-tags">
+          <span class="nc-tag">Guide de mise en route</span><span class="nc-tag">Pack Vespra 150 / 200 personnes</span>
+        </div>
+        <div class="nc-actions">
+          <a href="vespra-fiches-sono.pdf" download class="btn-dl">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Télécharger PDF
+          </a>
+          <a href="vespra-fiches-sono.pdf" target="_blank" class="btn-view">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Voir
+          </a>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       CATÉGORIE : BARNUM
+  ══════════════════════════════════════════════════ -->
+  <div class="cat-block" data-cat="Barnum">
+    <div class="cat-title">
+      <div class="cat-icon" style="background:#DBEAFE">⛺</div>
+      <span class="cat-name">Barnum</span>
+      <span class="cat-count">2 notices</span>
+    </div>
+
+    <div class="notice-grid">
+      <!-- Guide de montage : Barnum 4×8 m -->
+      <div class="notice-card">
+        <div class="nc-top">
+          <div class="nc-icon">📄</div>
+          <div class="nc-info">
+            <div class="nc-name">Barnum 4×8 m</div>
+            <div class="nc-desc">Guide de montage fabricant : pièces, schémas de montage, fixation et ancrage. La notice couvre les formats 4×6, 4×8 et 4×10 m.</div>
+          </div>
+        </div>
+        <div class="nc-tags">
+          <span class="nc-tag grey">4×8 m</span>
+          <span class="nc-tag orange">Guide de montage</span>
+        </div>
+        <div class="nc-actions">
+          <a href="barnum-4x8.pdf" target="_blank" rel="noopener" class="btn-dl">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Télécharger PDF
+          </a>
+          <a href="barnum-4x8.pdf" target="_blank" rel="noopener" class="btn-view">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Voir
+          </a>
+        </div>
+      </div>
+
+      <!-- Guide de montage : Barnum 6×10 m -->
+      <div class="notice-card">
+        <div class="nc-top">
+          <div class="nc-icon">📄</div>
+          <div class="nc-info">
+            <div class="nc-name">Barnum 6×10 m</div>
+            <div class="nc-desc">Guide de montage fabricant : pièces, schémas de montage, fixation et ancrage. La notice couvre les formats 6×6 à 6×14 m.</div>
+          </div>
+        </div>
+        <div class="nc-tags">
+          <span class="nc-tag grey">6×10 m</span>
+          <span class="nc-tag orange">Guide de montage</span>
+        </div>
+        <div class="nc-actions">
+          <a href="https://123-verleih.com/wp-content/uploads/2025/07/12x6-Aufbauanleitung.pdf" target="_blank" rel="noopener" class="btn-dl">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Télécharger PDF
+          </a>
+          <a href="https://123-verleih.com/wp-content/uploads/2025/07/12x6-Aufbauanleitung.pdf" target="_blank" rel="noopener" class="btn-view">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Voir
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       CATÉGORIE : ANIMATION
+  ══════════════════════════════════════════════════ -->
+  <div class="cat-block" data-cat="Animation">
+    <div class="cat-title">
+      <div class="cat-icon" style="background:#E0F2FE">📸</div>
+      <span class="cat-name">Animation</span>
+      <span class="cat-count">1 notice</span>
+    </div>
+
+    <div class="notice-grid">
+      <!-- Notice : Photobooth -->
+      <div class="notice-card">
+        <div class="nc-top">
+          <div class="nc-icon">📄</div>
+          <div class="nc-info">
+            <div class="nc-name">Photobooth — fiche technique et dépannage</div>
+            <div class="nc-desc">Guide de dépannage Photobooth : DNP RX1HS, DNP DS620 et appareil photo Canon. Procédures d’intervention rapide et assistance technique.</div>
+          </div>
+        </div>
+        <div class="nc-tags">
+          <span class="nc-tag">Photobooth</span><span class="nc-tag">Dépannage</span>
+        </div>
+        <div class="nc-actions">
+          <a href="fiche-technique-photobooth.pdf" download class="btn-dl">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Télécharger PDF
+          </a>
+          <a href="fiche-technique-photobooth.pdf" target="_blank" rel="noopener" class="btn-view">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Voir
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span class="foot-note">Vespra Event — vespraevent.fr — Page interne non indexée</span>
+    <a href="index.html" class="foot-link">← Retour au site</a>
+  </div>
+
+</div>
+<script src="/prix-registre.js" defer></script>
+<script src="/prix.js" defer></script>
+<script src="/textes.js" defer></script>
+<script src="/notices-registre.js" defer></script>
+<script src="/notices.js" defer></script>
+<script src="/entete.js" defer></script>
+<link rel="stylesheet" href="/mobile.css">
+<link rel="stylesheet" href="/fluide.css">
+<link rel="stylesheet" href="/boutons.css">
+<script src="/halloween.js" defer></script>
+<script src="/ambiance.js" defer></script>
+<script src="/adresse-auto.js"></script>
+<script src="/centrer.js?v=1" defer></script>
+</body>
+</html>

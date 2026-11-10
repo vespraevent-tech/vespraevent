@@ -1,0 +1,25 @@
+/* Bandeau du haut : trois repères fixes, dégradé bleu, fine ligne orange.
+   Mode sombre : dégradé noir, icônes blanches, fine ligne blanche. */
+html .ticker{background:linear-gradient(90deg,#2B4A6B,#234465);box-shadow:inset 0 1px 0 rgba(255,255,255,.18);border-bottom:2px solid #F59E0B;color:#fff;padding:0;height:36px;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;line-height:1.2;position:relative;width:100%}
+html .ticker-inner{display:flex;align-items:center;justify-content:center;gap:30px;animation:none;transform:none;font-size:12.5px;letter-spacing:0;font-weight:400;min-width:0;max-width:100%}
+html .ticker .tk-m{display:inline-flex;align-items:center;gap:8px;margin:0;color:#fff;text-decoration:none;min-width:0}
+html .ticker .tk-t{font-size:12.5px;font-weight:400;letter-spacing:0;color:#fff;overflow:hidden;text-overflow:ellipsis}
+html .ticker a.tk-m:hover .tk-t{opacity:.85}
+html .ticker .tk-i{display:inline-flex;width:15px;height:15px;flex:none;align-self:center}
+html .ticker .tk-t{line-height:1;padding-top:1px;box-sizing:border-box}
+html .ticker .tk-i svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+html .ticker .tk-s{width:1px;height:14px;background:rgba(255,255,255,.25);flex:none}
+html .ticker .l-court{display:none}
+@media(max-width:768px){
+  html .ticker{display:flex!important}
+  html .ticker-inner{gap:9px}
+  html .ticker .tk-t{font-size:11px}
+  html .ticker .tk-i{width:13px;height:13px}
+  html .ticker .tk-m{gap:6px}
+  html .ticker .l-long{display:none}
+  html .ticker .l-court{display:inline}
+}
+/* mode sombre : le site est inversé par l'ambiance, les couleurs ci-dessous sont donc les « négatifs » */
+html.am-sombre .ticker{background:linear-gradient(90deg,#f0f0f0,#e2e2e2 50%,#f0f0f0);box-shadow:none;border-bottom-color:rgba(0,0,0,.28);color:#000}
+html.am-sombre .ticker .tk-m,html.am-sombre .ticker .tk-t{color:#000}
+html.am-sombre .ticker .tk-s{background:rgba(0,0,0,.22)}

@@ -1,0 +1,284 @@
+/* ─────────────────────────────────────────────────────────────
+   Mise en page fluide — Vespra Event
+
+   Rien ici n'est calé sur un modèle de téléphone précis : textes,
+   boutons et espacements grandissent et rétrécissent en continu avec
+   la largeur de l'écran, de 280 px (très petit téléphone) à l'écran
+   d'ordinateur. Aux deux extrémités, on retrouve la taille d'origine ;
+   entre les deux, tout évolue progressivement. Au-dessous de 340 px,
+   textes et marges se resserrent un peu plus pour que rien ne touche
+   les bords d'un bouton.
+
+   Les tailles ci-dessous sont générées à partir des mesures réelles
+   de chaque élément (version téléphone 320 px et version ordinateur).
+   ───────────────────────────────────────────────────────────── */
+
+/* Cartes produit : 4 par ligne sur grand écran, 3 sur écran moyen,
+   2 sur téléphone, 1 seule sur un écran vraiment minuscule. */
+:root { --cols: 4; }
+@media (max-width: 1099px) { :root { --cols: 3; } }
+@media (max-width: 699px)  { :root { --cols: 2; } }
+@media (max-width: 299px)  { :root { --cols: 1; } }
+html body .prods-grid,
+html body .prod-grid {
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr)) !important;
+  gap: clamp(8px, 1vw + 4px, 28px) !important;
+}
+
+/* Un bouton ne dépasse jamais de son conteneur : le texte passe à la
+   ligne plutôt que de toucher les bords ou de sortir de l'écran. */
+html body button,
+html body [class*="btn"] {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+html body .catalogue-bottom-btn,
+html body .prod-vbtn-txt,
+html body .faq-q-cta {
+  white-space: normal !important;
+  text-wrap: balance;
+}
+html body .catalogue-bottom-actions { flex-wrap: wrap !important; }
+html body .catalogue-bottom-btn { flex: 0 1 auto !important; font-size: max(10.5px, min(calc(10.5px + (100vw - 280px) * 0.0125), 12.5px)) !important; padding-left: clamp(8px, 2.6vw, 13px) !important; padding-right: clamp(8px, 2.6vw, 13px) !important; }
+html body .star-btn { min-width: clamp(24px, 8.5vw, 34px) !important; min-height: clamp(30px, 9vw, 34px) !important; }
+html body .faq-stat { padding-left: clamp(14px, 3.5vw, 28px); padding-right: clamp(14px, 3.5vw, 28px); gap: clamp(12px, 3vw, 20px); }
+html body .faq-stats, html body .faq-hero-h, html body .faq-hero-sub { max-width: 100%; min-width: 0; overflow-wrap: break-word; }
+
+/* Les deux boutons de l'accueil restent côte à côte : le texte se calcule
+   sur la largeur réellement disponible, il ne touche jamais le bord. */
+html body .hero-cta .btn-p,
+html body .hero-cta .btn-o {
+  font-size: min(12.5px, calc((100vw - 56px) / 25)) !important;
+  padding-left: clamp(10px, 3.6vw, 16px) !important;
+  padding-right: clamp(10px, 3.6vw, 16px) !important;
+}
+
+/* Bouton « Devis » de l'en-tête */
+html body .cart-btn {
+  font-size: max(11px, min(calc(11px + (100vw - 280px) * 0.0095), 13px)) !important;
+  padding-left: clamp(8px, 1.6vw + 4px, 14px) !important;
+  padding-right: clamp(8px, 1.6vw + 4px, 14px) !important;
+}
+
+/* ── Tailles générées ─────────────────────────────────────── */
+html body a.blog-link{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), calc(12px + (100vw - 320px) * 0.001), 13px))!important}
+html body a.btn-cta{font-size:max(11.475px, min(calc(11.88px + (100vw - 280px) * 0.027), 13.5px))!important;padding-left:max(13.5px, min(calc(13.5px + (100vw - 280px) * 0.135), 27px))!important;padding-right:max(13.5px, min(calc(13.5px + (100vw - 280px) * 0.135), 27px))!important}
+html body a.btn-dl{font-size:max(10.625px, min(calc(11px + (100vw - 280px) * 0.025), 12.5px))!important;padding-left:max(7px, min(calc(7px + (100vw - 280px) * 0.07), 14px))!important;padding-right:max(7px, min(calc(7px + (100vw - 280px) * 0.07), 14px))!important}
+html body a.btn-gold{font-size:max(10.625px, min(calc(11px + (100vw - 280px) * 0.025), calc(12.5px + (100vw - 320px) * 0.001), 13.5px))!important;padding-left:clamp(10px, min(calc(10px + (100vw - 280px) * 0.1), calc(20px + (100vw - 320px) * 0.013)), 30px)!important;padding-right:clamp(10px, min(calc(10px + (100vw - 280px) * 0.1), calc(20px + (100vw - 320px) * 0.013)), 30px)!important}
+html body a.btn-nl{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important;padding-left:max(16px, min(calc(16px + (100vw - 280px) * 0.16), 32px))!important;padding-right:max(16px, min(calc(16px + (100vw - 280px) * 0.16), 32px))!important}
+html body a.btn-o{font-size:max(10.412px, min(calc(10.78px + (100vw - 280px) * 0.025), calc(12.25px + (100vw - 320px) * 0.002), 13.5px))!important}
+html body a.btn-p{font-size:max(11.475px, min(calc(11.88px + (100vw - 280px) * 0.027), 13.5px))!important;padding-left:max(13px, min(calc(13px + (100vw - 280px) * 0.13), 26px))!important;padding-right:max(13px, min(calc(13px + (100vw - 280px) * 0.13), 26px))!important}
+html body a.btn-view{font-size:max(10.625px, min(calc(11px + (100vw - 280px) * 0.025), 12.5px))!important;padding-left:max(8px, min(calc(8px + (100vw - 280px) * 0.08), 16px))!important;padding-right:max(8px, min(calc(8px + (100vw - 280px) * 0.08), 16px))!important}
+html body a.btn-w{font-size:max(11.475px, min(calc(11.88px + (100vw - 280px) * 0.027), 13.5px))!important;padding-left:max(15px, min(calc(15px + (100vw - 280px) * 0.15), 30px))!important;padding-right:max(15px, min(calc(15px + (100vw - 280px) * 0.15), 30px))!important}
+html body a.chip{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important;padding-left:max(10px, min(calc(10px + (100vw - 280px) * 0.1), 20px))!important;padding-right:max(10px, min(calc(10px + (100vw - 280px) * 0.1), 20px))!important}
+html body a.ez-btn{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important;padding-left:max(6px, min(calc(6px + (100vw - 280px) * 0.06), 12px))!important;padding-right:max(6px, min(calc(6px + (100vw - 280px) * 0.06), 12px))!important}
+html body a.ez-chip{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important;padding-left:max(7.5px, min(calc(7.5px + (100vw - 280px) * 0.075), 15px))!important;padding-right:max(7.5px, min(calc(7.5px + (100vw - 280px) * 0.075), 15px))!important}
+html body a.featured-link{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important;padding-left:max(12px, min(calc(12px + (100vw - 280px) * 0.12), 24px))!important;padding-right:max(12px, min(calc(12px + (100vw - 280px) * 0.12), 24px))!important}
+html body a.foot-link{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body a.home-form-catalogue-download{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), calc(13px + (100vw - 320px) * 0.004), 16px))!important;padding-left:max(8px, min(calc(8px + (100vw - 280px) * 0.08), 16px))!important;padding-right:max(8px, min(calc(8px + (100vw - 280px) * 0.08), 16px))!important}
+html body a.lg-dl{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important;padding-left:clamp(9px, min(calc(9px + (100vw - 280px) * 0.09), calc(18px + (100vw - 320px) * 0.005)), 22px)!important;padding-right:clamp(9px, min(calc(9px + (100vw - 280px) * 0.09), calc(18px + (100vw - 320px) * 0.005)), 22px)!important}
+html body a.pr-btn{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important;padding-left:max(12px, min(calc(12px + (100vw - 280px) * 0.12), 24px))!important;padding-right:max(12px, min(calc(12px + (100vw - 280px) * 0.12), 24px))!important}
+html body a.reco-part-tel{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important}
+html body a.rv-b{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important;padding-left:max(12px, min(calc(12px + (100vw - 280px) * 0.12), 24px))!important;padding-right:max(12px, min(calc(12px + (100vw - 280px) * 0.12), 24px))!important}
+html body a.sv-lien{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important}
+html body button.back-btn{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important}
+html body button.bests-arrow{font-size:max(14.45px, min(calc(14.96px + (100vw - 280px) * 0.034), calc(17px + (100vw - 320px) * 0.004), 20px))!important}
+html body button.bests-dot{font-size:max(11.333px, min(calc(11.733px + (100vw - 280px) * 0.027), 13.333px))!important}
+html body button.btn-add-cart{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important;padding-left:max(12px, min(calc(12px + (100vw - 280px) * 0.12), 24px))!important;padding-right:max(12px, min(calc(12px + (100vw - 280px) * 0.12), 24px))!important}
+html body button.btn-gold{font-size:max(12.325px, min(calc(12.76px + (100vw - 280px) * 0.029), 14.5px))!important;padding-left:max(13px, min(calc(13px + (100vw - 280px) * 0.13), 26px))!important;padding-right:max(13px, min(calc(13px + (100vw - 280px) * 0.13), 26px))!important}
+html body button.btn-p{font-size:max(11.475px, min(calc(11.88px + (100vw - 280px) * 0.027), 13.5px))!important;padding-left:max(7px, min(calc(7px + (100vw - 280px) * 0.07), 14px))!important;padding-right:max(7px, min(calc(7px + (100vw - 280px) * 0.07), 14px))!important}
+html body button.btn-submit{font-size:max(11.475px, min(calc(11.88px + (100vw - 280px) * 0.027), 13.5px))!important;padding-left:max(14px, min(calc(14px + (100vw - 280px) * 0.14), 28px))!important;padding-right:max(14px, min(calc(14px + (100vw - 280px) * 0.14), 28px))!important}
+html body button.faq-q{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important}
+html body button.form-input{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important;padding-left:max(8px, min(calc(8px + (100vw - 280px) * 0.08), 16px))!important;padding-right:max(8px, min(calc(8px + (100vw - 280px) * 0.08), 16px))!important}
+html body button.jx-open{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important;padding-left:max(8px, min(calc(8px + (100vw - 280px) * 0.08), 16px))!important;padding-right:max(8px, min(calc(8px + (100vw - 280px) * 0.08), 16px))!important}
+html body button.nl-btn{font-size:max(10.625px, min(calc(11px + (100vw - 280px) * 0.025), calc(12.5px + (100vw - 320px) * 0.002), 14px))!important;padding-left:clamp(10px, min(calc(10px + (100vw - 280px) * 0.1), calc(20px + (100vw - 320px) * 0.01)), 28px)!important;padding-right:clamp(10px, min(calc(10px + (100vw - 280px) * 0.1), calc(20px + (100vw - 320px) * 0.01)), 28px)!important}
+html body button.pr-btn{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important;padding-left:max(12px, min(calc(12px + (100vw - 280px) * 0.12), 24px))!important;padding-right:max(12px, min(calc(12px + (100vw - 280px) * 0.12), 24px))!important}
+html body button.pr-submit{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important;padding-left:max(14px, min(calc(14px + (100vw - 280px) * 0.14), 28px))!important;padding-right:max(14px, min(calc(14px + (100vw - 280px) * 0.14), 28px))!important}
+html body button.prod-vbtn{font-size:max(11.333px, min(calc(11.733px + (100vw - 280px) * 0.027), 13.333px))!important;padding-left:max(8px, min(calc(8px + (100vw - 280px) * 0.08), 16px))!important;padding-right:max(8px, min(calc(8px + (100vw - 280px) * 0.08), 16px))!important}
+html body button.prod-video-play{font-size:max(11.333px, min(calc(11.733px + (100vw - 280px) * 0.027), 13.333px))!important}
+html body button.re-next-btn{font-size:max(11.475px, min(calc(11.88px + (100vw - 280px) * 0.027), calc(13.5px + (100vw - 320px) * 0.001), 14px))!important;padding-left:clamp(11px, min(calc(11px + (100vw - 280px) * 0.11), calc(22px + (100vw - 320px) * 0.005)), 26px)!important;padding-right:clamp(11px, min(calc(11px + (100vw - 280px) * 0.11), calc(22px + (100vw - 320px) * 0.005)), 26px)!important}
+html body button.re-step-t{font-size:max(10.625px, min(calc(11px + (100vw - 280px) * 0.025), calc(12.5px + (100vw - 320px) * 0.002), 14px))!important}
+html body button.star-btn{font-size:max(18.7px, min(calc(19.36px + (100vw - 280px) * 0.044), calc(22px + (100vw - 320px) * 0.005), 26px))!important}
+html body button.va-btn{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important;padding-left:max(13px, min(calc(13px + (100vw - 280px) * 0.13), 26px))!important;padding-right:max(13px, min(calc(13px + (100vw - 280px) * 0.13), 26px))!important}
+html body div.addr-icon{font-size:max(13.6px, min(calc(14.08px + (100vw - 280px) * 0.032), 16px))!important}
+html body div.addr-text{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body div.art-tag{font-size:max(10px, 9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), calc(11px + (100vw - 320px) * -0.001)))!important}
+html body div.bc-cat{font-size:max(9px, 9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), calc(11px + (100vw - 320px) * -0.003)))!important}
+html body div.bc-desc{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body div.bc-name{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), calc(13px + (100vw - 320px) * 0.003), 15px))!important}
+html body div.bc-price{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), calc(13px + (100vw - 320px) * 0.005), 17px))!important}
+html body div.blog-cat{font-size:max(10px, 9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), calc(11px + (100vw - 320px) * -0.001)))!important}
+html body div.blog-excerpt{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), calc(12px + (100vw - 320px) * 0.001), 13px))!important}
+html body div.blog-hero-tag{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body div.blog-title{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), calc(14px + (100vw - 320px) * 0.003), 16px))!important}
+html body div.cat-hero-tag{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body div.cat-icon{font-size:max(17px, min(calc(17.6px + (100vw - 280px) * 0.04), 20px))!important}
+html body div.cl-card-n{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important}
+html body div.cl-card-p{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body div.cl-k{font-size:max(13.6px, min(calc(14.08px + (100vw - 280px) * 0.032), 16px))!important}
+html body div.cl-v{font-size:max(25.5px, min(calc(26.4px + (100vw - 280px) * 0.06), calc(30px + (100vw - 320px) * 0.018), 44px))!important}
+html body div.cta-tag{font-size:max(10px, 9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), calc(11px + (100vw - 320px) * -0.001)))!important}
+html body div.ez-h{font-size:max(25.5px, min(calc(26.4px + (100vw - 280px) * 0.06), calc(30px + (100vw - 320px) * 0.015), 42px))!important}
+html body div.ez-ico{font-size:max(28.9px, min(calc(29.92px + (100vw - 280px) * 0.068), 34px))!important}
+html body div.faq-a-inner{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body div.faq-hero-tag{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body div.faq-section-sub{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body div.faq-section-title{font-size:max(30.6px, min(calc(31.68px + (100vw - 280px) * 0.072), 36px))!important}
+html body div.faq-stat-l{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important}
+html body div.faq-stat-n{font-size:max(37.4px, min(calc(38.72px + (100vw - 280px) * 0.088), 44px))!important}
+html body div.featured-badge{font-size:max(8.5px, min(calc(8.8px + (100vw - 280px) * 0.02), 10px))!important}
+html body div.featured-title{font-size:max(23.8px, min(calc(24.64px + (100vw - 280px) * 0.056), calc(28px + (100vw - 320px) * 0.021), 44px))!important}
+html body div.form-subtitle{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body div.form-title{font-size:max(17px, min(calc(17.6px + (100vw - 280px) * 0.04), 20px))!important}
+html body div.ft-brand{font-size:max(18.7px, min(calc(19.36px + (100vw - 280px) * 0.044), 22px))!important}
+html body div.hero-eye{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body div.lg-alert{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body div.lg-box{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important}
+html body div.lg-date{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important}
+html body div.moment-desc{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body div.moment-title{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important}
+html body div.nc-desc{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body div.nc-icon{font-size:max(18.7px, min(calc(19.36px + (100vw - 280px) * 0.044), 22px))!important}
+html body div.nc-name{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body div.pc-cat{font-size:max(9px, 9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), calc(11px + (100vw - 320px) * -0.003)))!important}
+html body div.pc-name{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), calc(13px + (100vw - 320px) * 0.003), 15px))!important}
+html body div.pc-price{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), calc(12px + (100vw - 320px) * 0.004), 15px))!important}
+html body div.pp-ap-1{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important}
+html body div.pp-ap-2{font-size:max(21.25px, min(calc(22px + (100vw - 280px) * 0.05), calc(25px + (100vw - 320px) * 0.006), 30px))!important}
+html body div.pp-ap-3{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important}
+html body div.pp-ap-4{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body div.pp-ap-leg{font-size:max(9.775px, min(calc(10.12px + (100vw - 280px) * 0.023), 11.5px))!important}
+html body div.pp-t{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body div.pr-empty{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important}
+html body div.pr-tag{font-size:max(8.925px, min(calc(9.24px + (100vw - 280px) * 0.021), 10.5px))!important}
+html body div.prod-article-inner{font-size:max(13.6px, min(calc(14.08px + (100vw - 280px) * 0.032), 16px))!important}
+html body div.prod-cat{font-size:max(9px, 9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), calc(11px + (100vw - 320px) * -0.003)))!important}
+html body div.prod-cat-tag{font-size:max(10px, 9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), calc(11px + (100vw - 320px) * -0.001)))!important}
+html body div.prod-desc{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body div.prod-from-label{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body div.prod-name{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), calc(12px + (100vw - 320px) * 0.004), 15px))!important}
+html body div.prod-price{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), calc(12px + (100vw - 320px) * 0.006), 17px))!important}
+html body div.prod-trust-item{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body div.prod-variants-label{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body div.proof-l{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), calc(11px + (100vw - 320px) * 0.004), 14px))!important}
+html body div.proof-n{font-size:max(22.1px, min(calc(22.88px + (100vw - 280px) * 0.052), calc(26px + (100vw - 320px) * 0.044), 60px))!important}
+html body div.re-next-note{font-size:max(10.625px, min(calc(11px + (100vw - 280px) * 0.025), 12.5px))!important}
+html body div.rea-icon{font-size:max(17px, min(calc(17.6px + (100vw - 280px) * 0.04), 20px))!important}
+html body div.rea-label{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body div.rea-sub{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body div.reco-lieu{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important}
+html body div.rel-cat{font-size:max(10px, 9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), calc(11px + (100vw - 320px) * -0.001)))!important}
+html body div.rel-link{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important}
+html body div.rel-price{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), calc(13px + (100vw - 320px) * 0.004), 16px))!important}
+html body div.rel-title{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), calc(13px + (100vw - 320px) * 0.003), 15px))!important}
+html body div.rel-why{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), calc(11px + (100vw - 320px) * 0.002), 12.5px))!important}
+html body div.res-hero-tag{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body div.rf-t{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body div.rfv-t{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body div.rp-sceau{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body div.rv-k{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body div.sec-tag{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body div.sp-cat{font-size:max(10px, 9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), calc(11px + (100vw - 320px) * -0.001)))!important}
+html body div.sp-name{font-size:max(13.6px, min(calc(14.08px + (100vw - 280px) * 0.032), calc(16px + (100vw - 320px) * 0.005), 20px))!important}
+html body div.sp-price{font-size:max(14.45px, min(calc(14.96px + (100vw - 280px) * 0.034), calc(17px + (100vw - 320px) * 0.006), 22px))!important}
+html body div.sv-k{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body div.sv-lieu{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important}
+html body div.tarif-badge{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), calc(12px + (100vw - 320px) * 0.001), 13px))!important}
+html body div.tc-cap{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important}
+html body div.tc-dim{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important}
+html body div.tc-t{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body div.trust-title{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body div.why-icon{font-size:max(30.6px, min(calc(31.68px + (100vw - 280px) * 0.072), 36px))!important}
+html body div.why-sub{font-size:max(10.625px, min(calc(11px + (100vw - 280px) * 0.025), calc(12.5px + (100vw - 320px) * 0.002), 14px))!important}
+html body div.why-text{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body div.why-title{font-size:max(15.3px, min(calc(15.84px + (100vw - 280px) * 0.036), 18px))!important}
+html body div.zl-hero-tag{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body h2.cta-h{font-size:max(23.8px, min(calc(24.64px + (100vw - 280px) * 0.056), calc(28px + (100vw - 320px) * 0.012), 37.4px))!important}
+html body h2.pr-h2{font-size:max(18.7px, min(calc(19.36px + (100vw - 280px) * 0.044), calc(22px + (100vw - 320px) * 0.008), 27.9px))!important}
+html body h2.prod-video-h{font-size:max(25.5px, min(calc(26.4px + (100vw - 280px) * 0.06), 30px))!important}
+html body h3.sv-nom{font-size:max(19.55px, min(calc(20.24px + (100vw - 280px) * 0.046), 23px))!important}
+html body h4.ft-h4-suite{font-size:max(8.5px, min(calc(8.8px + (100vw - 280px) * 0.02), calc(10px + (100vw - 320px) * 0.001), 11px))!important}
+html body h4.reco-nom{font-size:max(21.25px, min(calc(22px + (100vw - 280px) * 0.05), 25px))!important}
+html body label.pr-label{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body label.reco-choix-l{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body p.art-chapo{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important}
+html body p.blog-hero-sub{font-size:max(14.45px, min(calc(14.96px + (100vw - 280px) * 0.034), 17px))!important}
+html body p.cat-hero-sub{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), calc(14px + (100vw - 320px) * 0.004), 17px))!important}
+html body p.cl-lead{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important}
+html body p.cl-note{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body p.cta-sub{font-size:max(10.625px, min(calc(11px + (100vw - 280px) * 0.025), calc(12.5px + (100vw - 320px) * 0.003), 15px))!important}
+html body p.ez-p{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important}
+html body p.faq-hero-sub{font-size:max(14.45px, min(calc(14.96px + (100vw - 280px) * 0.034), 17px))!important}
+html body p.faq-q-cta{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body p.featured-excerpt{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important}
+html body p.ft-desc{font-size:max(10.625px, min(calc(11px + (100vw - 280px) * 0.025), calc(12.5px + (100vw - 320px) * 0.001), 13px))!important}
+html body p.hero-sub{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), calc(13px + (100vw - 320px) * 0.005), 17px))!important}
+html body p.lg-crumb{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body p.lg-date{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important}
+html body p.nf-p{font-size:max(11.475px, min(calc(11.88px + (100vw - 280px) * 0.027), calc(13.5px + (100vw - 320px) * 0.002), 15px))!important}
+html body p.pp-note{font-size:max(10.625px, min(calc(11px + (100vw - 280px) * 0.025), 12.5px))!important}
+html body p.pr-baseline{font-size:max(13.6px, min(calc(14.08px + (100vw - 280px) * 0.032), 16px))!important}
+html body p.pr-form-subtitle{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important}
+html body p.pr-note{font-size:max(11.475px, min(calc(11.88px + (100vw - 280px) * 0.027), 13.5px))!important}
+html body p.pr-sub{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), calc(14px + (100vw - 320px) * 0.001), 14.5px))!important}
+html body p.prod-breadcrumb{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body p.prod-short-desc{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body p.prod-soustitre{font-size:max(9.775px, min(calc(10.12px + (100vw - 280px) * 0.023), calc(11.5px + (100vw - 320px) * 0.001), 12.5px))!important}
+html body p.prod-video-p{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body p.reco-mot{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body p.reco-note{font-size:max(11.475px, min(calc(11.88px + (100vw - 280px) * 0.027), calc(13.5px + (100vw - 320px) * 0.001), 14px))!important}
+html body p.reco-part-note{font-size:max(11.475px, min(calc(11.88px + (100vw - 280px) * 0.027), 13.5px))!important}
+html body p.rp-oblig{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body p.sp-desc{font-size:max(10.625px, min(calc(11px + (100vw - 280px) * 0.025), calc(12.5px + (100vw - 320px) * 0.001), 13px))!important}
+html body p.sv-lead{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important}
+html body p.sv-mot{font-size:max(11.475px, min(calc(11.88px + (100vw - 280px) * 0.027), calc(13.5px + (100vw - 320px) * 0.001), 14px))!important}
+html body p.sv-pied{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body p.zl-hero-sub{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), calc(14px + (100vw - 320px) * 0.004), 17px))!important}
+html body span.bc-from{font-size:max(7.65px, min(calc(7.92px + (100vw - 280px) * 0.018), calc(9px + (100vw - 320px) * 0.001), 10px))!important}
+html body span.blog-date{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), calc(11px + (100vw - 320px) * 0.001), 12px))!important}
+html body span.blog-read{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important}
+html body span.cat-count{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body span.cat-name{font-size:max(18.7px, min(calc(19.36px + (100vw - 280px) * 0.044), 22px))!important}
+html body span.city-badge-free{font-size:max(10px, 9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), calc(11px + (100vw - 320px) * -0.001)))!important}
+html body span.city-dist{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body span.city-name{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important}
+html body span.city-opt{font-size:max(10.948px, min(calc(11.334px + (100vw - 280px) * 0.026), 12.88px))!important}
+html body span.city-ticker-inner{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important}
+html body span.cl-badge{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body span.dept-tag{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body span.ez-alt{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important}
+html body span.ez-pop-l{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body span.foot-note{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body span.lg-dl-meta{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body span.nc-tag{font-size:max(9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), 11px))!important}
+html body span.pc-from{font-size:max(7.65px, min(calc(7.92px + (100vw - 280px) * 0.018), calc(9px + (100vw - 320px) * 0.001), 10px))!important}
+html body span.prod-from{font-size:max(7.65px, min(calc(7.92px + (100vw - 280px) * 0.018), calc(9px + (100vw - 320px) * 0.001), 10px))!important}
+html body span.prod-rating-count{font-size:max(11.05px, min(calc(11.44px + (100vw - 280px) * 0.026), 13px))!important}
+html body span.prod-stars{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important}
+html body span.prod-trust-icon{font-size:max(12.75px, min(calc(13.2px + (100vw - 280px) * 0.03), 15px))!important}
+html body span.prod-vbtn-name{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body span.prod-vbtn-price{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body span.prod-vbtn-sub{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body span.re-step-t{font-size:max(10.625px, min(calc(11px + (100vw - 280px) * 0.025), calc(12.5px + (100vw - 320px) * 0.002), 14px))!important}
+html body span.reco-groupe-n{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body span.reco-part-note{font-size:max(10.625px, min(calc(11px + (100vw - 280px) * 0.025), 12.5px))!important}
+html body span.reco-type{font-size:max(8.925px, min(calc(9.24px + (100vw - 280px) * 0.021), 10.5px))!important}
+html body span.rel-from{font-size:max(8.5px, 9.35px, min(calc(9.68px + (100vw - 280px) * 0.022), calc(11px + (100vw - 320px) * -0.003)))!important}
+html body span.sv-type{font-size:max(8.925px, min(calc(9.24px + (100vw - 280px) * 0.021), 10.5px))!important}
+html body span.tag-free{font-size:max(10.2px, min(calc(10.56px + (100vw - 280px) * 0.024), 12px))!important}
+html body span.variant-name{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+html body span.variant-price{font-size:max(11.9px, min(calc(12.32px + (100vw - 280px) * 0.028), 14px))!important}
+
+/* Filtres du catalogue : les deux listes passent l'une sous l'autre
+   quand la largeur ne permet plus de lire leur intitulé en entier. */
+@media (max-width: 640px) {
+  html body .filters { grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)) !important; }
+  html body .filter-select { text-overflow: ellipsis; font-size: max(11.5px, min(calc(11.5px + (100vw - 280px) * 0.0125), 13px)) !important; }
+}
+
+/* fiches produit : un peu d air entre le prix et « Choisissez votre… » */
+html body .prod-price-main + .prod-variants{margin-top:18px}
+
+/* téléphone : l'étiquette de catégorie occupe toujours deux lignes, pour que les noms de produits soient alignés d'une carte à l'autre */
+@media(max-width:640px){html body div.pc-cat,html body .prod-body .prod-cat{min-height:2.7em}}

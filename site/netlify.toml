@@ -1,0 +1,122 @@
+# Configuration Netlify — Vespra Event
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# La fonction qui construit les fiches créées depuis le back-office a
+# besoin du gabarit de page et de la page 404 : ils sont joints au code
+# de la fonction, sinon ils ne sont pas lisibles à l'exécution.
+[functions]
+  included_files = ["modele-produit.html", "404.html", "netlify/functions/_historique-reservations.json", "netlify/functions/_produits-pages.json", "netlify/functions/_contrat-modele.docx"]
+
+# Le site est entièrement statique : aucune commande de build.
+[build.environment]
+  NODE_VERSION = "20"
+  # L'identifiant du back-office est un mot courant du site (nom de domaine,
+  # adresse e-mail, sitemap) : le détecteur de secrets le retrouve partout et
+  # bloque le déploiement pour rien. On l'exclut de la recherche.
+  # ADMIN_PASSWORD, ADMIN_SECRET, AVIS_SECRET et RESEND_API_KEY restent surveillés.
+  SECRETS_SCAN_OMIT_KEYS = "ADMIN_USER"
+
+# ── En-têtes : cache long sur les fichiers immuables ────────
+# Images : revalidées à chaque affichage (réponse 304 si inchangées, donc
+# légères) : une photo remplacée sous le même nom s'affiche tout de suite.
+# Un cache « immutable » d'un an garderait une photo remplacée sous le même
+# nom de fichier pendant un an dans le navigateur des visiteurs.
+[[headers]]
+  for = "/*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, stale-while-revalidate=86400"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, stale-while-revalidate=86400"
+
+# Logo de la signature e-mail : cache long pour que Gmail l'affiche tout de suite.
+# (Si le logo change un jour, lui donner un nouveau nom de fichier.)
+[[headers]]
+  for = "/signature/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  # Mêmes en-têtes de sécurité pour les adresses sans « .html »
+  # (vespraevent.fr/prestations), qui sont celles utilisées par les visiteurs.
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # SAMEORIGIN (et non DENY) : le site doit pouvoir s'afficher dans le cadre
+    # d'aperçu du back-office, qui est sur le même domaine. Les sites tiers
+    # restent empêchés de l'afficher chez eux.
+    X-Frame-Options = "SAMEORIGIN"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()"
+    Cross-Origin-Opener-Policy = "same-origin"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.instagram.com https://www.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.netlify.app https://api-adresse.data.gouv.fr; frame-src 'self' https://www.instagram.com https://www.google.com https://maps.google.com; media-src 'self' blob: https:;"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # SAMEORIGIN (et non DENY) : le site doit pouvoir s'afficher dans le cadre
+    # d'aperçu du back-office, qui est sur le même domaine. Les sites tiers
+    # restent empêchés de l'afficher chez eux.
+    X-Frame-Options = "SAMEORIGIN"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()"
+    Cross-Origin-Opener-Policy = "same-origin"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.instagram.com https://www.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.netlify.app https://api-adresse.data.gouv.fr; frame-src 'self' https://www.instagram.com https://www.google.com https://maps.google.com; media-src 'self' blob: https:;"
+
+# Scripts et feuilles de style : toujours revérifiés, sans quoi un visiteur
+# pouvait exécuter l'ancienne version (ordre, photos, prix) avant la nouvelle.
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/*.pdf"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Content-Disposition = "inline"
+
+# Back-office installable comme application : le manifeste doit être servi
+# avec le bon type, et le service worker ne doit jamais rester en cache.
+[[headers]]
+  for = "/studio/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+
+[[headers]]
+  for = "/studio/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+# Back-office : toujours revérifier auprès du serveur. Un ordinateur qui garde
+# le back-office ouvert ou en cache pouvait afficher une ancienne version
+# pendant que le téléphone affichait déjà la nouvelle.
+[[headers]]
+  for = "/studio/*"
+  [headers.values]
+    Cache-Control = "no-cache, must-revalidate"
+
+[[headers]]
+  for = "/llms.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=3600"

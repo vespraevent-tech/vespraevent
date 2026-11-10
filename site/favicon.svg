@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-label="Vespra Event">
+  <!-- Le fond reste transparent. Sur une barre d'onglets sombre, un tracé
+       bleu marine ne se voyait plus : il passe donc en blanc quand le
+       navigateur est en thème sombre. -->
+  <style>
+    .trace { stroke: #234465; }
+    @media (prefers-color-scheme: dark) { .trace { stroke: #FFFFFF; } }
+  </style>
+  <g class="trace" fill="none" stroke-width="40">
+    <path d="M21.5 250 A228.5 228.5 0 1 1 250 478.5"/>
+    <path d="M92.5 250 A157.5 157.5 0 1 1 250 407.5"/>
+    <path d="M164 250 A86 86 0 1 1 250 336"/>
+  </g>
+</svg>

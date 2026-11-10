@@ -1,0 +1,3264 @@
+[
+{
+"id": "xls-2026-02-07-le-drean-ines",
+"client": "LE DREAN Ines",
+"phone": "07 82 12 99 90",
+"email": "",
+"dateStart": "2026-02-07",
+"dateEnd": "2026-02-07",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Pack Vespra 100 personnes",
+"short": "Pack 100",
+"cat": "sono",
+"price": 70.0,
+"variant": "100 personnes"
+}
+]
+},
+{
+"id": "xls-2026-02-14-grimault-allan",
+"client": "GRIMAULT Allan",
+"phone": "07 69 79 78 74",
+"email": "",
+"dateStart": "2026-02-14",
+"dateEnd": "2026-02-14",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Jeux de lumières Eurolite",
+"short": "Eurolite",
+"cat": "lumieres",
+"price": 30.0,
+"variant": "Standard"
+},
+{
+"name": "Machine à fumée",
+"short": "Fumée",
+"cat": "lumieres",
+"price": 10,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-02-28-beaulieu-dominique",
+"client": "BEAULIEU Dominique",
+"phone": "06 99 69 33 07",
+"email": "",
+"dateStart": "2026-02-28",
+"dateEnd": "2026-02-28",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Sono 40/60 personnes",
+"short": "Sono 40/60",
+"cat": "sono",
+"price": 30.0,
+"variant": "40 personnes"
+}
+]
+},
+{
+"id": "xls-2026-02-28-ranchoux-julien",
+"client": "RANCHOUX Julien",
+"phone": "06 81 21 61 00",
+"email": "",
+"dateStart": "2026-02-28",
+"dateEnd": "2026-02-28",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Jeux de lumières Eurolite",
+"short": "Eurolite",
+"cat": "lumieres",
+"price": 30.0,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-03-07-dufeu-arnaud",
+"client": "DUFEU Arnaud",
+"phone": "06 16 83 01 49",
+"email": "",
+"dateStart": "2026-03-07",
+"dateEnd": "2026-03-07",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "Balazé",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Pack Vespra 100 personnes",
+"short": "Pack 100",
+"cat": "sono",
+"price": 70.0,
+"variant": "100 personnes"
+},
+{
+"name": "Vidéoprojecteur",
+"short": "Vidéoproj.",
+"cat": "sono",
+"price": 10,
+"variant": "Seul"
+}
+]
+},
+{
+"id": "xls-2026-03-11-tanguy-claire",
+"client": "TANGUY Claire",
+"phone": "06 78 81 70 21",
+"email": "",
+"dateStart": "2026-03-11",
+"dateEnd": "2026-03-11",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Shampouineuse",
+"short": "Shampouineuse",
+"cat": "animation",
+"price": 15.0,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-03-28-brulard-pauline",
+"client": "BRULARD Pauline",
+"phone": "06 73 49 90 49",
+"email": "",
+"dateStart": "2026-03-28",
+"dateEnd": "2026-03-28",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Vidéoprojecteur",
+"short": "Vidéoproj.",
+"cat": "sono",
+"price": 10.0,
+"variant": "Seul"
+}
+]
+},
+{
+"id": "xls-2026-04-04-daniel-esteban",
+"client": "DANIEL Esteban",
+"phone": "06 37 20 14 95",
+"email": "",
+"dateStart": "2026-04-04",
+"dateEnd": "2026-04-04",
+"livraison": true,
+"livraisonPrice": 15.0,
+"acompte": 0,
+"source": "",
+"place": "Saint Ganton",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Pack Vespra 100 personnes",
+"short": "Pack 100",
+"cat": "sono",
+"price": 70.0,
+"variant": "100 personnes"
+}
+]
+},
+{
+"id": "xls-2026-04-04-janvier-marcel",
+"client": "JANVIER Marcel",
+"phone": "06 61 32 27 90",
+"email": "",
+"dateStart": "2026-04-04",
+"dateEnd": "2026-04-04",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "Guipry",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+},
+{
+"name": "Pack Vespra 100 personnes",
+"short": "Pack 100",
+"cat": "sono",
+"price": 70,
+"variant": "100 personnes"
+}
+]
+},
+{
+"id": "xls-2026-04-11-betton-louna",
+"client": "BETTON Louna",
+"phone": "06 47 11 45 61",
+"email": "",
+"dateStart": "2026-04-11",
+"dateEnd": "2026-04-11",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "Javène",
+"notes": "OFFRE PROCHAINE LOC",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+}
+]
+},
+{
+"id": "xls-2026-04-18-brunet-sebastien",
+"client": "BRUNET Sébastien",
+"phone": "06 27 26 07 87",
+"email": "",
+"dateStart": "2026-04-18",
+"dateEnd": "2026-04-18",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Sono 40/60 personnes",
+"short": "Sono 40/60",
+"cat": "sono",
+"price": 30.0,
+"variant": "40 personnes"
+},
+{
+"name": "Jeux de lumières Eurolite",
+"short": "Eurolite",
+"cat": "lumieres",
+"price": 30,
+"variant": "Standard"
+},
+{
+"name": "Machine à fumée",
+"short": "Fumée",
+"cat": "lumieres",
+"price": 10,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-04-18-lemarie-fanny",
+"client": "LEMARIE Fanny",
+"phone": "06 66 16 11 84",
+"email": "",
+"dateStart": "2026-04-18",
+"dateEnd": "2026-04-18",
+"livraison": true,
+"livraisonPrice": 20.0,
+"acompte": 0,
+"source": "",
+"place": "Laignelet",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+},
+{
+"id": "xls-2026-04-25-marechal-eric",
+"client": "MARECHAL Eric",
+"phone": "06 50 71 12 93",
+"email": "",
+"dateStart": "2026-04-25",
+"dateEnd": "2026-04-25",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Sono 40/60 personnes",
+"short": "Sono 40/60",
+"cat": "sono",
+"price": 30.0,
+"variant": "40 personnes"
+},
+{
+"name": "Jeux de lumières Eurolite",
+"short": "Eurolite",
+"cat": "lumieres",
+"price": 30,
+"variant": "Standard"
+},
+{
+"name": "Vidéoprojecteur",
+"short": "Vidéoproj.",
+"cat": "sono",
+"price": 10,
+"variant": "Seul"
+}
+]
+},
+{
+"id": "xls-2026-05-02-couturaud-anne-sophie",
+"client": "COUTURAUD Anne-Sophie",
+"phone": "06 82 52 65 33",
+"email": "",
+"dateStart": "2026-05-02",
+"dateEnd": "2026-05-02",
+"livraison": true,
+"livraisonPrice": 15.0,
+"acompte": 0,
+"source": "",
+"place": "12 L'Ecottais Moussé",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+}
+]
+},
+{
+"id": "xls-2026-05-07-toullec-patricia",
+"client": "TOULLEC Patricia",
+"phone": "06 88 41 01 58",
+"email": "",
+"dateStart": "2026-05-07",
+"dateEnd": "2026-05-07",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Jeux de lumières Eurolite",
+"short": "Eurolite",
+"cat": "lumieres",
+"price": 30.0,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-05-07-theard-flavie",
+"client": "THEARD Flavie",
+"phone": "06 29 27 26 13",
+"email": "",
+"dateStart": "2026-05-07",
+"dateEnd": "2026-05-07",
+"livraison": false,
+"livraisonPrice": 10.0,
+"acompte": 0,
+"source": "",
+"place": "supplément 1 jour en plus",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Livre d'or audio",
+"short": "Livre d'or",
+"cat": "animation",
+"price": 35.0,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-05-09-prioul-margaux",
+"client": "PRIOUL Margaux",
+"phone": "06 42 71 86 89",
+"email": "",
+"dateStart": "2026-05-09",
+"dateEnd": "2026-05-09",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "Saint Didier",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 145.0,
+"variant": "Personnalisé"
+}
+]
+},
+{
+"id": "xls-2026-05-13-le-floch-jan",
+"client": "LE FLOCH Jan",
+"phone": "07 66 65 56 48",
+"email": "",
+"dateStart": "2026-05-13",
+"dateEnd": "2026-05-13",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Pack Vespra 100 personnes",
+"short": "Pack 100",
+"cat": "sono",
+"price": 70.0,
+"variant": "100 personnes"
+}
+]
+},
+{
+"id": "xls-2026-05-16-fanielle-laetitia",
+"client": "FANIELLE Laetitia",
+"phone": "07 87 85 44 47",
+"email": "",
+"dateStart": "2026-05-16",
+"dateEnd": "2026-05-16",
+"livraison": true,
+"livraisonPrice": 15.0,
+"acompte": 0,
+"source": "",
+"place": "Genne sur seiche",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 100.0,
+"variant": "Numérique"
+}
+]
+},
+{
+"id": "xls-2026-05-23-cruchon-anne-lise",
+"client": "CRUCHON Anne Lise",
+"phone": "06 19 50 14 77",
+"email": "",
+"dateStart": "2026-05-23",
+"dateEnd": "2026-05-23",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Pack Vespra 60 personnes",
+"short": "Pack 60",
+"cat": "sono",
+"price": 60.0,
+"variant": "60 personnes"
+}
+]
+},
+{
+"id": "xls-2026-05-23-debrie-adeline",
+"client": "DEBRIE Adeline",
+"phone": "06 26 93 84 30",
+"email": "",
+"dateStart": "2026-05-23",
+"dateEnd": "2026-05-23",
+"livraison": true,
+"livraisonPrice": 10.0,
+"acompte": 0,
+"source": "",
+"place": "Erbree",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+},
+{
+"id": "xls-2026-05-30-lebreton-angelique",
+"client": "LEBRETON Angélique",
+"phone": "06 68 30 61 05",
+"email": "",
+"dateStart": "2026-05-30",
+"dateEnd": "2026-05-30",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Jeux de lumières Ibiza 4 spots",
+"short": "Ibiza 4 spots",
+"cat": "lumieres",
+"price": 20.0,
+"variant": "4 spots"
+}
+]
+},
+{
+"id": "xls-2026-05-30-guy-ylona",
+"client": "GUY Ylona",
+"phone": "06 95 71 32 56",
+"email": "",
+"dateStart": "2026-05-30",
+"dateEnd": "2026-05-30",
+"livraison": true,
+"livraisonPrice": 15.0,
+"acompte": 0,
+"source": "",
+"place": "Moutiers",
+"notes": "OFFRE PROCHAINE LOC",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+},
+{
+"id": "xls-2026-05-30-gogdet-jerome",
+"client": "GOGDET Jérôme",
+"phone": "06 37 22 40 74",
+"email": "",
+"dateStart": "2026-05-30",
+"dateEnd": "2026-05-30",
+"livraison": true,
+"livraisonPrice": 15.0,
+"acompte": 0,
+"source": "",
+"place": "Saint sauveur des landes",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 2",
+"short": "PB 2",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+},
+{
+"name": "Jeux de lumières Eurolite",
+"short": "Eurolite",
+"cat": "lumieres",
+"price": 30,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-06-06-mesle-magalie",
+"client": "MESLE Magalie",
+"phone": "06 67 45 92 58",
+"email": "",
+"dateStart": "2026-06-06",
+"dateEnd": "2026-06-06",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "Saint M'hervé - Samedi 10h",
+"notes": "OFFRE PROCHAINE LOC",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+},
+{
+"name": "Pack Vespra 60 personnes",
+"short": "Pack 60",
+"cat": "sono",
+"price": 60,
+"variant": "60 personnes"
+}
+]
+},
+{
+"id": "xls-2026-06-06-jerrican-fest",
+"client": "JERRICAN Fest",
+"phone": "",
+"email": "",
+"dateStart": "2026-06-06",
+"dateEnd": "2026-06-06",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "Festival - Argentré",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 2",
+"short": "PB 2",
+"cat": "photobooth",
+"price": 98.0,
+"variant": "Illimité"
+}
+]
+},
+{
+"id": "xls-2026-06-11-blanchard-tp",
+"client": "Blanchard TP",
+"phone": "02 99 78 65 90",
+"email": "",
+"dateStart": "2026-06-11",
+"dateEnd": "2026-06-11",
+"livraison": true,
+"livraisonPrice": 20.0,
+"acompte": 0,
+"source": "",
+"place": "1 rue de la Hautière, 35590 L'Hermitage",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 270.0,
+"variant": "400 tirages"
+}
+]
+},
+{
+"id": "xls-2026-06-13-bergere-marie",
+"client": "BERGERE Marie",
+"phone": "06 83 97 88 61",
+"email": "",
+"dateStart": "2026-06-13",
+"dateEnd": "2026-06-13",
+"livraison": true,
+"livraisonPrice": 15.0,
+"acompte": 0,
+"source": "",
+"place": "Le Bourgneuf la forêt - Beauvais rivage 53410",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 100.0,
+"variant": "Numérique"
+},
+{
+"name": "Jeux de lumières Eurolite",
+"short": "Eurolite",
+"cat": "lumieres",
+"price": 30,
+"variant": "Standard"
+},
+{
+"name": "Boule à facettes",
+"short": "Boule facettes",
+"cat": "lumieres",
+"price": 35,
+"variant": "Standard"
+},
+{
+"name": "Vidéoprojecteur",
+"short": "Vidéoproj. + écran",
+"cat": "sono",
+"price": 20,
+"variant": "Avec écran"
+},
+{
+"name": "Machine à fumée",
+"short": "Fumée",
+"cat": "lumieres",
+"price": 10,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-06-13-gerardot-albane",
+"client": "GERARDOT Albane",
+"phone": "07 82 07 56 80",
+"email": "",
+"dateStart": "2026-06-13",
+"dateEnd": "2026-06-13",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Pack Vespra 60 personnes",
+"short": "Pack 60",
+"cat": "sono",
+"price": 60.0,
+"variant": "60 personnes"
+}
+]
+},
+{
+"id": "xls-2026-06-13-leclou-frederic",
+"client": "LECLOU Frederic",
+"phone": "06 13 12 30 71",
+"email": "",
+"dateStart": "2026-06-13",
+"dateEnd": "2026-06-13",
+"livraison": true,
+"livraisonPrice": 15.0,
+"acompte": 0,
+"source": "",
+"place": "16 bis rue des vignes Chateaubourg",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 2",
+"short": "PB 2",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+},
+{
+"id": "xls-2026-06-19-le-meur-pauline",
+"client": "LE MEUR Pauline",
+"phone": "06 10 51 04 80",
+"email": "",
+"dateStart": "2026-06-19",
+"dateEnd": "2026-06-19",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "Vitré",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+},
+{
+"id": "xls-2026-06-21-boulle-celine",
+"client": "BOULLE Céline",
+"phone": "06 22 53 13 26",
+"email": "",
+"dateStart": "2026-06-21",
+"dateEnd": "2026-06-21",
+"livraison": true,
+"livraisonPrice": 15.0,
+"acompte": 0,
+"source": "",
+"place": "Livré sur changeon - 19 résidence des chênes",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+}
+]
+},
+{
+"id": "xls-2026-06-27-lucas-emilie",
+"client": "LUCAS Emilie",
+"phone": "07 60 58 88 60",
+"email": "",
+"dateStart": "2026-06-27",
+"dateEnd": "2026-06-27",
+"livraison": true,
+"livraisonPrice": 15.0,
+"acompte": 0,
+"source": "",
+"place": "Saint Pierre la cour",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 100.0,
+"variant": "Numérique"
+}
+]
+},
+{
+"id": "xls-2026-06-27-codron-marine",
+"client": "CODRON Marine",
+"phone": "06 62 75 22 64",
+"email": "",
+"dateStart": "2026-06-27",
+"dateEnd": "2026-06-27",
+"livraison": true,
+"livraisonPrice": 20.0,
+"acompte": 0,
+"source": "",
+"place": "Domalain",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 2",
+"short": "PB 2",
+"cat": "photobooth",
+"price": 100.0,
+"variant": "Numérique"
+},
+{
+"name": "Pack Vespra 100 personnes",
+"short": "Pack 100",
+"cat": "sono",
+"price": 70,
+"variant": "100 personnes"
+}
+]
+},
+{
+"id": "xls-2026-06-27-vandecandelaere-julie",
+"client": "VANDECANDELAERE Julie",
+"phone": "06 64 52 11 12",
+"email": "",
+"dateStart": "2026-06-27",
+"dateEnd": "2026-06-27",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "Trempe Sec la grande ferrière Vitré",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 3",
+"short": "PB 3",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+}
+]
+},
+{
+"id": "xls-2026-07-03-guinard-melanie",
+"client": "GUINARD Mélanie",
+"phone": "06 36 81 79 24",
+"email": "",
+"dateStart": "2026-07-03",
+"dateEnd": "2026-07-03",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Boule à facettes",
+"short": "Boule facettes",
+"cat": "lumieres",
+"price": 35.0,
+"variant": "Standard"
+},
+{
+"name": "Jeux de lumières Ibiza 4 spots",
+"short": "Ibiza 4 spots",
+"cat": "lumieres",
+"price": 20,
+"variant": "4 spots"
+}
+]
+},
+{
+"id": "xls-2026-07-04-pajaniandy-alexane",
+"client": "PAJANIANDY Alexane",
+"phone": "06 30 97 25 71",
+"email": "",
+"dateStart": "2026-07-04",
+"dateEnd": "2026-07-04",
+"livraison": true,
+"livraisonPrice": 10.0,
+"acompte": 0,
+"source": "",
+"place": "Saint Jean sur Vilaine",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+},
+{
+"name": "Sono 80/100 personnes",
+"short": "Sono 80/100",
+"cat": "sono",
+"price": 40,
+"variant": "80 personnes"
+}
+]
+},
+{
+"id": "xls-2026-07-04-lunel-carole",
+"client": "LUNEL Carole",
+"phone": "06 59 20 75 84",
+"email": "",
+"dateStart": "2026-07-04",
+"dateEnd": "2026-07-04",
+"livraison": true,
+"livraisonPrice": 20.0,
+"acompte": 0,
+"source": "",
+"place": "Servon sur Vilaine",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 2",
+"short": "PB 2",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+},
+{
+"id": "xls-2026-07-04-tual-helene",
+"client": "TUAL Helene",
+"phone": "06 84 94 33 92",
+"email": "",
+"dateStart": "2026-07-04",
+"dateEnd": "2026-07-04",
+"livraison": true,
+"livraisonPrice": 20.0,
+"acompte": 0,
+"source": "",
+"place": "Loiron",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 3",
+"short": "PB 3",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+}
+]
+},
+{
+"id": "xls-2026-07-04-le-goff-claire-violette",
+"client": "LE GOFF Claire-Violette",
+"phone": "06 79 53 08 30",
+"email": "",
+"dateStart": "2026-07-04",
+"dateEnd": "2026-07-04",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Vidéoprojecteur",
+"short": "Vidéoproj. + écran",
+"cat": "sono",
+"price": 20.0,
+"variant": "Avec écran"
+}
+]
+},
+{
+"id": "xls-2026-07-04-monnier-magali",
+"client": "MONNIER Magali",
+"phone": "06 24 97 49 61",
+"email": "",
+"dateStart": "2026-07-04",
+"dateEnd": "2026-07-04",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Pack Vespra 60 personnes",
+"short": "Pack 60",
+"cat": "sono",
+"price": 60.0,
+"variant": "60 personnes"
+},
+{
+"name": "Machine à fumée",
+"short": "Fumée",
+"cat": "lumieres",
+"price": 10,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-07-10-moutel-aude",
+"client": "MOUTEL Aude",
+"phone": "06 23 83 08 25",
+"email": "",
+"dateStart": "2026-07-10",
+"dateEnd": "2026-07-10",
+"livraison": true,
+"livraisonPrice": 25.0,
+"acompte": 0,
+"source": "",
+"place": "La Rouaudière",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+},
+{
+"id": "xls-2026-07-11-liboureau-cecile",
+"client": "LIBOUREAU Cécile",
+"phone": "06 73 48 68 74",
+"email": "",
+"dateStart": "2026-07-11",
+"dateEnd": "2026-07-11",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Sono 80/100 personnes",
+"short": "Sono 80/100",
+"cat": "sono",
+"price": 40.0,
+"variant": "80 personnes"
+},
+{
+"name": "Boule à facettes",
+"short": "Boule facettes",
+"cat": "lumieres",
+"price": 35,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-07-11-coquemont-fany",
+"client": "COQUEMONT Fany",
+"phone": "07 60 41 77 54",
+"email": "",
+"dateStart": "2026-07-11",
+"dateEnd": "2026-07-11",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "Val d'Izé",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 270.0,
+"variant": "400 tirages"
+}
+]
+},
+{
+"id": "xls-2026-07-11-rousseau-maeva",
+"client": "ROUSSEAU Maêva",
+"phone": "06 46 33 33 70",
+"email": "",
+"dateStart": "2026-07-11",
+"dateEnd": "2026-07-11",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Shampouineuse",
+"short": "Shampouineuse",
+"cat": "animation",
+"price": 15.0,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-07-13-ducourouble-etienne",
+"client": "DUCOUROUBLE Etienne",
+"phone": "07 69 07 05 85",
+"email": "",
+"dateStart": "2026-07-13",
+"dateEnd": "2026-07-13",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Vidéoprojecteur",
+"short": "Vidéoproj. + écran",
+"cat": "sono",
+"price": 20.0,
+"variant": "Avec écran"
+}
+]
+},
+{
+"id": "xls-2026-07-18-piton-lucille",
+"client": "PITON Lucille",
+"phone": "06 16 85 46 29",
+"email": "",
+"dateStart": "2026-07-18",
+"dateEnd": "2026-07-18",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Sono 40/60 personnes",
+"short": "Sono 40/60",
+"cat": "sono",
+"price": 30.0,
+"variant": "40 personnes"
+}
+]
+},
+{
+"id": "xls-2026-07-18-fauveau-pauline",
+"client": "FAUVEAU Pauline",
+"phone": "06 09 72 69 55",
+"email": "",
+"dateStart": "2026-07-18",
+"dateEnd": "2026-07-18",
+"livraison": true,
+"livraisonPrice": 15.0,
+"acompte": 0,
+"source": "",
+"place": "Breal sous Vitré",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+},
+{
+"name": "Pack Vespra 100 personnes",
+"short": "Pack 100",
+"cat": "sono",
+"price": 70,
+"variant": "100 personnes"
+},
+{
+"name": "Vidéoprojecteur",
+"short": "Vidéoproj. + écran",
+"cat": "sono",
+"price": 20,
+"variant": "Avec écran"
+}
+]
+},
+{
+"id": "xls-2026-07-18-le-ber-nolwen",
+"client": "LE BER Nolwen",
+"phone": "06 59 93 43 12",
+"email": "",
+"dateStart": "2026-07-18",
+"dateEnd": "2026-07-18",
+"livraison": true,
+"livraisonPrice": 15.0,
+"acompte": 0,
+"source": "",
+"place": "Domalain",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 2",
+"short": "PB 2",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+},
+{
+"id": "xls-2026-07-18-lolliot-amelie",
+"client": "LOLLIOT Amélie",
+"phone": "07 83 35 22 92",
+"email": "",
+"dateStart": "2026-07-18",
+"dateEnd": "2026-07-18",
+"livraison": true,
+"livraisonPrice": 35.0,
+"acompte": 0,
+"source": "",
+"place": "Haut Morand à Poilley",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 3",
+"short": "PB 3",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+},
+{
+"id": "xls-2026-07-25-bourgeais-vanessa",
+"client": "BOURGEAIS Vanessa",
+"phone": "06 10 86 80 53",
+"email": "",
+"dateStart": "2026-07-25",
+"dateEnd": "2026-07-25",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Livre d'or audio",
+"short": "Livre d'or",
+"cat": "animation",
+"price": 35.0,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-07-25-guillard-oceane",
+"client": "GUILLARD Océane",
+"phone": "06 16 13 34 49",
+"email": "",
+"dateStart": "2026-07-25",
+"dateEnd": "2026-07-25",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-07-25-paillette-guillaume",
+"client": "PAILLETTE Guillaume",
+"phone": "06 83 37 35 76",
+"email": "",
+"dateStart": "2026-07-25",
+"dateEnd": "2026-07-25",
+"livraison": true,
+"livraisonPrice": 50.0,
+"acompte": 0,
+"source": "",
+"place": "La Mancellière (50540)",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 2",
+"short": "PB 2",
+"cat": "photobooth",
+"price": 100.0,
+"variant": "Numérique"
+}
+]
+},
+{
+"id": "xls-2026-08-01-breton-elise",
+"client": "BRETON Elise",
+"phone": "06 32 68 43 74",
+"email": "",
+"dateStart": "2026-08-01",
+"dateEnd": "2026-08-01",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-08-01-hubert-nadege",
+"client": "HUBERT Nadège",
+"phone": "06 34 11 36 21",
+"email": "",
+"dateStart": "2026-08-01",
+"dateEnd": "2026-08-01",
+"livraison": true,
+"livraisonPrice": 20.0,
+"acompte": 0,
+"source": "",
+"place": "Saint hilaire du maine",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 2",
+"short": "PB 2",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+},
+{
+"name": "Livre d'or audio",
+"short": "Livre d'or",
+"cat": "animation",
+"price": 35,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-08-01-morisson-jordan",
+"client": "MORISSON Jordan",
+"phone": "",
+"email": "",
+"dateStart": "2026-08-01",
+"dateEnd": "2026-08-01",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Jeux de lumières Eurolite",
+"short": "Eurolite",
+"cat": "lumieres",
+"price": 0,
+"variant": "Standard"
+},
+{
+"name": "Jeux de lumières Ibiza 4 spots",
+"short": "Ibiza 4 spots",
+"cat": "lumieres",
+"price": 0,
+"variant": "4 spots"
+},
+{
+"name": "Machine à fumée",
+"short": "Fumée",
+"cat": "lumieres",
+"price": 0,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-08-08-dubos-aurelie",
+"client": "DUBOS Aurélie",
+"phone": "06 08 07 99 36",
+"email": "",
+"dateStart": "2026-08-08",
+"dateEnd": "2026-08-08",
+"livraison": true,
+"livraisonPrice": 15.0,
+"acompte": 0,
+"source": "",
+"place": "3 La planche 35130 La selle guerchaise",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 270.0,
+"variant": "400 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-08-22-berthelot-fanny",
+"client": "BERTHELOT Fanny",
+"phone": "06 86 18 80 53",
+"email": "",
+"dateStart": "2026-08-22",
+"dateEnd": "2026-08-22",
+"livraison": true,
+"livraisonPrice": 10.0,
+"acompte": 0,
+"source": "",
+"place": "Livré sur changeons",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+},
+{
+"id": "xls-2026-08-22-beauducel-tristan",
+"client": "BEAUDUCEL Tristan",
+"phone": "07 82 06 21 86",
+"email": "",
+"dateStart": "2026-08-22",
+"dateEnd": "2026-08-22",
+"livraison": true,
+"livraisonPrice": 25.0,
+"acompte": 0,
+"source": "",
+"place": "La rivère - La Salsa",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 2",
+"short": "PB 2",
+"cat": "photobooth",
+"price": 270.0,
+"variant": "400 tirages"
+}
+]
+},
+{
+"id": "xls-2026-08-22-bagot-verschuuren-morgan",
+"client": "BAGOT-VERSCHUUREN Morgane",
+"phone": "06 81 62 93 21",
+"email": "",
+"dateStart": "2026-08-22",
+"dateEnd": "2026-08-22",
+"livraison": true,
+"livraisonPrice": 50.0,
+"acompte": 0,
+"source": "",
+"place": "3 La Ville Pierre Plénée-Jugon 22640",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 3",
+"short": "PB 3",
+"cat": "photobooth",
+"price": 270.0,
+"variant": "400 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-08-22-trevier-jean",
+"client": "TREVIER Jean",
+"phone": "06 74 11 85 49",
+"email": "",
+"dateStart": "2026-08-22",
+"dateEnd": "2026-08-22",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 4",
+"short": "PB 4",
+"cat": "photobooth",
+"price": 100.0,
+"variant": "Numérique"
+},
+{
+"name": "Pack Vespra 100 personnes",
+"short": "Pack 100",
+"cat": "sono",
+"price": 70,
+"variant": "100 personnes"
+}
+]
+},
+{
+"id": "xls-2026-08-22-guichard-jean-francois",
+"client": "GUICHARD Jean François",
+"phone": "06 17 70 55 50",
+"email": "",
+"dateStart": "2026-08-22",
+"dateEnd": "2026-08-22",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Pack Vespra 60 personnes",
+"short": "Pack 60",
+"cat": "sono",
+"price": 60.0,
+"variant": "60 personnes"
+}
+]
+},
+{
+"id": "xls-2026-08-22-hamon-tiffanie",
+"client": "HAMON TIFFANIE",
+"phone": "06 43 83 40 71",
+"email": "",
+"dateStart": "2026-08-22",
+"dateEnd": "2026-08-22",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Vidéoprojecteur",
+"short": "Vidéoproj. + écran",
+"cat": "sono",
+"price": 20.0,
+"variant": "Avec écran"
+}
+]
+},
+{
+"id": "xls-2026-08-29-monnier-carl",
+"client": "MONNIER Carl",
+"phone": "06 83 88 34 81",
+"email": "",
+"dateStart": "2026-08-29",
+"dateEnd": "2026-08-29",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Vidéoprojecteur",
+"short": "Vidéoproj.",
+"cat": "sono",
+"price": 10.0,
+"variant": "Seul"
+}
+]
+},
+{
+"id": "xls-2026-08-29-le-ber-nolwen",
+"client": "LE BER Nolwen",
+"phone": "06 59 93 43 12",
+"email": "",
+"dateStart": "2026-08-29",
+"dateEnd": "2026-08-29",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "Argenté",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+},
+{
+"name": "Brasero",
+"short": "Brasero",
+"cat": "restauration",
+"price": 100,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-08-29-binois-anais",
+"client": "BINOIS Anaïs",
+"phone": "06 45 92 86 74",
+"email": "",
+"dateStart": "2026-08-29",
+"dateEnd": "2026-08-29",
+"livraison": true,
+"livraisonPrice": 30.0,
+"acompte": 0,
+"source": "",
+"place": "Le haut fousseau - Saint Pierre des Landes",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 2",
+"short": "PB 2",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+},
+{
+"id": "xls-2026-08-29-painchaud-maiwenn",
+"client": "PAINCHAUD Maïwenn",
+"phone": "06 14 04 42 04",
+"email": "",
+"dateStart": "2026-08-29",
+"dateEnd": "2026-08-29",
+"livraison": true,
+"livraisonPrice": 15.0,
+"acompte": 0,
+"source": "",
+"place": "Complexe du grand champ 15 rue des écoles Mecé",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 3",
+"short": "PB 3",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-08-29-boucherie-moise",
+"client": "BOUCHERIE Moise",
+"phone": "06 45 60 81 02",
+"email": "",
+"dateStart": "2026-08-29",
+"dateEnd": "2026-08-29",
+"livraison": true,
+"livraisonPrice": 25.0,
+"acompte": 0,
+"source": "",
+"place": "Javardan , Fercé 44660",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 4",
+"short": "PB 4",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-09-03-passion-reception",
+"client": "PASSION RECEPTION",
+"phone": "02 99 74 22 91",
+"email": "",
+"dateStart": "2026-09-03",
+"dateEnd": "2026-09-03",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 290.0,
+"variant": "400 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-09-05-sibille-cassandre",
+"client": "SIBILLE Cassandre",
+"phone": "06 67 07 74 59",
+"email": "",
+"dateStart": "2026-09-05",
+"dateEnd": "2026-09-05",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Machine à pop-corn",
+"short": "Pop-corn",
+"cat": "restauration",
+"price": 30.0,
+"variant": "Avec maïs"
+}
+]
+},
+{
+"id": "xls-2026-09-05-pintas-celine",
+"client": "PINTAS Céline",
+"phone": "06 76 18 68 64",
+"email": "",
+"dateStart": "2026-09-05",
+"dateEnd": "2026-09-05",
+"livraison": true,
+"livraisonPrice": 15.0,
+"acompte": 0,
+"source": "",
+"place": "31 la Poulaillerie Le Bourgneuf la Forêt 53410",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 200.0,
+"variant": "200 tirages"
+},
+{
+"name": "Déguisement",
+"short": "Déguisement",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+},
+{
+"name": "Pack Vespra 100 personnes",
+"short": "Pack 100",
+"cat": "sono",
+"price": 70,
+"variant": "100 personnes"
+}
+]
+},
+{
+"id": "xls-2026-09-05-gaudemer-marine",
+"client": "GAUDEMER Marine",
+"phone": "07 63 50 90 72",
+"email": "",
+"dateStart": "2026-09-05",
+"dateEnd": "2026-09-05",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 2",
+"short": "PB 2",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-09-05-monnerie-daniel",
+"client": "MONNERIE Daniel",
+"phone": "06 98 00 35 53",
+"email": "",
+"dateStart": "2026-09-05",
+"dateEnd": "2026-09-05",
+"livraison": true,
+"livraisonPrice": 60.0,
+"acompte": 0,
+"source": "",
+"place": "49 Le bois blin Erbrée",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Barnum 6x10m",
+"short": "Barnum 6x10",
+"cat": "barnum",
+"price": 155.0,
+"variant": "6x10m"
+}
+]
+},
+{
+"id": "xls-2026-09-05-gaudioso-graziella",
+"client": "GAUDIOSO Graziella",
+"phone": "06 31 71 10 93",
+"email": "",
+"dateStart": "2026-09-05",
+"dateEnd": "2026-09-05",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "Guipry",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 3",
+"short": "PB 3",
+"cat": "photobooth",
+"price": 130.0,
+"variant": "Personnalisé"
+}
+]
+},
+{
+"id": "xls-2026-09-05-janson-cyndie",
+"client": "JANSON Cyndie",
+"phone": "06 80 50 38 75",
+"email": "",
+"dateStart": "2026-09-05",
+"dateEnd": "2026-09-05",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 4",
+"short": "PB 4",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+},
+{
+"id": "xls-2026-09-12-jobert-marine",
+"client": "JOBERT Marine",
+"phone": "06 21 29 74 73",
+"email": "",
+"dateStart": "2026-09-12",
+"dateEnd": "2026-09-12",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 100.0,
+"variant": "Numérique"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-09-12-lucas-pauline",
+"client": "LUCAS Pauline",
+"phone": "06 47 94 22 66",
+"email": "",
+"dateStart": "2026-09-12",
+"dateEnd": "2026-09-12",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "Vitré",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 2",
+"short": "PB 2",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-09-12-gendron-lila",
+"client": "GENDRON Lila",
+"phone": "07 66 11 98 09",
+"email": "",
+"dateStart": "2026-09-12",
+"dateEnd": "2026-09-12",
+"livraison": true,
+"livraisonPrice": 30.0,
+"acompte": 0,
+"source": "",
+"place": "la péniardière, parigné, 35133",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 3",
+"short": "PB 3",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+},
+{
+"id": "xls-2026-09-12-bilheude-mathieu",
+"client": "BILHEUDE Mathieu",
+"phone": "06 12 12 34 28",
+"email": "",
+"dateStart": "2026-09-12",
+"dateEnd": "2026-09-12",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 4",
+"short": "PB 4",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-09-18-cariou-laura",
+"client": "CARIOU Laura",
+"phone": "02 99 75 87 40",
+"email": "",
+"dateStart": "2026-09-18",
+"dateEnd": "2026-09-18",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "Entreprise Cooper",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 490.0,
+"variant": "Personnalisé"
+}
+]
+},
+{
+"id": "xls-2026-09-19-pare-caroline",
+"client": "PARE Caroline",
+"phone": "06 62 55 01 09",
+"email": "",
+"dateStart": "2026-09-19",
+"dateEnd": "2026-09-19",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Vidéoprojecteur",
+"short": "Vidéoproj. + écran",
+"cat": "sono",
+"price": 20.0,
+"variant": "Avec écran"
+}
+]
+},
+{
+"id": "xls-2026-09-19-segretain-pauline",
+"client": "SEGRETAIN Pauline",
+"phone": "06 72 81 42 84",
+"email": "",
+"dateStart": "2026-09-19",
+"dateEnd": "2026-09-19",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Brasero",
+"short": "Brasero",
+"cat": "restauration",
+"price": 100.0,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-09-19-frangeul-pauline",
+"client": "FRANGEUL Pauline",
+"phone": "06 29 57 14 60",
+"email": "",
+"dateStart": "2026-09-19",
+"dateEnd": "2026-09-19",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Sono 40/60 personnes",
+"short": "Sono 40/60",
+"cat": "sono",
+"price": 30.0,
+"variant": "40 personnes"
+},
+{
+"name": "Jeux de lumières Ibiza 4 spots",
+"short": "Ibiza 4 spots",
+"cat": "lumieres",
+"price": 20,
+"variant": "4 spots"
+}
+]
+},
+{
+"id": "xls-2026-09-19-aubril-sandra",
+"client": "AUBRIL Sandra",
+"phone": "06 31 34 68 28",
+"email": "",
+"dateStart": "2026-09-19",
+"dateEnd": "2026-09-19",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Pack Vespra 100 personnes",
+"short": "Pack 100",
+"cat": "sono",
+"price": 60.0,
+"variant": "100 personnes"
+}
+]
+},
+{
+"id": "xls-2026-09-19-grosset-catherine",
+"client": "GROSSET Catherine",
+"phone": "06 27 11 71 89",
+"email": "",
+"dateStart": "2026-09-19",
+"dateEnd": "2026-09-19",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-09-19-guinche-barbara",
+"client": "GUINCHE Barbara",
+"phone": "06 13 52 31 73",
+"email": "",
+"dateStart": "2026-09-19",
+"dateEnd": "2026-09-19",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "Moutiers",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 2",
+"short": "PB 2",
+"cat": "photobooth",
+"price": 390.0,
+"variant": "Illimité"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-09-19-mordrelle-coraline",
+"client": "MORDRELLE Coraline",
+"phone": "06 16 53 66 01",
+"email": "",
+"dateStart": "2026-09-19",
+"dateEnd": "2026-09-19",
+"livraison": true,
+"livraisonPrice": 20.0,
+"acompte": 0,
+"source": "",
+"place": "Breal sous Vitré - 5 rue de la mairie",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 3",
+"short": "PB 3",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-09-19-meneux-helene",
+"client": "MENEUX Hélène",
+"phone": "06 76 42 36 48",
+"email": "",
+"dateStart": "2026-09-19",
+"dateEnd": "2026-09-19",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 4",
+"short": "PB 4",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+}
+]
+},
+{
+"id": "xls-2026-09-26-meilleray-clemence",
+"client": "MEILLERAY Clémence",
+"phone": "06 61 29 41 10",
+"email": "",
+"dateStart": "2026-09-26",
+"dateEnd": "2026-09-26",
+"livraison": true,
+"livraisonPrice": 20.0,
+"acompte": 0,
+"source": "",
+"place": "Sainte Marie",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+},
+{
+"id": "xls-2026-09-26-martin-sandra",
+"client": "MARTIN Sandra",
+"phone": "06 21 13 80 81",
+"email": "",
+"dateStart": "2026-09-26",
+"dateEnd": "2026-09-26",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Vidéoprojecteur",
+"short": "Vidéoproj.",
+"cat": "sono",
+"price": 10.0,
+"variant": "Seul"
+}
+]
+},
+{
+"id": "xls-2026-09-26-subile-valentin",
+"client": "SUBILE Valentin",
+"phone": "06 08 09 25 53",
+"email": "",
+"dateStart": "2026-09-26",
+"dateEnd": "2026-09-26",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Barnum 6x10m",
+"short": "Barnum 6x10",
+"cat": "barnum",
+"price": 190.0,
+"variant": "6x10m"
+}
+]
+},
+{
+"id": "xls-2026-09-26-dos-santos-gisele",
+"client": "DOS SANTOS Gisèle",
+"phone": "06 03 93 61 49",
+"email": "",
+"dateStart": "2026-09-26",
+"dateEnd": "2026-09-26",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Pack Vespra 60 personnes",
+"short": "Pack 60",
+"cat": "sono",
+"price": 60.0,
+"variant": "60 personnes"
+}
+]
+},
+{
+"id": "xls-2026-09-26-rouply-jonathan",
+"client": "ROUPLY JONATHAN",
+"phone": "06 79 72 67 27",
+"email": "",
+"dateStart": "2026-09-26",
+"dateEnd": "2026-09-26",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Pack Vespra 100 personnes",
+"short": "Pack 100",
+"cat": "sono",
+"price": 70.0,
+"variant": "100 personnes"
+}
+]
+},
+{
+"id": "xls-2026-09-26-couetil-doriane",
+"client": "COUETIL Doriane",
+"phone": "07 69 09 06 62",
+"email": "",
+"dateStart": "2026-09-26",
+"dateEnd": "2026-09-26",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 2",
+"short": "PB 2",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-10-03-lecampion-mathieu",
+"client": "LECAMPION Mathieu",
+"phone": "06 46 83 08 66",
+"email": "",
+"dateStart": "2026-10-03",
+"dateEnd": "2026-10-03",
+"livraison": true,
+"livraisonPrice": 15.0,
+"acompte": 0,
+"source": "",
+"place": "Val d'izé",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Pack Vespra 100 personnes",
+"short": "Pack 100",
+"cat": "sono",
+"price": 70.0,
+"variant": "100 personnes"
+},
+{
+"name": "Vidéoprojecteur",
+"short": "Vidéoproj. + écran",
+"cat": "sono",
+"price": 20,
+"variant": "Avec écran"
+}
+]
+},
+{
+"id": "xls-2026-10-10-maho",
+"client": "MAHO",
+"phone": "06 63 78 63 67",
+"email": "",
+"dateStart": "2026-10-10",
+"dateEnd": "2026-10-10",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Pack Vespra 60 personnes",
+"short": "Pack 60",
+"cat": "sono",
+"price": 60.0,
+"variant": "60 personnes"
+}
+]
+},
+{
+"id": "xls-2026-10-10-perrin-corinne",
+"client": "PERRIN Corinne",
+"phone": "07 52 07 96 65",
+"email": "",
+"dateStart": "2026-10-10",
+"dateEnd": "2026-10-10",
+"livraison": true,
+"livraisonPrice": 25.0,
+"acompte": 0,
+"source": "",
+"place": "Gué aux merles - Fougères",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-10-17-havenel-marie",
+"client": "HAVENEL Marie",
+"phone": "07 89 57 76 74",
+"email": "",
+"dateStart": "2026-10-17",
+"dateEnd": "2026-10-17",
+"livraison": true,
+"livraisonPrice": 46.0,
+"acompte": 0,
+"source": "",
+"place": "Montreuil sur Ille",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+},
+{
+"id": "xls-2026-10-24-begouin-ronan",
+"client": "BEGOUIN Ronan",
+"phone": "06 38 29 56 50",
+"email": "",
+"dateStart": "2026-10-24",
+"dateEnd": "2026-10-24",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Pack Vespra 60 personnes",
+"short": "Pack 60",
+"cat": "sono",
+"price": 60.0,
+"variant": "60 personnes"
+}
+]
+},
+{
+"id": "xls-2026-10-24-delonnglee-geraldine",
+"client": "DELONNGLEE Geraldine",
+"phone": "06 98 58 19 27",
+"email": "",
+"dateStart": "2026-10-24",
+"dateEnd": "2026-10-24",
+"livraison": true,
+"livraisonPrice": 25.0,
+"acompte": 0,
+"source": "",
+"place": "salle communale de la  Selle Guerchaise",
+"notes": "livraison le samedi apres midi si possible",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-10-31-jouanne-amandine",
+"client": "JOUANNE Amandine",
+"phone": "06 23 27 36 62",
+"email": "",
+"dateStart": "2026-10-31",
+"dateEnd": "2026-10-31",
+"livraison": true,
+"livraisonPrice": 20.0,
+"acompte": 0,
+"source": "",
+"place": "Haras de la chaîne à St Pierre des landes",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+}
+]
+},
+{
+"id": "xls-2026-10-31-hardouin-alexandra",
+"client": "HARDOUIN Alexandra",
+"phone": "06 61 19 24 50",
+"email": "",
+"dateStart": "2026-10-31",
+"dateEnd": "2026-10-31",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Jeux de lumières Ibiza 4 spots",
+"short": "Ibiza 4 spots",
+"cat": "lumieres",
+"price": 20.0,
+"variant": "4 spots"
+},
+{
+"name": "Vidéoprojecteur",
+"short": "Vidéoproj. + écran",
+"cat": "sono",
+"price": 20,
+"variant": "Avec écran"
+}
+]
+},
+{
+"id": "xls-2026-10-31-jolly-celine",
+"client": "JOLLY Céline",
+"phone": "06 35 09 77 79",
+"email": "",
+"dateStart": "2026-10-31",
+"dateEnd": "2026-10-31",
+"livraison": true,
+"livraisonPrice": 40.0,
+"acompte": 0,
+"source": "",
+"place": "Cournon",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 2",
+"short": "PB 2",
+"cat": "photobooth",
+"price": 230.0,
+"variant": "200 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-11-28-balc-hou-dorine",
+"client": "BALC'HOU Dorine",
+"phone": "06 32 80 85 73",
+"email": "",
+"dateStart": "2026-11-28",
+"dateEnd": "2026-11-28",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Machine à pop-corn",
+"short": "Pop-corn",
+"cat": "restauration",
+"price": 20.0,
+"variant": "Sans maïs"
+}
+]
+},
+{
+"id": "xls-2026-11-28-rethore-axel",
+"client": "RETHORE Axel",
+"phone": "07 88 08 48 13",
+"email": "",
+"dateStart": "2026-11-28",
+"dateEnd": "2026-11-28",
+"livraison": true,
+"livraisonPrice": 15.0,
+"acompte": 0,
+"source": "",
+"place": "Espace culturel André Blot Rue de la Dobiais, 35340 La Bouëxière",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 205.0,
+"variant": "200 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2026-12-05-boultareau-marie",
+"client": "BOULTAREAU Marie",
+"phone": "06 02 22 41 74",
+"email": "",
+"dateStart": "2026-12-05",
+"dateEnd": "2026-12-05",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+},
+{
+"name": "Pack Vespra 150 personnes",
+"short": "Pack 150",
+"cat": "sono",
+"price": 110,
+"variant": "150 personnes"
+}
+]
+},
+{
+"id": "xls-2026-12-19-lequeux-manon",
+"client": "LEQUEUX Manon",
+"phone": "07 69 40 85 63",
+"email": "",
+"dateStart": "2026-12-19",
+"dateEnd": "2026-12-19",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2027-03-27-prioul-margaux",
+"client": "PRIOUL Margaux",
+"phone": "06 42 71 86 89",
+"email": "",
+"dateStart": "2027-03-27",
+"dateEnd": "2027-03-27",
+"livraison": true,
+"livraisonPrice": 20.0,
+"acompte": 0,
+"source": "",
+"place": "Guipry",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+},
+{
+"name": "Pack Vespra 100 personnes",
+"short": "Pack 100",
+"cat": "sono",
+"price": 70,
+"variant": "100 personnes"
+}
+]
+},
+{
+"id": "xls-2027-04-24-fournier-megane",
+"client": "FOURNIER Mégane",
+"phone": "07 60 34 38 88",
+"email": "",
+"dateStart": "2027-04-24",
+"dateEnd": "2027-04-24",
+"livraison": true,
+"livraisonPrice": 25.0,
+"acompte": 0,
+"source": "",
+"place": "Cosse le vivien",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 270.0,
+"variant": "400 tirages"
+}
+]
+},
+{
+"id": "xls-2027-05-15-chauvel-viriginie",
+"client": "CHAUVEL Viriginie",
+"phone": "06 78 49 43 43",
+"email": "",
+"dateStart": "2027-05-15",
+"dateEnd": "2027-05-15",
+"livraison": true,
+"livraisonPrice": 25.0,
+"acompte": 0,
+"source": "",
+"place": "le château des pères",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2027-05-15-neveu-tiphaine",
+"client": "NEVEU Tiphaine",
+"phone": "06 84 01 31 60",
+"email": "",
+"dateStart": "2027-05-15",
+"dateEnd": "2027-05-15",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 2",
+"short": "PB 2",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+},
+{
+"id": "xls-2027-05-15-menager-flavie",
+"client": "MENAGER Flavie",
+"phone": "06 31 04 43 93",
+"email": "",
+"dateStart": "2027-05-15",
+"dateEnd": "2027-05-15",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "LA HAUTE HJEUVERIE",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Tente étoile 22m",
+"short": "Tente étoile",
+"cat": "barnum",
+"price": 590.0,
+"variant": "22m"
+}
+]
+},
+{
+"id": "xls-2027-06-12-ridard-pauline",
+"client": "RIDARD Pauline",
+"phone": "06 42 17 81 52",
+"email": "",
+"dateStart": "2027-06-12",
+"dateEnd": "2027-06-12",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "Torcé A Table",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2027-06-26-daburon-pauline",
+"client": "DABURON Pauline",
+"phone": "07 89 56 80 77",
+"email": "",
+"dateStart": "2027-06-26",
+"dateEnd": "2027-06-26",
+"livraison": true,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "Balazé",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2027-07-10-allard-marion",
+"client": "ALLARD Marion",
+"phone": "07 69 33 22 84",
+"email": "",
+"dateStart": "2027-07-10",
+"dateEnd": "2027-07-10",
+"livraison": true,
+"livraisonPrice": 40.0,
+"acompte": 0,
+"source": "",
+"place": "1 Lieu Dit La Blancherie\nSaint-Germain-du-Pinel",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Barnum 6x10m",
+"short": "Barnum 6x10",
+"cat": "barnum",
+"price": 190.0,
+"variant": "6x10m"
+}
+]
+},
+{
+"id": "xls-2027-09-11-bouffart-fabrice",
+"client": "BOUFFART Fabrice",
+"phone": "06 03 39 09 55",
+"email": "",
+"dateStart": "2027-09-11",
+"dateEnd": "2027-09-11",
+"livraison": true,
+"livraisonPrice": 45.0,
+"acompte": 0,
+"source": "",
+"place": "Montours",
+"notes": "Livraison + Reprise",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 235.0,
+"variant": "300 tirages"
+}
+]
+},
+{
+"id": "xls-2027-09-11-rouanet-manon",
+"client": "ROUANET Manon",
+"phone": "06 47 47 71 73",
+"email": "",
+"dateStart": "2027-09-11",
+"dateEnd": "2027-09-11",
+"livraison": true,
+"livraisonPrice": 20.0,
+"acompte": 0,
+"source": "",
+"place": "Chauvigne",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 2",
+"short": "PB 2",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+},
+{
+"id": "xls-2027-10-23-serais-elie",
+"client": "SERAIS Elie",
+"phone": "",
+"email": "",
+"dateStart": "2027-10-23",
+"dateEnd": "2027-10-23",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 270.0,
+"variant": "400 tirages"
+},
+{
+"name": "Cadre photo",
+"short": "Cadre photo",
+"cat": "photobooth",
+"price": 20,
+"variant": "Standard"
+}
+]
+},
+{
+"id": "xls-2028-11-18-dupire-melanie",
+"client": "DUPIRE Mélanie",
+"phone": "07 86 93 94 69",
+"email": "",
+"dateStart": "2028-11-18",
+"dateEnd": "2028-11-18",
+"livraison": false,
+"livraisonPrice": 0.0,
+"acompte": 0,
+"source": "",
+"place": "",
+"notes": "",
+"validatedBy": "Thomas",
+"products": [
+{
+"name": "Photobooth 1",
+"short": "PB 1",
+"cat": "photobooth",
+"price": 190.0,
+"variant": "200 tirages"
+}
+]
+}
+]

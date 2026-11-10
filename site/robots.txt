@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Pas d'intérêt à indexer les paramètres de panier
+Disallow: /*?demande=
+Disallow: /*?produit=
+Disallow: /studio/
+
+Sitemap: https://www.vespraevent.fr/sitemap.xml

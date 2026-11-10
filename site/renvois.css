@@ -1,0 +1,38 @@
+/* ─────────────────────────────────────────────────────────────
+   LES DEUX RENVOIS : « Nos lieux de réception » et « Nos prestataires »
+
+   Le même bloc sert sur la page d'accueil, les pages villes et les
+   articles. Il se place toujours en bas de page : ce sont des
+   entreprises qui ne sont pas les nôtres, elles viennent après ce
+   que nous louons, pas avant.
+
+   Une page peut n'afficher qu'une des deux cartes : la grille
+   s'adapte toute seule.
+   ───────────────────────────────────────────────────────────── */
+.rv{border-top:1px solid var(--g3,#C8CDD8);background:var(--g4,#F0F2F5);padding:56px 24px 60px}
+.rv-in{max-width:1120px;margin:0 auto;display:grid;gap:18px;
+  /* min() : sous 320 px de large, la colonne suit l'écran au lieu
+     de le déborder. */
+  grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr))}
+.rv-c{background:var(--white,#fff);border:1px solid var(--g3,#C8CDD8);border-radius:var(--rl,20px);
+  padding:30px 28px 28px;display:flex;flex-direction:column}
+.rv-k{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--g2,#646D7C);margin-bottom:10px}
+.rv-c h2{font-family:'Bebas Neue',sans-serif;font-size:29px;line-height:1.02;letter-spacing:.02em;
+  color:var(--black,#0C0F14);margin:0 0 12px}
+.rv-c p{font-size:14.5px;line-height:1.75;color:var(--g1,#3D4452);margin:0 0 20px;flex:1}
+.rv-b{display:inline-flex;align-items:center;justify-content:center;align-self:flex-start;
+  background:var(--navy,#2B4A6B);color:var(--white,#fff);text-decoration:none;
+  border-radius:999px;padding:12px 24px;font-size:14px;font-weight:700;
+  transition:background .18s}
+.rv-b:hover{background:var(--navy-h,#1e3650)}
+@media(max-width:640px){
+  .rv{padding:42px 16px 46px}
+  .rv-c{padding:24px 20px 22px}
+  .rv-c h2{font-size:25px}
+  .rv-b{align-self:stretch}
+}
+
+/* Une carte seule ne s'étire pas sur toute la largeur : au-delà, la
+   ligne de texte devient trop longue et le bloc paraît vide. */
+.rv-seul .rv-in{grid-template-columns:minmax(0,640px);justify-content:center}

@@ -1,0 +1,16 @@
+{
+  "name": "Vespra Event — Back office",
+  "short_name": "Vespra BO",
+  "description": "Réservations, planning, factures et catalogue Vespra Event.",
+  "start_url": "/studio/",
+  "scope": "/studio/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#2B4A6B",
+  "theme_color": "#2B4A6B",
+  "lang": "fr",
+  "icons": [
+    {"src": "/studio/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "/studio/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}

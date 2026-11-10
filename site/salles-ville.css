@@ -1,0 +1,57 @@
+/* Encart « salles recommandées » des pages de ville. */
+.sv{border-top:1px solid var(--g3,#C8CDD8);background:var(--white,#fff);padding:52px 64px}
+.sv-in{max-width:1120px;margin:0 auto}
+.sv-tete{max-width:720px;margin-bottom:26px}
+.sv-fleches{margin:16px 0 0}
+.sv-k{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--navy,#2B4A6B);margin-bottom:10px}
+.sv-tete h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(24px,calc(18px + 1.5vw),38px);
+  line-height:1;letter-spacing:.02em;color:var(--black,#0C0F14);margin:0 0 12px}
+.sv-lead{font-size:15px;line-height:1.75;color:var(--g1,#3D4452);margin:0}
+
+.sv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.sv-carte{position:relative;display:flex;flex-direction:column;background:var(--white,#fff);
+  border:1px solid var(--g3,#C8CDD8);border-radius:var(--rl,20px);padding:20px;transition:.18s}
+.sv-carte:hover{border-color:var(--navy,#2B4A6B);box-shadow:0 8px 24px rgba(12,15,20,.07)}
+.sv-exemple{border-style:dashed;background:var(--g4,#F0F2F5)}
+.sv-badge{position:absolute;top:-9px;right:16px;background:var(--gold,#F59E0B);color:#3b2a00;
+  font-size:10px;font-weight:800;letter-spacing:.12em;padding:4px 10px;border-radius:999px}
+.sv-type{display:inline-block;align-self:flex-start;background:var(--g4,#F0F2F5);
+  color:var(--navy,#2B4A6B);font-size:10.5px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;padding:5px 11px;border-radius:999px;margin-bottom:11px}
+.sv-nom{font-family:'Bebas Neue',sans-serif;font-size:23px;letter-spacing:.02em;
+  line-height:1.05;color:var(--black,#0C0F14);margin:0 0 5px}
+.sv-lieu{font-size:13px;color:var(--g2,#646D7C);margin-bottom:12px}
+.sv-lieu b{color:var(--g1,#3D4452);font-weight:600}
+.sv-mot{font-size:14px;line-height:1.7;color:var(--g1,#3D4452);margin:0 0 14px;flex:1}
+.sv-lien{font-size:13px;font-weight:600;color:var(--navy,#2B4A6B);text-decoration:underline;
+  padding-top:12px;border-top:1px solid var(--g4,#F0F2F5)}
+.sv-pied{margin-top:22px;font-size:14px;color:var(--g2,#646D7C)}
+.sv-pied a{color:var(--navy,#2B4A6B);font-weight:600;text-decoration:underline}
+
+@media(max-width:1000px){.sv-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.sv{padding:40px 24px}}
+@media(max-width:640px){.sv{padding:32px 18px}.sv-grid{grid-template-columns:1fr}.sv-carte{padding:18px}}
+
+/* ─────────────────────────────────────────────────────────────
+   Sur écran étroit, les trois cartes ne s'empilent plus : elles
+   deviennent une bande que l'on fait glisser au doigt, en plus
+   petit. Le carrousel commun (carrousel.css) fournit le
+   défilement ; on n'ajuste ici que la largeur des cartes.
+   ───────────────────────────────────────────────────────────── */
+@media(max-width:1000px){
+  .sv-grid.car-bande{display:flex;grid-template-columns:none}
+  .sv-grid.car-bande > *{flex:0 0 300px}
+}
+@media(max-width:640px){
+  .sv-grid.car-bande{display:flex;grid-template-columns:none;gap:12px}
+  .sv-grid.car-bande > *{flex:0 0 76%}
+  .sv-grid.car-bande .sv-carte{padding:16px}
+  .sv-grid.car-bande .sv-mot{font-size:13.5px}
+}
+/* au-dessus de 1000 px les trois tiennent : grille, pas de bande */
+@media(min-width:1001px){
+  .sv-grid.car-bande{display:grid;overflow:visible;flex-wrap:nowrap}
+  .sv-grid.car-bande > *{flex:none}
+  .sv-fleches{display:none}
+}

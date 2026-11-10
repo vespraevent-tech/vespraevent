@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200" role="img" aria-label="Calendrier avec une date confirmée">
+<rect width="320" height="200" fill="#EEF2F7"/>
+<g transform="translate(76 34)">
+<rect x="4" y="10" width="168" height="124" rx="10" fill="#C9D4E2"/>
+<rect x="0" y="4" width="168" height="124" rx="10" fill="#FFFFFF" stroke="#D6DEE8"/>
+<path d="M0 26a10 10 0 0 1 10-22h148a10 10 0 0 1 10 10v12z" fill="#1E3A5F"/>
+<rect x="0" y="4" width="168" height="26" rx="10" fill="#1E3A5F"/>
+<rect x="34" y="-4" width="9" height="20" rx="4.5" fill="#7A8CA3"/>
+<rect x="125" y="-4" width="9" height="20" rx="4.5" fill="#7A8CA3"/>
+<g fill="#C7D1DD">
+<rect x="18" y="44" width="22" height="16" rx="4"/><rect x="50" y="44" width="22" height="16" rx="4"/><rect x="82" y="44" width="22" height="16" rx="4"/><rect x="114" y="44" width="22" height="16" rx="4"/>
+<rect x="18" y="68" width="22" height="16" rx="4"/><rect x="82" y="68" width="22" height="16" rx="4"/><rect x="114" y="68" width="22" height="16" rx="4"/>
+<rect x="18" y="92" width="22" height="16" rx="4"/><rect x="50" y="92" width="22" height="16" rx="4"/><rect x="82" y="92" width="22" height="16" rx="4"/>
+</g>
+<rect x="50" y="68" width="22" height="16" rx="4" fill="#D2764A"/>
+<g transform="translate(108 84)">
+<circle cx="24" cy="24" r="26" fill="#FFFFFF"/>
+<circle cx="24" cy="24" r="21" fill="#1E3A5F"/>
+<path d="M14 24.5l7 7 14-14" fill="none" stroke="#FFFFFF" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</svg>
