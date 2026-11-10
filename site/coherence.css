@@ -23,7 +23,7 @@ html body .evs-head,html body .bests-head,html body .bests-cta{padding-left:var(
 html body .bests-track{padding-left:var(--edge);padding-right:var(--edge)}
 html body .faq{max-width:none}
 html body .rv-in,html body .rf-in{max-width:none;margin:0;width:100%}
-html body .hero-content{padding-left:var(--edge)}
+@media(min-width:961px){html body .hero-content{padding-left:var(--edge)}}
 
 /* 3. Même espace entre un titre de section et son contenu */
 html body .evs-head,html body .bests-head,html body .blog-head{margin-bottom:var(--head-gap)}
@@ -40,3 +40,38 @@ html body .contact-section{background:var(--g4,#F0F2F5)}
   html body .bests{padding-top:var(--sec-y)!important;padding-bottom:var(--sec-y)!important}
   html body .blog{padding:var(--sec-y) var(--edge)!important}
 }
+
+/* ===== Touches de finition (le design actuel est conservé) ===== */
+/* A. Mot d'accent en italique serif dans les titres */
+html body em.ac{font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:400;text-transform:none;letter-spacing:0;color:var(--gold,#F59E0B)}
+html body .cta-engage h2 em.ac{color:var(--gold,#F59E0B)}
+
+/* B. Sections colorées arrondies, détachées des bords */
+html body .hero,html body .off,html body .bests,html body .cta-engage,html body .contact-section{
+  margin-left:16px;margin-right:16px;border-radius:32px;overflow:hidden}
+html body .hero{margin-top:12px}
+html body .bests,html body .cta-engage,html body .contact-section{margin-top:12px;margin-bottom:12px}
+html body .off{margin-top:12px;margin-bottom:12px}
+html body .contact-section{margin-bottom:16px}
+@media(max-width:960px){html body .hero,html body .off,html body .bests,html body .cta-engage,html body .contact-section{margin-left:10px;margin-right:10px;border-radius:24px}}
+@media(max-width:560px){html body .hero,html body .off,html body .bests,html body .cta-engage,html body .contact-section{margin-left:8px;margin-right:8px;border-radius:20px}}
+
+/* C. Carte produit : elle se soulève, le bouton passe à l'orange */
+html body .bc{transition:transform .4s cubic-bezier(.2,.7,.2,1),box-shadow .4s cubic-bezier(.2,.7,.2,1)}
+@media(hover:hover){
+  html body .bc:hover{transform:translateY(-8px);box-shadow:0 4px 12px rgba(0,0,0,.06),0 28px 44px -18px rgba(20,37,58,.35)}
+  html body .bc:hover .bc-add{background:var(--gold,#F59E0B);color:#0C0F14;transform:scale(1.08)}
+}
+html body .bc-add{transition:background .3s,color .3s,transform .3s}
+
+/* D. Chiffres clés : bloc en verre dépoli sur le hero */
+html body .hero-proof{position:absolute;z-index:6;right:32px;bottom:32px;display:flex;
+  background:rgba(255,255,255,.14);backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);
+  border:1px solid rgba(255,255,255,.28);border-radius:22px;color:#fff;pointer-events:none}
+html body .hero-proof div{padding:16px 26px;text-align:center;border-right:1px solid rgba(255,255,255,.25)}
+html body .hero-proof div:last-child{border-right:0}
+html body .hero-proof b{display:block;font:400 32px/1 'Bebas Neue',sans-serif;letter-spacing:.02em}
+html body .hero-proof span{display:block;margin-top:4px;font-size:12px;color:rgba(255,255,255,.85);white-space:nowrap}
+@media(max-width:960px){html body .hero-proof{right:16px;bottom:56px}html body .hero-proof div{padding:12px 16px}html body .hero-proof b{font-size:26px}html body .hero-proof span{font-size:11px}}
+@media(max-width:560px){html body .hero-proof{left:12px;right:12px;bottom:48px;justify-content:space-between;border-radius:16px}
+  html body .hero-proof div{flex:1;padding:9px 6px}html body .hero-proof b{font-size:22px}html body .hero-proof span{font-size:10px;white-space:normal}}
