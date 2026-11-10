@@ -89,7 +89,9 @@ def voisins(d, n=14):
 def shell_parts():
     a = SHELL.index('<section class="hero"')
     b = SHELL.index('<footer')
-    return SHELL[:a], SHELL[b:]
+    # les feuilles de style écrites entre les sections (cartes produit, événements…) font partie du composant : on les garde
+    mid = ''.join(re.findall(r'<link rel="stylesheet"[^>]*>|<style\b[^>]*>.*?</style>', SHELL[a:b], re.S))
+    return SHELL[:a], mid + SHELL[b:]
 
 
 def block(rx):
@@ -192,7 +194,13 @@ def faq_items(d, kind):
         L['cadre'] = ("Peut-on personnaliser le cadre ?", "Oui, en option à 20 € : trois cadres au choix des invités sur place, personnalisation du cadre et page d'accueil personnalisée.")
         L['install'] = (f"Qui installe la borne à {n} ?", "Vous pouvez la mettre en place vous-même (elle est conçue pour ça) ou nous la livrons et l'installons, puis nous la reprenons après l'événement.")
         L['mariage'] = (f"Le photobooth convient-il à un mariage à {n} ?", "Oui : c'est notre location la plus demandée pour les mariages. Le bois s'accorde avec une décoration champêtre comme avec une salle moderne.")
-        order = ['livre', 'prix', 'communes', 'photos', 'format', 'salles', 'cadre', 'duree', 'install', 'domaines', 'mariage', 'cout']
+        L['retrait'] = ("Peut-on venir chercher le photobooth au dépôt ?", f"Oui. Vous pouvez venir chercher la borne à notre dépôt de Vitré, 1 bis allée de la Haute Gasniais, et la rapporter après votre événement" + (f" : pratique si vous êtes à {n} ou dans les environs." if sl != 'vitre' else '.'))
+        L['evenements'] = (f"Pour quels événements louer un photobooth à {n} ?", "Mariages, anniversaires, soirées d'entreprise, fêtes de village et événements d'associations : la borne s'installe facilement en salle comme sous un barnum.")
+        L['reserver'] = (f"Comment réserver un photobooth à {n} ?", "Demandez un devis en ligne avec la date, le lieu et la formule : nous répondons sous 24 heures avec un prix ferme. Le règlement se fait de préférence par virement ; carte et espèces sont acceptées le jour J.")
+        L['assistance'] = ("Que se passe-t-il en cas de problème pendant la soirée ?", "Nous restons joignables pendant toute votre soirée, et un guide de dépannage de la borne est disponible en PDF pour les interventions rapides.")
+        L['inclus'] = ("Qu'est-ce qui est inclus dans la location ?", "La borne avec écran tactile 21 pouces, l'éclairage LED intégré, le logiciel de déclenchement, la galerie numérique (QR code et site dédié) et les consommables de la formule choisie. Le cadre photo et le lot de déguisement sont en option à 20 € chacun.")
+        L['organisation'] = (f"Pouvez-vous m'aider à organiser mon événement à {n} ?", "Oui. Au-delà de la location, Vespra Event peut organiser votre événement et vous mettre en relation avec ses prestataires : serveuse privée, chef pâtissier et autres intervenants, de A à Z selon vos besoins.")
+        order = ['livre', 'prix', 'communes', 'photos', 'format', 'salles', 'cadre', 'duree', 'install', 'domaines', 'mariage', 'cout', 'retrait', 'evenements', 'reserver', 'assistance', 'inclus', 'organisation']
     else:
         L['prix'] = (f"Combien coûte la location d'un photobooth à {n} ?", "De 130 € (numérique) à 420 € (tirages illimités), pour une location du vendredi au lundi, plus la livraison." if sl != 'vitre' else "De 130 € (numérique) à 420 € (tirages illimités), livraison offerte à Vitré.")
         L['pack'] = ("Quel pack son et lumière choisir ?", "Le Pack Vespra va de 70 € pour 60 personnes à 150 € pour 200 personnes.")
@@ -201,11 +209,18 @@ def faq_items(d, kind):
         L['paiement'] = ("Comment se règle la location ?", "Le virement est privilégié, la carte et les espèces sont acceptées le jour J.")
         L['barnum'] = (f"Livrez-vous des barnums et une tente étoile à {n} ?", "Oui. Le montage et le démontage des barnums, de la tente étoile et de la buvette sont proposés en option.")
         L['delai'] = ("Sous quel délai recevons-nous un devis ?", "Nous répondons sous 24 heures, avec un prix ferme et la livraison détaillée.")
-        order = ['livre', 'cout', 'communes', 'prix', 'salles', 'pack', 'voir', 'domaines', 'remise', 'barnum', 'paiement', 'delai']
+        L['evenements'] = (f"Quels événements équipez-vous à {n} ?", "Mariages, anniversaires, gender reveals, soirées d'entreprise, fêtes de village et événements d'associations : photobooth, son et lumière, barnums, restauration, effets spéciaux et animations.")
+        L['organisation'] = (f"Pouvez-vous organiser mon événement à {n} ?", "Oui. Au-delà de la location, Vespra Event peut organiser votre événement et vous entourer de prestataires : serveuse privée, chef pâtissier et autres intervenants, de A à Z selon vos besoins.")
+        L['reserver'] = ("Comment réserver du matériel ?", "Ajoutez les produits à votre devis avec le bouton +, puis envoyez votre demande avec la date, le lieu et le nombre de personnes : nous répondons sous 24 heures.")
+        L['installation'] = (f"Installez-vous le matériel à {n} ?", "Oui : la livraison comprend l'installation, et nous reprenons le matériel après l'événement. Vous pouvez aussi venir le chercher au dépôt de Vitré.")
+        L['mariage'] = (f"Quel matériel louer pour un mariage à {n} ?", "Les plus demandés : le photobooth en bois, le panneau de bienvenue, la tente étoile ou un barnum, la boule à facettes et un pack son et lumière.")
+        L['assistance'] = ("Êtes-vous joignables pendant l'événement ?", "Oui, notre service client répond 7 jours sur 7, y compris pendant votre événement.")
+        L['visite'] = ("Puis-je voir le matériel avant de décider ?", "Oui, venez au dépôt de Vitré sur rendez-vous, sans engagement : vous pouvez prendre rendez-vous directement depuis le site.")
+        order = ['livre', 'cout', 'communes', 'prix', 'salles', 'pack', 'voir', 'domaines', 'remise', 'barnum', 'paiement', 'delai', 'evenements', 'organisation', 'reserver', 'installation', 'mariage', 'assistance']
     keys = [k for k in order if k in L]
     must = keys[:3]
     rest = shuffled(sl, 'faq' + kind, keys[3:])
-    sel = must + rest[:3]
+    sel = must + rest[:6]
     sel = shuffled(sl, 'faqo' + kind, sel[:2]) + sel[2:] if seed(sl, 'x') % 2 else sel
     return [L[k] for k in sel]
 
@@ -243,6 +258,19 @@ def local_block(d, kind, flip=False):
     return f'''<section class="sec g"><div class="sp{rev}"><div><span class="lab">Livraison locale</span><h2 class="t">{ttl}</h2><p style="color:var(--v-g1);margin-top:14px">{esc(intro)}</p>{facts}{venues}<div class="venues">{chips}</div><a class="lnk" href="zones-livraison.html">Toutes les villes desservies et bien plus !</a></div><div class="pic"><img src="{img}" alt="Camion Vespra Event pour une livraison à {esc(n)}" style="object-position:{pos}" loading="lazy"></div></div>{cities_marquee(d, kind)}</section>'''
 
 
+def local_lead(d, what):
+    """Deux phrases propres à la ville, tirées de ses données réelles (communes, salles, domaines, distance)."""
+    n = d['name']; sl = d['slug']; com = d['communes']
+    cand = []
+    if d.get('salles'): cand.append(f"À {n}, {what} s'installe volontiers dans les salles du secteur : nous sommes déjà intervenus dans des lieux comme {d['salles']}.")
+    if d.get('domaines'): cand.append(f"Côté réceptions, nous connaissons {d['domaines']} : de la place pour manœuvrer le camion, un accès pour décharger, et c'est prêt.")
+    if com: cand.append(f"{what[0].upper() + what[1:]} voyage aussi vers {join_fr(com[:4])}, avec le même matériel et la même installation : seule la livraison change.")
+    if d.get('km'): cand.append(f"Depuis notre dépôt de Vitré, comptez {d['min']} de route jusqu'à {n} ({d['km']} km) : {fee_phrase(d)}")
+    else: cand.append(fee_phrase(d))
+    sel = shuffled(sl, 'lead' + what, cand)[:2]
+    return ' '.join(sel)
+
+
 # ───────────────────────── page photobooth ─────────────────────────
 STRIPS = ['strip-octobre-rose.webp', 'strip-anniversaire.webp', 'strip-beer-week.webp', 'pb-situation-blanchard.webp']
 
@@ -267,10 +295,10 @@ def photobooth_page(d):
         li = '<li>Photos numériques illimitées</li><li>QR code et galerie en ligne</li>' + ('<li>Format 10 × 15 cm ou bandelette</li>' if papier else '')
         cards += f'<div class="pc {top}">{badge}<h3>{nom}</h3><div class="p">{prix}<small>€</small></div><div class="n2">{nb}</div><ul>{li}</ul><a class="go" href="produit-photobooth.html">Choisir</a></div>'
     ttl = pick(sl, 'tt', ['Choisissez votre <em>formule</em>', f'Votre photobooth à <em>{esc(n)}</em>', 'Cinq formules, <em>un seul prix</em> clair'])
-    formules = f'''<section class="sec g"><span class="lab">Nos formules</span><h2 class="t">{ttl}</h2><div class="rl"><div class="rail" id="vrb" style="margin-top:26px">{cards}</div></div>
+    formules = f'''<section class="sec g"><span class="lab">Nos formules</span><h2 class="t">{ttl}</h2><p style="color:var(--v-g1);max-width:74ch;margin-top:14px">{esc(local_lead(d, 'le photobooth'))}</p><div class="rl"><div class="rail" id="vrb" style="margin-top:26px">{cards}</div></div>
 <div class="incl"><span>Écran tactile 21 pouces</span><span>Éclairage LED intégré</span><span>Impression en moins de 10 secondes</span><span>Du vendredi au lundi (4 jours)</span></div>
-<div class="opts"><div class="op"><img src="strip-anniversaire.webp" alt="Cadre photo personnalisé du photobooth" loading="lazy"><div><h3>Cadre photo <b>+20 €</b></h3><p>Trois cadres au choix des invités sur place, personnalisation du cadre et page d'accueil personnalisée.</p></div></div>
-<div class="op"><img src="strip-octobre-rose.webp" alt="Lot de déguisement du photobooth" loading="lazy"><div><h3>Lot de déguisement <b>+20 €</b></h3><p>Une valise de plus de 30 accessoires : chapeaux, lunettes, moustaches, pancartes.</p></div></div></div></section>'''
+<div class="opts"><div class="op"><img src="strip-anniversaire.webp" alt="Cadre photo personnalisé du photobooth" loading="lazy"><div><h3>Cadre photo <b>+20 €</b></h3><p>{pick(sl, 'o1', ["Trois cadres au choix des invités sur place, personnalisation du cadre et page d'accueil personnalisée.", "Vos invités choisissent leur cadre parmi trois sur place ; nous personnalisons le cadre et la page d'accueil de la borne.", "Trois cadres à choisir sur la borne, un cadre personnalisé à votre événement et une page d'accueil sur mesure."])}</p></div></div>
+<div class="op"><img src="strip-octobre-rose.webp" alt="Lot de déguisement du photobooth" loading="lazy"><div><h3>Lot de déguisement <b>+20 €</b></h3><p>{pick(sl, 'o2', ["Une valise de plus de 30 accessoires : chapeaux, lunettes, moustaches, pancartes.", "Plus de 30 accessoires thématiques pour faire rire vos invités : chapeaux, lunettes, moustaches, pancartes.", "Une valise remplie de plus de 30 accessoires, des chapeaux aux pancartes, pour des photos plus drôles."])}</p></div></div></div></section>'''
     sit_pool = shuffled(sl, 'sit', ['pb-situation-blanchard.webp', 'strip-octobre-rose.webp', 'strip-anniversaire.webp', 'strip-beer-week.webp', 'photobooth-salle.webp'])
     sit = ''.join(f'<div class="ps"><img src="{p}" alt="Photobooth Vespra Event en situation près de {esc(n)}" loading="lazy"></div>' for p in sit_pool)
     sit_ttl = pick(sl, 'sit_t', ['Vos invités <em>adorent</em>', 'Le photobooth en <em>situation</em>', 'Des souvenirs <em>qui font sourire</em>'])
@@ -343,7 +371,7 @@ def materiel_page(d):
     best = re.sub(r'<h2 class="sec-h">.*?</h2>', f'<h2 class="sec-h">{ttl}</h2>', best, flags=re.S)
     best = best.replace('Sur le secteur', pick(sl, 'bs', ['Sur le secteur', 'Nos équipements', f'Autour de {esc(n)}']))
     best = best.replace('bestsDem', 'bestsV')
-    apercu = best
+    apercu = best.replace('</div>\n  <div class="bests-shell">', '</div>\n  <p style="padding:0 clamp(16px,4vw,56px);margin:-10px 0 18px;max-width:74ch;color:#3D4452">' + esc(local_lead(d, 'le matériel')) + '</p>\n  <div class="bests-shell">', 1)
     evs = EVS_BLOCK
     inc_items = [
         ('Livraison offerte à Vitré' if sl == 'vitre' else f'Livraison à {esc(n)}', ("Retrait possible au dépôt. Ailleurs, de 20 € à 50 € et plus selon la distance." if sl == 'vitre' else f"{esc(fee_phrase(d))}")),
