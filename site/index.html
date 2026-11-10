@@ -1996,6 +1996,11 @@ window.addEventListener('vespra-produits-ready',function(){
      l'arrête pas. Seul un glissement horizontal (en arrière ou en avant)
      le met en pause, puis il reprend tout seul. */
   wrap.addEventListener('keydown',()=>pause(),{passive:true});
+  /* souris posée dessus ou doigt posé : le défilement s'arrête, il reprend peu après le départ */
+  wrap.addEventListener('pointerenter',e=>{ if(e.pointerType==='mouse'){ enPause=true; clearTimeout(repriseTimer); } });
+  wrap.addEventListener('pointerleave',e=>{ if(e.pointerType==='mouse') pause(350); });
+  wrap.addEventListener('touchstart',()=>{ enPause=true; clearTimeout(repriseTimer); },{passive:true});
+  ['touchend','touchcancel'].forEach(ev=>wrap.addEventListener(ev,()=>pause(1600),{passive:true}));
   wrap.addEventListener('pointerdown',e=>{ if(e.pointerType==='mouse')pause(450); },{passive:true});
   let tx=0,ty=0;
   wrap.addEventListener('touchstart',e=>{ const t=e.touches[0]; tx=t.clientX; ty=t.clientY; },{passive:true});
@@ -2148,6 +2153,10 @@ const GOOGLE_REVIEWS=(window.VESPRA_AVIS_GOOGLE||[]).slice();
        seul un déplacement horizontal le suspend, et il repart presque aussitôt */
     let rep=null,attendu=0;
     const stop=(ms)=>{arret=true;clearTimeout(rep);rep=setTimeout(()=>{arret=false;dernier=0},ms||450)};
+    wrap.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'){arret=true;clearTimeout(rep)}});
+    wrap.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')stop(350)});
+    wrap.addEventListener('touchstart',()=>{arret=true;clearTimeout(rep)},{passive:true});
+    ['touchend','touchcancel'].forEach(ev=>wrap.addEventListener(ev,()=>stop(1600),{passive:true}));
     let tx=0,ty=0;
     wrap.addEventListener('touchstart',e=>{const t=e.touches[0];tx=t.clientX;ty=t.clientY;stop(250)},{passive:true});
     wrap.addEventListener('touchmove',e=>{const t=e.touches[0],dx=t.clientX-tx,dy=t.clientY-ty;if(Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy))stop(450)},{passive:true});
@@ -3202,7 +3211,17 @@ html:root:root:root:root body .off-cta a.btn-w{background:#fff!important;backgro
     sl[n].classList.add('on');marque(n);
     setTimeout(function(){if(o!==n){sl[o].classList.add('nt');sl[o].classList.remove('prev');void sl[o].offsetWidth;sl[o].classList.remove('nt');}},900);
   }
-  function auto(){clearInterval(t);if(mob())return;t=setInterval(function(){go((n+1)%sl.length)},5500);}
+  var tient=false,relache=0;
+  box.addEventListener('pointerenter',function(e){if(e.pointerType==='mouse')tient=true});
+  box.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')tient=false});
+  box.addEventListener('touchstart',function(){tient=true},{passive:true});
+  ['touchend','touchcancel'].forEach(function(ev){box.addEventListener(ev,function(){clearTimeout(relache);relache=setTimeout(function(){tient=false},2500)},{passive:true})});
+  function auto(){clearInterval(t);t=setInterval(function(){
+    if(tient||document.hidden)return;
+    var r=box.getBoundingClientRect();if(r.bottom<0||r.top>innerHeight)return;
+    if(mob()){var i=(Math.round(box.scrollLeft/box.clientWidth)+1)%sl.length;box.scrollTo({left:i*box.clientWidth,behavior:'smooth'})}
+    else go((n+1)%sl.length);
+  },5000);}
   dots.forEach(function(b,i){b.addEventListener('click',function(){
     if(mob()){box.scrollTo({left:i*box.clientWidth,behavior:'smooth'})}else{go(i);auto();}
   })});
@@ -3244,20 +3263,25 @@ html:root:root:root:root:root body .lnk-fl{font-size:10.2px!important}
  html:root:root:root:root:root body .cart-btn,html:root:root:root:root:root body .reserver-btn{font-size:9.4px!important}
 }
 </style>
-<link rel="stylesheet" href="/coherence.css?v=4">
-<script src="/coherence.js?v=3" defer></script>
+<link rel="stylesheet" href="/coherence.css?v=5">
+<script src="/coherence.js?v=4" defer></script>
 
 <script>
 (function(){
 function defile(w,cards,copies,vit){
  if(!w||cards.length<copies*3)return;
- var P=0,lo=0,pos=0,pause=0,last=0,drag=null,bouge=false,pose=0;
+ var P=0,lo=0,pos=0,pause=0,last=0,drag=null,bouge=false,pose=0,tient=false;
  var reduit=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
  function mesure(){var n=cards.length/copies;P=cards[n].offsetLeft-cards[0].offsetLeft;lo=P*.25;}
  function ecrire(x){w.scrollLeft=x;pose=w.scrollLeft;}
  function boucle(){if(!P)return;var x=w.scrollLeft;if(x<lo)x+=P;else if(x>=lo+P)x-=P;if(x!==w.scrollLeft){ecrire(x);pos=x;}}
  /* l'arrêt est court : le défilement repart presque aussitôt après le dernier geste */
  function arret(ms){pause=Date.now()+ms;}
+ /* souris ou doigt posé sur la rangée : elle s'arrête, puis repart peu après */
+ w.addEventListener('pointerenter',function(e){if(e.pointerType==='mouse')tient=true;});
+ w.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse'){tient=false;arret(350);}});
+ w.addEventListener('touchstart',function(){tient=true;},{passive:true});
+ ['touchend','touchcancel'].forEach(function(ev){w.addEventListener(ev,function(){tient=false;arret(1600);},{passive:true});});
  var tx=0,ty=0;
  w.addEventListener('touchstart',function(e){var t=e.touches[0];tx=t.clientX;ty=t.clientY;arret(250);},{passive:true});
  w.addEventListener('touchmove',function(e){var t=e.touches[0],dx=t.clientX-tx,dy=t.clientY-ty;if(Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy))arret(450);},{passive:true});
@@ -3272,7 +3296,7 @@ function defile(w,cards,copies,vit){
  w.addEventListener('click',function(e){if(bouge){e.preventDefault();e.stopPropagation();bouge=false;}},true);
  w.addEventListener('dragstart',function(e){e.preventDefault();});
  function pas(t){var dt=Math.min(64,t-(last||t));last=t;
-  if(P&&!reduit&&!document.hidden&&!drag&&Date.now()>=pause){var r=w.getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight){pos+=dt*vit;ecrire(pos);boucle();}}
+  if(P&&!reduit&&!document.hidden&&!drag&&!tient&&Date.now()>=pause){var r=w.getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight){pos+=dt*vit;ecrire(pos);boucle();}}
   requestAnimationFrame(pas);}
  function init(){mesure();if(!P)return;ecrire(P);pos=P;requestAnimationFrame(pas);}
  if(document.readyState==='complete')init();else addEventListener('load',init);

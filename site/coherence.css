@@ -171,3 +171,52 @@ html.am-sombre .trust-marquee-img[src*="t-logo-viva-tattoo"]{background:#fff;bac
 
 /* Mode sombre : le voile derrière les fenêtres redevient sombre (il virait au gris clair après inversion) */
 html.am-sombre :is(.vm-ov,.c-overlay,#devisPopup,.devis-popup,.pop-ov,.modal-ov){background:rgba(255,255,255,.62)!important}
+
+/* ===== Bandeau « Offre événement » : phrase d'accroche plus discrète ===== */
+html body .off-k{font-size:12px;letter-spacing:.14em;margin-bottom:12px;opacity:.9}
+@media(max-width:700px){html body .off-k{font-size:10.5px;letter-spacing:.12em;margin-bottom:10px}}
+html body .off-s .hero-proof{display:none}
+
+/* ===== Pop-ups : fenêtre d'ajout au devis, panier, notification ===== */
+html body :is(.vm-ov,.c-overlay){background:rgba(12,22,36,.45)!important;backdrop-filter:blur(10px) saturate(120%);-webkit-backdrop-filter:blur(10px) saturate(120%);transition:opacity .35s ease!important}
+html body .vm{width:min(500px,94vw);padding:0;border-radius:28px;overflow:auto;box-shadow:0 40px 80px -30px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.2);
+  transform:translateY(26px) scale(.96);opacity:0;transition:transform .5s cubic-bezier(.2,.7,.2,1),opacity .35s ease!important}
+html body .vm-ov.open .vm{transform:none;opacity:1}
+html body .vm-head{margin:0;padding:22px 22px 18px;gap:16px;align-items:center;background:linear-gradient(135deg,var(--g4,#F0F2F5),#fff)}
+html body .vm-img{width:84px;height:84px;border-radius:18px;border:0;padding:6px;object-fit:contain;background:#fff;box-shadow:0 8px 20px -10px rgba(20,37,58,.45)}
+html body .vm-info h3{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:32px;line-height:1;letter-spacing:.02em;margin-bottom:8px}
+html body .vm-info .vp{display:inline-block;background:var(--navy,#2B4A6B);color:#fff;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600}
+html body .vm-cls{align-self:flex-start;width:36px;height:36px;border:0;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.18);transition:transform .35s cubic-bezier(.2,.7,.2,1),background .3s}
+html body .vm-cls:hover{transform:rotate(90deg);background:var(--gold,#F59E0B)}
+html body .vm>:not(.vm-head){margin-left:22px;margin-right:22px}
+html body .vm #vmBody{margin-top:14px;color:var(--g2,#646D7C);font-size:14px;line-height:1.6}
+html body .vm-variants{margin:14px 22px 18px;gap:8px}
+html body .var-chip{padding:11px 18px;border:1.5px solid var(--g3,#C8CDD8);border-radius:999px;transition:transform .3s cubic-bezier(.2,.7,.2,1),border-color .3s,background .3s,color .3s,box-shadow .3s}
+html body .var-chip:hover:not(.selected){transform:translateY(-2px)}
+html body .var-chip.selected{box-shadow:0 8px 18px -8px rgba(43,74,107,.7)}
+html body #vmOptions label{border:1.5px solid var(--g3,#C8CDD8)!important;border-radius:16px!important;padding:13px 16px!important;transition:border-color .3s,background .3s,transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s}
+html body #vmOptions label:hover{border-color:var(--navy,#2B4A6B)!important;transform:translateY(-1px)}
+html body #vmOptions label:has(input:checked){border-color:var(--navy,#2B4A6B)!important;background:rgba(43,74,107,.06);box-shadow:0 0 0 3px rgba(43,74,107,.12)}
+html body .vm>.btn-p{position:sticky;bottom:0;width:calc(100% - 44px)!important;margin:6px 22px 22px;border-radius:999px;box-shadow:0 -10px 20px 6px #fff}
+html body .vm select,html body .vm input[type=text]{border-radius:14px}
+
+/* panier */
+html body .c-drawer{border-radius:28px 0 0 28px;box-shadow:-30px 0 60px -30px rgba(0,0,0,.45);transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+html body .c-head{background:linear-gradient(135deg,var(--g4,#F0F2F5),#fff);border-radius:28px 0 0 0}
+html body .c-head h2{font-weight:400;letter-spacing:.04em;font-size:30px}
+html body .c-cls{transition:transform .35s cubic-bezier(.2,.7,.2,1),background .3s}
+html body .c-cls:hover{transform:rotate(90deg);background:var(--gold,#F59E0B)}
+html body .c-item{border-radius:16px;padding:14px 10px;transition:background .25s}
+html body .c-item:hover{background:rgba(43,74,107,.05)}
+html body .c-item-img{border-radius:14px;border:0;box-shadow:0 6px 14px -8px rgba(20,37,58,.5)}
+html body .c-foot{background:#fff;box-shadow:0 -14px 24px -18px rgba(20,37,58,.35)}
+html body .c-total{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:26px}
+html body .c-checkout{transition:transform .35s cubic-bezier(.2,.7,.2,1),background .3s,box-shadow .3s}
+html body .c-checkout:hover{background:var(--gold,#F59E0B);color:#0C0F14;transform:translateY(-2px);box-shadow:0 12px 24px -10px rgba(245,158,11,.7)}
+@media(max-width:560px){html body .c-drawer{width:100vw;border-radius:0}html body .c-head{border-radius:0}html body .vm{border-radius:24px}}
+
+/* devis : même arrondi et même fermeture que les autres fenêtres */
+html body .devis-popup-card{border-radius:28px!important}
+html body .devis-popup-close{transition:transform .35s cubic-bezier(.2,.7,.2,1),background .3s}
+html body .devis-popup-close:hover{transform:rotate(90deg);background:var(--gold,#F59E0B);color:#0C0F14}
+@media(prefers-reduced-motion:reduce){html body .vm,html body .c-drawer{transition:none!important}}
