@@ -102,3 +102,19 @@ html body .hero-cta>*,html body .hs-cta>*,html body .off-cta>*,html body .cta-en
   /* images de cartes : zoom lent */
   html body .evs a img,html body .bc-img,html body .blog a img{transition:transform .9s cubic-bezier(.2,.7,.2,1)}
 }
+
+/* ===== Survol des boutons : aucun bouton n'est statique ===== */
+html body :is(.btn-p,.btn-w,.btn-o,.btn-submit,.reserver-btn,.cart-btn,.hero-catalogue-pdf,.lnk-fl,.bests-arrow,.c-cls,.bc-add,.bests-dot,.faq-q,.rv-b,.home-btn,.cta-voir a,.hero-cta a,.hs-cta a,.off-cta a,.rf-l a,button[type=submit],a[class*="btn"],button[class*="btn"]){
+  transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s cubic-bezier(.2,.7,.2,1),background-color .3s,color .3s,border-color .3s,filter .3s!important;
+  will-change:transform}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+  html body :is(.btn-p,.btn-w,.btn-o,.btn-submit,.reserver-btn,.cart-btn,.hero-catalogue-pdf,.rv-b,.home-btn,.hero-cta a,.hs-cta a,.off-cta a,button[type=submit],a[class*="btn"],button[class*="btn"]):hover{
+    transform:translateY(-3px) scale(1.03)!important;box-shadow:0 14px 26px -10px rgba(20,37,58,.45)!important;filter:brightness(1.06)}
+  html body :is(.btn-w,.hero-catalogue-pdf):hover{background:var(--gold,#F59E0B)!important;color:#0C0F14!important;border-color:var(--gold,#F59E0B)!important}
+  html body :is(.btn-o,.cta-voir a):hover{border-color:var(--gold,#F59E0B)!important}
+  html body :is(.bests-arrow):hover{transform:translateY(-50%) scale(1.1)!important;box-shadow:0 10px 20px -8px rgba(20,37,58,.4)!important}
+  html body :is(.lnk-fl,.rf-l a,.faq-q):hover{transform:translateX(4px)}
+  html body :is(.rf-l a):hover{transform:translateY(-2px);box-shadow:0 8px 16px -8px rgba(20,37,58,.35);border-color:var(--gold,#F59E0B)}
+  html body :is(.btn-p,.btn-w,.btn-o,.reserver-btn,.cart-btn,button[type=submit]):active{transform:translateY(0) scale(.97)!important;box-shadow:none!important}
+}
+html body .lnk-fl{display:inline-flex;align-items:center;gap:8px}
