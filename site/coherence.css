@@ -24,7 +24,7 @@ html body .evs-head,html body .bests-head,html body .bests-cta{padding-left:var(
 html body .bests-track{padding-left:var(--edge);padding-right:var(--edge)}
 html body .faq{max-width:none}
 html body .rv-in,html body .rf-in{max-width:none;margin:0;width:100%}
-@media(min-width:961px){html body .hero-content{padding-left:var(--edge)}}
+
 
 /* 3. Même espace entre un titre de section et son contenu */
 html body .evs-head,html body .bests-head,html body .blog-head{margin-bottom:var(--head-gap)}
@@ -358,3 +358,6 @@ html body .vm{display:block}
 html body .vm>a.vmLink,html body .vm>#vmLink{text-align:center}
 @media(min-width:900px){html body .vm>.btn-p,html body .vm>.btn-submit{max-width:calc(100% - 68px)!important;margin:16px auto 34px!important;padding:16px 40px!important}}
 
+
+/* En-tête : marge gauche fixe et modérée, même sur très grand écran */
+@media(min-width:961px){html body .hero-slide .hero-content,html body .hero:not(#hero) .hero-content{padding-left:64px!important}}
