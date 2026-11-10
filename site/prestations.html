@@ -610,8 +610,8 @@ function rail(){var w=document.getElementById('prRW'),t=document.getElementById(
 /* produits à forte valeur : la sélection change à chaque affichage et d'un onglet à l'autre */
 function ordreProduits(){var P=['p6','p39','p5','p24','p3','p22','p35','p37','p9','p8','p36','p44','p34'],i=P.length,j,t;while(i>1){j=Math.floor(Math.random()*i);i--;t=P[i];P[i]=P[j];P[j]=t}return P.slice(0,10).join(',')}
 function more(){var m=MORE[PR[cur].id],box=document.getElementById('prMore');if(!m){box.innerHTML='';return}
- box.innerHTML= '<div><h3>À louer en complément</h3><div class="bests pr-bests" id="prB" data-vcar="prB" data-add data-ids="'+ordreProduits()+'"><div class="bests-shell"><button class="bests-arrow bests-arrow-prev" id="prBPrev" aria-label="Produits précédents">‹</button><div class="bests-carousel" id="prBWrap"><div class="bests-track" id="prBTrack"></div></div><button class="bests-arrow bests-arrow-next" id="prBNext" aria-label="Produits suivants">›</button></div><div class="bests-dots" id="prBDots"></div></div></div>'+
- '<div class="pr-faq"><h3>Questions fréquentes</h3><div class="pr-fq">'+m.faq.map(function(q){return '<details><summary>'+esc(q[0])+'</summary><p>'+esc(q[1])+'</p></details>'}).join('')+'</div></div>';
+ box.innerHTML= '<div class="pr-sec pr-sec-b"><span class="pr-lab">Pour compléter votre événement</span><h3 class="pr-t">À louer <em class="ac">en complément</em></h3><div class="bests pr-bests" id="prB" data-vcar="prB" data-add data-ids="'+ordreProduits()+'"><div class="bests-shell"><button class="bests-arrow bests-arrow-prev" id="prBPrev" aria-label="Produits précédents">‹</button><div class="bests-carousel" id="prBWrap"><div class="bests-track" id="prBTrack"></div></div><button class="bests-arrow bests-arrow-next" id="prBNext" aria-label="Produits suivants">›</button></div><div class="bests-dots" id="prBDots"></div></div></div>'+
+ '<div class="pr-faq pr-sec"><span class="pr-lab">On vous répond</span><h3 class="pr-t">Questions <em class="ac">fréquentes</em></h3><div class="pr-fq">'+m.faq.map(function(q){return '<details><summary>'+esc(q[0])+'</summary><p>'+esc(q[1])+'</p></details>'}).join('')+'</div></div>';
  if(window.vespraCarrousels)window.vespraCarrousels()}
 var nav=document.getElementById('prNav'),card=document.getElementById('prCard'),cur=0;
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
@@ -819,5 +819,5 @@ function toggleNav(){
 <script src="/reprise.js"></script>
 <script src="/adresse-auto.js"></script>
 <script src="/centrer.js?v=1" defer></script>
-<link rel="stylesheet" href="/coherence.css?v=13">
+<link rel="stylesheet" href="/coherence.css?v=15">
 <script src="/coherence.js?v=5" defer></script>

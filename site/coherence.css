@@ -278,42 +278,26 @@ html body .sec-tag{margin-bottom:12px}
 html body .sec-h{margin-bottom:var(--head-gap)}
 @media(max-width:560px){html body .hero-eye{margin-bottom:12px!important}}
 
-/* ===== Pages prestataires : mise en page compacte et homogène ===== */
-/* « À louer en complément » (prestations) */
-html body .pr-bests{padding:26px 0 30px!important;margin:6px 0!important;background:transparent!important;border-radius:0!important}
-html body .pr-bests .bests-head{padding:0 0 4px;margin-bottom:14px}
-html body .pr-more h3,html body #prMore>div>h3{margin-bottom:10px}
-html body .pr-faq{margin-top:18px!important}
-html body .pr-more{margin-top:26px!important}
-
-/* « Nos prestataires recommandés » */
-html body .reco-intro{padding:28px 32px 0;max-width:1320px}
-html body .reco-intro-in{max-width:none}
-html body .reco-note{margin:0!important;border-left-color:var(--gold,#F59E0B)}
-html body .reco-section{padding:30px 32px 44px;max-width:1320px}
-html body .reco-section .sec-h{margin-bottom:16px}
-html body .reco-filtres{margin-bottom:22px;gap:8px}
-html body .reco-filtre{padding:8px 16px;transition:transform .3s cubic-bezier(.2,.7,.2,1),background .3s,color .3s,border-color .3s}
-html body .reco-filtre:hover{transform:translateY(-2px)}
-html body #recoListe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px 22px;align-items:start}
-html body .reco-groupe{margin:0;display:flex;flex-direction:column;gap:12px}
-html body .reco-groupe-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:0 0 8px;margin:0;border-bottom:2px solid var(--navy,#2B4A6B)}
-html body .reco-groupe-h h3{font-size:24px;letter-spacing:.03em;color:var(--navy,#2B4A6B)}
-html body .reco-groupe-h h3 a{border-bottom:0}
-html body .reco-groupe-n{font-size:10.5px;white-space:nowrap}
-html body .reco-grid{grid-template-columns:1fr!important;gap:14px}
-html body .reco-carte{height:100%;padding:18px 18px 16px;border-radius:20px;box-shadow:0 1px 4px rgba(0,0,0,.05);transition:transform .4s cubic-bezier(.2,.7,.2,1),box-shadow .4s,border-color .3s}
-html body .reco-carte:hover{transform:translateY(-6px);box-shadow:0 22px 36px -22px rgba(20,37,58,.45)}
-html body .reco-type{margin-bottom:10px}
-html body .reco-nom{font-size:24px;margin-bottom:4px}
-html body .reco-lieu{margin-bottom:10px}
-html body .reco-mot{font-size:13.5px;line-height:1.6;margin-bottom:12px}
-html body .reco-liens{padding-top:12px}
-@media(max-width:1100px){html body #recoListe{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:700px){html body .reco-intro{padding:20px 16px 0}html body .reco-section{padding:22px 16px 34px}html body #recoListe{grid-template-columns:1fr;gap:26px}}
-/* appel final : plus compact */
-html body .cta-section{padding:56px 24px}html body .cta-section h2{margin-bottom:14px}html body .cta-section p{margin-bottom:22px}
-@media(max-width:700px){html body .cta-section{padding:40px 20px}}
+/* ===== Page « Prestations » (serveuse privée, chef pâtissier) : « À louer en complément » et « Questions fréquentes » ===== */
+html body .pr-more{margin-top:14px!important;gap:14px!important}
+html body .pr-sec{background:#fff;border-radius:32px;padding:clamp(26px,4vw,48px);box-shadow:0 1px 4px rgba(0,0,0,.04)}
+html body .pr-lab{display:block;font:700 11px Inter,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--navy,#2B4A6B);margin-bottom:8px}
+html body .pr-t{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:clamp(32px,4.2vw,52px);line-height:.95;letter-spacing:.01em;color:var(--black,#0C0F14);margin:0 0 22px!important}
+html body .pr-t em{font:italic 400 .8em Fraunces,Georgia,serif;color:#D97706;letter-spacing:0;text-transform:none}
+html body .pr-bests{padding:0!important;margin:0!important;background:transparent!important;border-radius:0!important}
+html body .pr-bests .bests-shell{margin:0 -6px}
+html body .pr-bests .bests-dots{margin-top:14px}
+html body .pr-fq{background:transparent!important;box-shadow:none!important;border-radius:0!important;overflow:visible!important}
+html body .pr-faq{margin-top:0!important}
+html body .pr-faq details{border:0!important;border-bottom:1px solid var(--g3,#C8CDD8)!important;padding:0}
+html body .pr-faq details:last-child{border-bottom:0!important}
+html body .pr-faq summary{padding:18px 2px!important;font-size:16px!important}
+html body .pr-faq summary:hover{background:transparent!important;color:var(--navy,#2B4A6B)}
+html body .pr-faq p{padding:0 2px 18px!important;max-width:70ch!important}
+/* le bloc contact suit la largeur de la page */
+html body:has(.pr-in) .vcb{max-width:1128px;padding-left:24px;padding-right:24px}
+html body:has(.pr-in) .pr{padding-bottom:12px}
+@media(max-width:700px){html body .pr-sec{border-radius:24px}html body:has(.pr-in) .vcb{padding-left:12px;padding-right:12px}}
 
 /* ===== En-têtes de toutes les pages : mêmes proportions que l'accueil ===== */
 html body :is(.hero:not(#hero),.cat-hero,.article-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero) :is(h1,.hero-h:not(.hs-t),.cat-hero-h,.faq-hero-h,.blog-hero-h,.art-h1){
@@ -348,3 +332,6 @@ html body .hx-d.hx-don{width:26px;background:#fff}
   html body :is(.hero-cta,.hs-cta,.hx-cta)>*:only-child{flex:0 0 auto!important;width:auto!important;max-width:100%;padding:11px 18px!important;font-size:11px!important}
   html body .hx-cta .hs-btn{padding:11px 18px;font-size:11px}
 }
+html body:has(.pr-in) .vcb{background:var(--g4,#F0F2F5);max-width:none;padding:12px 24px 44px}
+html body:has(.pr-in) .vcb-in{max-width:1080px;margin:0 auto}
+@media(max-width:700px){html body:has(.pr-in) .vcb{padding:10px 12px 32px}}
