@@ -367,3 +367,19 @@ html body .vm>.btn-p{max-width:calc(100% - 44px)!important}
 /* En-tête de l'accueil : le contenu de chaque diapo est centré verticalement (plus de grand vide sous les boutons) */
 html body .hero-slide .hero-content{justify-content:center!important;min-height:0!important;height:100%}
 html body .hero-slide .hero-h.hs-t,html body .hero-slide:first-child .hero-h{min-height:0!important}
+
+/* ===== Fenêtre « Ajouter au devis » : bouton compact, centré, avec de l'air autour ===== */
+html body .vm{padding-bottom:0}
+html body .vm>.btn-p,html body .vm>.btn-submit{position:static!important;box-shadow:none!important;width:auto!important;min-width:220px;max-width:calc(100% - 44px)!important;display:flex;align-self:center;margin:14px auto 30px!important;padding:15px 34px!important;font-size:13px!important;border-radius:999px;justify-content:center}
+html body .vm{display:block}
+html body .vm>a.vmLink,html body .vm>#vmLink{text-align:center}
+@media(min-width:900px){html body .vm>.btn-p,html body .vm>.btn-submit{max-width:calc(100% - 68px)!important;margin:16px auto 34px!important;padding:16px 40px!important}}
+
+/* ===== Entêtes : hauteur raisonnable sur ordinateur (accueil et toutes les pages) ===== */
+@media(min-width:961px){
+  html body .hero{height:min(calc(100svh - 150px),620px)!important;min-height:480px!important}
+  html body .hero-slide .hero-content{padding-block:48px}
+  html body .hx{min-height:clamp(360px,34vw,470px)}
+  html body :is(.cat-hero,.article-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero){padding-top:48px!important;padding-bottom:48px!important}
+  html body .hero:not(#hero){min-height:clamp(320px,32vw,440px)!important;height:auto!important}
+}
