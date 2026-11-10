@@ -16,7 +16,7 @@
 (function(){
   try{
     var h='<div class="hero-proof" aria-label="Nos chiffres"><div><b>5/5</b><span>Note Google</span></div><div><b>+1000</b><span>Clients</span></div><div><b>24H</b><span>Réponse devis</span></div></div>';
-    if(!document.querySelector('.evs'))return; /* accueil uniquement */
+    if(!/^\/(index(\.html)?)?$/.test(location.pathname))return; /* accueil uniquement */
     [].forEach.call(document.querySelectorAll('#hero .hero-slide'),function(s){if(!s.querySelector('.hero-proof'))s.insertAdjacentHTML('beforeend',h)});
   }catch(e){}
 })();

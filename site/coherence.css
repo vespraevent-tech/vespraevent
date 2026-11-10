@@ -220,3 +220,16 @@ html body .devis-popup-card{border-radius:28px!important}
 html body .devis-popup-close{transition:transform .35s cubic-bezier(.2,.7,.2,1),background .3s}
 html body .devis-popup-close:hover{transform:rotate(90deg);background:var(--gold,#F59E0B);color:#0C0F14}
 @media(prefers-reduced-motion:reduce){html body .vm,html body .c-drawer{transition:none!important}}
+
+/* ===== « Ils nous ont fait confiance » : juste sous le hero, plus lisible ===== */
+html body .trust{padding-top:calc(var(--sec-y-sm) * .8);padding-bottom:calc(var(--sec-y-sm) * .8);border-top:0}
+html body .trust-title{font-size:13px;margin-bottom:26px;color:var(--g1,#3D4452)}
+html body .trust-marquee-img{filter:grayscale(1) opacity(.78)}
+html body .trust-marquee-img:hover{filter:none}
+html.am-sombre .trust .trust-marquee-img,html.am-sombre .trust .trust-marquee-img:hover{filter:none!important;opacity:1!important}
+
+/* ===== Bandeaux d'en-tête de toutes les pages : même cadre que l'accueil ===== */
+html body :is(.cat-hero,.article-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero){
+  margin:12px 16px 0;border-radius:32px;overflow:hidden}
+@media(max-width:960px){html body :is(.cat-hero,.article-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero){margin:10px 10px 0;border-radius:24px}}
+@media(max-width:560px){html body :is(.cat-hero,.article-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero){margin:8px 8px 0;border-radius:20px}}
