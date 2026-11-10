@@ -72,6 +72,33 @@ html body .hero-proof div{padding:16px 26px;text-align:center;border-right:1px s
 html body .hero-proof div:last-child{border-right:0}
 html body .hero-proof b{display:block;font:400 32px/1 'Bebas Neue',sans-serif;letter-spacing:.02em}
 html body .hero-proof span{display:block;margin-top:4px;font-size:12px;color:rgba(255,255,255,.85);white-space:nowrap}
-@media(max-width:960px){html body .hero-proof{right:16px;bottom:56px}html body .hero-proof div{padding:12px 16px}html body .hero-proof b{font-size:26px}html body .hero-proof span{font-size:11px}}
-@media(max-width:560px){html body .hero-proof{left:12px;right:12px;bottom:48px;justify-content:space-between;border-radius:16px}
-  html body .hero-proof div{flex:1;padding:9px 6px}html body .hero-proof b{font-size:22px}html body .hero-proof span{font-size:10px;white-space:normal}}
+/* Reste à droite et compact à toutes les largeurs (jamais pleine largeur) */
+@media(max-width:960px){html body .hero-proof{right:14px;bottom:52px;border-radius:16px}html body .hero-proof div{padding:10px 14px}html body .hero-proof b{font-size:24px}html body .hero-proof span{font-size:10.5px}}
+@media(max-width:560px){html body .hero-proof{right:10px;bottom:46px;left:auto;width:auto;border-radius:14px}
+  html body .hero-proof div{padding:7px 10px}html body .hero-proof b{font-size:19px}html body .hero-proof span{font-size:9px;margin-top:2px}}
+
+/* Boutons côte à côte : une seule ligne tant que la largeur le permet */
+html body .hero-cta,html body .hs-cta,html body .off-cta,html body .cta-engage .cta-btns,html body .bests-cta{display:flex;flex-wrap:nowrap;justify-content:flex-start;align-items:center;gap:10px}
+html body .off-cta,html body .cta-engage .cta-btns,html body .bests-cta{justify-content:center}
+html body .hero-cta>*,html body .hs-cta>*,html body .off-cta>*,html body .cta-engage .cta-btns>*{flex:0 1 auto;width:auto;min-width:0;white-space:nowrap}
+@media(max-width:560px){
+  html body .hero-cta,html body .hs-cta,html body .off-cta,html body .cta-engage .cta-btns{gap:8px}
+  html body .hero-cta>*,html body .hs-cta>*,html body .off-cta>*,html body .cta-engage .cta-btns>*{padding-left:14px!important;padding-right:14px!important;font-size:11px!important;letter-spacing:.04em!important}
+}
+@media(max-width:340px){html body .hero-cta,html body .hs-cta,html body .off-cta,html body .cta-engage .cta-btns{flex-wrap:wrap}}
+
+/* ===== Mouvement discret (désactivé si « réduire les animations ») ===== */
+@media(prefers-reduced-motion:no-preference){
+  /* apparition douce au défilement (ajoutée par coherence.js, visible par défaut sans JS) */
+  html.mv [data-mv]{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1);transition-delay:var(--d,0s)}
+  html.mv [data-mv].in{opacity:1;transform:none}
+  /* pastille de chiffres : très légère flottaison */
+  html body .hero-proof{animation:mvfloat 7s ease-in-out infinite}
+  @keyframes mvfloat{50%{transform:translateY(-4px)}}
+  /* boutons : appui et reflet doux */
+  html body .btn-p,html body .btn-w,html body .btn-o,html body .reserver-btn{transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s,background .3s,color .3s}
+  @media(hover:hover){html body .btn-p:hover,html body .btn-w:hover,html body .btn-o:hover{transform:translateY(-2px)}}
+  html body .btn-p:active,html body .btn-w:active,html body .btn-o:active{transform:scale(.97)}
+  /* images de cartes : zoom lent */
+  html body .evs a img,html body .bc-img,html body .blog a img{transition:transform .9s cubic-bezier(.2,.7,.2,1)}
+}
