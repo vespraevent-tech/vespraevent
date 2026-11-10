@@ -1,6 +1,7 @@
 ---
 name: impeccable-documenter
 description: Records DESIGN.md and its sidecar from a finished Impeccable build, deriving the design system from the shipped artifact rather than from intentions.
+tools: Read, Write, Bash, Glob, Grep
 model: inherit
 effort: medium
 maxTurns: 30

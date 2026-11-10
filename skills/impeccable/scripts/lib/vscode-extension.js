@@ -53,11 +53,7 @@ export function stageVSCodeExtension(rootDir, distDir) {
     engines: { vscode: '^1.109.3' },
     extensionKind: ['workspace'],
     extensionDependencies: ['GitHub.copilot-chat'],
-    capabilities: {
-      untrustedWorkspaces: { supported: false },
-      virtualWorkspaces: false,
-      agentsWindow: { supported: true },
-    },
+    capabilities: { untrustedWorkspaces: { supported: false }, virtualWorkspaces: false },
     contributes: { chatSkills: [{ path: './skills/impeccable/SKILL.md' }] },
   };
   fs.writeFileSync(path.join(extensionRoot, 'package.json'), `${JSON.stringify(manifest, null, 2)}\n`);

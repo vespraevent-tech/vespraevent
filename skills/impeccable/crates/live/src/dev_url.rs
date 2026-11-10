@@ -159,10 +159,7 @@ mod tests {
         );
         assert!(!answers(&format!("ftp://127.0.0.1:{}/", port)));
         drop(listener);
-        // Not the port just freed: a parallel test's listener can be handed it
-        // at once and answer. Port 1 is outside the ephemeral range, so nothing
-        // here ever binds it.
-        assert!(!answers("https://127.0.0.1:1/"));
+        assert!(!answers(&format!("https://127.0.0.1:{}/", port)));
     }
 
     #[test]

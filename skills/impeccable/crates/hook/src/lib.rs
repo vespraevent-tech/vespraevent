@@ -18,7 +18,6 @@ pub mod hook_lib;
 pub mod hook_sessions;
 mod build_completion;
 mod stop_baseline;
-mod stop_discovery;
 pub mod util;
 
 use impeccable_common::Io;
