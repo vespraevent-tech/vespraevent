@@ -1,0 +1,101 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Propositions Vespra</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fraunces:ital,wght@1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: onglets Pop-up / Back-office, même ADN que le site (navy, Bebas, orange, italique serif) */
+:root{--navy:#2B4A6B;--deep:#14253A;--ink:#0C0F14;--g1:#3D4452;--g2:#646D7C;--g3:#C8CDD8;--g4:#F0F2F5;--gold:#F59E0B;--ok:#15803D;--okb:#DCFCE7;--wait:#B45309;--waitb:#FEF3C7;--new:#1D4ED8;--newb:#DBEAFE;--e:cubic-bezier(.2,.7,.2,1);color-scheme:light}
+*{box-sizing:border-box;margin:0}html,body{background:#E9EDF2;color:var(--ink);font:14px/1.5 Inter,system-ui,sans-serif}
+body{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.top{max-width:1240px;margin:0 auto 18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.top h1{font:400 34px/1 'Bebas Neue';letter-spacing:.02em}.top h1 em{font:italic 400 30px Fraunces,serif;color:var(--gold);letter-spacing:0}
+.tabs{display:flex;gap:6px;background:#fff;padding:5px;border-radius:999px;box-shadow:0 1px 0 #0001}
+.tabs button{border:0;background:none;padding:10px 20px;border-radius:999px;font:600 13px Inter;color:var(--g1);cursor:pointer;transition:.3s var(--e)}
+.tabs button.on{background:var(--navy);color:#fff}
+.note{max-width:1240px;margin:0 auto 14px;color:var(--g2);font-size:13px}
+.stage{max-width:1240px;margin:0 auto;border-radius:28px;overflow:hidden;position:relative;min-height:640px;background:#fff;box-shadow:0 30px 60px -34px #14253a66}
+.pane{display:none}.pane.on{display:block}
+/* ---------- POP-UP ---------- */
+.site{padding:34px;background:var(--g4);min-height:640px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-content:start}
+.site .c{background:#fff;border-radius:20px;padding:12px;height:300px;display:flex;flex-direction:column;justify-content:space-between}
+.site .c i{display:block;flex:1;border-radius:14px;background:var(--g4)}
+.site .c b{padding:10px 6px 0;font-size:15px}
+.open-btn{position:absolute;left:50%;top:24px;transform:translateX(-50%);z-index:2;border:0;background:var(--gold);color:var(--ink);padding:12px 22px;border-radius:999px;font:700 13px Inter;cursor:pointer;box-shadow:0 10px 24px -10px #F59E0Bcc}
+.ov{position:absolute;inset:0;display:grid;place-items:center;padding:16px;background:rgba(12,22,36,.45);backdrop-filter:blur(10px) saturate(120%);opacity:0;pointer-events:none;transition:opacity .35s ease}
+.ov.on{opacity:1;pointer-events:auto}
+.md{width:min(500px,100%);max-height:calc(100% - 8px);overflow:auto;background:#fff;border-radius:28px;box-shadow:0 40px 80px -30px #000a,0 0 0 1px #fff3;transform:translateY(24px) scale(.96);opacity:0;transition:transform .5s var(--e),opacity .35s ease}
+.ov.on .md{transform:none;opacity:1}
+.md-h{display:flex;gap:16px;align-items:center;padding:22px 22px 18px;background:linear-gradient(135deg,var(--g4),#fff)}
+.md-h .ph{width:84px;height:84px;border-radius:18px;background:#fff;box-shadow:0 8px 20px -10px #14253a55;overflow:hidden;flex:none}.md-h img{width:100%;height:100%;object-fit:contain;padding:6px}
+.md-h h3{font:400 34px/1 'Bebas Neue';letter-spacing:.02em}.md-h h3 em{font:italic 400 26px Fraunces,serif;color:var(--gold);letter-spacing:0}
+.md-h p{color:var(--g2);font-size:13px;margin-top:4px}.pill{display:inline-block;margin-top:8px;background:var(--navy);color:#fff;border-radius:999px;padding:4px 12px;font:600 12px Inter}
+.x{margin-left:auto;align-self:flex-start;width:36px;height:36px;border-radius:50%;border:0;background:#fff;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:18px;transition:.35s var(--e)}.x:hover{transform:rotate(90deg);background:var(--gold)}
+.md-b{padding:6px 22px 8px}.lab{font:600 11px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--g2);margin:16px 0 8px}
+.opt{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid var(--g3);border-radius:16px;margin-bottom:8px;cursor:pointer;transition:.3s var(--e);background:#fff;width:100%;text-align:left;font:500 14px Inter;color:var(--ink)}
+.opt:hover{border-color:var(--navy);transform:translateY(-1px)}.opt.sel{border-color:var(--navy);background:#2B4A6B0d;box-shadow:0 0 0 3px #2B4A6B1a}
+.opt .r{width:20px;height:20px;border-radius:50%;border:2px solid var(--g3);flex:none;position:relative;transition:.3s}.opt.sel .r{border-color:var(--navy);background:var(--navy);box-shadow:inset 0 0 0 4px #fff}
+.opt span{flex:1}.opt b{color:var(--navy);font-weight:700}
+.sw{width:42px;height:24px;border-radius:999px;background:var(--g3);position:relative;flex:none;transition:.3s var(--e)}.sw:after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0004;transition:.3s var(--e)}
+.opt.sel .sw{background:var(--navy)}.opt.sel .sw:after{transform:translateX(18px)}
+.md-f{position:sticky;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 22px;background:#ffffffee;backdrop-filter:blur(8px);border-top:1px solid var(--g4)}
+.md-f small{display:block;color:var(--g2);font-size:11px}.md-f strong{font:400 32px/1 'Bebas Neue';color:var(--navy)}
+.cta{border:0;background:var(--navy);color:#fff;padding:15px 26px;border-radius:999px;font:700 13px Inter;letter-spacing:.04em;cursor:pointer;transition:.35s var(--e);white-space:nowrap}.cta:hover{background:var(--gold);color:var(--ink);transform:translateY(-2px);box-shadow:0 12px 24px -10px #F59E0Baa}
+/* ---------- BACK-OFFICE ---------- */
+.bo{display:grid;grid-template-columns:230px 1fr;min-height:660px;background:#F5F7FA}
+.sd{background:var(--deep);color:#c9d4e2;padding:22px 14px;display:flex;flex-direction:column;gap:4px}
+.sd .lg{font:400 26px 'Bebas Neue';color:#fff;letter-spacing:.03em;padding:0 10px 14px}.sd .g{font:600 10px Inter;letter-spacing:.16em;text-transform:uppercase;color:#7f93ab;padding:14px 10px 6px}
+.sd a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;color:inherit;text-decoration:none;font-weight:500;transition:.25s var(--e);cursor:pointer}.sd a:hover{background:#ffffff14;color:#fff;transform:translateX(3px)}
+.sd a.on{background:#fff;color:var(--deep);font-weight:700}.sd a i{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.5}.sd a.on i{background:var(--gold);opacity:1}
+.sd a em{margin-left:auto;font-style:normal;background:var(--gold);color:var(--ink);border-radius:999px;padding:1px 8px;font:700 11px Inter}
+.mn{padding:22px 26px 30px;min-width:0}
+.bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:20px}
+.bar h2{font:400 40px/1 'Bebas Neue';letter-spacing:.02em}.bar h2 em{font:italic 400 32px Fraunces,serif;color:var(--gold);letter-spacing:0}.bar p{color:var(--g2);font-size:13px}
+.bar .r{display:flex;gap:8px}.btn{border:1px solid var(--g3);background:#fff;padding:10px 16px;border-radius:999px;font:600 12px Inter;cursor:pointer;transition:.3s var(--e)}.btn:hover{transform:translateY(-2px);box-shadow:0 8px 16px -8px #14253a55}.btn.p{background:var(--navy);color:#fff;border-color:var(--navy)}.btn.p:hover{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+.kp{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.k{background:#fff;border-radius:20px;padding:16px 18px;box-shadow:0 1px 0 #0001;transition:.35s var(--e)}.k:hover{transform:translateY(-3px);box-shadow:0 16px 30px -18px #14253a66}
+.k small{font:600 11px Inter;letter-spacing:.1em;text-transform:uppercase;color:var(--g2)}.k b{display:block;font:400 40px/1.1 'Bebas Neue';color:var(--navy);margin-top:4px}.k span{font-size:12px;color:var(--ok);font-weight:600}.k span.w{color:var(--wait)}
+.row{display:grid;grid-template-columns:1.6fr 1fr;gap:14px}
+.card{background:#fff;border-radius:22px;padding:18px 18px 8px;box-shadow:0 1px 0 #0001;min-width:0}.card h3{font:700 15px Inter;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}.card h3 a{font:600 12px Inter;color:var(--navy);cursor:pointer}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:520px}th{font:600 11px Inter;letter-spacing:.1em;text-transform:uppercase;color:var(--g2);text-align:left;padding:8px 10px;border-bottom:1px solid var(--g4)}
+td{padding:13px 10px;border-bottom:1px solid var(--g4);font-size:13.5px}tr:last-child td{border:0}tbody tr{transition:.25s}tbody tr:hover{background:#2B4A6B0a}
+.av{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;font:700 11px Inter;margin-right:10px;vertical-align:middle}
+.st{display:inline-block;border-radius:999px;padding:3px 11px;font:700 11px Inter}.s1{background:var(--okb);color:var(--ok)}.s2{background:var(--waitb);color:var(--wait)}.s3{background:var(--newb);color:var(--new)}
+.li{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--g4)}.li:last-child{border:0}.li .d{flex:none;width:48px;text-align:center;background:var(--g4);border-radius:12px;padding:5px 0;font:600 10px Inter;color:var(--g2);text-transform:uppercase}.li .d b{display:block;font:400 24px/1 'Bebas Neue';color:var(--navy)}
+.li p{font-weight:600}.li small{color:var(--g2)}
+.mock{display:block;margin:14px auto 0;max-width:1240px;color:var(--g2);font-size:12px}
+@media(max-width:900px){.site{grid-template-columns:1fr 1fr}.bo{grid-template-columns:1fr}.sd{flex-direction:row;overflow-x:auto;padding:10px;gap:6px}.sd .lg,.sd .g{display:none}.sd a{white-space:nowrap}.kp{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr}.mn{padding:18px 14px}.stage{border-radius:20px}}
+@media(max-width:520px){.site{grid-template-columns:1fr}.md-h{flex-wrap:wrap}.md-f{flex-direction:column;align-items:stretch}.cta{width:100%}.top h1{font-size:28px}.open-btn{width:calc(100% - 32px);left:16px;transform:none}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<div class="top"><h1>Propositions <em>visuelles</em></h1><div class="tabs" role="tablist"><button class="on" data-t="p1">Pop-up</button><button data-t="p2">Back-office</button></div></div>
+<p class="note">Maquettes interactives (données d'exemple). Rien n'est appliqué au site. Cliquez, survolez, redimensionnez.</p>
+<div class="stage">
+<div class="pane on" id="p1"><div class="site"><div class="c"><i></i><b>Photobooth</b></div><div class="c"><i></i><b>Panneau de bienvenue</b></div><div class="c"><i></i><b>Étincelles froides</b></div></div>
+<button class="open-btn" id="ob">Ouvrir le pop-up</button>
+<div class="ov on" id="ov"><div class="md" role="dialog" aria-label="Ajouter au devis">
+<div class="md-h"><div class="ph"><img src="photobooth-detoure.webp" alt=""></div><div><h3>Photobooth <em>en bois</em></h3><p>Photobooth professionnel pour immortaliser tous les moments forts.</p><span class="pill">dès 130 € / location</span></div><button class="x" id="cl" aria-label="Fermer">×</button></div>
+<div class="md-b"><div class="lab">Formule</div>
+<button class="opt sel" data-g="f"><i class="r"></i><span>Digital (numérique)</span><b>130 €</b></button>
+<button class="opt" data-g="f"><i class="r"></i><span>Impression sur place</span><b>180 €</b></button>
+<div class="lab">Options</div>
+<button class="opt" data-o="20"><i class="sw"></i><span>Cadre photo personnalisable</span><b>+20 €</b></button>
+<button class="opt" data-o="20"><i class="sw"></i><span>Lot de déguisement</span><b>+20 €</b></button></div>
+<div class="md-f"><div><small>Total estimé</small><strong id="tot">130 €</strong></div><button class="cta">Ajouter au devis →</button></div></div></div></div>
+<div class="pane" id="p2"><div class="bo"><nav class="sd"><div class="lg">VESPRA EVENT</div><div class="g">Activité</div><a class="on"><i></i>Tableau de bord</a><a><i></i>Réservations<em>3</em></a><a><i></i>Demandes reçues<em>5</em></a><a><i></i>Planning</a><div class="g">Catalogue</div><a><i></i>Produits</a><a><i></i>Catégories</a><a><i></i>Images</a><div class="g">Site</div><a><i></i>Textes</a><a><i></i>Ambiance</a><a><i></i>Paramètres</a></nav>
+<div class="mn"><div class="bar"><div><h2>Tableau <em>de bord</em></h2><p>Lundi 10 novembre · exemple de données</p></div><div class="r"><button class="btn">Exporter</button><button class="btn p">+ Nouvelle réservation</button></div></div>
+<div class="kp"><div class="k"><small>Demandes</small><b>5</b><span>+2 aujourd'hui</span></div><div class="k"><small>Réservations</small><b>18</b><span>+12 % ce mois</span></div><div class="k"><small>Chiffre d'affaires</small><b>4 280 €</b><span>+8 %</span></div><div class="k"><small>À confirmer</small><b>3</b><span class="w">À traiter</span></div></div>
+<div class="row"><div class="card"><h3>Dernières réservations<a>Tout voir →</a></h3><div class="tw"><table><thead><tr><th>Client</th><th>Date</th><th>Matériel</th><th>Statut</th></tr></thead><tbody>
+<tr><td><span class="av">MD</span>Marie Dubois</td><td>22 nov.</td><td>Photobooth + panneau</td><td><span class="st s1">Confirmée</span></td></tr>
+<tr><td><span class="av">LP</span>Lucas Petit</td><td>29 nov.</td><td>Sono 180–250</td><td><span class="st s2">À confirmer</span></td></tr>
+<tr><td><span class="av">SM</span>Société Morin</td><td>6 déc.</td><td>Barnum 3x3, buvette</td><td><span class="st s3">Nouvelle</span></td></tr>
+<tr><td><span class="av">JL</span>Julie Lefèvre</td><td>13 déc.</td><td>Étincelles froides</td><td><span class="st s1">Confirmée</span></td></tr></tbody></table></div></div>
+<div class="card"><h3>Prochaines livraisons<a>Planning →</a></h3><div class="li"><div class="d">nov<b>22</b></div><div><p>Marie Dubois</p><small>Vitré · 14h00</small></div></div><div class="li"><div class="d">nov<b>29</b></div><div><p>Lucas Petit</p><small>Rennes · 10h30</small></div></div><div class="li"><div class="d">déc<b>06</b></div><div><p>Société Morin</p><small>Laval · 09h00</small></div></div></div></div></div></div></div>
+</div>
+<script>
+var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return [].slice.call((r||document).querySelectorAll(s))};
+$$('.tabs button').forEach(function(b){b.onclick=function(){$$('.tabs button').forEach(function(x){x.classList.toggle('on',x===b)});$$('.pane').forEach(function(p){p.classList.toggle('on',p.id===b.dataset.t)})}});
+$('#ob').onclick=function(){$('#ov').classList.add('on')};$('#cl').onclick=function(){$('#ov').classList.remove('on')};
+$('#ov').onclick=function(e){if(e.target===this)this.classList.remove('on')};
+function tot(){var t=$$('.opt[data-g].sel').length?($('.opt[data-g].sel b').textContent|0):0;$$('.opt[data-o].sel').forEach(function(o){t+=20});$('#tot').textContent=t+' €'}
+$$('.opt[data-g]').forEach(function(o){o.onclick=function(){$$('.opt[data-g]').forEach(function(x){x.classList.toggle('sel',x===o)});tot()}});
+$$('.opt[data-o]').forEach(function(o){o.onclick=function(){o.classList.toggle('sel');tot()}});
+</script>
