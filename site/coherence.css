@@ -65,7 +65,7 @@ html body .bc{transition:transform .4s cubic-bezier(.2,.7,.2,1),box-shadow .4s c
 html body .bc-add{transition:background .3s,color .3s,transform .3s}
 
 /* D. Chiffres clés : bloc en verre dépoli sur le hero */
-html body .hero-proof{position:absolute;z-index:6;right:32px;bottom:32px;display:flex;
+html body .hero-proof{position:absolute;z-index:3;right:32px;bottom:32px;display:flex;
   background:rgba(255,255,255,.14);backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);
   border:1px solid rgba(255,255,255,.28);border-radius:22px;color:#fff;pointer-events:none}
 html body .hero-proof div{padding:16px 26px;text-align:center;border-right:1px solid rgba(255,255,255,.25)}
@@ -139,8 +139,6 @@ html body .bests-carousel .bc{backface-visibility:hidden}
   html body .hero-proof{right:10px;bottom:44px;border-radius:16px}
   html body .hero-proof div{padding:9px 12px}html body .hero-proof b{font-size:24px}html body .hero-proof span{font-size:10px}}
 @media(prefers-reduced-motion:no-preference){
-  html body .hero-proof.mv-pulse{animation:mvpulse .9s cubic-bezier(.2,.7,.2,1),mvfloat 7s ease-in-out .9s infinite}
-  @keyframes mvpulse{0%{transform:translateY(0) scale(1)}35%{transform:translateY(-7px) scale(1.04)}100%{transform:translateY(0) scale(1)}}
 }
 
 /* Menu mobile : le panneau s'ouvre et se ferme en douceur, les liens arrivent l'un après l'autre */
@@ -157,16 +155,19 @@ html body .bests-carousel .bc{backface-visibility:hidden}
 }
 @media(prefers-reduced-motion:reduce){html body .nav-links,html body .nav-links>*{transition:none!important}}
 
-/* Mode sombre : logos transparents. Les logos noirs (restaurés par le double filtre) restent noirs sur fond noir :
-   on les laisse suivre l'inversion de la page pour qu'ils passent en blanc. */
+/* Mode sombre : le filtre d'inversion de la page ne peut pas rendre exactement les couleurs saturées.
+   Pour les logos, il est donc retiré de la racine et appliqué à chaque bloc de la page SAUF « Ils nous ont fait confiance »,
+   dont les logos (vrais PNG/WebP transparents) s'affichent sans aucun filtre. Les trois logos à encre noire
+   reposent sur une petite pastille claire pour rester lisibles. */
+html.am-sombre:has(.trust){filter:none!important;background:#000!important}
+html.am-sombre:has(.trust) body{background-color:#000!important}
+html.am-sombre:has(.trust) body>*:not(main):not(script):not(style):not(link):not(meta),
+html.am-sombre:has(.trust) main>*:not(.trust){filter:invert(1) hue-rotate(180deg)}
+html.am-sombre .trust{filter:none!important;background:#000!important;border-color:rgba(255,255,255,.12)}
+html.am-sombre .trust .trust-marquee-img,html.am-sombre .trust .trust-marquee-img:hover{filter:none!important;opacity:1!important;transition:none}
 html.am-sombre .trust-marquee-img[src*="t-logo-animal-trak"],
 html.am-sombre .trust-marquee-img[src*="t-logo-libre-inspi"],
-html.am-sombre .trust-marquee-img[src*="t-logo-viva-tattoo"]{filter:none!important;opacity:.85}
-html.am-sombre em.ac{filter:invert(1) hue-rotate(180deg)}
+html.am-sombre .trust-marquee-img[src*="t-logo-viva-tattoo"]{background:#fff;background-clip:padding-box;border-radius:14px;padding:8px;margin:0 38px;box-sizing:content-box}
 
-/* ===== Animations saisonnières : calque sous l'en-tête, les fenêtres et les chiffres clés ===== */
-html body #am-calque,html body #hw-calque{z-index:90!important}
-html body .hero-proof{z-index:95}
-html body .nav{z-index:100}
-html body #am-calque *,html body #hw-calque *{pointer-events:none!important}
-@media(max-width:560px){html body #am-calque .am-coin,html body #hw-calque .hw-cit,html body #hw-calque .hw-cit2{transform-origin:bottom left;scale:.7}}
+/* Mode sombre : le voile derrière les fenêtres redevient sombre (il virait au gris clair après inversion) */
+html.am-sombre :is(.vm-ov,.c-overlay,#devisPopup,.devis-popup,.pop-ov,.modal-ov){background:rgba(255,255,255,.62)!important}

@@ -12,16 +12,10 @@
   }catch(e){}
 })();
 
-/* Pastille de chiffres : un petit rebond à chaque changement de diapo du hero (contenu inchangé). */
+/* Bandeau « 5/5 · +1000 · 24H » : une copie dans chaque diapositive d'en-tête, il part et revient avec elle. */
 (function(){
   try{
-    var hp=document.querySelector('.hero-proof'),h=document.getElementById('hero');
-    if(!hp||!h||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
-    var t=0;
-    new MutationObserver(function(m){
-      if(!m.some(function(x){return x.target.classList&&x.target.classList.contains('hs-on')}))return;
-      clearTimeout(t);hp.classList.remove('mv-pulse');void hp.offsetWidth;hp.classList.add('mv-pulse');
-      t=setTimeout(function(){hp.classList.remove('mv-pulse')},1000);
-    }).observe(h,{attributes:true,attributeFilter:['class'],subtree:true});
+    var h='<div class="hero-proof" aria-label="Nos chiffres"><div><b>5/5</b><span>Note Google</span></div><div><b>+1000</b><span>Clients</span></div><div><b>24H</b><span>Réponse devis</span></div></div>';
+    [].forEach.call(document.querySelectorAll('.hero-slide,.off-s'),function(s){if(!s.querySelector('.hero-proof'))s.insertAdjacentHTML('beforeend',h)});
   }catch(e){}
 })();

@@ -28,4 +28,6 @@ $('ver').onclick=async()=>{try{const j=await F('action=etat');log('\nStockage ac
  j.stores.forEach(s=>log((s.blobs===s.supabase?'OK  ':'ÉCART ')+s.store+' : Netlify '+s.blobs+' / Supabase '+s.supabase));
  log(j.identique?'\nTout est identique.':'\nIl y a un écart : relance « Copier les données ».')}catch(e){log('\nERREUR : '+e.message)}};
 </script><script src="/centrer.js?v=1" defer></script>
+<link rel="stylesheet" href="/coherence.css?v=4">
+<script src="/coherence.js?v=3" defer></script>
 </body></html>
