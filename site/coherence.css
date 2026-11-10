@@ -347,3 +347,9 @@ html body .hero-proof{display:none!important}
   html body .pr-bests .bests-carousel{padding-left:18px}
   html body .pr-bests .bests-arrow{display:none!important}
 }
+
+/* Formulaire des pages prestataires : texte des champs et des listes plus petit */
+html body :is(.pr-i,.pr-card .sj-btn,.pr-form .sj-btn,.pr-box .sj-btn){font-size:13.5px!important}
+html body .pr-i::placeholder{font-size:13.5px;color:var(--g2,#646D7C);opacity:.85}
+html body .pr-card .sj-list .sj-opt,html body .sj-list .sj-opt{font-size:13.5px}
+@media(max-width:560px){html body :is(.pr-i,.pr-card .sj-btn,.pr-form .sj-btn,.pr-box .sj-btn){font-size:13px!important}html body .pr-i::placeholder{font-size:13px}}
