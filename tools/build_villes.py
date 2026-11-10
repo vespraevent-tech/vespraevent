@@ -308,10 +308,9 @@ def photobooth_page(d):
     order = pick(sl, 'ord', orders)
     hero = f'''<section class="hero{' flip' if flip else ''}"><div class="tx"><div class="crumb"><a href="/">Accueil</a> › <b>{esc(n)}</b></div><h1>Location de photobooth à <em>{esc(n)}</em></h1><p class="sub">{sub}</p><div><a class="btn b1" href="#vrb">Voir les formules</a></div></div>
 <div class="ph"><img src="{hero_img}" alt="Photobooth en bois Vespra Event, location à {esc(n)}" fetchpriority="high"><div class="pol b"><img src="{p1}" alt="" loading="lazy"></div><div class="pol a"><img src="{p2}" alt="" loading="lazy"></div></div></section>'''
-    main = hero + ''.join(sections[k] for k in order)
-    other = f'<div class="v-pg" style="padding-top:0"><div class="cl" style="margin:10px 12px 40px"><span>Besoin de tout le matériel à {esc(n)} : son, lumière, barnums ?</span><a class="lnk" href="{sl}.html">Voir la location de matériel à {esc(n)}</a></div></div>'
+    other = f'<section class="sec g"><div class="cl" style="margin-top:0"><span>Besoin de tout le matériel à {esc(n)} : son, lumière, barnums ?</span><a class="lnk" href="{sl}.html">Voir la location de matériel à {esc(n)}</a></div></section>'
+    main = hero + ''.join(sections[k] for k in order) + other
     main = prefix_classes(main)
-    other = prefix_classes(other)
     title = f"Location photobooth à {n} dès 130 € | Vespra Event"
     desc_opts = [
         f"Location de photobooth à {n} dès 130 € : photos numériques illimitées, tirages 10×15 ou bandelette. Livraison possible, devis sous 24 h.",
@@ -324,7 +323,7 @@ def photobooth_page(d):
             'offers': [{'@type': 'Offer', 'name': nom, 'price': str(prix), 'priceCurrency': 'EUR', 'availability': 'https://schema.org/InStock', 'url': url} for nom, prix, _, _ in TIERS]}
     ld = ld_graph(d, url, f'Location de photobooth à {n}', faq, prod)
     head, foot = head_for(title, desc, url, ld)
-    body = f'<main class="v-pg">{main}</main>{other}\n<script src="/ville-pages.js?v=1" defer></script>\n'
+    body = f'<main class="v-pg">{main}</main>\n<script src="/ville-pages.js?v=1" defer></script>\n'
     return head + body + foot
 
 
@@ -386,7 +385,7 @@ def materiel_page(d):
     for k in order:
         parts.append(sec[k] if k in ('apercu', 'events') else prefix_classes(sec[k]))
     main = prefix_classes(hero) + ''.join(parts)
-    cross = prefix_classes(f'<div class="cl" style="margin:36px 12px 10px"><span>Un photobooth pour votre événement à {esc(n)} ?</span><a class="lnk" href="location-photobooth-{sl}.html">Voir la location de photobooth à {esc(n)}</a></div>')
+    cross = prefix_classes(f'<section class="sec g"><div class="cl" style="margin-top:0"><span>Un photobooth pour votre événement à {esc(n)} ?</span><a class="lnk" href="location-photobooth-{sl}.html">Voir la location de photobooth à {esc(n)}</a></div></section>')
     title = f"Location de matériel événementiel à {n} | Vespra Event"
     desc_opts = [
         f"Location de matériel événementiel à {n} : photobooth, sono, lumière, barnums, restauration. Livraison {'offerte' if sl == 'vitre' else 'sur devis'}, devis sous 24 h.",

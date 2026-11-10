@@ -81,3 +81,9 @@
 .v-car{display:flex;gap:18px;overflow-x:auto;padding:12px 4px 28px;scrollbar-width:none;cursor:grab;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}.v-car::-webkit-scrollbar{display:none}.v-car.v-dn{cursor:grabbing}
 .v-evc{position:relative;width:340px;height:440px;flex:none;border-radius:28px;overflow:hidden;color:#fff;isolation:isolate}.v-evc img{position:absolute;inset:0;z-index:-2;transition:transform 1s var(--v-e)}.v-evc:hover img{transform:scale(1.06)}.v-evc:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,#0b1522f2 10%,#0b152200 62%)}
 .v-evc div{position:absolute;left:22px;right:22px;bottom:22px}.v-evc h3{font:400 36px/1 'Bebas Neue',sans-serif;color:#fff}.v-evc p{font-size:13.5px;color:#ffffffd6;margin-top:6px}@media(max-width:560px){.v-evc{width:78vw;height:400px}}
+
+/* bloc « Nous contacter » (injecté par contact-bloc.js) : même cadre arrondi que les autres sections */
+.vcb{background:transparent!important;padding:clamp(28px,4vw,48px) 10px 12px!important;max-width:1500px;margin:0 auto}
+.vcb-in{max-width:none!important;border-radius:32px!important;box-shadow:none!important;overflow:hidden;background:#fff!important}
+.vcb-tx{padding:clamp(28px,4vw,56px)!important}.vcb-map{min-height:360px}.vcb-map iframe{min-height:360px}
+@media(max-width:800px){.vcb-in{grid-template-columns:1fr!important}.vcb-map{min-height:280px}}

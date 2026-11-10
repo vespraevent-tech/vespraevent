@@ -254,3 +254,19 @@ img:where([width][height]){height:auto}
 /* Mot d'accent : orange plus profond sur fond clair (lisibilité), orange vif sur fond sombre */
 html body em.ac{color:#D97706}
 html body :is(.article-hero,.cta-engage,.hero,.off,.cat-hero,.dk,.footer,.ft) em.ac{color:var(--gold,#F59E0B)}
+
+/* ===== Fenêtre « Ajouter au devis » : plus grande sur ordinateur ===== */
+@media(min-width:900px){
+  html body .vm{width:min(780px,92vw)!important;max-height:90vh}
+  html body .vm-head{padding:30px 34px 24px;gap:24px}
+  html body .vm-img{width:128px;height:128px;border-radius:22px;padding:8px}
+  html body .vm-info h3{font-size:46px;margin-bottom:10px}
+  html body .vm-info .vp{font-size:14px;padding:6px 16px}
+  html body .vm-cls{width:42px;height:42px;font-size:22px}
+  html body .vm>:not(.vm-head){margin-left:34px;margin-right:34px}
+  html body .vm #vmBody{font-size:15.5px;margin-top:20px}
+  html body .vm-variants{margin:20px 34px 24px;gap:10px}
+  html body .var-chip{padding:14px 22px;font-size:14.5px}
+  html body #vmOptions label{padding:16px 20px!important;font-size:15px!important}
+  html body .vm>.btn-p{width:calc(100% - 68px)!important;margin:10px 34px 30px;padding:18px!important;font-size:15px!important}
+}
