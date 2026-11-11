@@ -5702,7 +5702,7 @@ function materielListe(d){
       try{
         const mcab = /^cabine t[ée]l[ée]phonique\s+(audio|vid[ée]o)\b(?!\s*\/)\s*(?:\(\s*(blanche|rouge)\s*\))?\s*(.*)$/i.exec(String(nom).trim());
         if(mcab){
-          nom = 'Cabine téléphonique audio / vidéo' + (mcab[3] ? ' ' + mcab[3] : '');
+          nom = 'Cabine téléphonique vidéo' + (mcab[3] ? ' ' + mcab[3] : '');
           /* depuis la fin de la formule audio : « vidéo » = la cabine à 149 €, sans option vidéo en plus */
           if(!formule) formule = /^vid/i.test(mcab[1]) ? 'Vidéo' : 'Audio';
           if(mcab[2] && !opts.some(o => /blanche|rouge/i.test(String(o)))) opts.push('Cabine ' + mcab[2].toLowerCase());

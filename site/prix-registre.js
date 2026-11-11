@@ -618,15 +618,6 @@ window.VESPRA_PRIX_REGISTRE = [
     "cvi": -1
   },
   {
-    "i": "livre-d-or-audio-opt-1",
-    "n": "Livre d'or audio",
-    "v": "Option : Cabine téléphonique (décor seul)",
-    "p": 60,
-    "pg": "produit-livre-or-audio.html",
-    "opt": 1,
-    "champ": "optionCabine"
-  },
-  {
     "i": "cabine-telephonique",
     "n": "Cabine téléphonique",
     "v": "",
@@ -646,15 +637,6 @@ window.VESPRA_PRIX_REGISTRE = [
     "champ": "optionNeon"
   },
   {
-    "i": "cabine-telephonique-opt-2",
-    "n": "Cabine téléphonique",
-    "v": "Option : Livre d'or audio",
-    "p": 35,
-    "pg": "produit-cabine-telephonique.html",
-    "opt": 1,
-    "champ": "optionLivre"
-  },
-  {
     "i": "livre-d-or-audio-opt-2",
     "n": "Livre d'or audio",
     "v": "Option : Néon lumineux",
@@ -665,7 +647,7 @@ window.VESPRA_PRIX_REGISTRE = [
   },
   {
     "i": "cabine-telephonique-audio-video",
-    "n": "Cabine téléphonique audio / vidéo",
+    "n": "Cabine téléphonique vidéo",
     "v": "Vidéo",
     "p": 149,
     "pg": "produit-cabine-telephonique-audio-video.html",
@@ -675,7 +657,7 @@ window.VESPRA_PRIX_REGISTRE = [
   },
   {
     "i": "cabine-telephonique-audio-video-opt-1",
-    "n": "Cabine téléphonique audio / vidéo",
+    "n": "Cabine téléphonique vidéo",
     "v": "Option : Néon lumineux",
     "p": 20,
     "pg": "produit-cabine-telephonique-audio-video.html",
@@ -691,24 +673,6 @@ window.VESPRA_PRIX_REGISTRE = [
     "vi": -1,
     "ci": "p32",
     "cvi": -1
-  },
-  {
-    "i": "neon-lumineux-opt-1",
-    "n": "Néon lumineux",
-    "v": "Option : Cabine téléphonique blanche",
-    "p": 120,
-    "pg": "produit-neon-lumineux.html",
-    "opt": 1,
-    "champ": "optionCabine"
-  },
-  {
-    "i": "neon-lumineux-opt-2",
-    "n": "Néon lumineux",
-    "v": "Option : Cabine téléphonique rouge",
-    "p": 120,
-    "pg": "produit-neon-lumineux.html",
-    "opt": 1,
-    "champ": "optionCabineRouge"
   },
   {
     "i": "baby-foot",
@@ -2414,7 +2378,7 @@ window.VESPRA_PRODUITS = [
       "Photobooth et accessoires",
       "Animations"
     ],
-    "desc": "Téléphone vintage qui enregistre les messages vocaux de vos invités, jusqu'à 100 heures. Avec la cabine en décor (+ 60 €), il revient à 95 € l'événement. Pour l'écran tactile et la vidéo, voir la cabine vidéo (149 €).",
+    "desc": "Téléphone vintage qui enregistre les messages vocaux de vos invités, jusqu'à 100 heures. Se loue seul. Pour l'écran tactile et la vidéo, voir la cabine vidéo (149 €).",
     "img": "telephone-vintage-2.webp",
     "imgCat": "telephone-vintage-2.webp",
     "page": "produit-livre-or-audio.html",
@@ -2423,13 +2387,6 @@ window.VESPRA_PRODUITS = [
     "variantes": [],
     "notices": [],
     "options": [
-      {
-        "nom": "Cabine téléphonique (décor seul)",
-        "prix": 60,
-        "devis": false,
-        "champ": "optionCabine",
-        "id": "livre-d-or-audio-opt-1"
-      },
       {
         "nom": "Néon lumineux",
         "prix": 20,
@@ -2448,7 +2405,7 @@ window.VESPRA_PRODUITS = [
       "Photobooth et accessoires",
       "Animations"
     ],
-    "desc": "Cabine à portes vitrées, blanche ou rouge, en décor. Avec le livre d'or audio, 95 € l'événement ; avec la cabine vidéo, 149 €.",
+    "desc": "Cabine à portes vitrées, blanche ou rouge, en décor. Pour les messages vidéo et l'écran tactile : la cabine vidéo, 149 €.",
     "img": "cabine-decor-blanche.webp",
     "imgCat": "cabine-decor-blanche.webp",
     "page": "produit-cabine-telephonique.html",
@@ -2463,20 +2420,13 @@ window.VESPRA_PRODUITS = [
         "devis": false,
         "champ": "optionNeon",
         "id": "cabine-telephonique-opt-1"
-      },
-      {
-        "nom": "Livre d'or audio",
-        "prix": 35,
-        "devis": false,
-        "champ": "optionLivre",
-        "id": "cabine-telephonique-opt-2"
       }
     ]
   },
   {
     "id": "p46",
     "ref": "p46",
-    "nom": "Cabine téléphonique audio / vidéo",
+    "nom": "Cabine téléphonique vidéo",
     "cat": "Photobooth et accessoires",
     "cats": [
       "Photobooth et accessoires",
@@ -2517,22 +2467,7 @@ window.VESPRA_PRODUITS = [
     "prixId": "neon-lumineux",
     "variantes": [],
     "notices": [],
-    "options": [
-      {
-        "nom": "Cabine téléphonique blanche",
-        "prix": 120,
-        "devis": false,
-        "champ": "optionCabine",
-        "id": "neon-lumineux-opt-1"
-      },
-      {
-        "nom": "Cabine téléphonique rouge",
-        "prix": 120,
-        "devis": false,
-        "champ": "optionCabineRouge",
-        "id": "neon-lumineux-opt-2"
-      }
-    ]
+    "options": []
   },
   {
     "id": "p40",
@@ -3247,14 +3182,10 @@ window.VESPRA_MEDIAS = {
       },
       {
         "s": "cabine-telephonique-audio.webp",
-        "a": "Version cabine téléphonique du livre d'or audio"
+        "a": "Livre d'or audio — téléphone vintage"
       }
     ],
     "options": {
-      "optionCabine": {
-        "nom": "Cabine téléphonique (décor seul)",
-        "desc": "La cabine uniquement, en décor : sans écran tactile ni fichiers au nom des invités. Le livre d'or reste le téléphone vintage. Blanche ou rouge, à préciser dans votre demande."
-      },
       "optionNeon": {
         "nom": "Néon lumineux",
         "desc": "Le texte est celui du néon « Laisser un message »."
@@ -3277,10 +3208,6 @@ window.VESPRA_MEDIAS = {
       "optionNeon": {
         "nom": "Néon lumineux",
         "desc": "Il éclaire l'intérieur et signale le coin messages. Le texte est celui du néon « Laisser un message »."
-      },
-      "optionLivre": {
-        "nom": "Livre d'or audio",
-        "desc": "Le téléphone vintage dans la cabine, sans écran tactile."
       }
     },
     "subs": []
@@ -3357,16 +3284,7 @@ window.VESPRA_MEDIAS = {
         "a": "Le néon se pose au fond de la cabine téléphonique"
       }
     ],
-    "options": {
-      "optionCabine": {
-        "nom": "Cabine téléphonique blanche",
-        "desc": "Avec livre d'or audio et écran tactile : vos invités entrent pour laisser leur message, sous le néon."
-      },
-      "optionCabineRouge": {
-        "nom": "Cabine téléphonique rouge",
-        "desc": "Avec livre d'or audio et écran tactile : la version rouge, même fonctionnement."
-      }
-    },
+    "options": {},
     "subs": []
   },
   "produit-guirlande-lumineuse.html": {
