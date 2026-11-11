@@ -131,6 +131,12 @@
     return (d && d.montagePrix != null) ? (Number(d.montagePrix) || 0) : 0;
   }
 
+  /* aucun devis ni facture à 0 € : tant qu'une prestation de prestataire n'a pas son prix (> 0), le document est bloqué */
+  function prixPrestaManquant(r, lignes, depuisDemande) {
+    if (depuisDemande) return (lignes || []).some(function (l) { return l && l.presta && !(Number(l.montantTTC) > 0); });
+    return ((r && r.supplements) || []).some(function (x) { return x && x.tiers && !(Number(x.prix) > 0); });
+  }
+
   function lignesDeDemande(d) {
     var l = lignesBrutes(d);
     try {
@@ -160,6 +166,7 @@
         montantTTC: prix,
         /* prix baissé directement sur la fiche : l'ancien prix du tarif figure barré sur le devis */
         ancienTTC: (it.manuel && Number(it.prixCatalogue) > prix) ? Number(it.prixCatalogue) : 0,
+        presta: it.presta === true,
       };
     });
   }
@@ -332,9 +339,11 @@
         '<input class="fc-input" id="fcTvaClient" type="text" value="' + txt(vu.tvaClient || '') + '" placeholder="FR00123456789">' +
       '</div>' +
 
+      (prixPrestaManquant(r, lignes, depuisDemande)
+        ? '<p class="fc-aide" id="fcBlocPresta" style="color:#b03a2a;font-weight:600;margin:10px 0 0">Le prix de la prestation n’est pas encore saisi : le devis ne peut pas être envoyé tant qu’il n’est pas renseigné.</p>' : '') +
       '<div class="modal-actions compact">' +
         '<button class="btn btn-ghost" onclick="fermerFacture()">Annuler</button>' +
-        '<button class="btn" id="fcGenerer">Télécharger<span class="bo-long"> le ' + (devis ? 'devis' : 'la facture').replace(/^la /, '') + '</span></button>' +
+        '<button class="btn" id="fcGenerer"' + (prixPrestaManquant(r, lignes, depuisDemande) ? ' disabled title="Prix de la prestation non saisi"' : '') + '>Télécharger<span class="bo-long"> le ' + (devis ? 'devis' : 'la facture').replace(/^la /, '') + '</span></button>' +
       '</div>';
 
     function totalCourant() {
@@ -476,6 +485,10 @@
     var montage = nombreOuNul(zone.querySelector('#fcMontage'));
     var retour = !!(zone.querySelector('#fcRetour') || {}).checked;
 
+    if (prixPrestaManquant(r, lignes, depuisDemande)) {
+      alert('Le prix de la prestation n’est pas encore saisi : le devis ne peut pas être envoyé.');
+      return;
+    }
     sauvegarderSaisies(id, source, r, { adresse: adresse, pro: pro, siret: siret, tvaClient: tvaClient,
                   avecAcompte: avecAcompte, livraison: livraison, montage: montage, retour: retour });
 
@@ -534,7 +547,7 @@
 
     appel
       .then(function (rep) {
-        if (!rep.ok) return rep.json().then(function (d) { throw new Error((d && d.error) || 'Erreur ' + rep.status); });
+        if (!rep.ok) return rep.json().then(function (d) { throw new Error((d && (d.message || d.error)) || 'Erreur ' + rep.status); });
         var nom = devis ? 'devis.pdf' : 'facture.pdf';
         var m = /filename="([^"]+)"/.exec(rep.headers.get('content-disposition') || '');
         if (m) nom = m[1];

@@ -568,14 +568,14 @@ textarea.pr-i{resize:vertical;min-height:96px}
 (function(){
 var PR=[
  {id:'serveuse',nom:'Serveuse privée',court:'Candice',img:'prestation-serveuse.webp',photo:true,
-  titre:'Serveuse privée : Candice',accroche:'Candice est notre serveuse privée dédiée à votre événement : elle s\'occupe de la présentation, du service et de la mise en place.',
+  titre:'Serveuse privée — Candice',accroche:'Candice, serveuse privée partenaire, réalise le service de votre événement : présentation, service et mise en place.',
   service:['Service du vin d\'honneur, du cocktail et du repas : présentation, passage des plateaux, service à table','Mise en place et rangement du bar et du buffet : verrerie, boissons, plats, décoration de table','Accueil et service des invités, avec le sourire et dans le calme','Gestion du rythme de la réception en lien avec vous et votre traiteur','Candice est une professionnelle expérimentée, avec une vingtaine d\'années d\'expérience','Un rendez-vous pour rencontrer Candice avant l\'événement et préparer le déroulé ensemble'],
-  infos:['Prestation sur devis : le prix dépend des heures et du nombre de personnes','Précisez l\'horaire de début et de fin souhaité','Vous pouvez la combiner avec la location de matériel (fontaine à cocktail, machine à glaçons, mange-debout…)'],
+  infos:['Prestation réalisée par Candice, prestataire partenaire. Vespra Event encaisse pour son compte et assure la coordination.','Prestation sur devis : le prix dépend des heures et du nombre de personnes','Précisez l\'horaire de début et de fin souhaité','Vous pouvez la combiner avec la location de matériel (fontaine à cocktail, machine à glaçons, mange-debout…)'],
   champs:'heures'},
  {id:'patissier',nom:'Chef pâtissier',court:'Emmanuel',img:'prestation-patissier.webp',photo:true,
-  titre:'Chef pâtissier : Emmanuel',accroche:'Emmanuel, notre chef pâtissier, crée sur mesure : tout est possible en pâtisserie. Gâteau, desserts ou buffet de douceurs, selon vos envies et le nombre d\'invités.',
+  titre:'Chef pâtissier — Emmanuel',accroche:'Emmanuel, chef pâtissier partenaire, réalise sur mesure : tout est possible en pâtisserie. Gâteau, desserts ou buffet de douceurs, selon vos envies et le nombre d\'invités.',
   service:['Création sur mesure : tout est possible en pâtisserie, selon vos envies et votre thème','Gâteaux à étages, pièces montées, entremets, mignardises et buffets de douceurs','Choix des saveurs, des textures et du décor avec vous, étape par étape','Prise en compte des allergies et des régimes particuliers','Un rendez-vous pour goûter les pâtisseries d\'Emmanuel peut être organisé : vous goûtez avant de choisir','Emmanuel est un chef expert, avec une dizaine d\'années d\'expérience'],
-  infos:['Prestation sur devis : selon le nombre de parts, le thème et la complexité','Indiquez vos envies, allergies et contraintes dans les précisions','Prévoyez de commander plusieurs semaines à l\'avance'],
+  infos:['Prestation réalisée par Emmanuel, prestataire partenaire. Vespra Event encaisse pour son compte et assure la coordination.','Prestation sur devis : selon le nombre de parts, le thème et la complexité','Indiquez vos envies, allergies et contraintes dans les précisions','Prévoyez de commander plusieurs semaines à l\'avance'],
   champs:'parts'}
 ];
 
@@ -628,7 +628,7 @@ function fiche(sub){
  }else{
    champ=''+NB+'<div class="pr-row"><input class="pr-i" id="prH" type="text" placeholder="Arrivée sur place (ex. 17h)"><input class="pr-i" id="prF" type="text" placeholder="Fin souhaitée (ex. 23h)"></div>';
  }
- var rdvTxt=p.champs==='parts'?'Un rendez-vous dégustation sera organisé : tests de pâtisserie, vous venez goûter et on affine ensemble la création.':'Un rendez-vous sera organisé avec notre serveuse privée : on échange sur sa façon de faire et sur la meilleure préparation de votre événement.';
+ var rdvTxt=p.champs==='parts'?'Un rendez-vous dégustation sera organisé : tests de pâtisserie, vous venez goûter et on affine ensemble la création.':'Un rendez-vous sera organisé avec la serveuse privée partenaire : on échange sur sa façon de faire et sur la meilleure préparation de votre événement.';
  var hero=document.getElementById('prHero'); hero.style.backgroundImage='url('+p.img+')'; document.getElementById('prHT').textContent=p.titre; document.getElementById('prHA').textContent=p.accroche;
  card.innerHTML='<div class="pr-box">'+
  '<div class="pr-sub" role="tablist"><button role="tab" data-s="service" aria-selected="'+(sub==='service')+'">Le service</button><button role="tab" data-s="infos" aria-selected="'+(sub==='infos')+'">Bon à savoir</button></div>'+

@@ -905,6 +905,34 @@ function dossierDemande(d, pdfOk) {
   };
 }
 
+/* Prestataires partenaires (mandat) : part du prestataire = fonds de tiers (tiers), part de Vespra = « Organisation et coordination ».
+   Nombres positifs et plafonnés ; tout le reste est recalculé côté serveur. */
+const PLAFOND_PRESTA = 20000, PLAFOND_ORGA = 5000;
+const PRESTATAIRES_OK = new Set(['candice', 'emmanuel']);
+const PRESTA_NOMS = { candice: 'Candice', emmanuel: 'Emmanuel' };
+function assainirPrestations(r) {
+  if (!r || !Array.isArray(r.supplements)) return r;
+  r.supplements = r.supplements.slice(0, 60).filter((s) => s && typeof s === 'object').map((s) => {
+    if (!s.tiers && !s.organisation) return s;
+    let prix = Math.round(Number(s.prix) * 100) / 100;
+    const plafond = s.tiers ? PLAFOND_PRESTA : PLAFOND_ORGA;
+    if (!Number.isFinite(prix) || prix < 0) prix = 0;
+    if (prix > plafond) prix = plafond;
+    const out = { ...s, prix, prestation: true, tiers: !!s.tiers, organisation: !s.tiers && !!s.organisation,
+      prestataire: PRESTATAIRES_OK.has(String(s.prestataire)) ? String(s.prestataire) : '', prestaId: String(s.prestaId || '').slice(0, 40), nom: String(s.nom || '').slice(0, 160) };
+    if (out.tiers) {
+      out.reverse = s.reverse === true;
+      out.reverseDate = out.reverse && /^\d{4}-\d{2}-\d{2}$/.test(String(s.reverseDate || '')) ? String(s.reverseDate) : '';
+    } else { delete out.reverse; delete out.reverseDate; }
+    return out;
+  });
+  return r;
+}
+/* une prestation de prestataire dont le prix n'est pas saisi (> 0) bloque tout devis ou facture */
+function prestationSansPrix(lignes) {
+  return (lignes || []).some((l) => l && l.tiers && !(Number(l.montantTTC) > 0));
+}
+
 /* Devis d'une demande : disponible dès que la livraison est chiffrée, ou tout de suite s'il n'y en a pas. */
 const maintenantMs = () => Date.now();
 async function lirePagesProduits() {
@@ -2056,6 +2084,7 @@ const gestionnaire = async (request) => {
           /* une remise (parrainage) est une ligne en négatif ; toute autre ligne reste positive */
           montantTTC: l.remise ? -Math.abs(Number(l.montantTTC) || 0) : Math.max(0, Number(l.montantTTC) || 0),
           ancienTTC: (!l.remise && Number(l.ancienTTC) > Number(l.montantTTC)) ? Number(l.ancienTTC) : 0,
+          ...(l.tiers ? { tiers: true } : {}),
         });
       }
       /* Affichage de la formule sur la facture.
@@ -2115,10 +2144,14 @@ const gestionnaire = async (request) => {
       }
       for (const s of (r.supplements || [])) {
         if (!s) continue;
-        lignes.push({ intitule: s.label || s.nom || 'Supplément', detail: '',
-          quantite: 1, montantTTC: Number(s.price ?? s.prix) || 0 });
+        const nomP = PRESTA_NOMS[String(s.prestataire || '')] || '';
+        lignes.push({ intitule: s.label || s.nom || 'Supplément',
+          detail: s.tiers && nomP ? `Prestation réalisée par ${nomP}, prestataire partenaire. Vespra Event encaisse pour son compte et assure la coordination.` : '',
+          quantite: 1, montantTTC: Number(s.price ?? s.prix) || 0, ...(s.tiers ? { tiers: true } : {}) });
       }
       if (!lignes.length) return json({ error: 'cette réservation ne porte aucun montant' }, 400);
+      /* aucun devis (ni facture) à 0 € : le prix de la prestation du prestataire doit d'abord être saisi */
+      if (prestationSansPrix(lignes)) return json({ error: 'prestation_sans_prix', message: 'Le prix de la prestation n’est pas encore saisi : le devis ne peut pas être envoyé.' }, 409);
 
       /* Les prix du site sont TTC : la facture les décompose. */
       const ENT = await lireEntreprise();
@@ -2592,6 +2625,10 @@ const gestionnaire = async (request) => {
     let body;
     try { body = await request.json(); } catch { return json({ error: 'Requête invalide' }, 400); }
     const { collection, item } = body;
+    /* prestataires partenaires : les montants sont revalidés ici, jamais crus sur parole */
+    if (collection === 'reservations' && item && typeof item.d === 'string') {
+      try { const rr = JSON.parse(item.d); if (rr && typeof rr === 'object') item.d = JSON.stringify(assainirPrestations(rr)); } catch { /* laissé tel quel */ }
+    }
     const formName = formDe(collection);
     if (!formName || !item || !item.id) return json({ error: 'collection ou item invalide' }, 400);
     try {

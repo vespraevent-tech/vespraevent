@@ -382,7 +382,7 @@ export function construireFacture({ emetteur, client, facture, lignes, reglages 
   };
   enteteTableau();
 
-  let brutHT = 0, brutTTC = 0;
+  let brutHT = 0, brutTTC = 0, tiersTTC = 0;
   var zebre = 0;
   const remises = [];
   /* intitulé simple : sans « Location — », sans le nom du produit répété,
@@ -402,8 +402,11 @@ export function construireFacture({ emetteur, client, facture, lignes, reglages 
       remises.push({ lib: String(l.intitule || 'Remise').replace(/\s+sur le matériel/i, ''), ttc: -ttc });
       continue;
     }
-    const ht = Math.round((ttc / (1 + reglages.tauxTVA / 100)) * 100) / 100;
-    brutHT += ht; brutTTC += ttc;
+    /* prestation d'un prestataire partenaire (fonds de tiers) : ni HT ni TVA de Vespra, le montant s'ajoute au total TTC */
+    const estTiers = l.tiers === true;
+    const ht = estTiers ? ttc : Math.round((ttc / (1 + reglages.tauxTVA / 100)) * 100) / 100;
+    if (estTiers) tiersTTC += ttc; else brutHT += ht;
+    brutTTC += ttc;
     const pres = presenter(simple(l.intitule), l.detail);
     const intitules = couper(pres.titre, 9.5, false, XQ - G - 30);
     const details = pres.detail ? couper(pres.detail, 8.5, false, XQ - G - 30) : [];
@@ -415,8 +418,8 @@ export function construireFacture({ emetteur, client, facture, lignes, reglages 
     if (zebre++ % 2 === 1) p.pave(G, bas, D - G, y + 13 - bas, GRIS_CLAIR);
     p.texte(G + 10, y, intitules[0], { taille: 9.5, couleur: NOIR });
     p.texte(XQ, y, String(qte), { taille: 9.5, couleur: NOIR, align: 'droite' });
-    p.texte(XPU, y, euros(ht / qte), { taille: 9.5, couleur: NOIR, align: 'droite' });
-    p.texte(XTVA, y, reglages.tauxTVA + ' %', { taille: 9.5, couleur: NOIR, align: 'droite' });
+    p.texte(XPU, y, estTiers ? '—' : euros(ht / qte), { taille: 9.5, couleur: NOIR, align: 'droite' });
+    p.texte(XTVA, y, estTiers ? '—' : reglages.tauxTVA + ' %', { taille: 9.5, couleur: NOIR, align: 'droite' });
     p.texte(XHT, y, euros(ttc), { taille: 9.5, couleur: NOIR, align: 'droite' });
     /* devis et facture : un prix baissé à la main (promo) laisse voir l'ancien prix, barré, à gauche du nouveau
        (une hausse, elle, ne se signale pas) */
@@ -450,15 +453,15 @@ export function construireFacture({ emetteur, client, facture, lignes, reglages 
   const netHT = Math.round((brutHT - remiseHT) * 100) / 100;
   const netTTC = Math.round((brutTTC - remiseTTC) * 100) / 100;
   const totalHT = Math.round(brutHT * 100) / 100;
-  const tva = Math.round((netTTC - netHT) * 100) / 100;
+  const tva = Math.round((netTTC - netHT - tiersTTC) * 100) / 100;
   const acompte = Number(facture.acompte) || 0;
   const aRem = remises.length > 0;
   const factAc = !estDevis && acompte > 0;
 
   const INTER = 18;               /* hauteur d'une ligne de total */
   const nbLignesTotaux = aRem
-    ? 7 + remises.length + (factAc ? 2 : 0) + (estDevis && acompte > 0 ? 1 : 0)
-    : 4 + remises.length + (aRem || factAc ? 1 : 0) + (acompte > 0 ? 1 : 0);
+    ? 7 + remises.length + (factAc ? 2 : 0) + (estDevis && acompte > 0 ? 1 : 0) + (tiersTTC > 0 ? 1 : 0)
+    : 4 + (tiersTTC > 0 ? 1 : 0) + remises.length + (aRem || factAc ? 1 : 0) + (acompte > 0 ? 1 : 0);
   const hTotaux = nbLignesTotaux * INTER + 30;
   const hBon = 82;
   /* tout le bas (totaux + accord + virement + pied) doit tenir sous les lignes :
@@ -485,7 +488,8 @@ export function construireFacture({ emetteur, client, facture, lignes, reglages 
     /* La réduction se lit en TTC, comme le client la perçoit (moins 10 €, pas moins 8,33 € HT).
        Le HT et la TVA du montant réduit restent indiqués, en petit, sous le total. */
     total('Total HT', euros(totalHT));
-    total(`TVA ${reglages.tauxTVA} %`, euros(Math.round((brutTTC - totalHT) * 100) / 100));
+    total(`TVA ${reglages.tauxTVA} %`, euros(Math.round((brutTTC - totalHT - tiersTTC) * 100) / 100));
+    if (tiersTTC > 0) total('Prestation partenaire (hors TVA)', euros(tiersTTC));
     trait();
     total('Total TTC avant réduction', euros(brutTTC));
     for (const r of remises) total(r.lib, '- ' + euros(r.ttc));
@@ -499,6 +503,7 @@ export function construireFacture({ emetteur, client, facture, lignes, reglages 
   } else {
   total('Total HT', euros(totalHT));
   total(`TVA ${reglages.tauxTVA} %`, euros(tva));
+  if (tiersTTC > 0) total('Prestation partenaire (hors TVA)', euros(tiersTTC));
   trait();
   if (aRem || factAc) {
     total('Total TTC', euros(brutTTC));
