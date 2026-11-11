@@ -3378,7 +3378,7 @@ window.ouvrirListeAcomptes=function(periode){
   var lignes=liste.map(function(r){
     var m=acompteRes(r);total+=m;
     var evt=fr(r.dateStart)+(r.dateEnd&&r.dateEnd!==r.dateStart?' \u2192 '+fr(r.dateEnd):'');
-    return '<tr><td class="ac-c">'+escHtmlBo(r.client||'Client')+'</td><td class="ac-d">'+evt+'</td><td class="ac-d">'+fr(r.acompteDate)+'</td><td class="ac-m">'+m.toLocaleString('fr-FR')+' \u20ac</td></tr>';
+    return '<tr><td class="ac-c">'+escHtmlBo(r.client||'Client')+'</td><td class="ac-d">'+evt+'</td><td class="ac-d">'+fr(r.acompteDate)+'</td><td class="ac-m">'+m.toLocaleString('fr-FR')+' \u20ac'+(caTiers(r)>0?'<div style="font:11px Inter,system-ui,sans-serif;color:#7a8190;font-weight:500">dont part prestataire '+(Math.round(tiersAcompte(r)*100)/100).toLocaleString('fr-FR')+' \u20ac \u00b7 part Vespra '+(Math.round((m-tiersAcompte(r))*100)/100).toLocaleString('fr-FR')+' \u20ac</div>':'')+'</td></tr>';
   }).join('');
   var old=document.getElementById('acListeMb'); if(old) old.remove();
   var mb=document.createElement('div');
