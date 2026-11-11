@@ -204,7 +204,7 @@ def faq_items(d, kind):
         L['domaines'] = (f"Livrez-vous dans les domaines et châteaux près de {n} ?", f"Oui, par exemple {d['domaines']}. Indiquez le nom du lieu sur votre demande de devis : nous vérifions l'accès camion et le point de branchement électrique.")
     if kind == 'photobooth':
         L['prix'] = (f"Quel est le prix d'un photobooth à {n} ?", f"La location va de 130 € (numérique) à 420 € (tirages illimités). La livraison à {n} est sur devis, selon la distance." if sl != 'vitre' else "De 130 € (numérique) à 420 € (tirages illimités), livraison offerte à Vitré.")
-        L['photos'] = ("Les photos numériques sont-elles limitées ?", "Non, elles sont illimitées dans toutes les formules, disponibles par QR code et sur une galerie en ligne. Seul le nombre de tirages papier change.")
+        L['photos'] = ("Les photos numériques sont-elles limitées ?", "Non : les photos numériques sont illimitées dans toutes les formules, dès 130 €. La galerie en ligne, sécurisée, vous est envoyée le lendemain de l'événement. Seul le nombre de photos papier instantanées change (à partir de 190 €).")
         L['format'] = ("Quels formats de tirage ?", "10 × 15 cm ou bandelette, au choix, selon la formule choisie.")
         L['duree'] = ("Combien de temps peut-on garder le photobooth ?", "Le prix est celui de l'événement : vous pouvez venir chercher la borne le vendredi et la rapporter le lundi.")
         L['cadre'] = ("Peut-on personnaliser le cadre ?", "Oui, en option à 20 € : trois cadres au choix des invités sur place, personnalisation du cadre et page d'accueil personnalisée.")
@@ -214,7 +214,7 @@ def faq_items(d, kind):
         L['evenements'] = (f"Pour quels événements louer un photobooth à {n} ?", "Mariages, anniversaires, soirées d'entreprise, fêtes de village et événements d'associations : la borne s'installe facilement en salle comme sous un barnum.")
         L['reserver'] = (f"Comment réserver un photobooth à {n} ?", "Demandez un devis en ligne avec la date, le lieu et la formule : nous répondons sous 24 heures avec un prix ferme. Le règlement se fait de préférence par virement ; carte et espèces sont acceptées le jour J.")
         L['assistance'] = ("Que se passe-t-il en cas de problème pendant la soirée ?", "Nous restons joignables pendant toute votre soirée, et un guide de dépannage de la borne est disponible en PDF pour les interventions rapides.")
-        L['inclus'] = ("Qu'est-ce qui est inclus dans la location ?", "La borne avec écran tactile 21 pouces, l'éclairage LED intégré, le logiciel de déclenchement, la galerie numérique (QR code et site dédié) et les consommables de la formule choisie. Le cadre photo et le lot de déguisement sont en option à 20 € chacun.")
+        L['inclus'] = ("Qu'est-ce qui est inclus dans la location ?", "La borne avec écran tactile 21 pouces, l'éclairage LED intégré, le logiciel de déclenchement, la galerie en ligne sécurisée (QR code et site dédié), envoyée le lendemain de l'événement et les consommables de la formule choisie. Le cadre photo et le lot de déguisement sont en option à 20 € chacun.")
         L['organisation'] = (f"Pouvez-vous m'aider à organiser mon événement à {n} ?", "Oui. Au-delà de la location, Vespra Event peut organiser votre événement et vous mettre en relation avec ses prestataires : serveuse privée, chef pâtissier et autres intervenants, de A à Z selon vos besoins.")
         order = ['livre', 'prix', 'communes', 'photos', 'format', 'salles', 'cadre', 'duree', 'install', 'domaines', 'mariage', 'cout', 'retrait', 'evenements', 'reserver', 'assistance', 'inclus', 'organisation']
     else:
@@ -333,7 +333,7 @@ def photobooth_page(d):
     desc_opts = [
         f"Location de photobooth à {n} dès 130 € : photos numériques illimitées, tirages 10×15 ou bandelette. Livraison possible, devis sous 24 h.",
         f"Louez le photobooth en bois de Vespra Event à {n} : 5 formules de 130 à 420 €, cadre et déguisement en option. Livraison possible.",
-        f"Photobooth à {n} pour mariage, anniversaire ou soirée privée : dès 130 €, photos illimitées. Organisation de A à Z possible avec nos prestataires."]
+        f"Photobooth à {n} pour mariage, anniversaire ou soirée privée : dès 130 €, photos numériques illimitées. Organisation de A à Z possible avec nos prestataires."]
     desc = pick(sl, 'dsc', desc_opts)
     prod = {'@type': 'Product', 'name': f'Location de photobooth à {n}', 'brand': {'@type': 'Brand', 'name': 'Vespra Event'},
             'description': f'Photobooth en bois : photos numériques illimitées, tirages 10×15 cm ou bandelette, livraison à {n}.',
