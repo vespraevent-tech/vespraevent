@@ -4054,7 +4054,7 @@ function acompteBlocHTML(d, r, modeForce){
       const aff = affichageMateriel(it.nom, String(it.formule||'').replace(/\btirages?\b/ig,'photos').replace(/^formule\s+(?=\d|illimit)/i,''), (it.options||[]).filter(o => !/installation|lancement|montage|d[ée]montage/i.test(String(o))));
       cartes.push({nom: aff.titre, qteHtml: caseQte(d, it), sous: aff.sous, total: Number(it.prix)||0, opts: aff.opts, idx: -1, cle: cleLigne(it), manuel: !!it.manuel, catalogue: it.prixCatalogue});
 
-      if(it.presta && Number(it.orga) > 0) autres.push({nom: 'Organisation et coordination', note: 'TTC', prix: Number(it.orga)});
+      if(it.presta && Number(it.orga) > 0) autres.push({nom: 'Organisation et coordination', note: '', prix: Number(it.orga)});
     });
     const liv = montantLivraison(d), mon = montantMontage(d);
     /* 0 € saisi exprès = ligne à 0 € ; champ vide = pas de ligne */
@@ -6050,7 +6050,7 @@ function listeMaterielHTML(items, extra, ctx){
       (aff.opts.length
         ? '<div class="mt-opts">' + aff.opts.map(o => puceOption(x.nom, o)).join('') + '</div>'
         : '') +
-    '</li>' + ((x.presta && Number(x.orga) > 0) ? carte('Organisation et coordination', 'TTC', Number(x.orga)) : ''); }).join('') +
+    '</li>' + ((x.presta && Number(x.orga) > 0) ? carte('Organisation et coordination', '', Number(x.orga)) : ''); }).join('') +
     (modeDemande ? prestationsHtml : '') +
     '</ul>' + (modeDemande ? '' : blocMontage) +
     /* la livraison et l'installation se comptent à part du matériel :
