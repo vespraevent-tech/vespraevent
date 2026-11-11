@@ -4053,6 +4053,8 @@ function acompteBlocHTML(d, r, modeForce){
     materielListe(d).forEach(it => {
       const aff = affichageMateriel(it.nom, String(it.formule||'').replace(/\btirages?\b/ig,'photos').replace(/^formule\s+(?=\d|illimit)/i,''), (it.options||[]).filter(o => !/installation|lancement|montage|d[ée]montage/i.test(String(o))));
       cartes.push({nom: aff.titre, qteHtml: caseQte(d, it), sous: aff.sous, total: Number(it.prix)||0, opts: aff.opts, idx: -1, cle: cleLigne(it), manuel: !!it.manuel, catalogue: it.prixCatalogue});
+
+      if(it.presta && Number(it.orga) > 0) autres.push({nom: 'Organisation et coordination', note: 'TTC', prix: Number(it.orga)});
     });
     const liv = montantLivraison(d), mon = montantMontage(d);
     /* 0 € saisi exprès = ligne à 0 € ; champ vide = pas de ligne */
@@ -5945,7 +5947,7 @@ function listeMaterielHTML(items, extra, ctx){
   /* le montage vaut exactement ce que vous avez saisi, jamais un prix de grille */
   const montage = montageSaisi !== null ? montageSaisi : 0;
 
-  const location = items.reduce((t, x) => t + (x.prix || 0), 0);
+  const location = items.reduce((t, x) => t + (x.prix || 0) + (x.presta ? (Number(x.orga) || 0) : 0), 0);
   const total = location + (extra || 0) + montage;
 
   const puceOption = (nomProduit, o) => {
@@ -6048,7 +6050,7 @@ function listeMaterielHTML(items, extra, ctx){
       (aff.opts.length
         ? '<div class="mt-opts">' + aff.opts.map(o => puceOption(x.nom, o)).join('') + '</div>'
         : '') +
-    '</li>'; }).join('') +
+    '</li>' + ((x.presta && Number(x.orga) > 0) ? carte('Organisation et coordination', 'TTC', Number(x.orga)) : ''); }).join('') +
     (modeDemande ? prestationsHtml : '') +
     '</ul>' + (modeDemande ? '' : blocMontage) +
     /* la livraison et l'installation se comptent à part du matériel :
@@ -6742,7 +6744,7 @@ async function ajouterAuPlanning(d){
     const totResa = nets.reduce((t, p) => t + (Number(p && p.price) || 0), 0)
       + (Number(resa.livraisonPrice) || 0) + (Number(resa.montage) || 0)
       + (resa.supplements || []).reduce((t, x) => t + (Number(x && (x.prix != null ? x.prix : x.price)) || 0), 0);
-    const totDevis = materielListe(d).reduce((t, it) => t + (Number(it.prix) || 0), 0)
+    const totDevis = materielListe(d).reduce((t, it) => t + (Number(it.prix) || 0) + (it.presta ? (Number(it.orga) || 0) : 0), 0)
       + montantLivraison(d) + montantMontage(d)
       - offreMariageMontant(d)
       - ((parrainEtat(d) && parrainEtat(d).statut === 'applique') ? REMISE_PARRAIN : 0);
