@@ -203,8 +203,8 @@ def faq_items(d, kind):
     if d.get('domaines'):
         L['domaines'] = (f"Livrez-vous dans les domaines et châteaux près de {n} ?", f"Oui, par exemple {d['domaines']}. Indiquez le nom du lieu sur votre demande de devis : nous vérifions l'accès camion et le point de branchement électrique.")
     if kind == 'photobooth':
-        L['prix'] = (f"Quel est le prix d'un photobooth à {n} ?", f"La location va de 130 € (numérique) à 420 € (tirages illimités). La livraison à {n} est sur devis, selon la distance." if sl != 'vitre' else "De 130 € (numérique) à 420 € (tirages illimités), livraison offerte à Vitré.")
-        L['photos'] = ("Les photos numériques sont-elles limitées ?", "Non : les photos numériques sont illimitées dans toutes les formules, dès 130 €. La galerie en ligne, sécurisée, vous est envoyée le lendemain de l'événement. Seul le nombre de photos papier instantanées change (à partir de 190 €).")
+        L['prix'] = (f"Quel est le prix d'un photobooth à {n} ?", f"Photobooth à partir de 130 € : photos numériques illimitées dans toutes les formules ; photos papier instantanées à partir de 190 € pour 200 tirages (jusqu'à 420 €, tirages illimités). La livraison à {n} est sur devis, selon la distance." if sl != 'vitre' else "À partir de 130 € : photos numériques illimitées dans toutes les formules ; photos papier instantanées à partir de 190 € pour 200 tirages (jusqu'à 420 €, tirages illimités). Livraison offerte à Vitré.")
+        L['photos'] = ("Les photos numériques sont-elles limitées ?", "Les photos numériques sont illimitées dans toutes les formules, dès 130 €. Pour avoir aussi des photos papier instantanées : à partir de 190 € pour 200 tirages.")
         L['format'] = ("Quels formats de tirage ?", "10 × 15 cm ou bandelette, au choix, selon la formule choisie.")
         L['duree'] = ("Combien de temps peut-on garder le photobooth ?", "Le prix est celui de l'événement : vous pouvez venir chercher la borne le vendredi et la rapporter le lundi.")
         L['cadre'] = ("Peut-on personnaliser le cadre ?", "Oui, en option à 20 € : trois cadres au choix des invités sur place, personnalisation du cadre et page d'accueil personnalisée.")
@@ -218,7 +218,7 @@ def faq_items(d, kind):
         L['organisation'] = (f"Pouvez-vous m'aider à organiser mon événement à {n} ?", "Oui. Au-delà de la location, Vespra Event peut organiser votre événement et vous mettre en relation avec ses prestataires : serveuse privée, chef pâtissier et autres intervenants, de A à Z selon vos besoins.")
         order = ['livre', 'prix', 'communes', 'photos', 'format', 'salles', 'cadre', 'duree', 'install', 'domaines', 'mariage', 'cout', 'retrait', 'evenements', 'reserver', 'assistance', 'inclus', 'organisation']
     else:
-        L['prix'] = (f"Combien coûte la location d'un photobooth à {n} ?", "De 130 € (numérique) à 420 € (tirages illimités), par événement, plus la livraison." if sl != 'vitre' else "De 130 € (numérique) à 420 € (tirages illimités), livraison offerte à Vitré.")
+        L['prix'] = (f"Combien coûte la location d'un photobooth à {n} ?", "À partir de 130 € : photos numériques illimitées dans toutes les formules ; photos papier instantanées à partir de 190 € pour 200 tirages (jusqu'à 420 €, tirages illimités). Livraison en plus." if sl != 'vitre' else "À partir de 130 € : photos numériques illimitées dans toutes les formules ; photos papier instantanées à partir de 190 € pour 200 tirages (jusqu'à 420 €, tirages illimités). Livraison offerte à Vitré.")
         L['pack'] = ("Quel pack son et lumière choisir ?", "Le Pack Vespra va de 70 € pour 60 personnes à 150 € pour 200 personnes.")
         L['voir'] = ("Peut-on voir le matériel avant de réserver ?", "Oui, sur rendez-vous à Vitré, sans engagement.")
         L['remise'] = ("Y a-t-il une remise si je loue plusieurs produits ?", "Oui : −10 % dès 5 produits, appliqués automatiquement sur votre devis.")
