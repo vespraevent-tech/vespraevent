@@ -1195,15 +1195,16 @@ var P=[
   ['Bouncedome gonflable avec toboggan Amazone Safari','animation',100,['Standard'],'Bouncedome'],
   ['Multiplay château gonflable Dinoworld','animation',150,['Standard'],'Dinoworld'],
   ['Château gonflable Multiplay Summer Party','animation',150,['Standard'],'Summer Party'],
-  ['Vidéoprojecteur','sono',10,['Vidéoprojecteur seul (sans écran)','Vidéoprojecteur + écran de projection'],'Vidéoprojecteur',
-    {'Vidéoprojecteur seul (sans écran)':10,'Vidéoprojecteur + écran de projection':20}],
+  ['Vidéoprojecteur','sono',20,['Vidéoprojecteur seul (sans écran)','Vidéoprojecteur + écran de projection'],'Vidéoprojecteur',
+    {'Vidéoprojecteur seul (sans écran)':20,'Vidéoprojecteur + écran de projection':30}],
+  ['Écran de projection','sono',10,['Standard'],'Écran'],
   ['Panneau de bienvenue','animation',190,['Standard'],'Panneau'],
   ['Panneau de direction','animation',40,['Standard'],'Panneau dir.'],
   ['Livre d\'or audio','animation',35,['Standard'],'Livre d\'or'],
   ['Cabine téléphonique','animation',null,['Blanche','Rouge'],'Cabine',
     {'Blanche':60,'Rouge':60}],
   ['Cabine téléphonique audio / vidéo','sono',null,['Vidéo · blanche','Vidéo · rouge','Audio · blanche','Audio · rouge'],'Cabine vidéo',
-    {'Vidéo · blanche':149,'Vidéo · rouge':149,'Audio · blanche':120,'Audio · rouge':120}],
+    {'Vidéo · blanche':149,'Vidéo · rouge':149,'Audio · blanche':95,'Audio · rouge':95}],
   ['Néon lumineux','animation',20,['Standard'],'Néon'],
   ['Baby-foot','animation',90,['Standard'],'Baby-foot'],
   ['Machine à étincelles froides','animation',null,['1 machine','2 machines'],'Étincelles',
@@ -5463,7 +5464,7 @@ function pkCatsSite(p){
   if(/^(Mini bounce|Bouncedome|Multiplay|Château)/.test(n)) return ['Chateaux','Animation'];
   if(n==='Chauffage') return ['Confort'];
   if(/^(Barnum|Tente|Buvette)/.test(n)) return ['Barnums'];
-  if(/^(Pack Vespra|Sono|Caisson|Micro|Vidéoprojecteur)/.test(n)) return ['Son'];
+  if(/^(Pack Vespra|Sono|Caisson|Micro|Vidéoprojecteur|Écran de projection)/.test(n)) return ['Son'];
   if(/^(Jeux de lumières|Boule à facettes|Guirlande lumineuse|Spot LED)/.test(n)) return ['Lumiere'];
   if(/^(Citroën Traction|Ford Mustang|Kilomètre supplémentaire)/.test(n)) return ['Voitures'];
   if(n==='Fontaine à cocktail'||n==='Machine à glaçons') return ['Restauration'];
