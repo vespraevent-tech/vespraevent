@@ -119,7 +119,7 @@ def head_for(title, desc, url, ld, img='photobooth.webp'):
     return head, SCRIPTS + foot
 
 
-SCRIPTS = '<script src="/carrousel.js"></script>\n<script src="/nav-actif.js" defer></script>\n<script src="/accueil-sections.js?v=6" defer></script>\n<script src="/contact-bloc.js" defer></script>\n'
+SCRIPTS = '<script src="/carrousel.js"></script>\n<script src="/nav-actif.js" defer></script>\n<script src="/accueil-sections.js?v=7" defer></script>\n<script src="/contact-bloc.js" defer></script>\n'
 LB = None
 def local_business():
     global LB

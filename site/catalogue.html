@@ -1109,7 +1109,7 @@ if(urlCat){
         /* classement choisi dans le back-office : un produit rangé quelque part suit ce classement */
         const assoc={};cfg.forEach(c=>(c.produits||[]).forEach(id=>(assoc[String(id)]||(assoc[String(id)]=[])).push(c.nom)));
         const connus=new Set((d.categoriesConnus||[]).map(String));
-        if(Object.keys(assoc).length){PRODUCTS.forEach(p=>{const a=assoc[String(p.id)];if(a&&a.length){const base=(p.cats||[p.cat]).filter(Boolean).map(normCat);p.cats=a.concat(base.filter(c=>a.indexOf(c)<0));p.cat=a[0];}/* un produit absent du classement enregistré garde sa catégorie d'origine : il ne disparaît jamais du catalogue */});}
+        if(Object.keys(assoc).length){PRODUCTS.forEach(p=>{const a=assoc[String(p.id)];if(a&&a.length){p.cats=a;p.cat=a[0];}else if(connus.has(String(p.id))){p.cats=[];}   /* le classement du back-office fait foi : ce qui en est retiré disparaît de la catégorie ; un produit nouveau (inconnu du back-office) garde sa catégorie d'origine *//* un produit absent du classement enregistré garde sa catégorie d'origine : il ne disparaît jamais du catalogue */});}
         const fs=document.getElementById('filterSelect');
         if(fs){const v=fs.value;fs.innerHTML='<option value="Tous">Toutes les catégories</option>'+P.map(c=>'<option value="'+String(c[0]).replace(/"/g,'&quot;')+'">'+c[0]+'</option>').join('');fs.value=P.some(c=>c[0]===v)?v:'Tous';applyFilters();}
       }

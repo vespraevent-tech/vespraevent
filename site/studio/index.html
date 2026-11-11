@@ -7385,7 +7385,18 @@ function catAdminAfficher(){
        +'<select class="cat-admin-add" onchange="if(this.value){catAdminProduit('+i+',this.value,true)}"><option value="">＋ Ajouter un produit…</option>'+dehors.map(x=>'<option value="'+escVal(x.id)+'">'+esc(x.nom)+'</option>').join('')+'</select></div>'
        +'<div class="cat-admin-foot"><span class="hint">Un produit peut être dans plusieurs catégories.</span><button type="button" class="btn btn-danger btn-sm" onclick="catAdminSupprimer('+i+')">Supprimer la catégorie</button></div>'
        +'</div>':'')+'</section>';
-  }).join('')+'</div>';
+  }).join('')+'</div>'+catAdminSansCategorieHTML(prods);
+}
+/* produits rangés dans aucune catégorie : ils n'apparaissent pas dans le catalogue du site */
+function catAdminSansCategorieHTML(prods){
+  const rattaches=new Set();catAdminData.forEach(c=>(c.produits||[]).forEach(id=>rattaches.add(String(id))));
+  const libres=prods.filter(p=>p&&p.page&&!rattaches.has(String(p.id)));
+  if(!libres.length||!catAdminData.length)return '';
+  return '<div class="cat-admin-orphelins" style="margin-top:14px;padding:12px 14px;border:1px solid #f0c36d;background:#fff8e6;border-radius:12px">'
+    +'<strong style="font-size:13px">Produits sans catégorie ('+libres.length+') : ils ne s\'affichent pas dans le catalogue du site</strong>'
+    +libres.map(p=>'<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid #f3e2b5;margin-top:6px"><span style="flex:1;min-width:0;font-size:14px">'+esc(p.nom)+'</span>'
+      +'<select onchange="if(this.value!==\'\'){catAdminProduit(Number(this.value),\''+escVal(p.id)+'\',true)}"><option value="">Ajouter à…</option>'+catAdminData.map((c,i)=>'<option value="'+i+'">'+esc(c.nom||'Catégorie')+'</option>').join('')+'</select></div>').join('')
+    +'</div>';
 }
 function catAdminToggle(i){catAdminOuverte=catAdminOuverte===i?null:i;catAdminAfficher();}
 function catAdminTitre(i){const item=document.querySelectorAll('.cat-admin-item')[i];const t=item&&item.querySelector('.cat-admin-title strong');if(t)t.textContent=catAdminData[i].nom||'Nouvelle catégorie';}
