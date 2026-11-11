@@ -1933,7 +1933,10 @@ window.addEventListener('vespra-produits-ready',function(){
       let ids=o&&o.ordre;
       if(typeof ids==='string'){try{ids=JSON.parse(ids)}catch(e){ids=[]}}
       if(!Array.isArray(ids)||!ids.length)ids=BEST_IDS;
-      const nv=ids.map(id=>PRODUCTS.find(x=>x.id===id)).filter(Boolean);
+      /* un produit absent de la liste écrite dans la page (ajouté depuis le back-office, ou plus récent que cette page)
+         est repris du registre des prix : il ne disparaît plus en silence */
+      const registre=Array.isArray(window.VESPRA_PRODUITS)?window.VESPRA_PRODUITS:[];
+      const nv=ids.map(id=>PRODUCTS.find(x=>x.id===id)||(function(r){return r&&r.page?{id:r.id,cat:r.cat,cats:r.cats||[r.cat],name:r.nom,price:r.prix||0,desc:r.desc||'',img:r.img||'',link:r.page}:null;})(registre.find(x=>x.id===id))).filter(Boolean);
       if(!nv.length)return;
       const signature=nv.map(x=>x.id).join('|');
       if(signature===dernierOrdreAccueil)return;
@@ -1946,6 +1949,7 @@ window.addEventListener('vespra-produits-ready',function(){
     }).catch(function(){});
   }
   window.addEventListener('vespra-produits-ready',chargerMeilleuresLocations);
+  window.addEventListener('load',chargerMeilleuresLocations);   /* registre des prix et produits du back-office arrivés */
   /* Le chargement des données peut finir avant l'installation de ce listener.
      On relit donc aussi le réglage après initialisation, sans attendre un nouvel événement. */
   chargerMeilleuresLocations();

@@ -48,7 +48,11 @@
 
     /* page d'accueil : la grille des meilleures ventes est figée,
        on se contente d'alimenter la liste pour le panier et les liens */
-    if (typeof window.PRODUCTS !== 'undefined') ajouter(window.PRODUCTS, produits);
+    if (typeof window.PRODUCTS !== 'undefined') {
+      ajouter(window.PRODUCTS, produits);
+      /* les « Meilleures locations » peuvent contenir un de ces produits : on les relit */
+      try { window.dispatchEvent(new Event('vespra-produits-ready')); } catch (e) {}
+    }
   }
 
   function charger() {
