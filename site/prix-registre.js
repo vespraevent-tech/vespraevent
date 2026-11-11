@@ -2403,7 +2403,8 @@ window.VESPRA_PRODUITS = [
     "cat": "Photobooth et accessoires",
     "cats": [
       "Photobooth et accessoires",
-      "Animations"
+      "Animations",
+      "Décoration"
     ],
     "desc": "Cabine à portes vitrées, blanche ou rouge, en décor. Pour les messages vidéo et l'écran tactile : la cabine vidéo, 149 €.",
     "img": "cabine-decor-blanche.webp",
