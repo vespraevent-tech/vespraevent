@@ -6025,8 +6025,8 @@ document.getElementById('saveM').onclick=function(){
       convives:document.getElementById('convives').value,typeEvenement:document.getElementById('typeEvt').value,
       messageClient:document.getElementById('messageClient').value,
       products:sel,validatedBy:_vb2,
-      /* saisie à la main dans le planning : réservation confirmée, visible tout de suite au planning et dans la liste */
-      statutSuivi:'validee'
+      /* une réservation créée à la main démarre « en cours » : elle est validée ensuite, par vous, quand le client a confirmé */
+      statutSuivi:'en-cours'
     });
     pkSuppSave(R[R.length-1]);
   }
