@@ -7193,9 +7193,21 @@ async function bestsEnregistrer(){
     gardeB();
     await loadProduits();
     gardeB();
+    /* ce que le SITE public renvoie réellement : on le lit comme un visiteur et on l'affiche */
+    let pub = '';
+    try{
+      const pr = await fetch('/api/site?_=' + Date.now(), {cache:'no-store', headers:{accept:'application/json'}});
+      const pj = pr.ok ? await pr.json() : null;
+      const pit = pj && (pj.produits||[]).find(x=>x && x.type==='ordre-accueil');
+      const pids = pit ? listeEnregistree(pit.ordre) : [];
+      if(origine) pub = ' Le site affiche l\'ordre d\'origine.';
+      else if(JSON.stringify(pids) === JSON.stringify(bestsListe)) pub = ' Le site public renvoie bien vos ' + pids.length + ' produits.';
+      else pub = ' Attention : le site public renvoie encore ' + pids.length + ' produit(s) (' + (pids.length ? 'ancienne version en cache, patientez quelques secondes puis rechargez la page d\'accueil' : 'aucun ordre') + ').';
+    }catch(_){ pub = ''; }
     if(e) e.textContent = (rep && rep.cache && rep.cache !== 'vide')
       ? 'Enregistré. La page d\'accueil se met à jour d\'ici quelques secondes (le cache du site n\'a pas pu être vidé tout de suite).'
       : 'Enregistré : la page d\'accueil est à jour.';
+    if(e && pub) e.textContent += pub;
     showToast('Meilleures locations enregistrées');
   }catch(err){ if(e) e.textContent = 'Échec : ' + (err.message||'erreur'); showToast(err.message, true); }
 }
