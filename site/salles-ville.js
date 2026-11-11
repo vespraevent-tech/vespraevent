@@ -38,7 +38,7 @@
     tete.appendChild(creer('h2', null, 'Où organiser votre événement à ' + nom));
     tete.appendChild(creer('p', 'sv-lead',
       'Des lieux de réception du secteur de ' + nom + ' où nous livrons notre' +
-      ' matériel. Nous ne touchons aucune commission sur ces salles : cette' +
+      ' matériel. Cette' +
       ' liste est là pour vous faire gagner du temps.'));
     dedans.appendChild(tete);
 

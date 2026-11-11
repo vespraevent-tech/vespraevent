@@ -7,7 +7,7 @@
 
    Un prestataire, ici, c'est une entreprise dont le métier n'est pas
    le nôtre : brasseur, traiteur, location de vaisselle, photographe,
-   fleuriste… Nous ne touchons aucune commission et nous n'avons aucun
+   fleuriste… Nous n'avons aucun
    accord commercial avec eux. Ce sont des gens que nous croisons sur
    les événements et dont le travail nous a paru sérieux.
 
