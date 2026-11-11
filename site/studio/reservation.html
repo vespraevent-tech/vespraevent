@@ -6346,7 +6346,7 @@ window.qteNom=qteNom;
 function qteMaxRes(base,n){
   var st=1; try{ st=stockProduit(base)||1; }catch(e){}
   var b=String(base||'').toLowerCase();
-  var def=/mange.?debout/.test(b)?10:/spot led/.test(b)?12:/^barnum/.test(b)?2:1;
+  var def=/mange.?debout/.test(b)?10:/spot led/.test(b)?12:/^barnum/.test(b)?2:/guirlande/.test(b)?10:/fontaine/.test(b)?4:1;
   return Math.max(st,def,n||1);
 }
 function caseQteRes(base,n,attrs){

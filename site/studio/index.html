@@ -205,6 +205,7 @@ img{display:block;max-width:100%}
 .md-q button:disabled{opacity:.35;cursor:default}
 .md-q b{min-width:18px;text-align:center;font:600 13.5px Inter,system-ui,sans-serif}
 .md-p{display:inline-flex;align-items:center;gap:4px}
+.md-desc{width:100%;margin:6px 0 2px;padding:8px 10px;border:1px solid #cdd6e0;border-radius:8px;font:13px Inter,system-ui,sans-serif;color:#14304f;background:#fff;resize:vertical;min-height:54px;box-sizing:border-box}
 .md-pin{width:74px;text-align:right;padding:5px 7px;border:1px solid #cdd6e0;border-radius:8px;font:600 13.5px Inter,system-ui,sans-serif;color:#14304f;background:#fff}
 .md-pin.forc{border-color:#d97706;background:#fffbeb}
 .md-rst{border:0;background:none;color:#d97706;cursor:pointer;font-size:15px;padding:0 2px}
@@ -2167,6 +2168,8 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
 <script src="/studio/modal-garde.js"></script>
 <script src="montage.js"></script>
 <script src="/prix-registre.js"></script>
+<script>/* un produit présent deux fois dans le registre (même identifiant) n'apparaît qu'une fois ; la dernière version fait foi */
+(function(){try{var L=window.VESPRA_PRODUITS||[],M={},O=[];L.forEach(function(p){if(!p)return;var k=p.id||p.nom;if(!(k in M))O.push(k);M[k]=p;});window.VESPRA_PRODUITS=O.map(function(k){return M[k];});}catch(e){}})();</script>
 <script src="/textes.js"></script>
 <script src="/avis-google.js"></script>
 <script src="/notices-registre.js"></script>
@@ -4796,11 +4799,23 @@ let mdLignes = [];
 
 function catalogue(){ return window.VESPRA_PRODUITS || []; }
 
+/* Prestations de service : pas de prix au catalogue, il se saisit sur la ligne, avec une description. */
+const PRESTATIONS = ['Serveuse privée — Candice', 'Chef pâtissier — Emmanuel'];
+function estPresta(nom){ return PRESTATIONS.indexOf(String(nom||'').trim()) >= 0; }
+/* ordre des catégories : celui du catalogue du site ; chaque catégorie regroupe ses produits (tous les châteaux ensemble, tous les barnums ensemble…) */
+const ORDRE_CATS = ['Photobooth et accessoires','Voitures de collection','Animations','Son, lumière et vidéo','Effets spéciaux et artifices','Châteaux gonflables','Mobilier, réception et barnums','Restauration','Confort','Décoration','Jeux en bois'];
 function catalogueOptionsHTML(){
-  /* ordre alphabétique : « Sono » se trouve à S, « Pack Vespra » à P */
-  return catalogue().filter(p => p && p.nom).slice()
-    .sort((a, b) => String(a.nom).localeCompare(String(b.nom), 'fr', {sensitivity:'base', numeric:true}))
-    .map(p => '<option value="' + escVal(p.nom) + '">' + esc(p.nom) + '</option>').join('');
+  const cmp = (a, b) => String(a.nom).localeCompare(String(b.nom), 'fr', {sensitivity:'base', numeric:true});
+  const groupes = {};
+  catalogue().filter(p => p && p.nom).forEach(p => {
+    let c = p.cat || (p.cats && p.cats[0]) || 'Autres';
+    if(c === 'Barnums') c = 'Mobilier, réception et barnums';
+    (groupes[c] = groupes[c] || []).push(p);
+  });
+  const cles = ORDRE_CATS.filter(c => groupes[c]).concat(Object.keys(groupes).filter(c => ORDRE_CATS.indexOf(c) < 0).sort());
+  const optG = (titre, noms) => '<optgroup label="' + escVal(titre) + '">' + noms.map(n => '<option value="' + escVal(n) + '">' + esc(n) + '</option>').join('') + '</optgroup>';
+  return cles.map(c => optG(c, groupes[c].slice().sort(cmp).map(p => p.nom))).join('')
+       + '<optgroup label="Prestations de service">' + PRESTATIONS.map(n => '<option value="' + escVal(n) + '">' + esc(n) + '</option>').join('') + '</optgroup>';
 }
 
 /* la fiche du catalogue qui correspond à un nom de produit */
@@ -4971,6 +4986,7 @@ function mdCharger(d){
     prix: (x.prix || 0) / (x.qte > 1 ? x.qte : 1),
     prixForce: x.prixManuel ? (Number(x.prix) || 0) : null,
     perso: x.perso || null, optPrix: x.optPrix || null, ancien: !!x.ancien,
+    presta: !!x.presta, desc: x.desc || '',
   }));
   /* Une formule absente ou inconnue ne doit jamais retomber sur la première
      du menu (« Digital ») : on la retrouve d'après le prix enregistré, et à
@@ -5071,10 +5087,10 @@ function mdRendre(){
     return '<div class="md-l">' +
       '<div class="md-h"><span class="md-n">' + esc(l.produit) + hors + '</span>' +
         ((qteMaxProduit(l.produit) > 1 || (l.qte||1) > 1) ? '<span class="md-q" title="Quantité"><button type="button" aria-label="Moins" onclick="mdQte(' + i + ', -1)">−</button><b>' + (l.qte||1) + '</b><button type="button" aria-label="Plus" onclick="mdQte(' + i + ', 1)"' + ((l.qte||1) >= Math.max(qteMaxProduit(l.produit), l.qte||1) ? ' disabled' : '') + '>+</button></span>' : '<span style="margin-left:auto"></span>') +
-        '<span class="md-p"><input type="text" inputmode="decimal" class="md-pin' + (l.prixForce != null ? ' forc' : '') + '" value="' + escVal(String(Math.round(prixLigne(l)*100)/100).replace('.', ',')) + '" aria-label="Prix de la ligne" onchange="mdPrix(' + i + ', this.value)"> €' +
-          (l.prixForce != null ? '<button type="button" class="md-rst" title="Revenir au prix du catalogue" onclick="mdPrix(' + i + ', \'\')">↺</button>' : '') + '</span>' +
+        '<span class="md-p"><input type="text" inputmode="decimal" class="md-pin' + (l.prixForce != null ? ' forc' : '') + '" value="' + escVal(l.presta && !prixLigne(l) ? '' : String(Math.round(prixLigne(l)*100)/100).replace('.', ',')) + '"' + (l.presta ? ' placeholder="Prix"' : '') + ' aria-label="Prix de la ligne" onchange="mdPrix(' + i + ', this.value)"> €' +
+          (l.prixForce != null && !l.presta ? '<button type="button" class="md-rst" title="Revenir au prix du catalogue" onclick="mdPrix(' + i + ', \'\')">↺</button>' : '') + '</span>' +
         '<button type="button" class="md-x" title="Retirer ce produit" onclick="mdRetirer(' + i + ')">&times;</button>' +
-      '</div>' + choixF + blocCouleurs + choixO +
+      '</div>' + (l.presta ? '<textarea class="md-desc" rows="2" placeholder="Description de la prestation (facultatif)" aria-label="Description" oninput="mdDesc(' + i + ', this.value)">' + esc(l.desc || '') + '</textarea>' : '') + choixF + blocCouleurs + choixO +
     '</div>';
   }).join('') +
   (function(){
@@ -5112,8 +5128,11 @@ function qteMaxProduit(nom){
   if(/^barnum/.test(n)) return 2;
   if(/mange.?debout/.test(n)) return 10;
   if(/spot led/.test(n)) return 12;
+  if(/guirlande/.test(n)) return 10;
+  if(/fontaine/.test(n)) return 4;
   return 1;
 }
+function mdDesc(i, v){ if(mdLignes[i]) mdLignes[i].desc = String(v||''); }
 function mdOuvert(i, o){ if(mdLignes[i]) mdLignes[i].ouvert = !!o; }
 function mdQte(i, delta){
   const l = mdLignes[i]; if(!l) return;
@@ -5193,6 +5212,10 @@ function mdRetirer(i){ mdLignes.splice(i, 1); mdRendre(); }
 function mdAjouter(){
   const sel = document.getElementById('mdNouveau');
   if(!sel || !sel.value) return;
+  if(estPresta(sel.value)){
+    mdLignes.push({ produit: sel.value, formule: '', options: [], prix: 0, qte: 1, prixForce: null, presta: true, desc: '' });
+    sel.value = ''; mdRendre(); return;
+  }
   const p = ficheProduit(sel.value);
   const vProp = (p && p.variantes && p.variantes.length) ? (p.variantes[p.vpropre] || p.variantes[0]) : null;
   mdLignes.push({
@@ -5215,7 +5238,8 @@ function mdPanier(){
       opts = cc.concat(opts);
       if(l.premiumGen && !feuxPremium(l)) opts.push('Couleur premium (jaune, orange, vert ou violet)');
     }
-    const o = { produit: l.produit, formule: l.formule || '', options: opts.join(', '), prix: prixLigne(l) };
+    const o = { produit: l.produit, formule: l.presta ? String(l.desc||'').trim() : (l.formule || ''), options: opts.join(', '), prix: prixLigne(l) };
+    if(l.presta){ o.prestation = true; o.description = String(l.desc||'').trim(); o.prixManuel = true; }
     if(l.qte > 1) o.quantite = l.qte;
     if(l.prixForce != null) o.prixManuel = true;
     if(l.perso) o.formulePerso = { n: l.perso.n, prix: l.perso.prix };
@@ -5629,6 +5653,13 @@ function materielListe(d){
       if(!nom) return;
       /* ligne « option » d'une réservation du planning : elle se range avec son produit */
       if(a.estOption && items.length){ items[items.length-1].options.push(nom); return; }
+      /* prestation de service : ligne libre (prix saisi, description), sans passer par le catalogue */
+      if(a.prestation || (a.estPresta && PRESTATIONS.indexOf(nom) >= 0)){
+        const qp = Number(a.quantite != null ? a.quantite : a.qty);
+        items.push({ nom: nom, formule: '', options: [], prix: montantLu(a.prix != null ? a.prix : a.price), qte: qp > 1 ? Math.floor(qp) : 1,
+          prixManuel: true, manuel: true, presta: true, desc: String(a.description || a.formule || ''), srcIdx: (brut === d.panier) ? ai : -1 });
+        return;
+      }
       /* Les demandes reçues avant la séparation formule / détail
          mettaient tout dans un seul libellé :
            « 4 canons à poudre — Jaune, Rouge, Orange, Rose »
