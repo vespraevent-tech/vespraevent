@@ -880,7 +880,7 @@ function dossierDemande(d, pdfOk) {
   /* le formulaire du site envoie { produit, formule, options, quantite, prix: « 130 € » } ; d'anciens formats utilisent name/price/qty */
   const prixNum = (v) => { if (typeof v === 'number') return v; const m = String(v == null ? '' : v).replace(/\s/g, '').replace(',', '.').match(/-?\d+(\.\d+)?/); return /devis/i.test(String(v)) || !m ? 0 : Number(m[0]); };
   let ecrase = {}; try { ecrase = JSON.parse(d.prixLignes || '{}') || {}; } catch {}
-  const lignes = panier.filter((p) => p && (p.produit || p.name || p.nom)).slice(0, 40).map((p) => {
+  const lignes = panier.filter((p) => p && (p.produit || p.name || p.nom)).slice(0, 40).flatMap((p) => {
     const nom = p.produit || p.name || p.nom;
     const formule = String(p.formule || p.variant || '').trim();
     const opts = Array.isArray(p.options) ? p.options.filter(Boolean).join(', ') : String(p.options || '').trim();
@@ -888,7 +888,19 @@ function dossierDemande(d, pdfOk) {
     const detail = aff.matched ? [aff.sous, opts].filter(Boolean).join(' · ') : [/^(standard|option)$/i.test(formule) ? '' : formule, opts].filter(Boolean).join(' · ');
     const cle = nom + '|' + formule;
     const prix = ecrase[cle] !== undefined && ecrase[cle] !== '' ? Number(ecrase[cle]) : prixNum(p.prix !== undefined ? p.prix : p.price);
-    return { nom: texte(aff.matched ? aff.titre : nom, 120), detail: texte(detail, 160), qte: Number(p.quantite || p.qty || p.qte) || 1, prix: nombre(prix) };
+    /* prestation d'un prestataire partenaire : deux lignes — la part du prestataire (fonds de tiers) puis « Organisation et coordination » */
+    if (p.prestation === true) {
+      const id = prestaIdDe(p.prestataire, nom);
+      const nomP = PRESTA_NOMS[id] || '';
+      const base = String(nom).replace(/\s*[—–-]\s*(sur devis|candice|emmanuel)\s*$/ig, '').trim() || 'Prestation';
+      const orga = Math.max(0, Math.min(PLAFOND_ORGA, prixNum(p.organisationTtc)));
+      const out = [{ nom: texte(nomP ? `${base} — réalisée par ${nomP} (facturée au nom et pour le compte de ${nomP})` : base, 160),
+        detail: nomP ? `Prestation réalisée par ${nomP}, prestataire partenaire. Vespra Event encaisse pour son compte et assure la coordination.` : '',
+        qte: 1, prix: nombre(Math.min(PLAFOND_PRESTA, Math.max(0, prix))), tiers: true }];
+      if (orga > 0) out.push({ nom: 'Organisation et coordination', detail: '', qte: 1, prix: nombre(orga), organisation: true });
+      return out;
+    }
+    return [{ nom: texte(aff.matched ? aff.titre : nom, 120), detail: texte(detail, 160), qte: Number(p.quantite || p.qty || p.qte) || 1, prix: nombre(prix) }];
   });
   const liv = d.livraisonPrix != null ? nombre(d.livraisonPrix) : 0;
   const mon = d.montagePrix != null ? nombre(d.montagePrix) : 0;
@@ -910,6 +922,12 @@ function dossierDemande(d, pdfOk) {
 const PLAFOND_PRESTA = 20000, PLAFOND_ORGA = 5000;
 const PRESTATAIRES_OK = new Set(['candice', 'emmanuel']);
 const PRESTA_NOMS = { candice: 'Candice', emmanuel: 'Emmanuel' };
+function prestaIdDe(declare, nom) {
+  const t = (String(declare || '') + ' ' + String(nom || '')).toLowerCase();
+  if (t.includes('candice') || /serveuse/.test(t)) return 'candice';
+  if (t.includes('emmanuel') || /p[âa]tissier/.test(t)) return 'emmanuel';
+  return '';
+}
 function assainirPrestations(r) {
   if (!r || !Array.isArray(r.supplements)) return r;
   r.supplements = r.supplements.slice(0, 60).filter((s) => s && typeof s === 'object').map((s) => {
@@ -966,7 +984,7 @@ function devisAutoPossible(d, lignes) {
 function envoiDevisDemande(d, lignes, fact) {
   const liv = d.livraisonPrix != null ? nombre(d.livraisonPrix) : 0, mon = d.montagePrix != null ? nombre(d.montagePrix) : 0;
   const retour = d.livraisonRetour !== false;
-  const l = lignes.map((x) => ({ intitule: (/^(serveuse|p[âa]tissier|chef p[âa]tissier)|—\s*sur devis\s*$/i.test(String(x.nom || '')) ? String(x.nom).replace(/\s*—\s*sur devis\s*$/i, '') : 'Location — ' + x.nom), detail: x.detail || '', quantite: x.qte || 1, montantTTC: x.prix }));
+  const l = lignes.map((x) => (x.tiers || x.organisation) ? { intitule: x.nom, detail: x.detail || '', quantite: 1, montantTTC: x.prix, ...(x.tiers ? { tiers: true } : {}) } : ({ intitule: (/^(serveuse|p[âa]tissier|chef p[âa]tissier)|—\s*sur devis\s*$/i.test(String(x.nom || '')) ? String(x.nom).replace(/\s*—\s*sur devis\s*$/i, '') : 'Location — ' + x.nom), detail: x.detail || '', quantite: x.qte || 1, montantTTC: x.prix }));
   /* un montant à 0 € saisi exprès (livraison offerte) figure sur le devis ; un champ vide, non */
   if (d.livraisonPrix != null) l.push({ intitule: retour ? 'Livraison et reprise du matériel' : 'Livraison du matériel', detail: '', quantite: 1, montantTTC: liv });
   if (d.montagePrix != null) l.push({ intitule: 'Montage et démontage sur place', detail: '', quantite: 1, montantTTC: mon });

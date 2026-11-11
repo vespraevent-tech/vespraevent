@@ -661,7 +661,7 @@ card.addEventListener('submit',function(e){
  bits.push('RDV souhaité : '+g('prRD')+(g('prRH')?' ('+g('prRH').toLowerCase()+')':''));
  var label=bits.filter(Boolean).join(' · '); if(g('prM'))label+=' — '+g('prM');
  try{localStorage.setItem('vespra_presta_infos',JSON.stringify({date:g('prD'),type:g('prT'),autre:g('prTA'),convives:g('prN'),t:Date.now()}))}catch(x){}
- var it={id:'presta_'+p.id+'_'+Date.now(),name:p.nom+' — sur devis',price:0,devis:true,img:p.img,label:label,prestation:true,details:{arrivee:g('prH'),fin:g('prF'),allergies:g('prA'),rdv:g('prRD'),moment:g('prRH'),message:g('prM')}};
+ var it={id:'presta_'+p.id+'_'+Date.now(),name:p.nom+' — sur devis',price:0,devis:true,img:p.img,label:label,prestation:true,prestataire:p.court,details:{arrivee:g('prH'),fin:g('prF'),allergies:g('prA'),rdv:g('prRD'),moment:g('prRH'),message:g('prM')}};
  if(window.addToCart){window.addToCart(it)}
  else{try{var c=JSON.parse(localStorage.getItem('vespra_cart')||'[]');c.push(it);localStorage.setItem('vespra_cart',JSON.stringify(c));location.href='reservation.html'}catch(x){}}
 });

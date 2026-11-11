@@ -6363,7 +6363,7 @@ function detailPrixHTML(r){
     lignes+=ligneP(escHtmlBo(x.nom||'Suppl\u00e9ment'), euroFr(Number(x.prix)||0), note,
       '<button class="dp-b sup" onclick="retirerSupplement(\''+r.id+'\','+i+')">Retirer</button>');
   });
-  try{ if(typeof mandatLienHTML==='function') lignes+=mandatLienHTML(r); }catch(e){}
+  try{ if(typeof recapPrestaHTML==='function') lignes+=recapPrestaHTML(r); if(typeof mandatLienHTML==='function') lignes+=mandatLienHTML(r); }catch(e){}
   lignes+='<div class="dp-l" style="justify-content:flex-start"><button class="dp-b sup" style="font-weight:600" onclick="ajouterSupplement(\''+r.id+'\')">+ Ajouter une prestation</button></div>';
   var total = loc+liv+mon+sup;
   var acc = (r.acompte===true) ? Math.round(total*0.3*100)/100 : 0;

@@ -152,7 +152,25 @@
 
   function lignesBrutes(d) {
     var items = (typeof materielListe === 'function') ? materielListe(d) : [];
-    return items.map(function (it) {
+    var sortie = [];
+    items.forEach(function (it) {
+      /* prestation d'un prestataire partenaire : part du prestataire (fonds de tiers) puis « Organisation et coordination » */
+      if (it.presta === true) {
+        var nomP = (typeof prestaNomLocal === 'function') ? prestaNomLocal(it.nom) : '';
+        var base = String(it.nom || 'Prestation').replace(/\s*[—–-]\s*(sur devis|candice|emmanuel)\s*$/ig, '').trim() || 'Prestation';
+        sortie.push({
+          intitule: nomP ? base + ' — réalisée par ' + nomP + ' (facturée au nom et pour le compte de ' + nomP + ')' : base,
+          detail: nomP ? 'Prestation réalisée par ' + nomP + ', prestataire partenaire. Vespra Event encaisse pour son compte et assure la coordination.' : (it.desc || ''),
+          quantite: 1, montantTTC: Number(it.prix) || 0, ancienTTC: 0, presta: true, tiers: true });
+        if (Number(it.orga) > 0) sortie.push({ intitule: 'Organisation et coordination', detail: '', quantite: 1, montantTTC: Number(it.orga), ancienTTC: 0 });
+        return;
+      }
+      sortie.push(lignesBrutesUne(it));
+    });
+    return sortie;
+  }
+  function lignesBrutesUne(it) {
+    {
       /* le prix d'une ligne du panier comprend déjà ses options (c'est le
          prix affiché sur la fiche et additionné dans son total) : on ne
          les ajoute pas une seconde fois, sinon le devis dépasse la fiche */
@@ -166,9 +184,9 @@
         montantTTC: prix,
         /* prix baissé directement sur la fiche : l'ancien prix du tarif figure barré sur le devis */
         ancienTTC: (it.manuel && Number(it.prixCatalogue) > prix) ? Number(it.prixCatalogue) : 0,
-        presta: it.presta === true,
+        presta: false,
       };
-    });
+    }
   }
 
 

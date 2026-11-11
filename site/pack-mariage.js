@@ -18,6 +18,8 @@
     var n = 0, brut = 0;
     /* Tous les produits comptent, d'où qu'ils aient été ajoutés (2 barnums = 2 produits) */
     cart.forEach(function(it){
+      /* −10 % : matériel loué uniquement, jamais les prestations de prestataires partenaires */
+      if (it && (it.prestation === true || /^presta_/.test(String(it.id || '')))) return;
       var q = it.qty || 1;
       brut += (Number(it.price) || 0) * q;
       n += q;

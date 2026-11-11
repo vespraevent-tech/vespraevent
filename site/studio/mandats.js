@@ -153,6 +153,19 @@
     };
   };
 
+  /* récapitulatif interne en clair : part prestataire à reverser, part Vespra HT, TVA, total client */
+  window.recapPrestaHTML = function(r){
+    var sp = (r.supplements || []).filter(function(x){ return x && (x.tiers || x.organisation); });
+    if (!sp.length) return '';
+    var tiers = 0, orga = 0;
+    sp.forEach(function(x){ if (x.tiers) tiers += Number(x.prix) || 0; else orga += Number(x.prix) || 0; });
+    var ht = Math.round(orga / 1.2 * 100) / 100, tva = Math.round((orga - ht) * 100) / 100;
+    var l = function(a, b, fort){ return '<div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;' + (fort ? 'font-weight:700;' : '') + '"><span>' + a + '</span><span>' + b + '</span></div>'; };
+    return '<div style="margin:8px 0;padding:10px 12px;background:#faf8f3;border:1px solid #e7e1d4;border-radius:10px;font-family:Inter,system-ui,sans-serif">'
+      + '<div style="font:700 11px Inter,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8a8f98;margin-bottom:6px">Récapitulatif interne — prestataire</div>'
+      + l('Part prestataire à reverser', eur(tiers)) + l('Part Vespra HT', eur(ht)) + l('TVA (20 %)', eur(tva)) + l('Total client (prestation)', eur(tiers + orga), true) + '</div>';
+  };
+
   /* lien « mandat » visible depuis une réservation contenant une prestation de prestataire */
   window.mandatLienHTML = function(r){
     var ids = {};

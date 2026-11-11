@@ -205,6 +205,7 @@ img{display:block;max-width:100%}
 .md-q button:disabled{opacity:.35;cursor:default}
 .md-q b{min-width:18px;text-align:center;font:600 13.5px Inter,system-ui,sans-serif}
 .md-p{display:inline-flex;align-items:center;gap:4px}
+.md-orga{margin:6px 0 2px}.md-orga label{display:flex;align-items:center;gap:8px;font:600 12px Inter,system-ui,sans-serif;color:#4a5160}.md-orga input{width:110px;padding:7px 9px;border:1px solid #cfc8ba;border-radius:8px;font:14px Inter,system-ui,sans-serif}
 .md-desc{width:100%;margin:6px 0 2px;padding:8px 10px;border:1px solid #cdd6e0;border-radius:8px;font:13px Inter,system-ui,sans-serif;color:#14304f;background:#fff;resize:vertical;min-height:54px;box-sizing:border-box}
 .md-pin{width:74px;text-align:right;padding:5px 7px;border:1px solid #cdd6e0;border-radius:8px;font:600 13.5px Inter,system-ui,sans-serif;color:#14304f;background:#fff}
 .md-pin.forc{border-color:#d97706;background:#fffbeb}
@@ -3912,7 +3913,7 @@ function parrainFiche(d){ const c = parrainCode(d); return c ? (cache.parrainCod
 function parrainLigneResa(r){ return r ? (r.supplements || []).find(x => x && x.parrainage) || null : null; }
 function montantPanier(d){
   try{
-    return materielListe(d).reduce((t, it) => t + (Number(it.prix) || 0), 0);
+    return materielListe(d).reduce((t, it) => t + (Number(it.prix) || 0) + (it.presta ? (Number(it.orga) || 0) : 0), 0);
   }catch(e){ return 0; }
 }
 function parrainEtat(d){
@@ -3941,7 +3942,11 @@ function offreMariageOn(d){
   if(d.offreMariage === false) return false;
   return /^\s*oui/i.test(String(d.packMariage || ''));
 }
-function offreMariageMontant(d){ return offreMariageOn(d) ? Math.round(montantPanier(d) * TAUX_MARIAGE) : 0; }
+/* −10 % : uniquement sur le matériel loué ; jamais sur les prestations de prestataires ni sur l'organisation */
+function montantProduitsRemisables(d){
+  try{ return materielListe(d).reduce((t, it) => t + ((it.presta || it.prestation) ? 0 : (Number(it.prix) || 0)), 0); }catch(e){ return 0; }
+}
+function offreMariageMontant(d){ return offreMariageOn(d) ? Math.round(montantProduitsRemisables(d) * TAUX_MARIAGE) : 0; }
 function parrainBlocHTML(d){
   const e = parrainEtat(d);
   if(!e) return '';
@@ -4801,6 +4806,8 @@ function catalogue(){ return window.VESPRA_PRODUITS || []; }
 
 /* Prestations de service : pas de prix au catalogue, il se saisit sur la ligne, avec une description. */
 const PRESTATIONS = ['Serveuse privée — Candice', 'Chef pâtissier — Emmanuel'];
+function prestaIdLocal(nom){ const t = String(nom||'').toLowerCase(); return /candice|serveuse/.test(t) ? 'candice' : (/emmanuel|p[âa]tissier/.test(t) ? 'emmanuel' : ''); }
+function prestaNomLocal(nom){ const id = prestaIdLocal(nom); return id === 'candice' ? 'Candice' : (id === 'emmanuel' ? 'Emmanuel' : ''); }
 function estPresta(nom){ return PRESTATIONS.indexOf(String(nom||'').trim()) >= 0; }
 /* ordre des catégories : celui du catalogue du site ; chaque catégorie regroupe ses produits (tous les châteaux ensemble, tous les barnums ensemble…) */
 const ORDRE_CATS = ['Photobooth et accessoires','Voitures de collection','Animations','Son, lumière et vidéo','Effets spéciaux et artifices','Châteaux gonflables','Mobilier, réception et barnums','Restauration','Confort','Décoration','Jeux en bois'];
@@ -4986,7 +4993,7 @@ function mdCharger(d){
     prix: (x.prix || 0) / (x.qte > 1 ? x.qte : 1),
     prixForce: x.prixManuel ? (Number(x.prix) || 0) : null,
     perso: x.perso || null, optPrix: x.optPrix || null, ancien: !!x.ancien,
-    presta: !!x.presta, desc: x.desc || '',
+    presta: !!x.presta, desc: x.desc || '', orga: x.orga || '',
   }));
   /* Une formule absente ou inconnue ne doit jamais retomber sur la première
      du menu (« Digital ») : on la retrouve d'après le prix enregistré, et à
@@ -5087,10 +5094,10 @@ function mdRendre(){
     return '<div class="md-l">' +
       '<div class="md-h"><span class="md-n">' + esc(l.produit) + hors + '</span>' +
         ((qteMaxProduit(l.produit) > 1 || (l.qte||1) > 1) ? '<span class="md-q" title="Quantité"><button type="button" aria-label="Moins" onclick="mdQte(' + i + ', -1)">−</button><b>' + (l.qte||1) + '</b><button type="button" aria-label="Plus" onclick="mdQte(' + i + ', 1)"' + ((l.qte||1) >= Math.max(qteMaxProduit(l.produit), l.qte||1) ? ' disabled' : '') + '>+</button></span>' : '<span style="margin-left:auto"></span>') +
-        '<span class="md-p"><input type="text" inputmode="decimal" class="md-pin' + (l.prixForce != null ? ' forc' : '') + '" value="' + escVal(l.presta && !prixLigne(l) ? '' : String(Math.round(prixLigne(l)*100)/100).replace('.', ',')) + '"' + (l.presta ? ' placeholder="Prix"' : '') + ' aria-label="Prix de la ligne" onchange="mdPrix(' + i + ', this.value)"> €' +
+        '<span class="md-p"><input type="text" inputmode="decimal" class="md-pin' + (l.prixForce != null ? ' forc' : '') + '" value="' + escVal(l.presta && !prixLigne(l) ? '' : String(Math.round(prixLigne(l)*100)/100).replace('.', ',')) + '"' + (l.presta ? ' placeholder="Prestation"' : '') + ' aria-label="Prix de la ligne" onchange="mdPrix(' + i + ', this.value)"> €' +
           (l.prixForce != null && !l.presta ? '<button type="button" class="md-rst" title="Revenir au prix du catalogue" onclick="mdPrix(' + i + ', \'\')">↺</button>' : '') + '</span>' +
         '<button type="button" class="md-x" title="Retirer ce produit" onclick="mdRetirer(' + i + ')">&times;</button>' +
-      '</div>' + (l.presta ? '<textarea class="md-desc" rows="2" placeholder="Description de la prestation (facultatif)" aria-label="Description" oninput="mdDesc(' + i + ', this.value)">' + esc(l.desc || '') + '</textarea>' : '') + choixF + blocCouleurs + choixO +
+      '</div>' + (l.presta ? '<div class="md-orga"><label>Organisation (€ TTC)<input type="text" inputmode="decimal" placeholder="Organisation" value="' + escVal(l.orga === '' || l.orga == null ? '' : String(l.orga).replace('.', ',')) + '" onchange="mdOrga(' + i + ', this.value)"></label></div><textarea class="md-desc" rows="2" placeholder="Description de la prestation (facultatif)" aria-label="Description" oninput="mdDesc(' + i + ', this.value)">' + esc(l.desc || '') + '</textarea>' : '') + choixF + blocCouleurs + choixO +
     '</div>';
   }).join('') +
   (function(){
@@ -5132,6 +5139,7 @@ function qteMaxProduit(nom){
   if(/fontaine/.test(n)) return 4;
   return 1;
 }
+function mdOrga(i, v){ if(!mdLignes[i]) return; const n = Number(String(v||'').replace(',', '.').replace(/[^\d.]/g, '')); mdLignes[i].orga = (isFinite(n) && n > 0) ? Math.min(5000, Math.round(n*100)/100) : ''; mdRendre(); }
 function mdDesc(i, v){ if(mdLignes[i]) mdLignes[i].desc = String(v||''); }
 function mdOuvert(i, o){ if(mdLignes[i]) mdLignes[i].ouvert = !!o; }
 function mdQte(i, delta){
@@ -5213,7 +5221,7 @@ function mdAjouter(){
   const sel = document.getElementById('mdNouveau');
   if(!sel || !sel.value) return;
   if(estPresta(sel.value)){
-    mdLignes.push({ produit: sel.value, formule: '', options: [], prix: 0, qte: 1, prixForce: null, presta: true, desc: '' });
+    mdLignes.push({ produit: sel.value, formule: '', options: [], prix: 0, qte: 1, prixForce: null, presta: true, desc: '', orga: '' });
     sel.value = ''; mdRendre(); return;
   }
   const p = ficheProduit(sel.value);
@@ -5239,7 +5247,7 @@ function mdPanier(){
       if(l.premiumGen && !feuxPremium(l)) opts.push('Couleur premium (jaune, orange, vert ou violet)');
     }
     const o = { produit: l.produit, formule: l.presta ? String(l.desc||'').trim() : (l.formule || ''), options: opts.join(', '), prix: prixLigne(l) };
-    if(l.presta){ o.prestation = true; o.description = String(l.desc||'').trim(); o.prixManuel = true; }
+    if(l.presta){ o.prestation = true; o.description = String(l.desc||'').trim(); o.prixManuel = true; o.organisationTtc = Number(l.orga) > 0 ? Number(l.orga) : 0; o.prestataire = prestaIdLocal(l.produit); }
     if(l.qte > 1) o.quantite = l.qte;
     if(l.prixForce != null) o.prixManuel = true;
     if(l.perso) o.formulePerso = { n: l.perso.n, prix: l.perso.prix };
@@ -5428,6 +5436,19 @@ async function reporterAuPlanning(d, avant, chg){
         r.products = prods;
       }
     }
+    /* prestations de prestataires partenaires : part du prestataire (fonds de tiers) + « Organisation et coordination », reprises de la fiche */
+    try{
+      const pl = materielListe(d).filter(it => it.presta);
+      const gardes = (r.supplements || []).filter(x => !(x && x.prestation && x.depuisDemande));
+      pl.forEach((it, k) => {
+        const id = prestaIdLocal(it.nom), nomP = prestaNomLocal(it.nom), pid = 'd' + String(d.id).replace(/\W/g, '').slice(-8) + k;
+        const base = String(it.nom).replace(/\s*[—–-]\s*(sur devis|candice|emmanuel)\s*$/ig, '').trim() || 'Prestation';
+        const exist = (r.supplements || []).find(x => x && x.tiers && x.prestaId === pid);
+        gardes.push({ nom: nomP ? base + ' — réalisée par ' + nomP + ' (facturée au nom et pour le compte de ' + nomP + ')' : base, prix: Math.max(0, Number(it.prix) || 0), prestation: true, tiers: true, prestataire: id, prestaId: pid, depuisDemande: true, reverse: exist ? exist.reverse === true : false, reverseDate: exist ? (exist.reverseDate || '') : '' });
+        if(Number(it.orga) > 0) gardes.push({ nom: 'Organisation et coordination', prix: Number(it.orga), prestation: true, organisation: true, prestataire: id, prestaId: pid, depuisDemande: true });
+      });
+      if(pl.length || gardes.length !== (r.supplements || []).length) r.supplements = gardes;
+    }catch(e){ console.error('prestations de la demande', e); }
     /* offre événement : une ligne en négatif sur la réservation, recalculée d'après le matériel */
     {
       const sans = (r.supplements || []).filter(x => !(x && x.offreMariage));
@@ -5657,7 +5678,7 @@ function materielListe(d){
       if(a.prestation || (a.estPresta && PRESTATIONS.indexOf(nom) >= 0)){
         const qp = Number(a.quantite != null ? a.quantite : a.qty);
         items.push({ nom: nom, formule: '', options: [], prix: montantLu(a.prix != null ? a.prix : a.price), qte: qp > 1 ? Math.floor(qp) : 1,
-          prixManuel: true, manuel: true, presta: true, desc: String(a.description || a.formule || ''), srcIdx: (brut === d.panier) ? ai : -1 });
+          prixManuel: true, manuel: true, presta: true, desc: String(a.description || a.formule || ''), orga: Number(a.organisationTtc) > 0 ? Number(a.organisationTtc) : '', srcIdx: (brut === d.panier) ? ai : -1 });
         return;
       }
       /* Les demandes reçues avant la séparation formule / détail
@@ -6554,7 +6575,7 @@ function produitsDepuisDemande(d, jour, finJour, ignoreId){
   const produits = [];
   /* plusieurs photobooths : un par exemplaire, chacun avec son numéro (PB1, PB2…) */
   const items = [];
-  materielListe(d).forEach(it => {
+  materielListe(d).filter(it => !it.presta).forEach(it => {   /* les prestations de prestataires partent en lignes à part (fonds de tiers), jamais en produits */
     if(it.qte > 1 && categorieDuProduit(it.nom) === 'photobooth'){
       for(let k = 0; k < it.qte; k++) items.push(Object.assign({}, it, { qte: 1, prix: (Number(it.prix) || 0) / it.qte, options: (it.options || []).slice() }));
     } else items.push(it);

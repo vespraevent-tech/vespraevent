@@ -15,9 +15,9 @@ export const DEFAUTS = {
     dispo: DISPO,
   },
   sans: {
-    objet: 'Votre demande est bien reçue — Vespra Event',
-    titre: 'Votre demande est bien reçue',
-    message: 'Merci de nous avoir contactés ! Notre équipe prépare votre devis et vous l\u2019envoie sous 24 h.\n\n' + T_RES,
+    objet: 'Nous avons bien reçu votre demande — Vespra Event',
+    titre: 'Nous avons bien reçu votre demande',
+    message: 'Merci de nous avoir contactés ! Nous étudions votre demande et revenons vers vous très vite avec votre devis personnalisé.\n\n' + T_RES,
     dispo: DISPO,
   },
 };
