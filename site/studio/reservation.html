@@ -1171,6 +1171,7 @@ var P=[
   ['Machine à fumée lourde effet brouillard','lumieres',60,['Standard'],'Fumée lourde brouillard'],
   ['Machine à fumée lourde effet nuage','lumieres',150,['Standard'],'Fumée lourde nuage'],
   ['Barnum 3x3m','barnum',60,['3x3m'],'Barnum 3x3'],
+  ['Barnum 4x6m','barnum',85,['4x6m'],'Barnum 4x6'],
   ['Barnum 4x8m','barnum',125,['4x8m'],'Barnum 4x8'],
   ['Barnum 6x10m','barnum',190,['6x10m'],'Barnum 6x10'],
   ['Tente étoile 10m','barnum',190,['10m'],'Tente étoile 10'],
@@ -1188,6 +1189,12 @@ var P=[
   ['Guirlande 20 m','barnum',18,['Standard'],'Guirlande 20 m'],
   ['Guirlande lumineuse','lumieres',null,['10 m','20 m','40 m'],'Guirlande',{'10 m':9,'20 m':18,'40 m':36,'30 m':25}],
   ['Méga ventilateur','barnum',10,['Standard'],'Ventilateur'],
+  ['Chauffage','barnum',null,['Sur devis'],'Chauffage'],
+  ['Mange-debout housse blanche','barnum',13,['Standard'],'Mange-debout'],
+  ['Mini bounce crocodile','animation',80,['Standard'],'Mini bounce'],
+  ['Bouncedome gonflable avec toboggan Amazone Safari','animation',100,['Standard'],'Bouncedome'],
+  ['Multiplay château gonflable Dinoworld','animation',150,['Standard'],'Dinoworld'],
+  ['Château gonflable Multiplay Summer Party','animation',150,['Standard'],'Summer Party'],
   ['Vidéoprojecteur','sono',10,['Vidéoprojecteur seul (sans écran)','Vidéoprojecteur + écran de projection'],'Vidéoprojecteur',
     {'Vidéoprojecteur seul (sans écran)':10,'Vidéoprojecteur + écran de projection':20}],
   ['Panneau de bienvenue','animation',190,['Standard'],'Panneau'],
@@ -5407,7 +5414,7 @@ var PK_OPT = {
 /* les options de chaque produit, d'après le catalogue du site */
 var OPTIONS_PRODUIT = {};
 ['Photobooth 1','Photobooth 2','Photobooth 3','Photobooth 4'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.cadre,PK_OPT.deguis];});
-['Barnum 3x3m','Barnum 4x8m','Barnum 6x10m'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.install,PK_OPT.lestage,PK_OPT.eclair,PK_OPT.guir10,PK_OPT.guir20];});
+['Barnum 3x3m','Barnum 4x6m','Barnum 4x8m','Barnum 6x10m'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.install,PK_OPT.lestage,PK_OPT.eclair,PK_OPT.guir10,PK_OPT.guir20];});
 ['Buvette 4x4m','Boîte de nuit gonflable Essential','Boîte de nuit gonflable Ultimate'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.install];});
 OPTIONS_PRODUIT['Buvette 4x4m']=[PK_OPT.install,PK_OPT.guir10,PK_OPT.guir20];
 ['Tente étoile 10m','Tente étoile 14m','Tente étoile 22m'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.install,PK_OPT.eclair,PK_OPT.guir10,PK_OPT.guir20];});
@@ -5440,6 +5447,7 @@ var PK_ONGLETS=[
   {id:'Son',label:'Son et vidéo',color:'#FFE5A0'},
   {id:'Lumiere',label:'Lumière',color:'#FFC8AA'},
   {id:'Restauration',label:'Restauration',color:'#B10202'},
+  {id:'Chateaux',label:'Châteaux gonflables',color:'#FFD6E8'},
   {id:'Confort',label:'Confort',color:'#D4EDBC'}
 ];
 function pkCatsSite(p){
@@ -5451,6 +5459,9 @@ function pkCatsSite(p){
   if(/^Machine à (étincelles|fumée|bulles)/.test(n)) return ['Effets'];
   if(/^Boîte de nuit/.test(n)) return ['Animation','Barnums'];
   if(n==='Baby-foot'||n==='Jeux en bois'||n==='Pack karaoké') return ['Animation'];
+  if(/^Mange-debout/.test(n)) return ['Barnums','Restauration'];
+  if(/^(Mini bounce|Bouncedome|Multiplay|Château)/.test(n)) return ['Chateaux','Animation'];
+  if(n==='Chauffage') return ['Confort'];
   if(/^(Barnum|Tente|Buvette)/.test(n)) return ['Barnums'];
   if(/^(Pack Vespra|Sono|Caisson|Micro|Vidéoprojecteur)/.test(n)) return ['Son'];
   if(/^(Jeux de lumières|Boule à facettes|Guirlande lumineuse|Spot LED)/.test(n)) return ['Lumiere'];
