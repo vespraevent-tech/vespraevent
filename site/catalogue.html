@@ -1166,7 +1166,7 @@ if(urlCat){
     /* l'adresse garde la catégorie : le retour depuis une fiche produit revient ici */
     /* entrée dans une catégorie depuis le choix : nouvelle étape d'historique, pour que « retour » revienne au choix des catégories */
     try{const u='catalogue.html?cat='+(v==='Tous'?'tout':encodeURIComponent(v));if(mode==='push')history.pushState(null,'',u);else if(mode!=='none')history.replaceState(null,'',u);}catch(e){}
-    setTimeout(function(){const f=document.getElementById('prodGrid')||document.getElementById('filtersBar');if(f)window.scrollTo({top:Math.max(0,f.getBoundingClientRect().top+scrollY-88),behavior:'auto'});},60);
+    window.__vespraNoCentrer=Date.now();setTimeout(function(){if(v==='Tous'){window.scrollTo({top:0,behavior:'auto'});return;}const f=document.getElementById('prodGrid')||document.getElementById('filtersBar');if(f)window.scrollTo({top:Math.max(0,f.getBoundingClientRect().top+scrollY-88),behavior:'auto'});},60);
   }
   ul.addEventListener('click',function(e){
     const b=e.target.closest('button[data-i]');if(!b)return;
@@ -2211,6 +2211,6 @@ function goReserver(){saveCart();window.location.href='reservation.html';}
 <script src="/adresse-auto.js"></script>
 
 <script src="/selects-jolis.js" defer></script>
-<script src="/centrer.js?v=2" defer></script>
+<script src="/centrer.js?v=4" defer></script>
 <link rel="stylesheet" href="/coherence.css?v=23">
 <script src="/coherence.js?v=6" defer></script>

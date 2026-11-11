@@ -7167,12 +7167,23 @@ async function bestsEnregistrer(){
   const e = document.getElementById('bestsEtat');
   if(!bestsListe || !bestsListe.length) return;
   const origine = JSON.stringify(bestsListe) === JSON.stringify(BESTS_DEFAUT.filter(bestsProduit));
+  let rep = null;
   try{
     if(e) e.textContent = 'Enregistrement…';
     if(origine){
       if((cache.produits||[]).some(x=>x && x.type==='ordre-accueil')) await api('/data?collection=produits&id=__ordre_accueil', {method:'DELETE'});
     } else {
-      await api('/data', {method:'POST', body: JSON.stringify({collection:'produits', item:{id:'__ordre_accueil', type:'ordre-accueil', ordre: bestsListe}})});
+      rep = await api('/data', {method:'POST', body: JSON.stringify({collection:'produits', item:{id:'__ordre_accueil', type:'ordre-accueil', ordre: bestsListe}})});
+      /* on relit le serveur : le nouvel ordre doit y être, sinon on le dit au lieu de croire qu'il est publié */
+      try{
+        const rel = await api('/data?collection=produits');
+        const it = (rel||[]).find(x=>x && x.type==='ordre-accueil');
+        if(!it || JSON.stringify(listeEnregistree(it.ordre)) !== JSON.stringify(bestsListe)){
+          if(e) e.textContent = 'Attention : le serveur n\'a pas gardé le nouvel ordre (il renvoie encore l\'ancien).';
+          showToast('Le serveur n\'a pas gardé le nouvel ordre', true);
+          return;
+        }
+      }catch(_){ /* relecture impossible : on garde l'enregistrement tel quel */ }
     }
     bestsModifie = false;
     const gardeB=function(){
@@ -7182,7 +7193,9 @@ async function bestsEnregistrer(){
     gardeB();
     await loadProduits();
     gardeB();
-    if(e) e.textContent = 'Enregistré : la page d\'accueil est à jour.';
+    if(e) e.textContent = (rep && rep.cache && rep.cache !== 'vide')
+      ? 'Enregistré. La page d\'accueil se met à jour d\'ici quelques secondes (le cache du site n\'a pas pu être vidé tout de suite).'
+      : 'Enregistré : la page d\'accueil est à jour.';
     showToast('Meilleures locations enregistrées');
   }catch(err){ if(e) e.textContent = 'Échec : ' + (err.message||'erreur'); showToast(err.message, true); }
 }

@@ -13,7 +13,7 @@ import { getStore } from './_stockage.mjs';
 
 const DATA_STORE = 'vespra-admin-data';
 
-/* Une réponse réussie est gardée une minute par le réseau de diffusion de
+/* Une réponse réussie est gardée dix secondes par le réseau de diffusion de
    Netlify (puis servie le temps d'être renouvelée) : le site n'interroge
    plus le stockage à chaque visite. Le back-office vide ce cache à chaque
    enregistrement (étiquette « vespra-contenu »). Une erreur n'est jamais gardée. */
@@ -22,7 +22,7 @@ const json = (data, status = 200) => new Response(JSON.stringify(data), {
   headers: status === 200 ? {
     'content-type': 'application/json; charset=utf-8',
     'cache-control': 'public, max-age=0, must-revalidate',
-    'netlify-cdn-cache-control': 'public, s-maxage=60',
+    'netlify-cdn-cache-control': 'public, s-maxage=10',
     'cache-tag': 'vespra-contenu',
   } : {
     'content-type': 'application/json; charset=utf-8',

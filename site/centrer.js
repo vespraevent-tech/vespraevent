@@ -12,7 +12,7 @@
 
   var reduit=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
   var CIBLES='summary,.faq-q,[aria-expanded],[role="tab"],.cc-list button,.pr-tab,.pr-sub button,.px-faq button,[class*="accord"] button,[class*="-tab"],[class*="chip"],[class*="onglet"]';
-  var EXCLUS='.va-btn,header,.nav,nav,.nav-links,.nav-toggle,.vm-ov,.vsaj,#vsAjout,.c-drawer,.drawer,.cart,[role="dialog"],.bests-arrow,.bests-dot,.bc-add,.btn-add,select,input,textarea,.theme-toggle,#themeToggle,.dock,[class*="catalogue-flottant"]';
+  var EXCLUS='.va-btn,.cc-voir,header,.nav,nav,.nav-links,.nav-toggle,.vm-ov,.vsaj,#vsAjout,.c-drawer,.drawer,.cart,[role="dialog"],.bests-arrow,.bests-dot,.bc-add,.btn-add,select,input,textarea,.theme-toggle,#themeToggle,.dock,[class*="catalogue-flottant"]';
 
   function enteteH(){
     var h=document.querySelector('.nav,header');
@@ -35,6 +35,7 @@
     return {t:haut,b:bas,r:r};
   }
   function recaler(t){
+    if(window.__vespraNoCentrer&&Date.now()-window.__vespraNoCentrer<2500)return;   /* la page vient de se placer elle-même (entrée dans une catégorie) */
     var z=zone(t),H=innerHeight,e=enteteH(),h=z.b-z.t;
     var centre=(z.t+z.b)/2,milieu=(H+e)/2;
     var ok=(z.t>=e+8&&z.b<=H-8&&Math.abs(centre-milieu)<H*.14);
