@@ -27,5 +27,5 @@ $('go').onclick=async()=>{$('go').disabled=true;$('log').textContent='Démarrage
 $('ver').onclick=async()=>{try{const j=await F('action=etat');log('\nStockage actif : '+j.stockage_actif);
  j.stores.forEach(s=>log((s.blobs===s.supabase?'OK  ':'ÉCART ')+s.store+' : Netlify '+s.blobs+' / Supabase '+s.supabase));
  log(j.identique?'\nTout est identique.':'\nIl y a un écart : relance « Copier les données ».')}catch(e){log('\nERREUR : '+e.message)}};
-</script><script src="/centrer.js?v=1" defer></script>
+</script><script src="/centrer.js?v=2" defer></script>
 </body></html>

@@ -12,7 +12,7 @@
 
   var reduit=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
   var CIBLES='summary,.faq-q,[aria-expanded],[role="tab"],.cc-list button,.pr-tab,.pr-sub button,.px-faq button,[class*="accord"] button,[class*="-tab"],[class*="chip"],[class*="onglet"]';
-  var EXCLUS='header,.nav,nav,.nav-links,.nav-toggle,.vm-ov,.vsaj,#vsAjout,.c-drawer,.drawer,.cart,[role="dialog"],.bests-arrow,.bests-dot,.bc-add,.btn-add,select,input,textarea,.theme-toggle,#themeToggle,.dock,[class*="catalogue-flottant"]';
+  var EXCLUS='.va-btn,header,.nav,nav,.nav-links,.nav-toggle,.vm-ov,.vsaj,#vsAjout,.c-drawer,.drawer,.cart,[role="dialog"],.bests-arrow,.bests-dot,.bc-add,.btn-add,select,input,textarea,.theme-toggle,#themeToggle,.dock,[class*="catalogue-flottant"]';
 
   function enteteH(){
     var h=document.querySelector('.nav,header');
