@@ -446,6 +446,15 @@ select.dpc-q,.dpc-q{width:68px;flex:0 0 68px;min-width:0;font:600 12px Inter,sys
 .pk-cnt button{border:0;background:#f0ece3;border-radius:50%;width:22px;height:22px;cursor:pointer;font:600 14px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1;padding:0;color:#1f2430}
 .pk-cnt button:hover{background:#e3ddd0}
 @media(max-width:560px){.pk-row{grid-template-columns:1fr auto auto;gap:8px;padding:9px 2px}.pk-nom{font-size:13px;flex-direction:column;align-items:flex-start;gap:2px}.pk-prix{font-size:12px}.pk-btn{min-width:72px;padding:6px 10px}}
+.pk-chead{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;box-sizing:border-box;margin:6px 0 0;padding:12px 14px;border:1px solid #e3ddd0;border-radius:12px;background:#fff;font:600 14px Inter,system-ui,sans-serif;color:#1d2433;cursor:pointer;text-align:left}
+.pk-chead:hover{background:#faf8f3}.pk-chead.on{background:#f5f1e8;border-color:#cfc8ba}
+.pk-chead small{font-weight:500;color:#7a8190;margin-left:6px}.pk-chead i{font-style:normal;transition:transform .2s;color:#8a93a3}.pk-chead.on i{transform:rotate(90deg)}
+.pk-cbody{padding:2px 6px 8px;border-left:2px solid #efebe2;margin:0 0 4px 10px}
+.pk-search{width:100%;box-sizing:border-box;margin:8px 0 2px;padding:10px 12px;border:1px solid #cfc8ba;border-radius:10px;font:14px Inter,system-ui,sans-serif;background:#fff}
+.pk-pform{display:grid;gap:10px;padding:12px;margin:4px 0 8px;background:#faf8f3;border:1px solid #e3ddd0;border-radius:12px}
+.pk-pform label{display:grid;gap:4px;font:600 12px Inter,system-ui,sans-serif;color:#4a5160}.pk-pform input{padding:9px 10px;border:1px solid #cfc8ba;border-radius:8px;font:14px Inter,system-ui,sans-serif;background:#fff}
+.pk-ptot{display:flex;justify-content:space-between;font:600 14px Inter,system-ui,sans-serif;padding-top:4px}
+.pk-pform button:disabled{opacity:.45;cursor:not-allowed}
 .pk-cat{width:100%;box-sizing:border-box;margin:10px 0 4px;padding:10px 12px;border:1px solid #cfc8ba;border-radius:10px;background:#fff;font:600 14px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;color:#1f2430}
 .pk-nom .pk-ici{margin-left:0}
 .prod-selected-tags{display:flex;flex-wrap:wrap;gap:6px;padding:10px 0 4px}
@@ -1063,7 +1072,7 @@ function applyConfig(cfg){
   function chk(k,s){if(cfg[k]){var v=JSON.stringify(cfg[k]);if(v!==localStorage.getItem(s)){localStorage.setItem(s,v);changed=true;}}}
   chk('prods','vespraProds');chk('cats','vespraCats');chk('src','vespraSrc');
   chk('frais','vespraFrais');chk('fraisCats','vespraFraisCats');
-  chk('purchases','vespraPurchases');if(cfg.factAchat&&faMerge(cfg.factAchat))changed=true;chk('tvaDecl','vespraTvaDecl');chk('equipGroups','vespraEquipGroups');
+  chk('purchases','vespraPurchases');if(cfg.mandats){var _mv=JSON.stringify(cfg.mandats);if(_mv!==localStorage.getItem('vespraMandats')){localStorage.setItem('vespraMandats',_mv);changed=true;}}if(cfg.factAchat&&faMerge(cfg.factAchat))changed=true;chk('tvaDecl','vespraTvaDecl');chk('equipGroups','vespraEquipGroups');
   if(cfg.colors){localStorage.setItem('vespraColors',JSON.stringify(cfg.colors));applyColors(cfg.colors);}
   if(cfg.clients){localStorage.setItem('vespraClients',JSON.stringify(cfg.clients));}
   return changed;
@@ -1082,7 +1091,7 @@ function applySSEData(path,data){
     var field=path.replace('/cfg/','');
     var fmap={prods:'vespraProds',cats:'vespraCats',src:'vespraSrc',frais:'vespraFrais',
       fraisCats:'vespraFraisCats',clients:'vespraClients',colors:'vespraColors',
-      purchases:'vespraPurchases',factAchat:'vespraFactAchat',tvaDecl:'vespraTvaDecl',equipGroups:'vespraEquipGroups'};
+      purchases:'vespraPurchases',factAchat:'vespraFactAchat',tvaDecl:'vespraTvaDecl',equipGroups:'vespraEquipGroups',mandats:'vespraMandats'};
     if(field==='factAchat'){if(data!=null&&faMerge(data))changed=true;}
     else if(fmap[field]&&data!=null){
       localStorage.setItem(fmap[field],JSON.stringify(data));
@@ -1528,29 +1537,41 @@ function caLocations(r){
 }
 function caLivraison(r){ return Number(r.livraisonPrice)||0; }
 function caMontage(r){ return Number(r.montage)||0; }
-function caSupplements(r){
+/* Prestataires partenaires (mandat) : la part du prestataire est un fonds de tiers (x.tiers),
+   encaissé pour son compte. Elle figure sur le total du client mais n'entre NI dans le CA,
+   NI dans la TVA. Seule la ligne « Organisation » (x.organisation) est un revenu de Vespra. */
+function caSupplementsClient(r){
   return (r.supplements||[]).reduce(function(s,x){return s+(Number(x.prix)||0);},0);
+}
+function caTiers(r){
+  return (r.supplements||[]).reduce(function(s,x){return s+(x&&x.tiers?(Number(x.prix)||0):0);},0);
+}
+function caSupplements(r){            /* part qui revient à Vespra */
+  return Math.round((caSupplementsClient(r)-caTiers(r))*100)/100;
 }
 /* frais de livraison / reprise et d'installation : facturés au client mais dépensés
    (carburant, temps, main-d'œuvre) : ils ne comptent pas dans le chiffre d'affaires
    affiché. La TVA, elle, reste calculée sur la facture complète. */
 function fraisLMRes(r){ return caLivraison(r); }
 function fraisLMAcompte(r){ return r&&r.acompte===true ? Math.round(fraisLMRes(r)*0.3*100)/100 : 0; }
+/* part « fonds de tiers » (prestataires partenaires) : encaissée mais jamais du CA ni de la TVA */
+function tiersAcompte(r){ return r&&r.acompte===true ? Math.round(caTiers(r)*0.3*100)/100 : 0; }
+function tiersSolde(r){ return Math.round((caTiers(r)-tiersAcompte(r))*100)/100; }
 function fraisLMSolde(r){ return Math.round((fraisLMRes(r)-fraisLMAcompte(r))*100)/100; }
 function calcResTotal(r){
-  return caLocations(r)+caLivraison(r)+caMontage(r)+caSupplements(r);
+  return caLocations(r)+caLivraison(r)+caMontage(r)+caSupplementsClient(r);   /* total payé par le client */
 }
 /* L'acompte est toujours de 30 % du total ; il ne compte que s'il a été versé. */
 /* date à laquelle l'acompte a été reçu ; à défaut, celle de l'événement */
-function encaisseEntre(deb,fin,sansVirements,horsFrais){
+function encaisseEntre(deb,fin,sansVirements,horsFrais,horsTiers){
   /* encaissé = acomptes reçus dans la période + soldes des événements passés dans la période */
   var auj=caIso(new Date()),t=0,n=0;
   R.forEach(function(r){
     if(r._deleted||enSuivi(r))return;
     if(sansVirements&&r.virementRecu===true)return;   /* déjà réglé par virement : plus rien à encaisser */
     var a=0,b=0;
-    if(r.acompte===true){var d=acompteDateRes(r);if(d&&d>=deb&&d<=fin)a=acompteRes(r)-(horsFrais?fraisLMAcompte(r):0);}
-    if(r.dateStart&&r.dateStart>=deb&&r.dateStart<=fin)b=resteRes(r)-(horsFrais?fraisLMSolde(r):0);
+    if(r.acompte===true){var d=acompteDateRes(r);if(d&&d>=deb&&d<=fin)a=acompteRes(r)-(horsFrais?fraisLMAcompte(r):0)-((horsFrais||horsTiers)?tiersAcompte(r):0);}
+    if(r.dateStart&&r.dateStart>=deb&&r.dateStart<=fin)b=resteRes(r)-(horsFrais?fraisLMSolde(r):0)-((horsFrais||horsTiers)?tiersSolde(r):0);
     if(a||b){t+=a+b;n++;}
   });
   return {ttc:Math.round(t*100)/100,n:n};
@@ -1567,7 +1588,7 @@ function resLignesCents(r){
   var li=caLivraison(r),mo=caMontage(r);
   if(li>0)l.push(Math.round(li*100));
   if(mo>0)l.push(Math.round(mo*100));
-  (r.supplements||[]).forEach(function(x){var v=Number(x.prix)||0;l.push(Math.round(v*100));});
+  (r.supplements||[]).forEach(function(x){if(x&&x.tiers)return;var v=Number(x.prix)||0;l.push(Math.round(v*100));});   /* fonds de tiers : hors TVA */
   return l;
 }
 function resTvaTotalCents(r){
@@ -4762,7 +4783,7 @@ function ca(){
   var tvaAn=tvaAnneeEntiere(),tvaQOpts=tvaQs.map(function(q,i){return '<option value="'+(i+1)+'"'+(!tvaAn&&i+1===tvaPeriode.trimestre?' selected':'')+'>'+q+'</option>';}).join('')+'<option value="A"'+(tvaAn?' selected':'')+'>Année entière</option>';
   var tvaDates=tvaPeriodeDates(),tvaQD=tvaTrimestreDates();
   var tvaRes=R.filter(function(r){return !r._deleted&&!enSuivi(r)&&r.dateStart&&r.dateStart>=tvaDates.debut&&r.dateStart<=tvaDates.fin&&r.products&&r.products.length;});
-  var _enc=encaisseEntre(tvaDates.debut,tvaDates.fin);var tvaTtc=_enc.ttc;tvaRes=new Array(_enc.n);
+  var _enc=encaisseEntre(tvaDates.debut,tvaDates.fin,false,false,true);var tvaTtc=_enc.ttc;tvaRes=new Array(_enc.n);
   var varTva=tvaCollecteeEntre(tvaDates.debut,tvaDates.fin),tvaHt=Math.round((tvaTtc-varTva)*100)/100;
   var tvaPer='r'+tvaDates.debut+'_'+tvaDates.fin,tvaDed=chargesTvaPeriode(getFrais(),tvaPer);var tvaFa=faTvaDed(tvaDates.debut,tvaDates.fin);var _fx=(!tvaPersonnalisee()&&!tvaAnneeEntiere())?tvaFixe(tvaPeriode.annee,tvaPeriode.trimestre):null;if(_fx){varTva=_fx.coll;tvaDed=_fx.chg;tvaFa=_fx.fa;}var tvaCredIn=tvaPersonnalisee()?0:tvaCreditIn(tvaPeriode.annee,tvaPeriode.trimestre);var tvaNetQ=Math.round((Math.round(varTva*100)-Math.round(tvaDed*100)-Math.round(tvaFa*100)-Math.round(tvaCredIn*100)))/100;
   var _DK=tvaPeriode.annee+'-T'+tvaPeriode.trimestre,_DD=tvaDeclGet()[_DK]||{},_DS='border:1px solid #dcd5c8;border-radius:8px;padding:5px 8px;font:12px Inter,system-ui,sans-serif;background:#fff;color:#555;width:auto';
@@ -4817,8 +4838,8 @@ function ca(){
   var venteRows=[];
   R.forEach(function(r){
     if(r._deleted||enSuivi(r))return;var p=null;
-    if(r.acompte===true){var da=acompteDateRes(r);if(da&&da>=tvaDates.debut&&da<=tvaDates.fin){p=resTvaParts(r);venteRows.push({d:da,t:'Acompte',ttc:acompteRes(r),tva:p.a/100});}}
-    if(r.dateStart&&r.dateStart>=tvaDates.debut&&r.dateStart<=tvaDates.fin){p=p||resTvaParts(r);venteRows.push({d:r.dateStart,t:'Solde',ttc:resteRes(r),tva:p.s/100});}
+    if(r.acompte===true){var da=acompteDateRes(r);if(da&&da>=tvaDates.debut&&da<=tvaDates.fin){p=resTvaParts(r);venteRows.push({d:da,t:'Acompte',ttc:acompteRes(r)-tiersAcompte(r),tva:p.a/100});}}
+    if(r.dateStart&&r.dateStart>=tvaDates.debut&&r.dateStart<=tvaDates.fin){p=p||resTvaParts(r);venteRows.push({d:r.dateStart,t:'Solde',ttc:resteRes(r)-tiersSolde(r),tva:p.s/100});}
   });
   venteRows.sort(function(a,b){return a.d<b.d?-1:a.d>b.d?1:0;});
   var venteTable=venteRows.length?'<div style="overflow-x:auto;margin-top:16px"><table style="width:100%;border-collapse:collapse;min-width:320px"><thead><tr><th style="'+TH+'">Date</th><th style="'+TH+'">Type</th><th style="'+TH+';text-align:right">Encaissé TTC</th><th style="'+TH+';text-align:right">TVA</th></tr></thead><tbody>'
@@ -4907,12 +4928,16 @@ function ca(){
   resAcompte.forEach(function(r){fraisLMPer+=fraisLMAcompte(r);});
   R.filter(function(r){return !r._deleted&&!enSuivi(r)&&r.dateStart&&inPeriod(r.dateStart);}).forEach(function(r){fraisLMPer+=fraisLMSolde(r);});
   fraisLMPer=Math.round(fraisLMPer*100)/100;
-  var caHorsLivTTC=Math.round((totalEncaisse-fraisLMPer)*100)/100, livTTC=0;
+  var tiersPer=0;
+  resAcompte.forEach(function(r){tiersPer+=tiersAcompte(r);});
+  R.filter(function(r){return !r._deleted&&!enSuivi(r)&&r.dateStart&&inPeriod(r.dateStart);}).forEach(function(r){tiersPer+=tiersSolde(r);});
+  tiersPer=Math.round(tiersPer*100)/100;
+  var caHorsLivTTC=Math.round((totalEncaisse-fraisLMPer-tiersPer)*100)/100, livTTC=0;
   var tvaColl2=0;
   resAcompte.forEach(function(r){tvaColl2+=resTvaParts(r).a;});
   R.filter(function(r){return !r._deleted&&!enSuivi(r)&&r.dateStart&&inPeriod(r.dateStart);}).forEach(function(r){tvaColl2+=resTvaParts(r).s;});
   tvaColl2=tvaColl2/100;
-  var caHT2=r2(totalEncaisse-tvaColl2-fraisLMPer/(1+CA_TVA_RATE)), livHT2=0;
+  var caHT2=r2(totalEncaisse-tvaColl2-tiersPer-fraisLMPer/(1+CA_TVA_RATE)), livHT2=0;
   var chgHT2=r2(chargesHTPeriode(fraisPeriod)+_ach.ht), chgNet=r2(chgHT2-livHT2);
   var resReel=r2(caHT2-chgNet);
   var tvaDed2=chargesTvaPeriode(fraisPeriod,caFilter.period), _bF=fraisPeriodeBornes(caFilter.period),tvaFa2=faTvaDed(_bF?_bF.from:'',_bF?_bF.to:'');var _fx2=tvaFixeBornes(_bF&&_bF.from,_bF&&_bF.to);if(_fx2){tvaColl2=_fx2.coll;tvaDed2=_fx2.chg;tvaFa2=_fx2.fa;}
@@ -5001,7 +5026,7 @@ function ca(){
   var _segs=_moisSegments(tvaDates.debut,tvaDates.fin),_multiAn=_segs.length&&_segs[0].y!==_segs[_segs.length-1].y;
   var _vSumTtc=0,_vSumTva=0;
   var _vRows=_segs.map(function(sg){
-    var e=encaisseEntre(sg.from,sg.to).ttc,c=tvaCollecteeEntre(sg.from,sg.to);
+    var e=encaisseEntre(sg.from,sg.to,false,false,true).ttc,c=tvaCollecteeEntre(sg.from,sg.to);
     _vSumTtc+=Math.round(e*100);_vSumTva+=Math.round(c*100);
     var fut=sg.from>_todayIso&&e===0;
     var g=fut?'color:#b3b8c0;':'';
@@ -5093,7 +5118,7 @@ function ca(){
     }
   });
   /* Panier moyen : total TTC moyen d'une réservation dont l'événement tombe dans la période affichée */
-  var _pmN=byPeriod.length,_pmT=byPeriod.reduce(function(t,r){return t+calcResTotal(r)-fraisLMRes(r);},0);
+  var _pmN=byPeriod.length,_pmT=byPeriod.reduce(function(t,r){return t+calcResTotal(r)-caTiers(r)-fraisLMRes(r);},0);
   var _ovRows=[0,1,2].map(function(i){
     var f1=caIso(new Date(_qy,_qm+i,1)),f2=caIso(new Date(_qy,_qm+i+1,0));
     var ca1=encaisseEntre(f1,f2,false,true).ttc,tv1=tvaCollecteeEntre(f1,f2),pr='r'+f1+'_'+f2,ch1=0;
@@ -5119,6 +5144,7 @@ function ca(){
     +carteT(_cumNet<0?'Crédit de TVA':'TVA à mettre de côté',(_cumNet<0?'+ ':(_cumNet>0?'− ':''))+eurT(Math.abs(_cumNet)),(_cred>0?'cumul du trimestre · report '+euros(_cred):'cumul du trimestre'),_sgCol(-_cumNet))
     +carteT('Panier moyen',_pmN?eurT(_pmT/_pmN):'<span style="color:#c3c7ce">—</span>',_pmN?('sur '+_pmN+' réservation'+(_pmN>1?'s':'')+' · TTC, hors livraison et installation'):'aucune réservation sur la période')
     +carteT('Prochain prélèvement',_nxD?eurT(_nxT/100):'<span style="color:#c3c7ce">—</span>',_nxD?(_fmtJ(_nxD)+' · '+(_nxL.length>1?_nxL.length+' charges':String(_nxL[0].label||_nxL[0].cat||'charge'))):'aucune charge à venir')+'</div>'
+    +(typeof fondsTiersHTML==='function'?fondsTiersHTML():'')
     +'<div style="background:#fff;border:1px solid #eee8dc;border-radius:14px;padding:20px"><div style="'+ETQ_H+'color:#8a8f98;margin-bottom:6px">Trimestre T'+_qq+' '+_qy+', mois par mois</div>'
     +'<div style="overflow-x:auto"><table class="ca-card" style="width:100%;border-collapse:collapse;min-width:700px"><thead><tr><th style="'+_THv+'">Mois</th><th style="'+_THv+';text-align:right">CA TTC</th><th style="'+_THv+';text-align:right">Charges TTC</th><th style="'+_THv+';text-align:right">Balance</th><th style="'+_THv+';text-align:right">TVA collectée</th><th style="'+_THv+';text-align:right">TVA déductible</th><th style="'+_THv+';text-align:right">TVA nette</th><th style="'+_THv+';text-align:right">Cumul net</th></tr></thead><tbody>'
     +_ovRows.map(function(m){
@@ -5489,17 +5515,12 @@ function renderAccordion(){
   var acc=document.getElementById('prod-accordion');
   if(!acc) return;
   var cats=PK_ONGLETS;
-  if(!accordionCat||!cats.find(function(c){return c.id===accordionCat;})) accordionCat=cats[0].id;
   var ds=document.getElementById('dateStart'),de=document.getElementById('dateEnd');
   var dStart=ds?ds.value:'',dEnd=de?de.value:'';
-
-  var tabs='<select class="pk-cat" data-act="catsel" aria-label="Catégorie">'+cats.map(function(c){
-    var n=P.filter(function(p){return pkCatsSite(p).indexOf(c.id)>=0&&!pkEstOption(p[0]);}).length;
-    return '<option value="'+pkEsc(c.id)+'"'+(c.id===accordionCat?' selected':'')+'>'+pkEsc(c.label)+' ('+n+')</option>';
-  }).join('')+'</select>';
-
-  var lignes=P.map(function(p,i){return{p:p,i:i};}).filter(function(x){return pkCatsSite(x.p).indexOf(accordionCat)>=0 && !pkEstOption(x.p[0]);}).sort(function(a,b){return String(a.p[0]).localeCompare(String(b.p[0]),'fr',{sensitivity:'base',numeric:true});});
-  var liste='<div class="pk-list">'+lignes.map(function(x){
+  var norm=function(t){return String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();};
+  var q=norm(pkQuery).trim();
+  var lignesDe=function(catId){return P.map(function(p,i){return{p:p,i:i};}).filter(function(x){return pkCatsSite(x.p).indexOf(catId)>=0 && !pkEstOption(x.p[0]);}).sort(function(a,b){return String(a.p[0]).localeCompare(String(b.p[0]),'fr',{sensitivity:'base',numeric:true});});};
+  var rowFn=function(x){
     var p=x.p,i=x.i, plusieurs=p[3].length>1;
     var noSt=isNoStockProduct(p[0]);
     var grp=getEquipGroupForProduct(p[0]);
@@ -5543,14 +5564,61 @@ function renderAccordion(){
         +'<button type="button" class="pk-btn plein" data-act="perso-ok" data-i="'+i+'">Ajouter ce photobooth</button></div>';
     }
     return html;
-  }).join('')+'</div>';
+  };
+  var listeDe=function(lignes){return '<div class="pk-list">'+lignes.map(rowFn).join('')+'</div>';};
+  /* prestataires partenaires : dernière catégorie */
+  var prestaHTML=function(filtre){
+    var l=PRESTATAIRES.filter(function(pr){return !filtre||norm(pkNomPresta(pr)).indexOf(filtre)>=0;});
+    return '<div class="pk-list">'+l.map(function(pr){
+      var ouv=pkPrestaOuvert===pr.id;
+      var h='<div class="pk-row"><div class="pk-nom">'+pkEsc(pkNomPresta(pr))+'</div><div class="pk-prix">prix libre</div>'
+        +'<button type="button" class="pk-btn" data-act="presta" data-id="'+pr.id+'">'+(ouv?'Fermer':'Choisir')+'</button></div>';
+      if(ouv){
+        h+='<div class="pk-pform">'
+          +'<label>Prix de la prestation (\u20ac)<input id="pp-prix" type="text" inputmode="decimal" autocomplete="off" placeholder=""></label>'
+          +'<label>Organisation (\u20ac TTC)<input id="pp-orga" type="text" inputmode="decimal" autocomplete="off" placeholder=""></label>'
+          +'<div class="pk-ptot"><span>Total client</span><b id="pp-total">0,00 \u20ac</b></div>'
+          +'<button type="button" id="pp-ok" class="pk-btn plein" data-act="presta-ok" data-id="'+pr.id+'" disabled>Ajouter \u00e0 la r\u00e9servation</button></div>';
+      }
+      return h;
+    }).join('')+'</div>';
+  };
+  var contenu='';
+  var champ='<input type="search" class="pk-search" id="pk-q" placeholder="Rechercher un produit ou une prestation" value="'+pkEsc(pkQuery)+'" autocomplete="off">';
+  if(q){
+    var trouves=P.map(function(p,i){return{p:p,i:i};}).filter(function(x){return !pkEstOption(x.p[0])&&norm(x.p[0]).indexOf(q)>=0;}).sort(function(a,b){return String(a.p[0]).localeCompare(String(b.p[0]),'fr',{sensitivity:'base',numeric:true});});
+    var seen={};trouves=trouves.filter(function(x){if(seen[x.i])return false;seen[x.i]=1;return true;});
+    contenu=(trouves.length?listeDe(trouves):'')+(PRESTATAIRES.some(function(pr){return norm(pkNomPresta(pr)).indexOf(q)>=0;})?prestaHTML(q):'')
+      +((!trouves.length&&!PRESTATAIRES.some(function(pr){return norm(pkNomPresta(pr)).indexOf(q)>=0;}))?'<div style="padding:12px 4px;color:#8a93a3;font-size:13px">Aucun r\u00e9sultat.</div>':'');
+  } else {
+    contenu=cats.map(function(c){
+      var l=lignesDe(c.id), n=l.length, on=accordionCat===c.id;
+      return '<button type="button" class="pk-chead'+(on?' on':'')+'" data-act="cat" data-v="'+pkEsc(c.id)+'" aria-expanded="'+on+'"><span>'+pkEsc(c.label)+'<small>('+n+')</small></span><i>\u203a</i></button>'
+        +(on?'<div class="pk-cbody">'+listeDe(l)+'</div>':'');
+    }).join('');
+    var onP=accordionCat==='__presta';
+    contenu+='<button type="button" class="pk-chead'+(onP?' on':'')+'" data-act="cat" data-v="__presta" aria-expanded="'+onP+'"><span>Prestations<small>('+PRESTATAIRES.length+')</small></span><i>\u203a</i></button>'
+      +(onP?'<div class="pk-cbody">'+prestaHTML('')+'</div>':'');
+  }
 
-  acc.innerHTML=pkBandeauDispo(dStart,dEnd||dStart)+tabs+liste;
+  acc.innerHTML=pkBandeauDispo(dStart,dEnd||dStart)+champ+contenu;
+  var qi=document.getElementById('pk-q');
+  if(qi){ qi.oninput=function(){ pkQuery=qi.value; var pos=qi.selectionStart; renderAccordion(); var n=document.getElementById('pk-q'); if(n){ n.focus(); try{n.setSelectionRange(pos,pos);}catch(e){} } }; }
+  var pp=document.getElementById('pp-prix'), po=document.getElementById('pp-orga');
+  var maj=function(){
+    var a=pkNombre(pp&&pp.value), b=pkNombre(po&&po.value);
+    var tot=document.getElementById('pp-total'), ok=document.getElementById('pp-ok');
+    if(tot) tot.textContent=euroFr(Math.round(((a>0?a:0)+(b>0?b:0))*100)/100);
+    if(ok) ok.disabled=!(a>0&&a<=20000&&!(b<0||b>5000));
+  };
+  if(pp) pp.oninput=maj; if(po) po.oninput=maj;
   acc.onchange=function(e){ var t=e.target; if(t&&t.getAttribute('data-act')==='catsel') window.accSelectCat(t.value); };
   acc.onclick=function(e){
     var b=e.target.closest('[data-act]'); if(!b||b.disabled) return;
     var act=b.getAttribute('data-act');
     if(act==='cat'){ window.accSelectCat(b.getAttribute('data-v')); }
+    else if(act==='presta'){ var id=b.getAttribute('data-id'); pkPrestaOuvert=(pkPrestaOuvert===id?null:id); renderAccordion(); }
+    else if(act==='presta-ok'){ window.pkAjouterPresta(b.getAttribute('data-id')); }
     else if(act==='prod'){ window.accSelectProd(Number(b.getAttribute('data-i'))); }
     else if(act==='var'){ accordionProdIdx=Number(b.getAttribute('data-i')); window.accSelectVariant(b.getAttribute('data-v')); }
     else if(act==='perso-ok'){ accordionProdIdx=Number(b.getAttribute('data-i')); window.accConfirmPerso(); }
@@ -5722,7 +5790,19 @@ function pkAjouterOption(par,d){
 }
 
 window.accSelectCat=function(catId){
-  accordionCat=catId; pkOuvert=null; pkPerso=null; renderAccordion();
+  accordionCat=(accordionCat===catId?'':catId); pkOuvert=null; pkPerso=null; pkPrestaOuvert=null; renderAccordion();
+};
+function pkNombre(v){var n=Number(String(v==null?'':v).replace(',','.').replace(/\s|\u20ac/g,''));return (v===''||v==null||isNaN(n))?NaN:n;}
+window.pkAjouterPresta=function(id){
+  var pr=pkPrestataire(id); if(!pr) return;
+  var a=pkNombre(document.getElementById('pp-prix').value), b=pkNombre(document.getElementById('pp-orga').value);
+  if(!(a>0&&a<=20000)){ document.getElementById('pp-prix').focus(); return; }
+  if(isNaN(b)) b=0;
+  if(b<0||b>5000){ document.getElementById('pp-orga').focus(); return; }
+  if(!mandatValide(id)&&!confirm('Aucun mandat valide pour '+pr.nom+'. Ajouter quand m\u00eame la prestation ? (pensez \u00e0 faire signer le mandat)')) return;
+  modalPresta.push({pid:'p'+Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36),prestataire:id,nom:pkNomPresta(pr),prix:Math.round(a*100)/100,orga:Math.round(b*100)/100,prestation:true});
+  pkPrestaOuvert=null; renderPrestaModal(); pkToast('\u2713 '+pkNomPresta(pr)+' ajout\u00e9 \u00e0 la r\u00e9servation');
+  try{ renderAccordion(); }catch(e){}
 };
 window.accBack=function(step){ accordionStep=step; pkOuvert=null; pkPerso=null; renderAccordion(); };
 window.SP=function(idx){window.accSelectProd(idx);};
@@ -5757,11 +5837,17 @@ var pkFlashUid=null;
 var pkOd={};
 var modalRed=false;
 var modalPresta=[];
+/* Prestataires partenaires : la prestation est réalisée et facturée par le prestataire, Vespra encaisse pour son compte et coordonne */
+var PRESTATAIRES=[{id:'candice',libelle:'Serveuse privée',nom:'Candice'},{id:'emmanuel',libelle:'Chef pâtissier',nom:'Emmanuel'}];
+function pkPrestataire(id){return PRESTATAIRES.filter(function(p){return p.id===id;})[0]||null;}
+var pkPrestaOuvert=null, pkQuery='';
+function pkNomPresta(p){return p.libelle+' \u2014 '+p.nom;}
 try{fetch('/api/site').then(function(r){return r.ok?r.json():null}).then(function(j){var dl=document.getElementById('presta-noms');if(!dl||!j||!Array.isArray(j.prestations))return;j.prestations.forEach(function(x){if(x&&x.nom){var o=document.createElement('option');o.value=x.nom;dl.appendChild(o);}});}).catch(function(){});}catch(e){}
 function renderPrestaModal(){
   var el=document.getElementById('presta-list'); if(!el) return;
   el.innerHTML=modalPresta.map(function(x,i){
-    return '<div style="display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:6px 0;border-bottom:1px solid #eef0f4"><span>'+escHtmlBo(x.nom)+'</span><span>'+euroFr(Number(x.prix)||0)+' <a href="#" style="color:#8a93a3;margin-left:8px" onclick="retirerPrestaModal('+i+');return false">Retirer</a></span></div>';
+    var tot=(Number(x.prix)||0)+(x.prestataire?(Number(x.orga)||0):0);
+    return '<div style="display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:6px 0;border-bottom:1px solid #eef0f4"><span>'+escHtmlBo(x.nom)+(x.prestataire?'<br><small style="color:#7a8190">Prestation '+euroFr(Number(x.prix)||0)+' + Organisation '+euroFr(Number(x.orga)||0)+'</small>':'')+'</span><span>'+euroFr(tot)+' <a href="#" style="color:#8a93a3;margin-left:8px" onclick="retirerPrestaModal('+i+');return false">Retirer</a></span></div>';
   }).join('');
   var sm=document.getElementById('presta-summary'); if(sm) sm.textContent=modalPresta.length?('Ajouter une autre prestation ('+modalPresta.length+')'):'Ajouter une prestation';
 }
@@ -5776,7 +5862,14 @@ window.ajouterPrestaModal=function(){
 };
 window.retirerPrestaModal=function(i){ modalPresta.splice(i,1); renderPrestaModal(); try{ if(typeof renderProdTags==='function') renderProdTags(); }catch(e){} };
 function pkTotalMat(){var t=0;modalSel.forEach(function(x){var v=getProductPrice(x);t+=(v!=null?v:0);});return t;}
-function pkSuppSave(r){var sup=(r.supplements||[]).filter(function(x){return !x.offreMariage&&!x.prestation;}).concat(modalPresta.map(function(x){return {nom:x.nom,prix:x.prix,prestation:true};}));if(modalRed){var m=Math.round(pkTotalMat()*10)/100;if(m>0)sup.push({nom:'Réduction de 10 %',prix:-m,offreMariage:true});}r.supplements=sup;}
+function pkSuppSave(r){var sup=(r.supplements||[]).filter(function(x){return !x.offreMariage&&!x.prestation;});
+  modalPresta.forEach(function(x){
+    if(x.prestataire){
+      var pr=pkPrestataire(x.prestataire)||{libelle:x.nom,nom:''};
+      sup.push({nom:pr.libelle+' \u2014 r\u00e9alis\u00e9e par '+pr.nom+' (factur\u00e9e au nom et pour le compte de '+pr.nom+')',prix:Math.max(0,Number(x.prix)||0),prestation:true,tiers:true,prestataire:x.prestataire,prestaId:x.pid,reverse:x.reverse===true,reverseDate:x.reverse===true?(x.reverseDate||''):''});
+      if((Number(x.orga)||0)>0) sup.push({nom:'Organisation et coordination',prix:Number(x.orga),prestation:true,organisation:true,prestataire:x.prestataire,prestaId:x.pid});
+    } else sup.push({nom:x.nom,prix:x.prix,prestation:true});
+  });if(modalRed){var m=Math.round(pkTotalMat()*10)/100;if(m>0)sup.push({nom:'Réduction de 10 %',prix:-m,offreMariage:true});}r.supplements=sup;}
 function pkToast(msg){
   if(!/stock|erreur|impossible|aucun/i.test(String(msg||''))) return;
   var old=document.querySelector('.pk-toast'); if(old) old.remove();
@@ -6266,9 +6359,11 @@ function detailPrixHTML(r){
     lignes+=lignePEditable(fam.titre||'Montage et d\u00e9montage', mon, '', r.id, 'montage');
   }
   (r.supplements||[]).forEach(function(x,i){
-    lignes+=ligneP(escHtmlBo(x.nom||'Suppl\u00e9ment'), euroFr(Number(x.prix)||0), '',
+    var note=x.tiers?(x.reverse?'fonds de tiers \u00b7 revers\u00e9 le '+escHtmlBo(String(x.reverseDate||'')):'fonds de tiers \u00b7 \u00e0 reverser \u00e0 '+escHtmlBo((pkPrestataire(x.prestataire)||{nom:'son prestataire'}).nom)):(x.organisation?'revenu Vespra \u00b7 TTC':'');
+    lignes+=ligneP(escHtmlBo(x.nom||'Suppl\u00e9ment'), euroFr(Number(x.prix)||0), note,
       '<button class="dp-b sup" onclick="retirerSupplement(\''+r.id+'\','+i+')">Retirer</button>');
   });
+  try{ if(typeof mandatLienHTML==='function') lignes+=mandatLienHTML(r); }catch(e){}
   lignes+='<div class="dp-l" style="justify-content:flex-start"><button class="dp-b sup" style="font-weight:600" onclick="ajouterSupplement(\''+r.id+'\')">+ Ajouter une prestation</button></div>';
   var total = loc+liv+mon+sup;
   var acc = (r.acompte===true) ? Math.round(total*0.3*100)/100 : 0;
@@ -6426,7 +6521,9 @@ window.ajouterSupplement=function(id){
 window.retirerSupplement=function(id, i){
   var r=R.find(function(x){return String(x.id)===String(id);});
   if(!r||!r.supplements) return;
-  r.supplements.splice(i,1);
+  var _sx=r.supplements[i];
+  if(_sx&&_sx.prestaId){ r.supplements=r.supplements.filter(function(y){return !(y&&y.prestaId===_sx.prestaId);}); }   /* part prestataire et organisation partent ensemble */
+  else r.supplements.splice(i,1);
   enregistrerResa(r);
   openDetail(id);
   if(typeof planning==='function') planning();
@@ -6666,7 +6763,12 @@ function openModalEdit(id) {
   // Accordéon produits - restaurer les produits de la réservation
   modalSel=produitsNets(r.products).map(function(p){return Object.assign({},p);});
   modalRed=(r.supplements||[]).some(function(x){return x.offreMariage;});
-  modalPresta=(r.supplements||[]).filter(function(x){return x&&x.prestation;}).map(function(x){return {nom:x.nom,prix:x.prix,prestation:true};});renderPrestaModal();
+  modalPresta=[];(r.supplements||[]).forEach(function(x,i,sp){
+    if(!x||!x.prestation) return;
+    if(x.tiers){ var o=sp.filter(function(y){return y&&y.organisation&&y.prestaId===x.prestaId;})[0]; var pr=pkPrestataire(x.prestataire); modalPresta.push({pid:x.prestaId,prestataire:x.prestataire,nom:pr?pkNomPresta(pr):x.nom,prix:x.prix,orga:o?o.prix:0,reverse:x.reverse===true,reverseDate:x.reverseDate||'',prestation:true}); }
+    else if(x.organisation){ if(!sp.some(function(y){return y&&y.tiers&&y.prestaId===x.prestaId;})) modalPresta.push({nom:x.nom,prix:x.prix,prestation:true}); }
+    else modalPresta.push({nom:x.nom,prix:x.prix,prestation:true});
+  });renderPrestaModal();
   accordionStep='cats';accordionCat=null;accordionProdIdx=null;
   renderAccordion();
 
@@ -6772,6 +6874,7 @@ if(true){
 <script src="/studio/modal-garde.js"></script>
 <script src="/studio/reservation-pont.js?v=706"></script>
 <script src="/studio/reservation-plus.js"></script>
+<script src="/studio/mandats.js?v=1"></script>
 <script src="/studio/reservation-excel.js"></script>
 <script src="/studio/reservation-import.js"></script>
 <script src="/studio/reservation-vue.js"></script>

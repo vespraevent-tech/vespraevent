@@ -9442,7 +9442,7 @@ function accueilRender2(){
   let caM=0,caA=0,nA=0,acM=0,resteM=0,evts=[];
   if(w){
     w.R.filter(r=>r&&!r._deleted&&r.dateStart&&!(typeof w.enSuivi==='function'&&w.enSuivi(r))).forEach(r=>{
-      let t=0; try{ t=w.calcResTotal(r)||0; }catch(e){}
+      let t=0; try{ t=(w.calcResTotal(r)||0)-(typeof w.caTiers==='function'?w.caTiers(r):0); }catch(e){}   /* fonds de tiers hors CA */
       if(r.dateStart.slice(0,4)===an){ caA+=t; nA++; }
       if(r.dateStart.slice(0,7)===mois){ caM+=t; let a=0; try{ a=w.acompteRes(r)||0; }catch(e){} acM+=a; if(r.virementRecu!==true){ let lm=0; try{ lm=w.fraisLMSolde(r)||0; }catch(e){} resteM+=t-a-lm; } }
       if((r.dateEnd||r.dateStart)>=iso) evts.push(r);

@@ -119,7 +119,7 @@
     prods: 'vespraProds', cats: 'vespraCats', src: 'vespraSrc', frais: 'vespraFrais',
     fraisCats: 'vespraFraisCats', colors: 'vespraColors', clients: 'vespraClients',
     purchases: 'vespraPurchases', equipGroups: 'vespraEquipGroups',
-    factAchat: 'vespraFactAchat', tvaDecl: 'vespraTvaDecl',
+    factAchat: 'vespraFactAchat', tvaDecl: 'vespraTvaDecl', mandats: 'vespraMandats',
   };
 
   function configLocale() {
