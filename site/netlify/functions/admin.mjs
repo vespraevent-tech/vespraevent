@@ -2907,7 +2907,7 @@ const gestionnaire = async (request) => {
            les autres corrections, qui sont des champs de formulaire */
         const panier = body.corrections.panier;
         if (panier !== undefined && panier !== null) {
-          champs.c_panier = String(panier).slice(0, 8000);
+          champs.c_panier = String(panier).slice(0, 16000);
         }
       }
       /* Chaque enregistrement du suivi est une nouvelle ligne, et seule la

@@ -128,7 +128,7 @@
     ov.querySelectorAll('input[type=file]').forEach(function(f){
       f.onchange = function(){
         var file = f.files && f.files[0]; if (!file) return;
-        if (file.type !== 'application/pdf' || file.size > 1500000) { alert('Un PDF de 1,5 Mo maximum, svp.'); f.value = ''; return; }
+        if (file.type !== 'application/pdf' || file.size > 800000) { alert('Un PDF de 800 Ko maximum, svp.'); f.value = ''; return; }
         var rd = new FileReader(), id = f.closest('[data-mid]').getAttribute('data-mid');
         rd.onload = function(){ pdfs[id] = String(rd.result); f.parentNode.firstChild.textContent = 'PDF prêt : ' + file.name; };
         rd.readAsDataURL(file);
