@@ -1109,7 +1109,7 @@ if(urlCat){
         /* classement choisi dans le back-office : un produit rangé quelque part suit ce classement */
         const assoc={};cfg.forEach(c=>(c.produits||[]).forEach(id=>(assoc[String(id)]||(assoc[String(id)]=[])).push(c.nom)));
         const connus=new Set((d.categoriesConnus||[]).map(String));
-        if(Object.keys(assoc).length){PRODUCTS.forEach(p=>{const a=assoc[String(p.id)];if(a&&a.length){p.cats=a;p.cat=a[0];}else if(connus.has(String(p.id))){p.cats=[];}});}
+        if(Object.keys(assoc).length){PRODUCTS.forEach(p=>{const a=assoc[String(p.id)];if(a&&a.length){const base=(p.cats||[p.cat]).filter(Boolean).map(normCat);p.cats=a.concat(base.filter(c=>a.indexOf(c)<0));p.cat=a[0];}/* un produit absent du classement enregistré garde sa catégorie d'origine : il ne disparaît jamais du catalogue */});}
         const fs=document.getElementById('filterSelect');
         if(fs){const v=fs.value;fs.innerHTML='<option value="Tous">Toutes les catégories</option>'+P.map(c=>'<option value="'+String(c[0]).replace(/"/g,'&quot;')+'">'+c[0]+'</option>').join('');fs.value=P.some(c=>c[0]===v)?v:'Tous';applyFilters();}
       }
@@ -1166,7 +1166,7 @@ if(urlCat){
     /* l'adresse garde la catégorie : le retour depuis une fiche produit revient ici */
     /* entrée dans une catégorie depuis le choix : nouvelle étape d'historique, pour que « retour » revienne au choix des catégories */
     try{const u='catalogue.html?cat='+(v==='Tous'?'tout':encodeURIComponent(v));if(mode==='push')history.pushState(null,'',u);else if(mode!=='none')history.replaceState(null,'',u);}catch(e){}
-    setTimeout(function(){const f=document.querySelector('.cat-breadcrumb')||document.getElementById('filtersBar');if(f)window.scrollTo({top:Math.max(0,f.getBoundingClientRect().top+scrollY-78),behavior:'auto'});},60);
+    setTimeout(function(){const f=document.getElementById('prodGrid')||document.getElementById('filtersBar');if(f)window.scrollTo({top:Math.max(0,f.getBoundingClientRect().top+scrollY-88),behavior:'auto'});},60);
   }
   ul.addEventListener('click',function(e){
     const b=e.target.closest('button[data-i]');if(!b)return;
