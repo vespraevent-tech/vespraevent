@@ -220,3 +220,6 @@ html:root{--pill:8px}
 html:root:root body :is(.hs-btn,.btn-p,.btn-o,.btn-submit,.reserver-btn,.cart-btn,.pa-btn,.xm-cta,.cs-empty-btn,.ez-btn,.hero-catalogue-pdf,.btn-add-cart,.vc-btn-primary,.vc-btn-secondary,.pr-btn,.pr-submit,.c-checkout,.var-chip,.opt-chip,.ez-chip){border-radius:8px!important}
 
 html:root{--r:8px;--rl:8px}
+
+/* Boutons : coins peu arrondis partout (jamais en pilule) */
+html body .vcb-b,html body .ch-btn,html body .cc-go,html body .va-btn,html body .v-btn,html body .fin-rdv-in a,html body .pc-btn,html body .pc-cat{border-radius:10px!important}
