@@ -92,3 +92,7 @@
   .v-pg :is(div,p):has(>.v-btn+.v-lnk){display:flex;width:fit-content;max-width:100%;flex-direction:column;align-items:stretch;gap:16px}
   .v-pg .v-btn+.v-lnk{justify-content:center;text-align:center}
 }
+
+/* Un bandeau « Un événement à … ? » seul dans sa section : pas de grand vide autour */
+.v-sec:has(>.v-cl:only-child){padding-top:clamp(16px,2.5vw,28px);padding-bottom:clamp(16px,2.5vw,28px)}
+.v-sec:has(+ .v-sec>.v-cl:only-child){padding-bottom:clamp(16px,2.5vw,28px)}
