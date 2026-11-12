@@ -35,7 +35,7 @@
  '<li><i>'+ic.tel+'</i><a href="tel:+33650836828">06 50 83 68 28</a><small>Appel, SMS ou WhatsApp</small></li>'+
  '<li><i>'+ic.mail+'</i><a href="mailto:contact@vespraevent.com">contact@vespraevent.com</a><small>Réponse sous 24 h</small></li>'+
  '<li><i>'+ic.clock+'</i><span>Tous les jours, de 9 h à 20 h</span><small>Service client 7j/7</small></li>'+
- '<li><i>'+ic.pin+'</i><span>1 bis allée de la Haute Gasniais, 35500 Vitré</span><small>Livraison dans tout le grand Ouest</small></li></ul>'+
+ '<li><i>'+ic.pin+'</i><span>1 bis allée de la Haute Gasniais, 35500 Vitré</span><small>Livraison et installation</small></li></ul>'+
  '<div class="vcb-btns"><a class="vcb-b vcb-b1" href="tel:+33650836828">Appeler</a><a class="vcb-b vcb-b2" href="rendez-vous.html">Prendre rendez-vous</a></div>'+
  '<a class="vcb-lk" href="https://maps.app.goo.gl/Xx467HsxADjk95Tw8" target="_blank" rel="noopener">Voir notre fiche Google et nos avis →</a></div>'+
  '<div class="vcb-map"><iframe src="https://maps.google.com/maps?q=1+bis+all%C3%A9e+de+la+Haute+Gasniais+35500+Vitr%C3%A9&t=&z=13&ie=UTF8&iwloc=&output=embed" loading="lazy" title="Vespra Event — Vitré" allowfullscreen></iframe></div></div>';

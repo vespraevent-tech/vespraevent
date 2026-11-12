@@ -12,8 +12,7 @@
    quelqu'un l'ait écrite.
 
    Les règles de la maison sont appliquées ici, une fois pour
-   toutes : on écrit « grand Ouest » et jamais le nom de la
-   région, on loue et on ne vend pas, on ne se présente ni comme
+   toutes : on n'écrit jamais le nom de la région, on loue et on ne vend pas, on ne se présente ni comme
    agence événementielle ni comme organisateur.
 
    Utilisation :
@@ -67,8 +66,8 @@
   var INTERDITS = [
     /* le nom de la région, mais jamais à l'intérieur d'un nom de
        commune comme La Guerche-de-Bretagne */
-    { motif: /(?<![-\u2011])\bbretagne\b/gi, remplacement: 'grand Ouest',
-      note: 'la région a été remplacée par « grand Ouest »' },
+    { motif: /(?<![-\u2011])\bbretagne\b/gi, remplacement: '',
+      note: 'le nom de la région a été retiré' },
     { motif: /\bagence [ée]v[ée]nementielle\b/gi, remplacement: 'loueur de matériel',
       note: '« agence événementielle » n’est pas ce que vous êtes' },
     { motif: /\borganisateur (?:de soir[ée]es?|d[’']?[ée]v[ée]nements?)\b/gi, remplacement: 'loueur de matériel',
