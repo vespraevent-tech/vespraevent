@@ -107,6 +107,7 @@
       '.pc-cat:hover{background:#E9EEF5}',
       '.pc-mini{display:none}',
       '.pc-panel.vide h3{font-size:30px}',
+      '.pc-voir{display:none}',
 
       /* titres */
       '.pc-main .sec-tag{color:var(--pcn)}',
@@ -167,10 +168,10 @@
       '#formZone .form-input,#formZone .form-select,#formZone .form-textarea{border:1px solid #D5DBE5;padding:12px 15px;border-radius:14px}',
       '#formZone .form-input:focus,#formZone .form-select:focus,#formZone .form-textarea:focus{border-color:var(--pcn)}',
       '#formZone .form-label{font-size:11px;letter-spacing:.1em}',
-      '#formZone .qui-seg{display:grid;grid-template-columns:1fr 1fr;gap:0;width:100%;max-width:400px;padding:3px;background:#F3F5F9;border:1px solid #E3E7EE;border-radius:999px}',
+      '#formZone .qui-seg{display:grid;grid-template-columns:1fr 1fr;gap:0;width:100%;max-width:340px;padding:2px;background:#F3F5F9;border:1px solid #E3E7EE;border-radius:999px}',
       '#formZone .qui-seg::before{display:none}',
       '#formZone .qui-seg label{display:block;margin:0}',
-      '#formZone .qui-seg span{display:grid;place-items:center;text-align:center;min-height:34px;padding:7px 10px;font-size:13px;line-height:1.2;border-radius:999px;color:var(--g2)}',
+      '#formZone .qui-seg span{display:grid;place-items:center;text-align:center;min-height:28px;padding:5px 8px;font-size:12px;line-height:1.2;border-radius:999px;color:var(--g2)}',
       '#formZone .qui-seg span::before,#formZone .qui-seg span::after{display:none}',
       '#formZone .qui-seg input:checked + span{background:var(--pcn);color:#fff;font-weight:600}',
       '#formZone .radio-row{gap:6px 24px}',
@@ -180,6 +181,10 @@
       '#formZone .pa-fin .form-input::placeholder{font-size:12px;letter-spacing:.02em;color:#A0A9B7;font-weight:400}',
       '#formZone .pa-fin .pa-btn{border:1px solid #CBD2DD;padding:7px 15px;font-size:12px;font-weight:600;letter-spacing:.02em;color:var(--pcn)}',
       '#formZone .pa-fin .pa-btn:hover:not(:disabled){background:#F3F5F9;color:var(--pcn)}',
+      '#formZone #dateEvenement{font-size:13px;padding:9px 40px 9px 13px;border-radius:12px}',
+      '#formZone #dateEvenement::placeholder{font-size:12px;letter-spacing:.02em}',
+      '.dfr-wrap::after{width:16px!important;height:16px!important;margin-top:-8px!important;right:13px!important}',
+      '#formZone .btn-submit{white-space:nowrap;padding:15px 28px;font-size:14px}',
       '#formZone .btn-submit:disabled{opacity:.45;cursor:not-allowed}',
 
       /* téléphone : une page courte, un seul récapitulatif compact */
@@ -209,11 +214,8 @@
       '  .pc-mt small{font-family:Inter,sans-serif;font-size:11px;color:#D0DCEA}',
       '  .pc-mp small{display:block;font-size:12px;color:#D0DCEA;margin-bottom:7px}',
       '  .pc-panel.vide{padding:16px}',
-      '  .pc-panel.vide h3{display:block;font-size:24px;margin:0 0 8px}',
-      '  .pc-panel.vide .pc-s{display:block;font-size:13px;margin:0 0 8px}',
-      '  .pc-panel.vide .pc-s:nth-of-type(2){display:none}',
+      '  .pc-panel.vide h3{display:block}',
       '  .pc-panel.vide .pc-k{display:none}',
-      '  .pc-cat{padding:9px 18px;font-size:13px}',
       '  .pc-main .sec-tag{font-size:10px;margin-bottom:8px}',
       '  .pc-main .sec-h{font-size:32px;margin-bottom:14px}',
       '  .pc-lead{font-size:14px;margin:-4px 0 16px}',
@@ -221,7 +223,14 @@
       '  .pc-card{flex-direction:row;flex-wrap:wrap;border-radius:16px}.pc-card img{width:96px;height:auto;min-height:96px;flex:none}',
       '  .pc-cb{flex:1;min-width:0;padding:10px 12px 2px}.pc-cb h3{font-size:15px}.pc-cf{width:100%;padding:4px 12px 12px}',
       '  .cs-item{flex-wrap:wrap;border-radius:16px;padding:10px 12px;gap:10px}.cs-item-img{width:60px;height:46px}',
-      '  .voir-place{display:none}',
+      '  .voir-place,.pc-qty,.cs-item-opts{display:none!important}',
+      '  .cs-item{flex-wrap:nowrap}.cs-item-name{font-size:14.5px}',
+      '  .pc-voir{display:inline-block;background:none;border:0;padding:0;margin:0 16px 8px 0;font:inherit;font-size:12.5px;color:#fff;text-decoration:underline;text-underline-offset:3px;cursor:pointer}',
+      '  .pc-panel.vide .pc-vp{display:none}.pc-panel.vide.open .pc-vp{display:block}',
+      '  .pc-panel.vide .pc-s{font-size:12px;margin:0 0 6px}',
+      '  .pc-panel.vide h3{font-size:22px;margin:0 0 6px}',
+      '  .pc-cat{padding:7px 15px;font-size:12px;margin-top:2px}',
+      '  #formZone .btn-submit{padding:13px;font-size:14px}',
       '  .pc-nav{margin-top:18px}.pc-btn{padding:13px 26px}',
       '  #formZone .form-section-head{margin-bottom:14px}',
       '}'
@@ -277,13 +286,20 @@
       var l = document.getElementById('dateLabel');
       if (l) l.textContent = "Date de l'événement *";
     }
+    var mq = window.matchMedia('(max-width:640px)');
+    function texteEnvoi() {
+      var b = document.getElementById('submitBtn');
+      if (!b || /cours|rification/i.test(b.textContent)) return;
+      b.textContent = mq.matches ? 'Envoyer' : 'Envoyer ma demande de devis';
+    }
     var setIntentOrig = window.setIntent;
     window.setIntent = function () {
       if (typeof setIntentOrig === 'function') setIntentOrig.apply(this, arguments);
-      libelleDate();
+      libelleDate(); texteEnvoi();
     };
     if (rDevis && typeof setIntentOrig === 'function') setIntentOrig(rDevis);
-    libelleDate();
+    libelleDate(); texteEnvoi();
+    if (mq.addEventListener) mq.addEventListener('change', texteEnvoi);
 
     /* ── bouton d'envoi actif seulement quand les deux cases sont cochées ── */
     var c1 = document.getElementById('savoirOk'), c2 = document.getElementById('savoirOk2');
@@ -335,8 +351,9 @@
           '<ul class="pc-ul">' +
           etapeLi('cur', '', 'Remplir vos coordonnées', '') +
           etapeLi('', '', 'Envoi du devis', 'Réponse sous 24 h') + '</ul>' +
-          '<p class="pc-s">Vous pouvez envoyer votre demande avec un devis vide. Précisez dans la case « Message » le matériel que vous souhaitez.</p>' +
-          '<p class="pc-s">Vous souhaitez connaître les prix ? Rendez-vous sur notre catalogue et ajoutez le matériel qui vous plaît à votre devis.</p>' +
+          '<div class="pc-vp"><p class="pc-s">Vous pouvez envoyer votre demande avec un devis vide. Précisez dans la case « Message » le matériel que vous souhaitez.</p>' +
+          '<p class="pc-s">Vous souhaitez connaître les prix ? Rendez-vous sur notre catalogue et ajoutez le matériel qui vous plaît à votre devis.</p></div>' +
+          '<button type="button" class="pc-voir" aria-expanded="false">Voir plus</button>' +
           '<a class="pc-cat" href="catalogue.html">Voir le catalogue</a>';
         return;
       }
@@ -388,6 +405,13 @@
     }
 
     coque.addEventListener('click', function (ev) {
+      var vp = ev.target.closest('.pc-voir');
+      if (vp) {
+        var ouvert = $('#pcPanel').classList.toggle('open');
+        vp.textContent = ouvert ? 'Voir moins' : 'Voir plus';
+        vp.setAttribute('aria-expanded', ouvert);
+        return;
+      }
       var b = ev.target.closest('[data-go]');
       if (b) { ev.preventDefault(); aller(b.getAttribute('data-go')); }
     });
