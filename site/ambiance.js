@@ -722,3 +722,28 @@
   window.VESPRA_AMBIANCE = { theme: function () { return actif; }, auto: themeAuto, noms: NOMS, dates: DATES, paques: paquesDe };
   if (document.body) demarrer(); else document.addEventListener('DOMContentLoaded', demarrer);
 })();
+
+/* Téléphone : les boutons flottants (mode sombre, ambiance) gênent la lecture.
+   On les range en bas de page, dans le pied, au lieu de les laisser par-dessus. */
+(function () {
+  var mq = window.matchMedia('(max-width:640px)');
+  function ranger() {
+    if (!mq.matches || /\/studio\//.test(location.pathname)) return;
+    var pied = document.querySelector('footer'); if (!pied) return;
+    var w = document.getElementById('am-pied');
+    if (!w) {
+      var st = document.createElement('style');
+      st.textContent = '#am-pied{display:flex;gap:10px;padding:6px 20px 22px;background:inherit}' +
+        '#am-pied #am-btn,#am-pied #am-btn2{position:static!important;left:auto!important;bottom:auto!important;width:34px!important;height:34px!important;box-shadow:none!important}' +
+        '#am-pied svg{width:19px!important;height:19px!important}';
+      document.head.appendChild(st);
+      w = document.createElement('div'); w.id = 'am-pied'; pied.appendChild(w);
+    }
+    ['am-btn', 'am-btn2'].forEach(function (id) {
+      var b = document.getElementById(id); if (b && b.parentNode !== w) w.appendChild(b);
+    });
+  }
+  function demarrer() { ranger(); if (document.body) new MutationObserver(ranger).observe(document.body, { childList: true }); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', demarrer); else demarrer();
+  window.addEventListener('load', ranger);
+})();

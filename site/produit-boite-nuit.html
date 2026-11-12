@@ -1095,7 +1095,7 @@ function buildDrawerCSS(){
 .vc-total span:last-child{color:#2B4A6B;font-size:18px}
 .vc-btn-primary{display:block;background:#2B4A6B;color:#fff;text-align:center;padding:14px;border-radius:999px;font-size:15px;font-weight:700;text-decoration:none;transition:background .2s;margin-bottom:10px}
 .vc-btn-primary:hover{background:#1e3650}
-.vc-btn-secondary{display:block;background:#fff;color:#2B4A6B;text-align:center;padding:13px;border-radius:999px;font-size:14px;font-weight:600;text-decoration:none;border:2px solid #2B4A6B;transition:background .2s,color .2s}
+.vc-btn-secondary{display:block;background:#fff;color:#2B4A6B;text-align:center;padding:13px;border-radius:10px;font-size:14px;font-weight:600;text-decoration:none;border:2px solid #2B4A6B;width:100%;font-family:inherit;cursor:pointer;transition:background .2s,color .2s}
 .vc-btn-secondary:hover{background:#2B4A6B;color:#fff}
 .vc-note{font-size:11px;color:#646D7C;text-align:center;margin-top:10px;line-height:1.5}
 `;
@@ -1122,7 +1122,7 @@ function buildDrawerDOM(){
   </label>
   <div class="vc-total"><span>Total (devis)</span><span id="vc-total-val">0 €</span></div>
   <a href="reservation.html" class="vc-btn-primary">Envoyer mon devis →</a>
-  <a href="catalogue.html" class="vc-btn-secondary">Continuer à choisir</a>
+  <button type="button" class="vc-btn-secondary" onclick="closeCart()">Continuer ma sélection</button>
   <p class="vc-note">Devis gratuit, sans engagement. Notre équipe vous recontacte sous 24h.</p>
 </div>`;
   document.body.appendChild(overlay);

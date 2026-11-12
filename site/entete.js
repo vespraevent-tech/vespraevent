@@ -383,6 +383,7 @@
     var s = document.createElement('style');
     s.textContent = [
       '.cat-fab-w{position:fixed;right:10px;bottom:10px;z-index:900}',
+      '@media(max-width:640px){.cat-fab-w{display:none!important}}',
       '.cat-fab{display:flex;align-items:center;gap:7px;padding:5px 10px 5px 5px;background:#fff;border:1px solid #e3e5ea;border-radius:10px;box-shadow:0 2px 10px rgba(20,24,35,.1);font:500 11px/1.2 Inter,system-ui,sans-serif;color:#2b303b;cursor:pointer;text-align:left}',
       '.cat-fab-x{position:absolute;top:-7px;left:-7px;width:18px;height:18px;padding:0;border-radius:50%;border:1px solid #e3e5ea;background:#fff;color:#646D7C;font-size:10px;line-height:1;cursor:pointer}',
       '.cat-fab img{width:22px;height:31px;object-fit:cover;border-radius:4px;border:1px solid #e3e5ea}',
