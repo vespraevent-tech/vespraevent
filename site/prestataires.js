@@ -39,12 +39,6 @@ window.VESPRA_PRESTATAIRES = [
     mot: "Possibilité d'acheter des boissons (bière, vin…) et de louer des tireuses à bière pour votre événement.",
     site: "https://www.instagram.com/3b_bar_craftbeer/", tel: "", exemple: false, rang: 5000
   },
-  {
-    metier: "Bar & cave", nom: "V and B Vitré", type: "Cave et bar",
-    commune: "Vitré",
-    mot: "Cave et bar à Vitré : bières, vins et spiritueux, avec la possibilité de commander en volume pour une réception.",
-    site: "https://www.vandb.fr/v-and-b-vitre.html", tel: "", exemple: false
-  },
 
   /* ——— Service ——— */
   {
