@@ -112,7 +112,7 @@ def head_for(title, desc, url, ld, img='photobooth.webp'):
     head = re.sub(r'<meta property="og:image" content="[^"]*">', f'<meta property="og:image" content="{BASE}/{img}">', head)
     head = re.sub(r'<link rel="canonical" href="[^"]*">', f'<link rel="canonical" href="{url}">', head)
     head = re.sub(r'<script type="application/ld\+json">.*?</script>', '<script type="application/ld+json">' + json.dumps(ld, ensure_ascii=False) + '</script>', head, count=1, flags=re.S)
-    head = head.replace('<link rel="stylesheet" href="/hero-ville.css?v=989">', '<link rel="stylesheet" href="/hero-ville.css?v=989">\n<link rel="stylesheet" href="/ville-pages.css?v=1">')
+    head = head.replace('<link rel="stylesheet" href="/hero-ville.css?v=989">', '<link rel="stylesheet" href="/hero-ville.css?v=989">\n<link rel="stylesheet" href="/ville-pages.css?v=4">')
     head = re.sub(r'<link rel="preload"[^>]*hero-zones-livraison[^>]*>', '', head)
     foot = re.sub(r'<script src="/hero-ville.js[^"]*"></script>\s*', '', foot)
     foot = re.sub(r'<script src="/salles.js"></script>\s*', '', foot)

@@ -81,3 +81,14 @@
 .v-car{display:flex;gap:18px;overflow-x:auto;padding:12px 4px 28px;scrollbar-width:none;cursor:grab;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}.v-car::-webkit-scrollbar{display:none}.v-car.v-dn{cursor:grabbing}
 .v-evc{position:relative;width:340px;height:440px;flex:none;border-radius:28px;overflow:hidden;color:#fff;isolation:isolate}.v-evc img{position:absolute;inset:0;z-index:-2;transition:transform 1s var(--v-e)}.v-evc:hover img{transform:scale(1.06)}.v-evc:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,#0b1522f2 10%,#0b152200 62%)}
 .v-evc div{position:absolute;left:22px;right:22px;bottom:22px}.v-evc h3{font:400 36px/1 'Bebas Neue',sans-serif;color:#fff}.v-evc p{font-size:13.5px;color:#ffffffd6;margin-top:6px}@media(max-width:560px){.v-evc{width:78vw;height:400px}}
+
+/* Boutons des pages villes / pro : la règle « .v-pg a{color:inherit} » rendait le texte noir sur fond bleu */
+.v-pg a.v-b2{color:#fff}
+.v-pg a.v-b1{color:var(--v-ink)}
+.v-pg a.v-lnk{color:var(--v-navy)}
+.v-pg a.v-azp{color:#fff}
+/* Téléphone : le lien sous un bouton est centré sur le bouton, pas collé à son bord gauche */
+@media(max-width:900px){
+  .v-pg :is(div,p):has(>.v-btn+.v-lnk){display:flex;width:fit-content;max-width:100%;flex-direction:column;align-items:stretch;gap:16px}
+  .v-pg .v-btn+.v-lnk{justify-content:center;text-align:center}
+}

@@ -724,26 +724,33 @@
 })();
 
 /* Téléphone : les boutons flottants (mode sombre, ambiance) gênent la lecture.
-   On les range en bas de page, dans le pied, au lieu de les laisser par-dessus. */
+   Ils sont cachés, et n'apparaissent à côté du bouton du menu que lorsque le menu est déplié. */
 (function () {
-  var mq = window.matchMedia('(max-width:640px)');
-  function ranger() {
-    if (!mq.matches || /\/studio\//.test(location.pathname)) return;
-    var pied = document.querySelector('footer'); if (!pied) return;
-    var w = document.getElementById('am-pied');
-    if (!w) {
-      var st = document.createElement('style');
-      st.textContent = '#am-pied{display:flex;gap:10px;padding:6px 20px 22px;background:inherit}' +
-        '#am-pied #am-btn,#am-pied #am-btn2{position:static!important;left:auto!important;bottom:auto!important;width:34px!important;height:34px!important;box-shadow:none!important}' +
-        '#am-pied svg{width:19px!important;height:19px!important}';
-      document.head.appendChild(st);
-      w = document.createElement('div'); w.id = 'am-pied'; pied.appendChild(w);
-    }
+  var mq = window.matchMedia('(max-width:960px)');
+  if (/\/studio\//.test(location.pathname)) return;
+  var st = document.createElement('style');
+  st.textContent = '@media(max-width:960px){#am-btn,#am-btn2{display:none!important}' +
+    'html.am-menu #am-btn,html.am-menu #am-btn2{display:flex!important;position:fixed!important;bottom:auto!important;width:34px!important;height:34px!important;box-shadow:none!important;z-index:100000!important;animation:amIn .2s ease both}' +
+    'html.am-menu #am-btn svg,html.am-menu #am-btn2 svg{width:19px!important;height:19px!important}}' +
+    '@keyframes amIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}';
+  document.head.appendChild(st);
+  function placer() {
+    var nav = document.querySelector('.nav'), liens = document.getElementById('navLinks');
+    var ouvert = !!(mq.matches && liens && liens.classList.contains('open'));
+    document.documentElement.classList.toggle('am-menu', ouvert);
+    if (!ouvert || !nav) return;
+    var r = nav.getBoundingClientRect(), x = 62;
     ['am-btn', 'am-btn2'].forEach(function (id) {
-      var b = document.getElementById(id); if (b && b.parentNode !== w) w.appendChild(b);
+      var b = document.getElementById(id); if (!b) return;
+      b.style.setProperty('top', Math.round(r.top + (r.height - 34) / 2) + 'px', 'important');
+      b.style.setProperty('left', x + 'px', 'important');
+      x += 42;
     });
   }
-  function demarrer() { ranger(); if (document.body) new MutationObserver(ranger).observe(document.body, { childList: true }); }
+  function demarrer() {
+    var liens = document.getElementById('navLinks'); if (!liens) return;
+    new MutationObserver(placer).observe(liens, { attributes: true, attributeFilter: ['class'] });
+    window.addEventListener('resize', placer); placer();
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', demarrer); else demarrer();
-  window.addEventListener('load', ranger);
 })();
