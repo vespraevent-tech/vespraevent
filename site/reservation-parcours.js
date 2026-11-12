@@ -106,6 +106,7 @@
       '.pc-cat{display:inline-block;margin-top:6px;background:#fff;color:var(--pcd);border-radius:999px;padding:11px 22px;font-size:14px;font-weight:700;text-decoration:none}',
       '.pc-cat:hover{background:#E9EEF5}',
       '.pc-mini{display:none}',
+      '.pc-steps.deux{grid-template-columns:1fr 1fr}',
       '#pcMiniBas{display:none}',
       '.pc-panel.vide h3{font-size:30px}',
       '.pc-voir{display:none}',
@@ -211,7 +212,7 @@
       '  .pc-mini{display:block}',
       '  .pc[data-e="sel"] #pcPanel{display:none}',
       '  .pc[data-e="sel"] #pcMiniBas{display:block;background:var(--pcd);color:#fff;border-radius:18px;padding:14px 16px;margin-top:14px}',
-      '  .pc-mt{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px}',
+      '  .pc-mt{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}',
       '  .pc-mt span{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#D0DCEA}',
       '  .pc-mt b{font-family:"Bebas Neue",sans-serif;font-weight:400;font-size:34px;line-height:1;color:#fff}',
       '  .pc-mt small{font-family:Inter,sans-serif;font-size:11px;color:#D0DCEA}',
@@ -219,7 +220,16 @@
       '  .pc-panel.vide{padding:16px}',
       '  .pc-panel.vide h3{display:block}',
       '  .pc-panel.vide .pc-k{display:none}',
-      '  .pc-main .sec-tag{font-size:10px;margin-bottom:8px}',
+      '  .pc-main .sec-tag{display:none}',
+      '  .cs-item-img{display:block!important;width:56px;height:42px;object-fit:cover;border-radius:8px}',
+      '  .cart-summary{display:flex;flex-direction:column}',
+      '  .cs-items{order:1}.cs-head{order:2;justify-content:flex-start;margin:10px 0 0}',
+      '  .cs-edit{font-size:13px;font-weight:600}',
+      '  .pc-btn{border-radius:10px;padding:10px 22px;font-size:14px}',
+      '  .pc-cat{border-radius:10px}',
+      '  #formZone .btn-submit{border-radius:10px}',
+      '  #pcMiniBas{border-radius:14px!important}.pc-panel{border-radius:14px}',
+      '  .pc-nav.fin{justify-content:flex-end}',
       '  .pc-main .sec-h{font-size:32px;margin-bottom:14px}',
       '  .pc-lead{font-size:14px;margin:-4px 0 16px}',
       '  .pc-sug{grid-template-columns:1fr;gap:10px}',
@@ -324,6 +334,7 @@
     var liste = [];
     var ids = { sel: 1, idees: 2, coord: 3 };
 
+    var mob = window.matchMedia('(max-width:640px)');
     function nbEcrans() { return vide() ? 1 : 3; }
 
     function dessinerFil() {
@@ -333,10 +344,10 @@
         f.innerHTML = '<div class="pc-st on"><i></i><span><em>1</em>Vos coordonnées</span></div>';
         return;
       }
-      f.className = 'pc-steps';
-      var noms = [['sel', 'Votre sélection'], ['idees', 'À ne pas oublier'], ['coord', 'Vos coordonnées']];
+      var noms = mob.matches ? [['sel', 'Votre sélection'], ['coord', 'Vos coordonnées']] : [['sel', 'Votre sélection'], ['idees', 'À ne pas oublier'], ['coord', 'Vos coordonnées']];
+      f.className = 'pc-steps' + (mob.matches ? ' deux' : '');
       f.innerHTML = noms.map(function (x, i) {
-        var n = i + 1, c = ids[ecran], cl = n === c ? 'on' : (n < c || n <= atteint && n < c ? 'ok' : '');
+        var n = i + 1, c = mob.matches ? (ecran === 'coord' ? 2 : 1) : ids[ecran], cl = n === c ? 'on' : (n < c || n <= atteint && n < c ? 'ok' : '');
         if (n < c) cl = 'ok';
         return '<' + (cl === 'ok' ? 'button type="button" data-go="' + x[0] + '"' : 'div') + ' class="pc-st ' + cl + '"><i></i><span><em>' +
           (cl === 'ok' ? '✓' : n) + '</em>' + x[1] + '</span></' + (cl === 'ok' ? 'button' : 'div') + '>';
@@ -389,9 +400,11 @@
       if (tag3) tag3.textContent = v ? 'Vos coordonnées' : 'Étape 3 sur 3';
     }
 
+    if (mob.addEventListener) mob.addEventListener('change', function () { maj(); });
     function maj() {
       coque.setAttribute('data-v', vide() ? '1' : '0');
       if (vide() && ecran !== 'coord') ecran = 'coord';
+      if (mob.matches && ecran === 'idees') ecran = 'coord';
       coque.setAttribute('data-e', ecran);
       majTitres();
       dessinerFil();
@@ -400,6 +413,7 @@
 
     function aller(cible, sansDefiler) {
       if (vide()) cible = 'coord';
+      if (mob.matches && cible === 'idees') cible = (ecran === 'coord') ? 'sel' : 'coord';
       if (cible === 'idees') calculerIdees();
       ecran = cible;
       if (ids[cible] > atteint) atteint = ids[cible];
@@ -433,6 +447,16 @@
       var lignes = document.querySelectorAll('#csItems .cs-item');
       Array.prototype.forEach.call(lignes, function (el, i) {
         if (el.querySelector('.pc-qty') || !_cart[i]) return;
+        if (!el.querySelector('.cs-item-img')) {
+          var nomP = String(_cart[i].name || '').toLowerCase(), im = '';
+          try {
+            (window.VESPRA_PRODUITS || []).some(function (p) {
+              var n = String(p.nom || '').toLowerCase();
+              if (n && (n === nomP || nomP.indexOf(n) === 0 || n.indexOf(nomP) === 0)) { im = p.imgCat || p.img; return true; }
+            });
+          } catch (e) {}
+          if (im) { var g = document.createElement('img'); g.className = 'cs-item-img'; g.alt = ''; g.src = im; el.insertBefore(g, el.firstChild); }
+        }
         var q = _cart[i].qty || 1, mx = qmax(_cart[i]);
         var box = document.createElement('div');
         box.className = 'pc-qty';
