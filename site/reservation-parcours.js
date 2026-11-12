@@ -106,6 +106,7 @@
       '.pc-cat{display:inline-block;margin-top:6px;background:#fff;color:var(--pcd);border-radius:999px;padding:11px 22px;font-size:14px;font-weight:700;text-decoration:none}',
       '.pc-cat:hover{background:#E9EEF5}',
       '.pc-mini{display:none}',
+      '#pcMiniBas{display:none}',
       '.pc-panel.vide h3{font-size:30px}',
       '.pc-voir{display:none}',
 
@@ -208,6 +209,8 @@
       '  .pc-panel{padding:14px 16px;border-radius:18px}',
       '  .pc-panel .pc-k,.pc-panel h3,.pc-panel .pc-ul,.pc-panel .pc-tot,.pc-panel>.pc-s,.pc-panel .pc-ret{display:none}',
       '  .pc-mini{display:block}',
+      '  .pc[data-e="sel"] #pcPanel{display:none}',
+      '  .pc[data-e="sel"] #pcMiniBas{display:block;background:var(--pcd);color:#fff;border-radius:18px;padding:14px 16px;margin-top:14px}',
       '  .pc-mt{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px}',
       '  .pc-mt span{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#D0DCEA}',
       '  .pc-mt b{font-family:"Bebas Neue",sans-serif;font-weight:400;font-size:34px;line-height:1;color:#fff}',
@@ -273,6 +276,9 @@
     var nav1 = document.createElement('div');
     nav1.className = 'pc-nav fin';
     nav1.innerHTML = '<button type="button" class="pc-btn" data-go="idees">Suivant →</button>';
+    var bas = document.createElement('div');
+    bas.id = 'pcMiniBas';
+    cart.appendChild(bas);
     cart.appendChild(nav1);
 
     var tag3 = $('.form-section-head .sec-tag', form), h3 = $('.form-section-head .sec-h', form);
@@ -364,6 +370,7 @@
       var seg = ''; for (var q = 0; q < i.seuil; q++) seg += '<i' + (q < i.n ? ' class="on"' : '') + '></i>';
       var mini = '<div class="pc-mini"><div class="pc-mt"><span>Total du devis</span><b>' + eur(i.net) + (devis ? ' <small>+ sur devis</small>' : '') + '</b></div>' +
         '<div class="pc-mp"><small>' + (i.actif ? '−10\u00a0% obtenu' : pluriel(i.n) + ' · encore ' + i.restant + ' pour −10\u00a0%') + '</small><span class="pc-seg' + (i.actif ? ' full' : '') + '">' + seg + '</span></div></div>';
+      var bs = $('#pcMiniBas'); if (bs) bs.innerHTML = mini;
       p.className = 'pc-panel';
       p.innerHTML = mini + '<p class="pc-k">Total du devis</p><h3>Votre parcours</h3><ul class="pc-ul">' +
         etapeLi(e === 1 ? 'cur' : 'ok', e === 1 ? '' : COCHE, 'Sélection validée', e === 1 ? '' : 'Votre panier est prêt') +
