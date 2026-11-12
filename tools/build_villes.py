@@ -349,20 +349,31 @@ def photobooth_page(d):
 HERO_MAT = ['ambiance-soiree.webp', 'boite-nuit-situation.webp', 'etincelles-froides-situation.webp', 'tente-etoile-situation.webp', 'barnum-situation.webp', 'jeux-lumieres-situation.webp', 'boule-facettes-situation.webp', 'popcorn-situation.webp']
 
 
+# Produits mis en avant sur les pages villes : uniquement les gros produits, ceux qui font envie
+# (structures gonflables, photobooth, tentes étoile, barnums, feux d'artifice, voitures de collection,
+# baby-foot…). Rien en dessous de 60 €.
+STAR_IDS = ['p3', 'p46', 'p31', 'p24', 'p50', 'p51', 'p6', 'p38', 'p39', 'p37', 'p36', 'p44', 'p9', 'p5',
+            'p22', 'p35', 'p41', 'p55', 'p56', 'p57', 'p54', 'p34', 'p1']
+
+
 def mix_ids(sl, salt, pro=False, n=11):
+    pool = [p for p in PRODUCTS if p['id'] in STAR_IDS and p['price'] >= 60]
     used = set(); out = []
+    # un produit par catégorie d'abord (variété), puis on complète avec les plus beaux restants
     for k in shuffled(sl, salt, CATS):
-        pool = [p for p in PRODUCTS if k in (p.get('cats') or [p['cat']]) and p['id'] not in used]
-        if not pool: continue
-        if pro:
-            pool.sort(key=lambda p: -p['price'])
-            if pool[0]['price'] < 40: continue
-            pool = pool[:2]
-        else:
-            f = [p for p in pool if p['price'] >= 15]
-            pool = f or pool
-        p = shuffled(sl, salt + k, pool)[0]
+        cand = [p for p in pool if p['cat'] == k and p['id'] not in used]
+        if not cand: continue
+        p = shuffled(sl, salt + k, cand)[0]
+        if k == 'Photobooth et accessoires':
+            p = next((x for x in cand if x['id'] == 'p3'), p)
         used.add(p['id']); out.append(p['id'])
+    rest = [p for p in shuffled(sl, salt + 'reste', pool) if p['id'] not in used]
+    for p in rest:
+        if len(out) >= n: break
+        used.add(p['id']); out.append(p['id'])
+    # le photobooth, produit phare, ouvre toujours le carrousel
+    if 'p3' in out:
+        out.remove('p3'); out.insert(0, 'p3')
     return out[:n]
 
 
@@ -424,7 +435,7 @@ PRO_EVENTS = [('mange-debout.webp', 'Séminaires', "Accueil, restauration, sonor
               ('jeux-lumieres-situation.webp', "Événements de fin d'année", "Lumière, musique et animations pour réunir vos équipes en fin d'année.", 'catalogue.html?evt=entreprise'),
               ('barnum-situation.webp', 'Associations et collectivités', 'Kermesses, repas, fêtes de village : du matériel pour accueillir beaucoup de monde.', 'catalogue.html')]
 LOGOS = ['t-logo-armor-wash', 't-logo-viva-tattoo', 't-logo-3b-cave', 't-logo-animal-trak', 't-logo-blanchard', 't-logo-jerrigan', 't-logo-libre-inspi', 't-logo-cooper-standard', 't-logo-passion-reception', 'logo-netflix', 't-logo-seche']
-PRO_IDS = ['p39', 'p22', 'p9', 'p5', 'p41', 'p50', 'p3', 'p8', 'p37', 'p35']
+PRO_IDS = ['p6', 'p39', 'p22', 'p9', 'p5', 'p50', 'p3', 'p37', 'p36', 'p51', 'p41']
 
 
 def pro_page():
