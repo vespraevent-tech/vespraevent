@@ -84,7 +84,7 @@ html body .off-cta,html body .cta-engage .cta-btns,html body .bests-cta{justify-
 html body .hero-cta>*,html body .hs-cta>*,html body .off-cta>*,html body .cta-engage .cta-btns>*{flex:0 1 auto;width:auto;min-width:0;white-space:nowrap}
 @media(max-width:560px){
   html body .hero-cta,html body .hs-cta,html body .off-cta,html body .cta-engage .cta-btns{gap:8px}
-  html body .hero-cta>*,html body .hs-cta>*,html body .off-cta>*,html body .cta-engage .cta-btns>*{padding-left:14px!important;padding-right:14px!important;font-size:11px!important;letter-spacing:.04em!important}
+  html body .hero-cta>*,html body .hs-cta>*,html body .off-cta>*,html body .cta-engage .cta-btns>*{padding-left:14px!important;padding-right:14px!important;font-size:9.8px!important;letter-spacing:.05em!important}
 }
 @media(max-width:340px){html body .hero-cta,html body .hs-cta,html body .off-cta,html body .cta-engage .cta-btns{flex-wrap:wrap}}
 

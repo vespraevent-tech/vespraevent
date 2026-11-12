@@ -223,3 +223,4 @@ html:root{--r:8px;--rl:8px}
 
 /* Boutons : coins peu arrondis partout (jamais en pilule) */
 html body .vcb-b,html body .ch-btn,html body .cc-go,html body .va-btn,html body .v-btn,html body .fin-rdv-in a,html body .pc-btn,html body .pc-cat{border-radius:10px!important}
+
