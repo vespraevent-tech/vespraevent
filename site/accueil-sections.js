@@ -181,10 +181,20 @@ function defile(w,cards,copies,vit){
  if(document.readyState==='complete')init();else addEventListener('load',init);
  addEventListener('resize',mesure);
 }
+function tirage(el,ids){
+  /* data-shuffle : ordre différent à chaque visite ; data-exclusive : un seul produit du groupe ; data-pick : nombre gardé */
+  if(!el.hasAttribute('data-shuffle'))return ids;
+  var a=ids.slice();
+  for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}
+  var ex=(el.getAttribute('data-exclusive')||'').split(',').filter(Boolean);
+  if(ex.length){var vu=false;a=a.filter(function(x){if(ex.indexOf(x)<0)return true;if(vu)return false;vu=true;return true;});}
+  var n=parseInt(el.getAttribute('data-pick'),10);if(n>0)a=a.slice(0,n);
+  return a;
+}
 function vc(){
   document.querySelectorAll('[data-vcar]').forEach(function(el){
     if(el.__vcar)return;el.__vcar=1;
-    var id=el.getAttribute('data-vcar'),ids=(el.getAttribute('data-ids')||'').split(',').filter(Boolean);
+    var id=el.getAttribute('data-vcar'),ids=tirage(el,(el.getAttribute('data-ids')||'').split(',').filter(Boolean));
     carrousel({wrap:id+'Wrap',track:id+'Track',dots:id+'Dots',prev:id+'Prev',next:id+'Next',ids:ids.length?ids:BEST,bo:el.hasAttribute('data-bo'),add:el.hasAttribute('data-add')});
   });
 }
@@ -195,7 +205,7 @@ function init(){
     setTimeout(function(){setInterval(function(){im[k].classList.remove('on');k=(k+1)%im.length;im[k].classList.add('on');},4200);},(parseInt(c.dataset.d,10)%5)*800);});
   document.querySelectorAll('[data-vcar]').forEach(function(el){
     if(el.__vcar)return;el.__vcar=1;
-    var id=el.getAttribute('data-vcar'),ids=(el.getAttribute('data-ids')||'').split(',').filter(Boolean);
+    var id=el.getAttribute('data-vcar'),ids=tirage(el,(el.getAttribute('data-ids')||'').split(',').filter(Boolean));
     carrousel({wrap:id+'Wrap',track:id+'Track',dots:id+'Dots',prev:id+'Prev',next:id+'Next',ids:ids.length?ids:BEST,bo:el.hasAttribute('data-bo'),add:el.hasAttribute('data-add')});
   });
 }

@@ -119,7 +119,7 @@ def head_for(title, desc, url, ld, img='photobooth.webp'):
     return head, SCRIPTS + foot
 
 
-SCRIPTS = '<script src="/carrousel.js"></script>\n<script src="/nav-actif.js" defer></script>\n<script src="/accueil-sections.js?v=7" defer></script>\n<script src="/contact-bloc.js" defer></script>\n'
+SCRIPTS = '<script src="/carrousel.js"></script>\n<script src="/nav-actif.js" defer></script>\n<script src="/accueil-sections.js?v=8" defer></script>\n<script src="/contact-bloc.js" defer></script>\n'
 LB = None
 def local_business():
     global LB
@@ -391,10 +391,10 @@ def materiel_page(d):
     sub = pick(sl, 'subm', subs)
     hero = f'''<section class="hero{' flip' if flip else ''}"><div class="tx"><div class="crumb"><a href="/">Accueil</a> › <b>{esc(n)}</b></div><h1>Location de matériel événementiel à <em>{esc(n)}</em></h1><p class="sub">{sub}</p><div><a class="btn b1" href="catalogue.html">Voir le catalogue</a></div></div>
 <div class="ph"><img src="{h_main}" alt="Location de matériel événementiel à {esc(n)}" fetchpriority="high"><div class="pol b"><img src="{h1_}" alt="" loading="lazy"></div><div class="pol a"><img src="{h2_}" alt="" loading="lazy"></div></div></section>'''
-    ids = ','.join(mix_ids(sl, 'mat'))
+    ids = ','.join(STAR_IDS)
     ttl = pick(sl, 'bt', [f'LE PLUS DEMANDÉ<br>À {esc(n.upper())}', 'DÉCOUVREZ UN APERÇU<br>DE NOS ÉQUIPEMENTS', f'POUR VOTRE<br>ÉVÉNEMENT À {esc(n.upper())}'])
     best = BESTS_BLOCK
-    best = best.replace('data-ids="p3,p8,p36,p9"', f'data-ids="{ids}"')
+    best = best.replace('data-ids="p3,p8,p36,p9"', f'data-ids="{ids}" data-shuffle data-pick="11" data-exclusive="p50,p51"')
     best = re.sub(r'<h2 class="sec-h">.*?</h2>', f'<h2 class="sec-h">{ttl}</h2>', best, flags=re.S)
     best = best.replace('Sur le secteur', pick(sl, 'bs', ['Sur le secteur', 'Nos équipements', f'Autour de {esc(n)}']))
     best = best.replace('bestsDem', 'bestsV')
@@ -435,14 +435,14 @@ PRO_EVENTS = [('mange-debout.webp', 'Séminaires', "Accueil, restauration, sonor
               ('jeux-lumieres-situation.webp', "Événements de fin d'année", "Lumière, musique et animations pour réunir vos équipes en fin d'année.", 'catalogue.html?evt=entreprise'),
               ('barnum-situation.webp', 'Associations et collectivités', 'Kermesses, repas, fêtes de village : du matériel pour accueillir beaucoup de monde.', 'catalogue.html')]
 LOGOS = ['t-logo-armor-wash', 't-logo-viva-tattoo', 't-logo-3b-cave', 't-logo-animal-trak', 't-logo-blanchard', 't-logo-jerrigan', 't-logo-libre-inspi', 't-logo-cooper-standard', 't-logo-passion-reception', 'logo-netflix', 't-logo-seche']
-PRO_IDS = ['p6', 'p39', 'p22', 'p9', 'p5', 'p50', 'p3', 'p37', 'p36', 'p51', 'p41']
+PRO_IDS = ['p6', 'p39', 'p38', 'p37', 'p36', 'p44', 'p34', 'p3', 'p1', 'p5', 'p9', 'p22', 'p46']
 
 
 def pro_page():
     url = f'{BASE}/evenements-pro'
     lg = ''.join(f'<img src="{l}.webp" alt="" loading="lazy">' for l in LOGOS)
     evc = ''.join(f'<a class="evc" href="{h}"><img src="{i}" alt="{esc(t)}" loading="lazy"><div><h3>{esc(t)}</h3><p>{esc(p)}</p></div></a>' for i, t, p, h in PRO_EVENTS)
-    best = BESTS_BLOCK.replace('data-ids="p3,p8,p36,p9"', 'data-ids="' + ','.join(PRO_IDS) + '"').replace('bestsDem', 'bestsPro')
+    best = BESTS_BLOCK.replace('data-ids="p3,p8,p36,p9"', 'data-ids="' + ','.join(PRO_IDS) + '" data-shuffle data-pick="11"').replace('bestsDem', 'bestsPro')
     best = re.sub(r'<h2 class="sec-h">.*?</h2>', '<h2 class="sec-h">CE QUE NOUS INSTALLONS<br>LE PLUS SOUVENT</h2>', best, flags=re.S).replace('Sur le secteur', 'Le matériel qui marque vos événements')
     faq = [("Pouvez-vous établir une facture au nom de notre entreprise ou association ?", "Oui. Dans le formulaire de demande, choisissez « Entreprise ou association » et indiquez la raison sociale, le SIRET et, si vous en avez un, le numéro de TVA. Le paiement se fait par virement."),
            ("Livrez-vous en dehors de Vitré ?", "Oui, dans tout le grand Ouest : Ille-et-Vilaine, Mayenne, Côtes-d'Armor et Loire-Atlantique. La livraison est offerte à Vitré ; ailleurs, elle est possible sur devis."),
