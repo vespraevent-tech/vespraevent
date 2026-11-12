@@ -37,33 +37,35 @@
     st.id = 'dateFrStyle';
     st.textContent = [
       '.dfr-wrap{position:relative;display:block}',
-      '.dfr-cal{position:absolute;z-index:3000;top:calc(100% + 6px);left:0;width:290px;max-width:100%;',
-      '  background:#fff;border:1px solid var(--g3,#C8CDD8);border-radius:14px;',
-      '  box-shadow:0 14px 40px rgba(12,15,20,.16);padding:12px;',
+      '.dfr-wrap::after{content:"";position:absolute;right:14px;top:50%;width:19px;height:19px;margin-top:-9.5px;pointer-events:none;',
+      '  background:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%232B4A6B\' stroke-width=\'1.7\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Crect x=\'3.5\' y=\'5\' width=\'17\' height=\'15\' rx=\'3\'/%3E%3Cpath d=\'M3.5 10h17M8 3v4M16 3v4\'/%3E%3C/svg%3E") center/contain no-repeat}',
+      '.dfr-wrap input{cursor:pointer;padding-right:44px!important}',
+      '.dfr-cal{z-index:3000;width:320px;max-width:100%;background:#fff;border:1px solid var(--g3,#C8CDD8);border-radius:22px;',
+      '  box-shadow:0 22px 50px -18px rgba(20,37,58,.45);padding:0 0 4px;overflow:hidden;',
       '  font-family:inherit;color:var(--black,#0C0F14)}',
       '.dfr-cal[hidden]{display:none}',
-      '.dfr-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}',
-      '.dfr-mois{font-size:14px;font-weight:700;text-transform:capitalize}',
-      '.dfr-nav{background:none;border:1px solid var(--g3,#C8CDD8);border-radius:50%;',
-      '  width:30px;height:30px;line-height:1;cursor:pointer;color:var(--navy,#2B4A6B);',
-      '  font-size:15px;font-family:inherit;display:flex;align-items:center;justify-content:center;flex-shrink:0}',
-      '.dfr-nav:hover:not(:disabled){background:var(--navy,#2B4A6B);color:#fff;border-color:var(--navy,#2B4A6B)}',
-      '.dfr-nav:disabled{opacity:.3;cursor:default}',
-      '.dfr-grille{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}',
-      '.dfr-jour{font-size:10.5px;font-weight:700;color:var(--g2,#646D7C);text-align:center;padding:4px 0}',
-      '.dfr-case{background:none;border:none;border-radius:8px;padding:0;height:34px;cursor:pointer;',
-      '  font-family:inherit;font-size:13px;color:var(--black,#0C0F14)}',
+      '.dfr-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;background:var(--navy,#2B4A6B);color:#fff;margin:0 0 8px}',
+      '.dfr-mois{white-space:nowrap;font-family:"Bebas Neue",sans-serif;font-weight:400;font-size:26px;line-height:1;letter-spacing:.03em;text-transform:uppercase}',
+      '.dfr-nav{background:rgba(255,255,255,.14);border:0;border-radius:50%;',
+      '  width:32px;height:32px;line-height:1;cursor:pointer;color:#fff;',
+      '  font-size:18px;font-family:inherit;display:flex;align-items:center;justify-content:center;flex-shrink:0}',
+      '.dfr-nav:hover:not(:disabled){background:rgba(255,255,255,.28)}',
+      '.dfr-nav:disabled{opacity:.3;cursor:not-allowed}',
+      '.dfr-grille{display:grid;grid-template-columns:repeat(7,1fr);gap:3px 0;padding:0 10px}',
+      '.dfr-jour{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--g2,#646D7C);text-align:center;padding:4px 0}',
+      '.dfr-case{background:none;border:none;border-radius:50%;padding:0;height:40px;cursor:pointer;',
+      '  font-family:inherit;font-size:14px;font-weight:500;color:var(--black,#0C0F14);font-variant-numeric:tabular-nums}',
       '.dfr-case:hover:not(:disabled){background:var(--g4,#F0F2F5)}',
-      '.dfr-case:disabled{color:var(--g3,#C8CDD8);cursor:default}',
+      '.dfr-case:disabled{color:#C3C9D3;cursor:not-allowed}',
       '.dfr-case.vide{visibility:hidden}',
-      '.dfr-case.aujourdhui{box-shadow:inset 0 0 0 1.5px var(--g3,#C8CDD8)}',
+      '.dfr-case.aujourdhui{box-shadow:inset 0 0 0 2px var(--gold,#F59E0B)}',
       '.dfr-case.choisi{background:var(--navy,#2B4A6B)!important;color:#fff;font-weight:700}',
       '.dfr-pied{display:flex;justify-content:space-between;align-items:center;gap:8px;',
-      '  margin-top:10px;padding-top:9px;border-top:1px solid var(--g4,#F0F2F5)}',
-      '.dfr-lien{background:none;border:none;padding:0;font-family:inherit;font-size:12.5px;',
+      '  margin:8px 0 0;padding:9px 14px 6px;border-top:1px solid var(--g4,#F0F2F5)}',
+      '.dfr-lien{background:none;border:none;padding:0;font-family:inherit;font-size:13px;',
       '  font-weight:600;color:var(--navy,#2B4A6B);cursor:pointer}',
       '.dfr-lien:hover{text-decoration:underline}',
-      '@media(max-width:400px){.dfr-cal{width:270px}.dfr-case{height:32px}}',
+      '@media(max-width:400px){.dfr-case{height:38px}}',
     ].join('');
     document.head.appendChild(st);
   }
@@ -138,7 +140,7 @@
        s'ouvrait bel et bien, mais on ne le voyait pas. */
     function placer() {
       var cr = champ.getBoundingClientRect();
-      var larg = Math.min(290, window.innerWidth - 16);
+      var larg = Math.min(320, window.innerWidth - 16);
       cal.style.width = larg + 'px';
       cal.style.maxWidth = 'none';
       cal.style.maxHeight = Math.max(220, window.innerHeight - 16) + 'px';
