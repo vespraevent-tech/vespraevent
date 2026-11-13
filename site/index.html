@@ -737,14 +737,14 @@ transform:none!important;stroke-dashoffset:0!important}}
   if(deja){e.remove();return}
   try{localStorage.setItem('vespra_intro_t',String(now))}catch(x){}
   try{sessionStorage.setItem('vespra_intro','1')}catch(x){}
-  var t0=Date.now(),MIN=900,MAX=3600,fait=false,pagePrete=false,policesPretes=false;
+  var t0=Date.now(),MIN=2000,MAX=4500,fait=false,pagePrete=false,policesPretes=false;
   function fermer(){e.classList.add('vsl-off');setTimeout(function(){e.remove()},520)}
   function fin(){if(fait)return;fait=true;setTimeout(fermer,Math.max(0,MIN-(Date.now()-t0)))}
   function verifier(){if(pagePrete&&policesPretes)fin()}
   if(document.readyState==='complete')pagePrete=true;else addEventListener('load',function(){pagePrete=true;verifier()});
   try{(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(function(){policesPretes=true;verifier()})}catch(x){policesPretes=true}
   verifier();
-  setTimeout(fin,MAX);   /* garde-fou : jamais plus de 3,6 s, même sur une très mauvaise connexion */
+  setTimeout(fin,MAX);   /* garde-fou : jamais plus de 4,5 s, même sur une très mauvaise connexion */
 })();
 </script>
 <div class="ticker">
@@ -781,37 +781,12 @@ transform:none!important;stroke-dashoffset:0!important}}
    hauteurs égalisées) : plus de blocs qui bougent ou changent sous les yeux du visiteur */
 html:not(.hero-pret) body #hero .hero-content,html:not(.hero-pret) body #hero .hero-dots{opacity:0}
 html body #hero .hero-content,html body #hero .hero-dots{transition:opacity .35s ease}
-
-/* ── Proportions de l'en-tête : titres sur DEUX lignes au maximum, plus mesurés ──
-   Le texte n'est plus agrandi pour remplir la place : on l'aère (espaces plus généreux
-   entre pastille, titre, texte et boutons) et on centre le bloc dans la hauteur de l'en-tête. */
-html body .hero{height:min(calc(100svh - 110px),600px);min-height:470px}
-html body .hero-content{max-width:780px;padding:56px 88px 64px}
-html body .hero-eye{margin-bottom:30px}
-html body .hero-h,html body .hero-h.hs-t,html body .hero-slide:first-child .hero-h{
-  font-size:clamp(38px,calc(14px + 3.3vw),64px);line-height:1.02;letter-spacing:.012em;
-  margin-bottom:28px;text-wrap:balance}
-html body h1.hero-h br,html body h1.hero-h br.hero-br-tel,html body h1.hero-h br.hero-br-pc{display:none!important}   /* le titre d'accueil se coupe tout seul, en deux lignes équilibrées */
-html body h1.hero-h{margin-bottom:28px!important}
-html body h1.hero-h em{white-space:normal}
-html body .hs-sub,html body .hero-sub{font-size:17px;line-height:1.6;max-width:540px;margin:0 0 38px}
-html body .hero-slide .hero-content{justify-content:center!important}
+/* sur téléphone, l'en-tête garde la même hauteur qu'avant (72 % de l'écran) mais elle est
+   fixée d'avance : elle ne varie plus pendant le chargement, le reste de la page ne saute plus */
 @media(max-width:900px){
-  /* hauteur fixe : l'en-tête ne change plus de taille une fois la page chargée,
-     les blocs du dessous ne « sautent » donc plus */
-  html body .hero{height:max(66svh,520px);min-height:0}
+  html body .hero{height:max(72svh,540px);min-height:0}
   html body .hero .hero-slide:first-child{position:absolute;inset:0;height:auto;min-height:0}
-  html body .hero-content{max-width:100%;padding:52px 34px 64px}
 }
-@media(max-width:640px){
-  html body .hero{height:max(66svh,520px)}
-  html body .hero-content{padding:46px 20px 60px!important}
-  html body .hero-eye{margin-bottom:22px}
-  html body .hero-h,html body .hero-h.hs-t,html body .hero-slide:first-child .hero-h,html body .hero-slide .hero-h.hs-t{
-    font-size:clamp(26px,8vw,34px)!important;line-height:1.04;margin-bottom:20px!important}
-  html body .hs-sub,html body .hero-sub{font-size:14px;line-height:1.55;margin:0 0 28px}
-}
-
 </style>
 <section class="hero" id="hero" aria-roledescription="carrousel" aria-label="À la une">
   <div class="hero-slide hs-on" data-bg="hero-zones-livraison.webp" style="background-image:url('hero-zones-livraison.webp')">
@@ -821,7 +796,7 @@ html body .hero-slide .hero-content{justify-content:center!important}
     <!-- Les retours à la ligne diffèrent selon l'écran : trois lignes bien
          remplies sur téléphone (voir mobile.css), la coupure habituelle sur
          ordinateur. Le texte, lui, est le même partout. -->
-    <h1 class="hero-h">VOTRE SPÉCIALISTE <br>DE LA <br class="hero-br-pc"><em>LOCATION <br class="hero-br-tel">À <span id="hero-city-slot"><span id="hero-city-ghost" aria-hidden="true" data-g="Saint-Malo"></span><span id="hero-city">Vitré</span></span></em></h1>
+    <h1 class="hero-h">VOTRE SPÉCIALISTE <br>DE LA <br class="hero-br-pc"><em>LOCATION&nbsp;<br class="hero-br-tel">À <span id="hero-city-slot"><span id="hero-city-ghost" aria-hidden="true" data-g="Saint-Malo"></span><span id="hero-city">Vitré</span></span></em></h1>
     <p class="hs-sub">Mariages, anniversaires, séminaires : du matériel livré et installé chez vous, pour tous vos événements.</p>
     <div class="hero-cta">
       <a href="catalogue.html" class="btn-p">Voir le catalogue</a>

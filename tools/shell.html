@@ -555,14 +555,14 @@ transform:none!important;stroke-dashoffset:0!important}}
   if(deja){e.remove();return}
   try{localStorage.setItem('vespra_intro_t',String(now))}catch(x){}
   try{sessionStorage.setItem('vespra_intro','1')}catch(x){}
-  var t0=Date.now(),MIN=900,MAX=3600,fait=false,pagePrete=false,policesPretes=false;
+  var t0=Date.now(),MIN=2000,MAX=4500,fait=false,pagePrete=false,policesPretes=false;
   function fermer(){e.classList.add('vsl-off');setTimeout(function(){e.remove()},520)}
   function fin(){if(fait)return;fait=true;setTimeout(fermer,Math.max(0,MIN-(Date.now()-t0)))}
   function verifier(){if(pagePrete&&policesPretes)fin()}
   if(document.readyState==='complete')pagePrete=true;else addEventListener('load',function(){pagePrete=true;verifier()});
   try{(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(function(){policesPretes=true;verifier()})}catch(x){policesPretes=true}
   verifier();
-  setTimeout(fin,MAX);   /* garde-fou : jamais plus de 3,6 s, même sur une très mauvaise connexion */
+  setTimeout(fin,MAX);   /* garde-fou : jamais plus de 4,5 s, même sur une très mauvaise connexion */
 })();
 </script>
 <div class="ticker">
@@ -599,7 +599,7 @@ transform:none!important;stroke-dashoffset:0!important}}
   <div class="hero-overlay"></div>
   <div class="hero-content">
     <div class="hero-eye" style="text-transform:none"><span></span> Spécialiste de la location</div>
-    <h1 class="hero-h">VOTRE SPÉCIALISTE <br>DE LA <br class="hero-br-pc"><em>LOCATION <br class="hero-br-tel">À VITR&#201;</em></h1>
+    <h1 class="hero-h">VOTRE SPÉCIALISTE <br>DE LA <br class="hero-br-pc"><em>LOCATION&nbsp;<br class="hero-br-tel">À VITR&#201;</em></h1>
     <p class="hero-sub">Photobooth, son, lumière, barnums : nous livrons, installons et récupérons votre matériel à Vitré. Vous profitez de votre événement, on s'occupe du reste.</p>
   </div>
   </div>
