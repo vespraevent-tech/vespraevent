@@ -1139,7 +1139,7 @@ if(urlCat){
     const li=document.createElement('li');
     li.innerHTML='<button type="button" data-i="'+i+'"><span class="cc-cat-name">'+c[0]+'</span><span class="cc-cat-meta"><small>'+n+'</small><svg class="cc-chevron" viewBox="0 0 8 14" aria-hidden="true"><path d="M1 1l6 6-6 6"/></svg></span></button>';
     ul.appendChild(li);rows[i]=li;
-    const im=new Image();im.src=c[1];im.alt='';im.decoding='async';im.loading='eager';im.fetchPriority=i<1?'high':'low';im.dataset.categoryIndex=String(i);im.style.cursor='pointer';im.setAttribute('role','button');im.setAttribute('tabindex','0');im.setAttribute('aria-label','Afficher la catégorie '+c[0]);im.onerror=function(){this.style.display='none';};ph.insertBefore(im,ph.firstChild);imgs[i]=im;
+    const im=new Image();im.src=(window.VESPRA_IMG?window.VESPRA_IMG(c[1],900):c[1]);im.alt='';im.decoding='async';im.loading='eager';im.fetchPriority=i<1?'high':'low';im.dataset.categoryIndex=String(i);im.style.cursor='pointer';im.setAttribute('role','button');im.setAttribute('tabindex','0');im.setAttribute('aria-label','Afficher la catégorie '+c[0]);im.onerror=function(){this.style.display='none';};ph.insertBefore(im,ph.firstChild);imgs[i]=im;
   });
   /* L'image d'aperçu est aussi un raccourci cliquable vers sa catégorie. */
   function choisirImageActive(){

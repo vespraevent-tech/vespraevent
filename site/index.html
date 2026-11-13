@@ -2379,12 +2379,21 @@ setTimeout(typeCity,4000);
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(egalise);
   var calme=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
   /* les photos des diapositives suivantes se chargent après la page */
-  function charge(){sl.forEach(function(x){
-    var b=x.querySelector('.hs-bg');if(b)b.style.backgroundImage="url('"+x.getAttribute('data-bg')+"')";
-});}
+  /* La photo visible se charge tout de suite ; les suivantes attendent, pour ne pas
+     retarder l'affichage de la page avec près d'un mégaoctet d'images invisibles. */
+  function peindre(x){var b=x.querySelector('.hs-bg');if(b&&!b.style.backgroundImage)b.style.backgroundImage="url('"+x.getAttribute('data-bg')+"')";}
+  function charge(){
+    if(sl[cur])peindre(sl[cur]);
+    var reste=sl.filter(function(x,i){return i!==cur;}),i=0;
+    (function suite(){ if(i>=reste.length)return; peindre(reste[i++]); setTimeout(suite,350); })();
+  }
+  /* la photo de la diapositive affichée ne doit pas attendre la fin du chargement
+     de la page : sans cela l'en-tête reste sombre plusieurs secondes */
+  if(sl[cur])peindre(sl[cur]);
   if(document.readyState==='complete')charge();else addEventListener('load',charge);
   function aller(n,dir){
     if(busy||n===cur)return;busy=true;clearTimeout(timer);barreRaz();
+    if(sl[n]&&typeof peindre==='function')peindre(sl[n]);
     dir=dir||(n>cur?1:-1);
     var a=sl[cur],b=sl[n];
     b.classList.remove('hs-go');b.style.transform='translateX('+(dir*100)+'%)';b.classList.add('hs-in');

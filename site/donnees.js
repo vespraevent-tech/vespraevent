@@ -14,6 +14,23 @@
    garde le contenu écrit dans ses fichiers : rien ne disparaît.
    ───────────────────────────────────────────────────────────── */
 (function () {
+  /* ── Photos envoyées depuis le back-office ────────────────────────
+     Elles sont enregistrées telles quelles (une photo de téléphone pèse
+     souvent plus d'un mégaoctet). Le CDN d'images de Netlify les sert
+     redimensionnées et converties en WebP : la page se charge sans
+     attendre plusieurs mégaoctets, et la photo reste nette.
+     Une adresse qui n'est pas un envoi du back-office n'est pas touchée. */
+  window.VESPRA_IMG = function (src, largeur) {
+    var s = String(src == null ? '' : src).trim();
+    if (!s || s.indexOf('/.netlify/images') === 0) return s;
+    if (s.indexOf('/api/media/') !== 0) return s;
+    var w = largeur || 900;
+    try {
+      var dpr = window.devicePixelRatio || 1;
+      if (dpr > 1.5) w = Math.min(Math.round(w * 1.5), 1600);
+    } catch (e) {}
+    return '/.netlify/images?url=' + encodeURIComponent(s) + '&w=' + w + '&fm=webp&q=72';
+  };
   var VIDE = { theme: {}, ambiance: {}, bandeau: {}, textes: [], notices: [], produits: [], google: [],
                images: [], miseEnPage: [], salles: [], prestataires: [], catalogue: [], entreprise: {} };
 

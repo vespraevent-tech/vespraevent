@@ -19,7 +19,7 @@
       name: p.nom,
       price: Number(p.prix) || 0,
       desc: String(p.descCourte || '').replace(/<[^>]+>/g, ''),
-      img: p.img || (Array.isArray(p.images) ? p.images[0] : '') || '',
+      img: (function(u){return window.VESPRA_IMG?window.VESPRA_IMG(u,900):u;})(p.img || (Array.isArray(p.images) ? p.images[0] : '') || ''),
       page: '/' + p.id,
       /* le choix se fait sur la fiche : l'ajout rapide y renvoie */
       surFiche: true,

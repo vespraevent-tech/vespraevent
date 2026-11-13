@@ -47,7 +47,7 @@
         } else if (it.type === 'produit') {
           /* photos remaniées dans cette version : une ancienne photo ou galerie enregistrée avant
              (sans la marque vimg) ne doit pas écraser les nouvelles ; un nouvel enregistrement du back-office la porte */
-          if ({p3:1,p8:1,p13:1,p15:1,p38:1,p39:1,p44:1,p56:1}[it.id] && String(it.vimg) !== '2' && (it.image || it.photos)) {
+          if ({p3:1,p8:1,p13:1,p15:1,p38:1,p39:1,p44:1,p56:1,p58:1}[it.id] && String(it.vimg) !== '2' && (it.image || it.photos)) {
             it = Object.assign({}, it); delete it.image; delete it.photos;
           }
           fiches[it.id] = it;
@@ -161,7 +161,7 @@
 
     if (f.image) {
       var img = document.getElementById('prodMainImg');
-      if (img) { img.src = f.image; img.removeAttribute('srcset'); }
+      if (img) { img.src = (window.VESPRA_IMG ? window.VESPRA_IMG(f.image, 1400) : f.image); img.removeAttribute('srcset'); }
     }
 
     /* galerie : la liste de photos choisie dans le back-office remplace celle de la page */
@@ -239,10 +239,11 @@
           var b = vb[i];
           if (!src || !b) return;
           var oc = b.getAttribute('onclick');
-          if (oc) b.setAttribute('onclick', oc.replace(/(selectVariant\(this,\s*'[^']*',\s*[\d.]+)(?:,\s*'[^']*')?\)/, "$1,'" + String(src).replace(/'/g, '') + "')"));
+          var srcL = window.VESPRA_IMG ? window.VESPRA_IMG(src, 1400) : src;
+          if (oc) b.setAttribute('onclick', oc.replace(/(selectVariant\(this,\s*'[^']*',\s*[\d.]+)(?:,\s*'[^']*')?\)/, "$1,'" + String(srcL).replace(/'/g, '') + "')"));
           if (b.classList.contains('active')) {
             var mi = document.getElementById('prodMainImg');
-            if (mi) { mi.removeAttribute('srcset'); mi.src = src; }
+            if (mi) { mi.removeAttribute('srcset'); mi.src = srcL; }
             try { if (typeof _selectedVariant !== 'undefined' && _selectedVariant) _selectedVariant.img = src; } catch (e5) {}
           }
         });
@@ -378,12 +379,13 @@
       var f = fiches[id], prod = null;
       for (var k = 0; k < P.length; k++) if (P[k].id === id) { prod = P[k]; break; }
       if (!prod) return;
-      if (f.image) prod.img = f.image;
-      if (f.imgcarte) prod.img = f.imgcarte;
+      var all = function (u, w) { return window.VESPRA_IMG ? window.VESPRA_IMG(u, w || 900) : u; };
+      if (f.image) prod.img = all(f.image);
+      if (f.imgcarte) prod.img = all(f.imgcarte);
       if (f.varimg && prod.variants) {
         try {
           (JSON.parse(f.varimg) || []).forEach(function (src, i) {
-            if (src && prod.variants[i]) prod.variants[i].img = src;
+            if (src && prod.variants[i]) prod.variants[i].img = all(src);
           });
         } catch (e7) {}
       }
@@ -435,7 +437,7 @@
         name: it.nom,
         price: nombre(it.prix) || 0,
         desc: it.description || '',
-        img: it.image || '',
+        img: (window.VESPRA_IMG ? window.VESPRA_IMG(it.image || '', 900) : (it.image || '')),
         page: null,
       });
     });

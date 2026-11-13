@@ -23,7 +23,7 @@
     Object.keys(PHOTOS_ORIGINE).forEach(function(id){
       PHOTOS_ORIGINE[id].forEach(function(n){usage[n]=(usage[n]||0)+1;});
     });
-    var ANCIENNES={p3:1,p8:1,p13:1,p15:1,p38:1,p39:1,p44:1,p56:1};
+    var ANCIENNES={p3:1,p8:1,p13:1,p15:1,p38:1,p39:1,p44:1,p56:1,p58:1};
     (Array.isArray(produits)?produits:[]).forEach(function(it){
       if(it&&it.type==='produit'&&it.id&&it.imgcarte)carte[it.id]=cleanUrl(it.imgcarte);
       if(it&&it.type==='produit'&&ANCIENNES[it.id]&&String(it.vimg)!=='2')return; /* ancienne photo enregistrée avant le remaniement */
@@ -55,7 +55,7 @@
       img.removeAttribute('data-vespra-image-deleted');
       img.style.display='';
       var rep=map[key];
-      if(rep)img.setAttribute('src',rep);
+      if(rep)img.setAttribute('src',(window.VESPRA_IMG?window.VESPRA_IMG(rep,img.id==='prodMainImg'||img.id==='pgImg'?1400:900):rep));
     }
     /* garde-fou pour toutes les fiches produit : une même photo n'apparaît
        jamais deux fois dans la galerie, quelle qu'en soit la cause */
@@ -140,7 +140,7 @@
       }else{
         img.removeAttribute('data-vespra-image-deleted');
         var rep=replacement(src,map);
-        if(rep){img.setAttribute('src',rep);img.removeAttribute('srcset');}
+        if(rep){img.setAttribute('src',(window.VESPRA_IMG?window.VESPRA_IMG(rep,900):rep));img.removeAttribute('srcset');}
       }
       var srcset=img.getAttribute('srcset');
       if(srcset&&!deleted[key]){
@@ -190,13 +190,25 @@
       (window.PRODUCTS||[]).forEach(function(p){
         if(!p||!p.id)return;
         var nouvelle=fp.carte[p.id]||fp.parId[p.id];
-        if(nouvelle){p.img=nouvelle;}
-        else if(p.img&&map[basename(p.img)]){p.img=map[basename(p.img)];}
+        if(!nouvelle&&p.img&&map[basename(p.img)])nouvelle=map[basename(p.img)];
+        /* allégée dès maintenant : les cartes et les aperçus sont construits à partir de p.img */
+        if(nouvelle)p.img=(window.VESPRA_IMG?window.VESPRA_IMG(nouvelle,900):nouvelle);
         if(nouvelle&&p.name)produitsParNom[norm(p.name)]=nouvelle;
       });
     }catch(e){}
     /* une carte construite par script ou ajoutée après coup (panier, fenêtre
        produit, carrousel) reçoit elle aussi la bonne photo */
+    /* largeur utile selon l'endroit où la photo est affichée */
+    function allege(src,img){
+      if(typeof window.VESPRA_IMG!=='function')return src;
+      var w=900;
+      try{
+        if(img&&(img.id==='prodMainImg'||img.id==='pgImg'))w=1400;
+        else if(img&&img.closest&&img.closest('#prodThumbs'))w=300;
+        else{var r=img&&img.getBoundingClientRect?img.getBoundingClientRect().width:0;if(r>0)w=Math.max(300,Math.min(1400,Math.ceil(r/100)*100));}
+      }catch(e){}
+      return window.VESPRA_IMG(src,w);
+    }
     function corrige(img){
       if(!img||img.nodeName!=='IMG')return;
       var src=img.getAttribute('src')||'',key=basename(src);
@@ -220,14 +232,18 @@
       /* la photo trouvée d'après le nom peut elle-même avoir été remplacée : on va jusqu'au bout,
          sinon deux règles se renvoient la balle à l'infini et la page se fige */
       if(rep&&map[basename(rep)])rep=map[basename(rep)];
-      if(rep&&basename(rep)!==key&&src!==rep){
+      /* une photo envoyée depuis le back-office est servie redimensionnée :
+         sinon la page chargerait la photo d'origine, souvent de plusieurs mégaoctets */
+      var final=allege(rep||src,img);
+      if(final&&final!==src){
         var nb=+(img.getAttribute('data-vi')||0);if(nb>=3)return;   /* garde-fou anti-boucle */
         img.setAttribute('data-vi',String(nb+1));
-        img.removeAttribute('srcset');img.setAttribute('src',rep);
+        img.removeAttribute('srcset');img.setAttribute('src',final);
       }
     }
-    var aCorriger=Object.keys(map).length||Object.keys(produitsParNom).length;
-    if(aCorriger){
+    /* la passe tourne toujours : même sans remplacement, les photos du
+       back-office doivent être allégées avant d'être affichées */
+    {
       document.querySelectorAll('img').forEach(corrige);
       try{
         new MutationObserver(function(muts){
