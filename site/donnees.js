@@ -46,7 +46,7 @@
      la bonne apparaissait d'un coup. La page reste donc invisible le
      temps que ces réglages arrivent et soient appliqués, puis s'affiche
      une seule fois. Garde-fou : si le serveur tarde, elle s'affiche
-     quand même au bout d'une seconde et demie. */
+     quand même au bout de 0,7 seconde. */
   var voileLeve = false, dcl = false, donneesPretes = false, minuteur = null;
   try {
     var st = document.createElement('style');
@@ -69,7 +69,7 @@
   }
   document.addEventListener('DOMContentLoaded', function () { dcl = true; verifier(); });
   if (document.readyState !== 'loading') dcl = true;
-  minuteur = setTimeout(leverVoile, 1500);
+  minuteur = setTimeout(leverVoile, 700);
   window.VESPRA_LEVER_VOILE = leverVoile;
 
 

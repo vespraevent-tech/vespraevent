@@ -34,6 +34,29 @@
   [headers.values]
     Cache-Control = "public, max-age=3600, stale-while-revalidate=86400"
 
+# Scripts et feuilles de style : gardés 10 minutes dans le navigateur (puis revérifiés en arrière-plan),
+# au lieu d'être redemandés au serveur à chaque page : le site s'affiche nettement plus vite.
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=600, stale-while-revalidate=86400"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=600, stale-while-revalidate=86400"
+
+[[headers]]
+  for = "/*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, stale-while-revalidate=86400"
+
+# Le back-office doit toujours être à jour
+[[headers]]
+  for = "/studio/*"
+  [headers.values]
+    Cache-Control = "no-cache"
+
 # Logo de la signature e-mail : cache long pour que Gmail l'affiche tout de suite.
 # (Si le logo change un jour, lui donner un nouveau nom de fichier.)
 [[headers]]
