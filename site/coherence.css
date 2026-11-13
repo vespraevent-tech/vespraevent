@@ -142,12 +142,12 @@ html body .bests-carousel .bc{backface-visibility:hidden}
 @media(prefers-reduced-motion:no-preference){
 }
 
-/* Menu mobile : fondu rapide avec un très léger glissement (0,16 s), sans cascade */
+/* Menu mobile : balayage immédiat depuis la droite (0,14 s), sans fondu ni délai */
 @media(max-width:960px){
-  html body .nav-links{display:flex!important;visibility:hidden;opacity:0;pointer-events:none;transform:translateY(-8px);
-    transition:opacity .16s ease,transform .18s cubic-bezier(.2,.8,.2,1),visibility 0s linear .18s}
-  html body .nav-links.open{visibility:visible;opacity:1;pointer-events:auto;transform:none;
-    transition:opacity .16s ease,transform .18s cubic-bezier(.2,.8,.2,1),visibility 0s}
+  html body .nav-links{display:flex!important;visibility:hidden;opacity:1;pointer-events:none;transform:translateX(100%);
+    transition:transform .12s ease-in,visibility 0s linear .12s}
+  html body .nav-links.open{visibility:visible;pointer-events:auto;transform:none;
+    transition:transform .14s cubic-bezier(.1,.9,.2,1),visibility 0s}
   html body .nav-links>*{opacity:1;transform:none;transition:none}
 }
 @media(prefers-reduced-motion:reduce){html body .nav-links,html body .nav-links>*{transition:none!important}}
