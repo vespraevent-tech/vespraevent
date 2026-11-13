@@ -64,7 +64,7 @@
   if (page.indexOf('.') === -1) page += '.html';
 
   var promesse = null;
-  var CLE_CACHE = 'vespra_site', DUREE_CACHE = 10 * 60 * 1000;
+  var CLE_CACHE = 'vespra_site', DUREE_CACHE = 45 * 1000;   /* moins d'une minute : une modification du back-office est visible presque tout de suite */
 
   /* ── voile anti-clignotement ───────────────────────────────────
      La page est écrite avec les photos, l'ordre et les textes du
@@ -75,7 +75,7 @@
      une seule fois. Garde-fou : si le serveur tarde, elle s'affiche
      quand même au bout de 0,4 seconde. */
   var voileLeve = false, dcl = false, donneesPretes = false, minuteur = null;
-  /* Réglages déjà connus (visite précédente de moins de dix minutes) : il n'y a
+  /* Réglages déjà connus (page vue il y a moins de 45 secondes) : il n'y a
      plus rien à attendre, donc plus de raison de masquer la page. Elle se
      dessine au fur et à mesure, comme n'importe quel site, et le catalogue
      apparaît dès que le navigateur l'a lu. */
@@ -152,7 +152,7 @@
      Sans elle, chaque page attend la réponse du serveur avant de
      s'afficher : le visiteur voit une page vide, puis tout apparaît d'un
      coup. La dernière réponse est donc gardée dans le navigateur et
-     réutilisée telle quelle pendant quelques minutes : la page suivante
+     réutilisée telle quelle pendant moins d'une minute : la page suivante
      s'affiche immédiatement, déjà juste. La réponse du serveur est
      quand même redemandée en arrière-plan, pour la fois d'après. */
   /* la réponse couvre tout le site : chaque page ne garde que ce qui la concerne */
