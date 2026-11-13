@@ -217,7 +217,14 @@
           }
         }
       }
-      if(rep&&basename(rep)!==key&&src!==rep){img.removeAttribute('srcset');img.setAttribute('src',rep);}
+      /* la photo trouvée d'après le nom peut elle-même avoir été remplacée : on va jusqu'au bout,
+         sinon deux règles se renvoient la balle à l'infini et la page se fige */
+      if(rep&&map[basename(rep)])rep=map[basename(rep)];
+      if(rep&&basename(rep)!==key&&src!==rep){
+        var nb=+(img.getAttribute('data-vi')||0);if(nb>=3)return;   /* garde-fou anti-boucle */
+        img.setAttribute('data-vi',String(nb+1));
+        img.removeAttribute('srcset');img.setAttribute('src',rep);
+      }
     }
     var aCorriger=Object.keys(map).length||Object.keys(produitsParNom).length;
     if(aCorriger){
