@@ -111,7 +111,7 @@ function buildDrawerDOM(){
   </label>
   <div class="vc-total"><span>Total (devis)</span><span id="vc-total-val">0 €</span></div>
   <a href="reservation.html" class="vc-btn-primary">Envoyer mon devis →</a>
-  <button type="button" class="vc-btn-secondary" onclick="closeCart()">Continuer ma sélection</button>
+  <button type="button" class="vc-btn-secondary" onclick="closeCart()">Ajouter d'autres produits</button>
   <p class="vc-note">Devis gratuit, sans engagement. Notre équipe vous recontacte sous 24h.</p>
 </div>`;
   document.body.appendChild(overlay);

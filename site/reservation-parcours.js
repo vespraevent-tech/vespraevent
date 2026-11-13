@@ -223,6 +223,7 @@
       '  .pc-panel.vide h3{display:block}',
       '  .pc-panel.vide .pc-k{display:none}',
       '  .pc-main .sec-tag{display:none}',
+      '  #cartZone .sec-h{display:none}',
       '  .cs-item-img{display:block!important;width:56px;height:42px;object-fit:cover;border-radius:8px}',
       '  .cart-summary{display:flex;flex-direction:column}',
       '  .cs-items{order:1}.cs-head{order:2;justify-content:flex-start;margin:10px 0 0}',
