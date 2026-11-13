@@ -2350,7 +2350,7 @@ setTimeout(typeCity,4000);
     catch(e){try{n=parseInt(sessionStorage.getItem('vespra_hero_n'),10)||0;sessionStorage.setItem('vespra_hero_n',String(n+1));}catch(e2){}}
     n=Math.abs(n);
     /* ordre et produit tirés au hasard à chaque visite : l'en-tête n'est plus toujours le même */
-    var cycle=[2,'V',3,12],choix=cycle[Math.floor(Math.random()*cycle.length)],P=(choix==='V')?(n%2===0?10:11):choix; /* produit tiré au hasard ; la voiture alterne Mustang / Traction à chaque visite */
+    var produits=[1,2,3,4,5,6,10,11,12],P=produits[Math.floor(Math.random()*produits.length)]; /* un produit tiré au hasard parmi tous (voitures et château compris) */
     var T={A:0,B:7,C:P,D:8,E:9};
     var lettres='ABCDE'.split('');
     for(var i=lettres.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=lettres[i];lettres[i]=lettres[j];lettres[j]=t;}
