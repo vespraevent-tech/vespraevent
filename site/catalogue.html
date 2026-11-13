@@ -2,6 +2,9 @@
 <html lang="fr">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>/* Les réglages du site sont demandés dès la première ligne de la page :
+   la réponse arrive ainsi pendant que le reste se charge, au lieu d'attendre. */
+try{window.__VESPRA_SITE=fetch('/api/site',{headers:{accept:'application/json'},cache:'no-store'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}catch(e){}</script>
 <title>Catalogue Location Événementielle Vitré — Tarifs | Vespra Event</title>
 <link rel="stylesheet" href="/boutons-petits.css?v=2">
 <link rel="stylesheet" href="/bandeau.css">
@@ -13,7 +16,10 @@ html.cc-pre .filters,html.cc-pre .cat-grid-wrap{display:none}
 html.cc-pre #catChooser{display:block!important}
 html.cc-pre .cc{display:block}
 </style>
-<script src="/donnees.js"></script><script src="/images-registre.js"></script><script src="/images.js"></script><script src="/mise-en-page.js"></script>
+<script src="/donnees.js"></script>
+<script src="/images-registre.js"></script>
+<script src="/images.js"></script>
+<script src="/mise-en-page.js"></script>
 <script src="/theme.js"></script>
 <script src="/pack-mariage.js"></script>
 <meta name="description" content="Tout le matériel en location à Vitré : photobooth dès 130 €, sono dès 20 €, barnums dès 60 €, brasero 100 €. Tarifs en ligne.">
@@ -2220,8 +2226,8 @@ function goReserver(){saveCart();window.location.href='reservation.html';}
 })();
 </script>
 <script src="jeux-bois-popup.js" defer></script>
-<script src="/reprise.js"></script>
-<script src="/adresse-auto.js"></script>
+<script src="/reprise.js" defer></script>
+<script src="/adresse-auto.js" defer></script>
 
 <script src="/selects-jolis.js" defer></script>
 <script>window.__vespraSansCentrage=1;</script><script src="/centrer.js?v=5" defer></script>

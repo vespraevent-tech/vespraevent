@@ -3,9 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>/* Les réglages du site sont demandés dès la première ligne de la page :
+   la réponse arrive ainsi pendant que le reste se charge, au lieu d'attendre. */
+try{window.__VESPRA_SITE=fetch('/api/site',{headers:{accept:'application/json'},cache:'no-store'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}catch(e){}</script>
 <title>Location de matériel événementiel à Saint-Malo | Vespra Event</title>
 <link rel="stylesheet" href="/boutons-petits.css?v=2">
-<script src="/donnees.js"></script><script src="/images-registre.js"></script><script src="/images.js"></script><script src="/mise-en-page.js"></script>
+<script src="/donnees.js"></script>
+<script src="/images-registre.js"></script>
+<script src="/images.js"></script>
+<script src="/mise-en-page.js"></script>
 <script src="/theme.js"></script>
 <meta name="description" content="Louez photobooth, son, lumière et barnums à Saint-Malo, ou confiez-nous l&#x27;organisation complète avec prestataires. Devis gratuit sous 24 h.">
 <meta property="og:type" content="website">
@@ -1122,8 +1128,8 @@ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded'
 }
 </style>
 <script src="jeux-bois-popup.js" defer></script>
-<script src="/reprise.js"></script>
-<script src="/adresse-auto.js"></script>
+<script src="/reprise.js" defer></script>
+<script src="/adresse-auto.js" defer></script>
 
 <script id="vespra-car-modal-sync">
 (function(){

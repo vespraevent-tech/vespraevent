@@ -3,9 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>/* Les réglages du site sont demandés dès la première ligne de la page :
+   la réponse arrive ainsi pendant que le reste se charge, au lieu d'attendre. */
+try{window.__VESPRA_SITE=fetch('/api/site',{headers:{accept:'application/json'},cache:'no-store'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}catch(e){}</script>
 <title>Location de matériel événementiel à Nantes | Vespra Event</title>
 <link rel="stylesheet" href="/boutons-petits.css?v=2">
-<script src="/donnees.js"></script><script src="/images-registre.js"></script><script src="/images.js"></script><script src="/mise-en-page.js"></script>
+<script src="/donnees.js"></script>
+<script src="/images-registre.js"></script>
+<script src="/images.js"></script>
+<script src="/mise-en-page.js"></script>
 <script src="/theme.js"></script>
 <meta name="description" content="Tout le matériel de votre fête à Nantes : barnums, tente étoile, photobooth, sonorisation, effets. Vespra Event livre à Nantes sur devis, réponse sous 24 h.">
 <meta property="og:type" content="website">
@@ -1122,8 +1128,8 @@ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded'
 }
 </style>
 <script src="jeux-bois-popup.js" defer></script>
-<script src="/reprise.js"></script>
-<script src="/adresse-auto.js"></script>
+<script src="/reprise.js" defer></script>
+<script src="/adresse-auto.js" defer></script>
 
 <script id="vespra-car-modal-sync">
 (function(){

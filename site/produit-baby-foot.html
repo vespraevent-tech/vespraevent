@@ -2,10 +2,16 @@
 <html lang="fr">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>/* Les réglages du site sont demandés dès la première ligne de la page :
+   la réponse arrive ainsi pendant que le reste se charge, au lieu d'attendre. */
+try{window.__VESPRA_SITE=fetch('/api/site',{headers:{accept:'application/json'},cache:'no-store'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}catch(e){}</script>
 <title>Location Baby-foot en bois — 90 € | Vespra Event</title>
 <link rel="stylesheet" href="/boutons-petits.css?v=2">
 <link rel="stylesheet" href="/bandeau.css">
-<script src="/donnees.js"></script><script src="/images-registre.js"></script><script src="/images.js"></script><script src="/mise-en-page.js"></script>
+<script src="/donnees.js"></script>
+<script src="/images-registre.js"></script>
+<script src="/images.js"></script>
+<script src="/mise-en-page.js"></script>
 <script src="/theme.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@87.5,700&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@87.5,700&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
@@ -1136,8 +1142,8 @@ window.toggleProdDescription=toggleProdDescription;
 </style>
 <script>window.VARIANTES_PAGE={"defaut": 0, "titreAjouts": "Ajouter aussi des jeux en bois", "items": [{"id": "p34", "name": "Baby-foot", "court": "Baby-foot", "price": 90, "titre": "BABY-FOOT<br><span class=\"prod-title-2\">EN BOIS</span>", "cat": "Animation", "short": "Un vrai <strong>baby-foot en bois</strong> pour des parties animées pendant toute la soirée. Un seul exemplaire à la location : il devient vite le point de rendez-vous des invités, petits et grands.", "feats": ["Baby-foot en bois robuste, prêt à jouer", "Un seul exemplaire disponible, réservé pour votre événement", "Pour 2 à 4 joueurs, convient à tous les âges dès 6 ans", "Livraison offerte à Vitré, installation possible"], "photos": [{"s": "baby-foot-dessus.webp", "a": "Baby-foot en bois, vue de dessus", "t": "baby-foot-dessus-t.webp"}, {"s": "baby-foot-ambiance.webp", "a": "Détail d'un baby-foot en bois pendant une partie", "t": "baby-foot-ambiance-t.webp"}], "aj": {"desc": "Un vrai baby-foot en bois pour des parties animées pendant toute la soirée."}}, {"id": "p2", "name": "Jeux en bois", "label": "Cornhole", "court": "Cornhole", "price": 15, "titre": "CORNHOLE<br><span class=\"prod-title-2\">EN BOIS</span>", "cat": "Animation", "short": "Le jeu de lancer de sacs américain : une planche inclinée, un trou central et ses sacs colorés.", "feats": ["Le jeu de lancer de sacs américain : une planche inclinée, un trou central et ses sacs colorés.", "Livraison offerte à Vitré, installation possible"], "photos": [{"s": "jeux-cornhole.webp", "a": "Cornhole en bois"}], "aj": {"desc": "Le jeu de lancer de sacs américain : une planche inclinée, un trou central et ses sacs colorés."}}, {"id": "p2", "name": "Jeux en bois", "label": "Palet breton", "court": "Palet breton", "price": 15, "titre": "PALET BRETON<br><span class=\"prod-title-2\">EN BOIS</span>", "cat": "Animation", "short": "La tradition bretonne : un plateau en bois massif et des palets en métal.", "feats": ["La tradition bretonne : un plateau en bois massif et des palets en métal.", "Livraison offerte à Vitré, installation possible"], "photos": [{"s": "jeux-palet-breton.webp", "a": "Palet breton en bois"}], "aj": {"desc": "La tradition bretonne : un plateau en bois massif et des palets en métal."}}, {"id": "p2", "name": "Jeux en bois", "label": "Puissance 4 géant", "court": "Puissance 4 géant", "price": 15, "titre": "PUISSANCE 4<br><span class=\"prod-title-2\">GÉANT</span>", "cat": "Animation", "short": "Le grand classique en version XXL, en bois, avec ses jetons rouges et jaunes.", "feats": ["Le grand classique en version XXL, en bois, avec ses jetons rouges et jaunes.", "Livraison offerte à Vitré, installation possible"], "photos": [{"s": "jeux-puissance4.webp", "a": "Puissance 4 géant en bois"}], "aj": {"desc": "Le grand classique en version XXL, en bois, avec ses jetons rouges et jaunes."}}, {"id": "p2", "name": "Jeux en bois", "label": "Passe-trappe", "court": "Passe-trappe", "price": 15, "titre": "PASSE-TRAPPE<br><span class=\"prod-title-2\">EN BOIS</span>", "cat": "Animation", "short": "Le jeu d'adresse en bois où l'on fait glisser ses palets à travers la trappe.", "feats": ["Le jeu d'adresse en bois où l'on fait glisser ses palets à travers la trappe.", "Livraison offerte à Vitré, installation possible"], "photos": [{"s": "jeux-passe-trappe.webp", "a": "Passe-trappe en bois"}], "aj": {"desc": "Le jeu d'adresse en bois où l'on fait glisser ses palets à travers la trappe."}}]};</script>
 <script src="/variantes-page.js" defer></script>
-<script src="/reprise.js"></script>
-<script src="/adresse-auto.js"></script>
+<script src="/reprise.js" defer></script>
+<script src="/adresse-auto.js" defer></script>
 <script src="/centrer.js?v=5" defer></script>
 <link rel="stylesheet" href="/coherence.css?v=31">
 <script src="/coherence.js?v=7" defer></script>

@@ -2,10 +2,16 @@
 <html lang="fr">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>/* Les réglages du site sont demandés dès la première ligne de la page :
+   la réponse arrive ainsi pendant que le reste se charge, au lieu d'attendre. */
+try{window.__VESPRA_SITE=fetch('/api/site',{headers:{accept:'application/json'},cache:'no-store'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}catch(e){}</script>
 <title>Les lieux de réception que nous recommandons | Vespra Event</title>
 <link rel="stylesheet" href="/boutons-petits.css?v=2">
 <link rel="stylesheet" href="/bandeau.css">
-<script src="/donnees.js"></script><script src="/images-registre.js"></script><script src="/images.js"></script><script src="/mise-en-page.js"></script>
+<script src="/donnees.js"></script>
+<script src="/images-registre.js"></script>
+<script src="/images.js"></script>
+<script src="/mise-en-page.js"></script>
 <script src="/theme.js"></script>
 <meta name="description" content="Les lieux de réception que nous recommandons : domaines, fermes et salles des fêtes, ville par ville.">
 <!-- Pages en construction : on attend d'avoir de vraies listes avant de les
@@ -1229,8 +1235,8 @@ function toggleNav(){
   .hero-sub{margin-bottom:22px}
 }
 </style>
-<script src="/reprise.js"></script>
-<script src="/adresse-auto.js"></script>
+<script src="/reprise.js" defer></script>
+<script src="/adresse-auto.js" defer></script>
 
 <script src="/selects-jolis.js" defer></script>
 <script src="/centrer.js?v=5" defer></script>

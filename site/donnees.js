@@ -79,11 +79,14 @@
      plus rien à attendre, donc plus de raison de masquer la page. Elle se
      dessine au fur et à mesure, comme n'importe quel site, et le catalogue
      apparaît dès que le navigateur l'a lu. */
-  var dejaConnus = false;
-  try { var mem = JSON.parse(localStorage.getItem(CLE_CACHE) || 'null'); dejaConnus = !!(mem && mem.d && Date.now() - mem.t <= DUREE_CACHE); } catch (e) {}
-  if (dejaConnus) { voileLeve = true; }
+  /* La demande des réglages part désormais dès la première ligne de la page :
+     la réponse arrive pendant que la page se lit, et les photos ou prix changés
+     dans le back-office sont déjà appliqués au moment où le navigateur affiche
+     la zone concernée. Masquer la page n'a donc plus lieu d'être : elle se
+     dessine tout de suite, comme n'importe quel site. */
+  voileLeve = true;
   try {
-    if (dejaConnus) throw 0;
+    throw 0;
     var st = document.createElement('style');
     st.id = 'v-voile-style';
     st.textContent = 'html.v-attente body{opacity:0!important}html.v-fin body{transition:opacity .18s ease}';
@@ -194,8 +197,9 @@
   }
   function rafraichirEnFond() {
     try {
-      fetch('/api/site', { headers: { accept: 'application/json' }, cache: 'no-store' })
-        .then(function (r) { return r.ok ? r.json() : null; })
+      /* la demande lancée en haut de la page suffit : pas de second appel */
+      (window.__VESPRA_SITE || fetch('/api/site', { headers: { accept: 'application/json' }, cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; }))
         .then(function (d) { if (d) garder(d); })
         .catch(function () {});
     } catch (e) {}
@@ -218,11 +222,12 @@
       promesse = Promise.resolve(garde);
       return promesse;
     }
-    promesse = fetch('/api/site', {
+    /* la demande a déjà été lancée tout en haut de la page : on reprend sa réponse */
+    promesse = (window.__VESPRA_SITE || fetch('/api/site', {
       headers: { accept: 'application/json', 'cache-control': 'no-cache' },
       cache: 'no-store',
-    })
-      .then(function (r) { return r.ok ? r.json() : VIDE; })
+    }).then(function (r) { return r.ok ? r.json() : null; }))
+      .then(function (d) { return d || VIDE; })
       .then(function (d) { garder(d); return normaliser(d); })
       .catch(function () { return VIDE; })
       .then(function (d) {
