@@ -170,7 +170,7 @@
       cal.dfrT = Date.now();
       /* assez de place sous le champ : sinon on fait défiler la page d'abord */
       var cr0 = champ.getBoundingClientRect(), besoin = 340;
-      if (window.innerHeight - cr0.bottom < besoin) {
+      if (!window.__vespraSansDefilementDate && window.innerHeight - cr0.bottom < besoin) {
         window.scrollBy({top: Math.min(besoin - (window.innerHeight - cr0.bottom) + 12, Math.max(0, cr0.top - 70)), behavior: 'instant'});
       }
       placer();

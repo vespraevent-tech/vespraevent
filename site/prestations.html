@@ -633,6 +633,14 @@ function more(){var m=MORE[PR[cur].id],box=document.getElementById('prMore');if(
 var nav=document.getElementById('prNav'),card=document.getElementById('prCard'),cur=0;
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function tabs(){nav.innerHTML=PR.map(function(p,i){return '<button class="pr-tab" role="tab" aria-selected="'+(i===cur)+'" data-i="'+i+'">'+esc(p.nom)+'</button>'}).join('')}
+/* Horaires proposés (au lieu d'une heure à taper) : par demi-heure, on fait défiler et on choisit.
+   Arrivée sur place : de 8 h à minuit. Fin souhaitée : de minuit à minuit (la fête peut finir tard). */
+function horaires(type){
+ var h=function(m){var H=Math.floor(m/60)%24,M=m%60;if(H===0&&M===0)return 'Minuit';if(H===12&&M===0)return 'Midi';return H+'h'+(M?'30':'')};
+ var out=[],i;
+ if(type==='arrivee'){for(i=8*60;i<=24*60;i+=30)out.push(h(i))}
+ else{for(i=0;i<24*60;i+=30)out.push(h(i));out.push('Minuit (fin de journée)')}
+ return out}
 function fiche(sub){
  var p=PR[cur]; sub=sub||'service';
  var liste=(sub==='service'?p.service:p.infos).map(function(t){return '<li>'+esc(t)+'</li>'}).join('');
@@ -643,7 +651,7 @@ function fiche(sub){
  if(p.champs==='parts'){
    champ='<div class="pr-row">'+NB+'<input class="pr-i" id="prA" type="text" placeholder="Allergies / contraintes"></div>';
  }else{
-   champ=''+NB+'<div class="pr-row"><input class="pr-i" id="prH" type="text" placeholder="Arrivée sur place (ex. 17h)"><input class="pr-i" id="prF" type="text" placeholder="Fin souhaitée (ex. 23h)"></div>';
+   champ=''+NB+'<div class="pr-row">'+sel('prH','Arrivée sur place',horaires('arrivee'))+sel('prF','Fin souhaitée',horaires('fin'))+'</div>';
  }
  var rdvTxt=p.champs==='parts'?'Un rendez-vous dégustation sera organisé : tests de pâtisserie, vous venez goûter et on affine ensemble la création.':'Un rendez-vous sera organisé avec la serveuse privée partenaire : on échange sur sa façon de faire et sur la meilleure préparation de votre événement.';
  var hero=document.getElementById('prHero'); hero.style.backgroundImage='url('+p.img+')'; document.getElementById('prHT').textContent=p.titre; document.getElementById('prHA').textContent=p.accroche;
@@ -793,6 +801,7 @@ html body .ft > *{min-width:0}
 <!-- Formulaire technique : stocke les articles de blog ajoutés depuis l'admin. Invisible pour les visiteurs. -->
 
 
+<script>window.__vespraSansCentrage=1;window.__vespraSansDefilementDate=1;</script>
 <script>
 function toggleFaq(btn){
   const item=btn.parentElement,ans=item.querySelector('.faq-a'),inner=item.querySelector('.faq-a-inner'),open=item.classList.contains('open');
