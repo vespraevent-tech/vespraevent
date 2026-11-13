@@ -5,6 +5,14 @@
 <title>Catalogue Location Événementielle Vitré — Tarifs | Vespra Event</title>
 <link rel="stylesheet" href="/boutons-petits.css?v=2">
 <link rel="stylesheet" href="/bandeau.css">
+<script>(function(){try{var q=new URLSearchParams(location.search),h=document.documentElement;h.classList.add('cc-wait');if(!(q.get('cat')||q.get('q')||q.get('evt')))h.classList.add('cc-pre');setTimeout(function(){h.classList.remove('cc-wait','cc-pre')},4000)}catch(e){}})()</script>
+<style>
+/* avant que le script de la page ait choisi l'affichage : on ne montre ni la grille des produits (ancienne présentation) ni rien d'autre que le choix des catégories */
+html.cc-wait .cat-grid-wrap,html.cc-wait .filters{visibility:hidden}
+html.cc-pre .filters,html.cc-pre .cat-grid-wrap{display:none}
+html.cc-pre #catChooser{display:block!important}
+html.cc-pre .cc{display:block}
+</style>
 <script src="/donnees.js"></script><script src="/images-registre.js"></script><script src="/images.js"></script><script src="/mise-en-page.js"></script>
 <script src="/theme.js"></script>
 <script src="/pack-mariage.js"></script>
@@ -1189,6 +1197,7 @@ if(urlCat){
   const q=new URLSearchParams(location.search);
   if(!(q.get('cat')||q.get('q')||q.get('evt'))){document.body.classList.add('cat-choose');selectedIndex=0;armedIndex=-1;show(0);updateCrumb('');}
   else{const v=document.getElementById('filterSelect').value;if(v!=='Tous')choisir(v);else updateCrumb('');}
+  document.documentElement.classList.remove('cc-wait','cc-pre');
 })();
 
 function saveCart(){try{localStorage.setItem('vespra_cart',JSON.stringify(cart))}catch(e){}}
