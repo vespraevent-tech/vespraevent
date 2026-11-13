@@ -20,7 +20,7 @@
     var bloc = document.createElement('div');
     bloc.id = 'cContact';
     bloc.innerHTML =
-        '<a class="cc-b" href="/reservation.html?demande=devis">Envoyer une demande →</a>'
+        '<a class="cc-b" href="/reservation.html?demande=devis">Envoyer une demande</a>'
       + '<a class="cc-c" href="/catalogue.html">Voir le catalogue</a>';
     pied.parentNode.insertBefore(bloc, pied.nextSibling);
     function maj() {
