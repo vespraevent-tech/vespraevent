@@ -339,12 +339,12 @@ html body .pr-card .sj-list .sj-opt,html body .sj-list .sj-opt{font-size:13.5px}
 /* Fenêtre « Ajouter au devis » : rien ne dépasse, pas de défilement horizontal */
 html body .vm{overflow-x:hidden!important}
 html body .vm,html body .vm *{box-sizing:border-box}
-html body .vm>*{max-width:calc(100% - 44px)}
+html body .vm>*{max-width:calc(100% - 44px);margin-left:auto;margin-right:auto}
 html body .vm>.vm-head{max-width:100%}
 html body .vm img,html body .vm select,html body .vm input,html body .vm .sj-wrap{max-width:100%}
 html body .vm-variants,html body #vmOptions,html body #vmBody{min-width:0}
-html body .vm>.btn-p{max-width:calc(100% - 44px)!important}
-@media(min-width:900px){html body .vm>*{max-width:calc(100% - 68px)}html body .vm>.btn-p{max-width:calc(100% - 68px)!important}}
+html body .vm>.btn-p,html body .vm>.btn-submit{max-width:calc(100% - 44px)!important}
+@media(min-width:900px){html body .vm>*{max-width:calc(100% - 68px)}html body .vm>.btn-p,html body .vm>.btn-submit{max-width:calc(100% - 68px)!important}}
 
 
 /* ===== Fenêtre « Ajouter au devis » : bouton compact, centré, avec de l'air autour ===== */
@@ -361,3 +361,6 @@ html body .vm>a.vmLink,html body .vm>#vmLink{text-align:center}
 /* Accueil : moins de vide entre l'en-tête et « Par où commencer » */
 html body .evs{padding-top:64px!important}
 @media(max-width:700px){html body .evs{padding-top:34px!important}}
+
+/* Fenêtre produit : bouton d'ajout toujours centré, pleine largeur du contenu (accueil comprise) */
+html body .vm>.btn-p,html body .vm>.btn-submit,html body .vm>.btn-add-cart{display:flex!important;align-items:center;justify-content:center;width:100%!important;margin-left:auto!important;margin-right:auto!important}

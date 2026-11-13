@@ -249,6 +249,8 @@
       '  #formZone .btn-submit{padding:13px;font-size:14px}',
       '  .pc-nav{margin-top:18px}.pc-btn{padding:13px 26px}',
       '  #formZone .form-section-head{margin-bottom:14px}',
+      '  #formZone .sj-btn,#formZone .sj-btn .sj-txt{font-size:13px!important}',
+      '  .sj-pop .sj-opt,.sj-list .sj-opt{font-size:13px}',
       '}'
     ].join('');
     document.head.appendChild(st);
