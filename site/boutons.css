@@ -225,6 +225,7 @@ html:root{--r:8px;--rl:8px}
 html body .vcb-b,html body .ch-btn,html body .cc-go,html body .va-btn,html body .v-btn,html body .fin-rdv-in a,html body .pc-btn,html body .pc-cat{border-radius:10px!important}
 
 
-/* Panier : bouton secondaire « Ajouter d'autres produits » sous « Réserver » */
-html body .c-continue{display:block;width:100%;margin-top:8px;padding:8px 12px;background:transparent;color:var(--navy,#2B4A6B);border:1px solid var(--navy,#2B4A6B);border-radius:8px;font-family:inherit;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-align:center;cursor:pointer;transition:background .2s,color .2s}
+/* Panier : bouton secondaire « Ajouter d'autres produits », même taille que « Réserver » */
+html body .c-continue{display:flex;align-items:center;justify-content:center;min-height:38px;width:100%;margin-top:8px;padding:11px 12px;background:transparent;color:var(--navy,#2B4A6B);border:1px solid var(--navy,#2B4A6B);border-radius:8px;font-family:inherit;font-size:10px;font-weight:500;letter-spacing:.06em;line-height:normal;text-transform:uppercase;text-align:center;cursor:pointer;transition:background .2s,color .2s}
 html body .c-continue:hover{background:var(--navy,#2B4A6B);color:#fff}
+@media(min-width:701px){html body .c-continue{min-height:42px;padding:12px;font-size:9.4px;letter-spacing:.08em}}
