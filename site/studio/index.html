@@ -7522,6 +7522,12 @@ function ouvrirFiche(id, silencieux){
   const subs = f.varsub != null && f.varsub !== '' ? String(f.varsub).replace(/\\(['"])/g, '$1').split('|') : [];
   let optlib = {};
   try{ optlib = JSON.parse(f.optlib || '{}') || {}; }catch(e){ optlib = {}; }
+  /* photo propre à chaque variante et image de la carte produit */
+  let varimg = [];
+  try{ varimg = JSON.parse(f.varimg || '[]') || []; }catch(e){ varimg = []; }
+  if(!Array.isArray(varimg)) varimg = [];
+  ficheVarImg = varimg;
+  ficheImgCarte = f.imgcarte || '';
 
   let lignesPrix = '';
   if(p.variantes.length){
@@ -7532,6 +7538,8 @@ function ouvrirFiche(id, silencieux){
       return '<div class="vrow">'
         + '<div class="vrow-n"><input id="v-lab-' + i + '" value="' + escVal(String(labels[i]||v.label).trim()) + '" placeholder="Nom de la variante">'
         + ((med.subs||[])[i] ? '<input id="v-sub-' + i + '" style="margin-top:6px;font-size:12.5px" placeholder="Petit texte sous le nom" value="' + escVal(String(subs[i] != null && subs[i] !== '' ? subs[i] : med.subs[i]).trim()) + '">' : '')
+        + '<div class="vrow-img" style="display:flex;gap:8px;align-items:center;margin-top:8px"><img id="v-imgp-' + i + '" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:8px;background:var(--g4);flex-shrink:0;display:none">'
+        + '<select id="v-img-' + i + '" onchange="majApercuVarImg(' + i + ')" style="flex:1;min-width:0;font-size:12.5px;padding:9px 12px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-family:inherit"></select></div>'
         + '</div>'
         + '<div class="vrow-p"><input id="v-prix-' + escAttr(v.prixId) + '"' + (modif?' class="modif"':'') + ' value="' + escVal(val) + '" inputmode="decimal"></div>'
         + '<span class="vrow-eur">€</span>'
@@ -7593,16 +7601,22 @@ function ouvrirFiche(id, silencieux){
 
     + (lignesOptions ? '<div class="sec"><div class="sec-t">Options proposées sur la fiche</div>' + lignesOptions + '</div>' : '')
 
-    + '<div class="sec"><div class="sec-t">Présentation</div>'
-    + '<div class="field"><label>Titre du produit</label>'
-    + '<input id="f-titre" value="' + escVal(f.titre || p.nom) + '" placeholder="' + escVal(p.nom) + '">'
-    + '<div class="aide">Affiché sur la page du produit et dans le catalogue. Vide = titre d\'origine.</div></div>'
-    + '<div class="field"><label>Photos de la fiche</label>'
+    + '<div class="sec"><div class="sec-t">Photos : ordre et image de la carte</div>'
+    + '<div class="field"><label>Ordre des photos de la fiche</label>'
     + '<div class="aide" style="margin-bottom:8px">La première photo est celle du catalogue et de l\'ouverture de la fiche. Toutes les photos de la galerie sont modifiables : remplacer, retirer, réordonner, ajouter.</div>'
     + '<div id="f-photos"></div>'
     + '<label class="btn btn-ghost btn-sm" style="display:inline-block;margin-top:8px">+ Ajouter une photo'
     + '<input type="file" accept="image/*" hidden onchange="ajouterPhotoFiche(this)"></label>'
     + '<span class="env-etat" style="font-size:12px;color:var(--green);margin-left:10px"></span></div>'
+    + '<div class="field" style="margin-top:14px"><label>Image de la carte produit (catalogue, accueil, pages villes)</label>'
+    + '<div style="display:flex;gap:10px;align-items:center"><img id="f-imgcarte-p" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px;background:var(--g4);flex-shrink:0;display:none">'
+    + '<select id="f-imgcarte" onchange="majApercuImgCarte()" style="flex:1;min-width:0;padding:9px 12px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-family:inherit;font-size:13px"></select></div>'
+    + '<div class="aide">Automatique = la photo principale de la galerie. Choisissez ici une autre photo pour la carte uniquement : la galerie de la fiche ne change pas.</div></div></div>'
+
+    + '<div class="sec"><div class="sec-t">Présentation</div>'
+    + '<div class="field"><label>Titre du produit</label>'
+    + '<input id="f-titre" value="' + escVal(f.titre || p.nom) + '" placeholder="' + escVal(p.nom) + '">'
+    + '<div class="aide">Affiché sur la page du produit et dans le catalogue. Vide = titre d\'origine.</div></div>'
     + '<div class="field"><label>Description courte (carte du catalogue)</label>'
     + '<textarea id="f-description" placeholder="' + escVal(p.desc) + '">' + esc(f.description||'') + '</textarea>'
     + '<div class="aide">Vide = description d\'origine.</div></div></div>'
@@ -7636,6 +7650,45 @@ function ouvrirFiche(id, silencieux){
 
 /* ── photos de la fiche ── */
 let fichePhotos = [];
+let ficheVarImg = [];
+let ficheImgCarte = '';
+function optionsPhotos(sel, vide){
+  let h = '<option value="">' + vide + '</option>', trouve = !sel;
+  fichePhotos.forEach(function(ph, i){
+    if(!ph || !ph.s) return;
+    if(ph.s === sel) trouve = true;
+    h += '<option value="' + escVal(ph.s) + '"' + (ph.s === sel ? ' selected' : '') + '>Photo ' + (i+1) + (ph.a ? ' — ' + esc(String(ph.a).slice(0,50)) : '') + '</option>';
+  });
+  if(!trouve) h += '<option value="' + escVal(sel) + '" selected>Photo choisie (hors galerie)</option>';
+  return h;
+}
+function majApercuVarImg(i){
+  const s = document.getElementById('v-img-' + i), p = document.getElementById('v-imgp-' + i);
+  if(!s || !p) return;
+  if(s.value){ p.src = srcPhoto(s.value); p.style.display = ''; } else { p.style.display = 'none'; }
+}
+function majApercuImgCarte(){
+  const s = document.getElementById('f-imgcarte'), p = document.getElementById('f-imgcarte-p');
+  if(!s || !p) return;
+  if(s.value){ p.src = srcPhoto(s.value); p.style.display = ''; } else { p.style.display = 'none'; }
+}
+function majSelectsPhotos(){
+  const p = (window.VESPRA_PRODUITS||[]).find(x=>x.id===ficheOuverte);
+  const nb = p ? p.variantes.length : 0;
+  for(let i=0;i<nb;i++){
+    const s = document.getElementById('v-img-' + i);
+    if(!s) continue;
+    const cur = s.options.length ? s.value : (ficheVarImg[i] || '');
+    s.innerHTML = optionsPhotos(cur, 'Photo d\'origine du site');
+    majApercuVarImg(i);
+  }
+  const c = document.getElementById('f-imgcarte');
+  if(c){
+    const cur = c.options.length ? c.value : ficheImgCarte;
+    c.innerHTML = optionsPhotos(cur, 'Automatique (photo principale)');
+    majApercuImgCarte();
+  }
+}
 function srcPhoto(s){ return urlImage(s); }
 function lirePhotosFiche(){
   fichePhotos.forEach((ph, i) => { const el = document.getElementById('ph-alt-' + i); if(el) ph.a = el.value; });
@@ -7654,6 +7707,7 @@ function dessinerPhotosFiche(){
     + '<label class="btn btn-ghost btn-sm" style="margin:0">Remplacer<input type="file" accept="image/*" hidden onchange="remplacerPhotoFiche(this,' + i + ')"></label>'
     + (fichePhotos.length > 1 ? '<button type="button" class="btn btn-ghost btn-sm" title="Retirer" onclick="retirerPhotoFiche(' + i + ')">✕</button>' : '')
     + '</div></div>').join('');
+  majSelectsPhotos();
 }
 function deplacerPhotoFiche(i, d){
   lirePhotosFiche();
@@ -7769,6 +7823,10 @@ async function enregistrerFiche(id){
   if(changeLabels) fiche.variantes = labels.join('|');
   if(changeSubs) fiche.varsub = subsLus.map((x,i)=> x || (med.subs||[])[i] || '').join('|');
   if(Object.keys(optlib).length) fiche.optlib = JSON.stringify(optlib);
+  const varimgLus = p.variantes.map(function(v,i){ const el = document.getElementById('v-img-'+i); return el ? String(el.value||'') : ''; });
+  if(varimgLus.some(Boolean)) fiche.varimg = JSON.stringify(varimgLus);
+  const carteEl = document.getElementById('f-imgcarte');
+  if(carteEl && carteEl.value) fiche.imgcarte = carteEl.value;
   const comps = [];
   [0,1,2,3].forEach(function(k){
     const el = document.getElementById('f-comp-'+k);
@@ -7778,7 +7836,7 @@ async function enregistrerFiche(id){
   if(comps.length) fiche.complements = JSON.stringify(comps);
 
   const avant = modifFiche(p.id);
-  if(fiche.image || fiche.photos || fiche.titre || fiche.description || fiche.variantes || fiche.varsub || fiche.optlib || fiche.complements) ecritures.push(['ecrire', fiche]);
+  if(fiche.image || fiche.photos || fiche.titre || fiche.description || fiche.variantes || fiche.varsub || fiche.optlib || fiche.varimg || fiche.imgcarte || fiche.complements) ecritures.push(['ecrire', fiche]);
   else if(avant) ecritures.push(['suppr', p.id]);
 
   if(!ecritures.length){ showToast('Aucune modification'); return; }

@@ -225,6 +225,24 @@
         });
       } catch (e) {}
     }
+    /* photo propre à chaque variante, choisie dans le back-office */
+    if (f.varimg) {
+      try {
+        var vimgs = JSON.parse(f.varimg);
+        var vb = document.querySelectorAll('.prod-vbtn');
+        (Array.isArray(vimgs) ? vimgs : []).forEach(function (src, i) {
+          var b = vb[i];
+          if (!src || !b) return;
+          var oc = b.getAttribute('onclick');
+          if (oc) b.setAttribute('onclick', oc.replace(/(selectVariant\(this,\s*'[^']*',\s*[\d.]+)(?:,\s*'[^']*')?\)/, "$1,'" + String(src).replace(/'/g, '') + "')"));
+          if (b.classList.contains('active')) {
+            var mi = document.getElementById('prodMainImg');
+            if (mi) { mi.removeAttribute('srcset'); mi.src = src; }
+            try { if (typeof _selectedVariant !== 'undefined' && _selectedVariant) _selectedVariant.img = src; } catch (e5) {}
+          }
+        });
+      } catch (e6) { /* liste illisible : les photos d'origine restent */ }
+    }
     if (f.variantes) {
       var labels = String(f.variantes).replace(/\\(['"])/g, '$1').split('|');
       var btns = document.querySelectorAll('.prod-vbtn');
@@ -356,6 +374,14 @@
       for (var k = 0; k < P.length; k++) if (P[k].id === id) { prod = P[k]; break; }
       if (!prod) return;
       if (f.image) prod.img = f.image;
+      if (f.imgcarte) prod.img = f.imgcarte;
+      if (f.varimg && prod.variants) {
+        try {
+          (JSON.parse(f.varimg) || []).forEach(function (src, i) {
+            if (src && prod.variants[i]) prod.variants[i].img = src;
+          });
+        } catch (e7) {}
+      }
       if (f.description) prod.desc = f.description;
       if (f.titre) prod.name = String(f.titre).replace(/\\(['"])/g, '$1');
       if (f.variantes && prod.variants) {

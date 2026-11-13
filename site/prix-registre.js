@@ -3158,6 +3158,10 @@ window.VESPRA_MEDIAS = {
   "produit-pack-vespra.html": {
     "photos": [
       {
+        "s": "pack-vespra-20-v2.webp",
+        "a": "Pack Vespra 20 personnes"
+      },
+      {
         "s": "pack-vespra-60-v2.webp",
         "a": "Pack Vespra 40 à 60 personnes"
       },
