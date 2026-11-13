@@ -295,3 +295,5 @@ http://www.vespraevent.com/*   https://www.vespraevent.fr/:splat   301!
 # v748 : la cabine rouge est devenue un choix de couleur sur la fiche audio/vidéo
 /produit-cabine-telephonique-rouge   /produit-cabine-telephonique-audio-video.html?c=rouge   301
 /produit-cabine-telephonique-rouge.html   /produit-cabine-telephonique-audio-video.html?c=rouge   301
+/article-neon-lumineux /blog 301
+/article-neon-lumineux.html /blog 301

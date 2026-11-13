@@ -3032,8 +3032,8 @@ window.VESPRA_PRODUITS = [
       "Effets spéciaux et artifices"
     ],
     "desc": "Une fumée légère pour révéler les faisceaux lumineux et renforcer l'ambiance.",
-    "img": "machine-fumee-situation.webp",
-    "imgCat": "machine-fumee-situation.webp",
+    "img": "machine-fumee.webp",
+    "imgCat": "machine-fumee.webp",
     "page": "produit-machines-effets.html",
     "prix": 10,
     "prixId": "pyrotechnie-2",
@@ -3632,7 +3632,7 @@ window.VESPRA_MEDIAS = {
         "a": "La machine à bulles pendant une soirée"
       },
       {
-        "s": "machine-fumee-situation.webp",
+        "s": "machine-fumee.webp",
         "a": "La machine à fumée sur une piste de danse"
       }
     ],
