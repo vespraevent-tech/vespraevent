@@ -719,7 +719,7 @@ transform:none!important;stroke-dashoffset:0!important}}
   var e=document.getElementById('vsLoad');if(!e)return;
   /* pas d'animation d'accueil dans l'aperçu ni dans l'édition du
      back-office : la page doit s'y afficher tout de suite */
-  if(window.parent!==window||/[?&](edition|apercu)=1/.test(location.search)){e.remove();return}
+  if(window.parent!==window||/[?&](edition|apercu)=1/.test(location.search)||!/^\/(index(\.html)?)?$/.test(location.pathname)){e.remove();return}  /* l'animation ne s'affiche qu'à l'arrivée sur l'accueil, jamais sur les autres pages */
   var deja=false;try{deja=sessionStorage.getItem('vespra_intro')==='1'}catch(x){}
   if(deja){e.remove();return}                       // uniquement à l'arrivée sur le site
   try{sessionStorage.setItem('vespra_intro','1')}catch(x){}
