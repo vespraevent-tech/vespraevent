@@ -203,13 +203,41 @@
     /* largeur utile selon l'endroit où la photo est affichée */
     function allege(src,img){
       if(typeof window.VESPRA_IMG!=='function')return src;
-      var w=900;
+      /* si le service d'images ne répond pas, on n'y fait plus appel du tout */
+      if(window.__VESPRA_IMG_HS||(img&&img.__sansCdn))return src;
+      var w=800;
       try{
+        var cl=' '+(img&&img.className||'')+' ';
         if(img&&(img.id==='prodMainImg'||img.id==='pgImg'))w=1400;
         else if(img&&img.closest&&img.closest('#prodThumbs'))w=300;
+        else if(/ (prod-img|bc-img|pc-img|blog-thumb|c-item-img|vm-img|evc-img) /.test(cl))w=450;
         else{var r=img&&img.getBoundingClientRect?img.getBoundingClientRect().width:0;if(r>0)w=Math.max(300,Math.min(1400,Math.ceil(r/100)*100));}
       }catch(e){}
       return window.VESPRA_IMG(src,w);
+    }
+    /* si le service d'images ne répond pas, la photo d'origine reprend sa place */
+    var echecs=0;
+    /* service d'images injoignable : toutes les photos reprennent leur version d'origine */
+    function toutRetablir(){
+      try{
+        document.querySelectorAll('img').forEach(function(i){
+          if(!i.__orig)return;
+          if((i.getAttribute('src')||'').indexOf('/.netlify/images')!==0)return;
+          i.__sansCdn=1;i.removeAttribute('srcset');i.setAttribute('src',i.__orig);
+        });
+      }catch(e){}
+    }
+    function filet(img,origine){
+      img.__orig=origine;
+      if(!img||img.__filet)return;img.__filet=1;
+      img.addEventListener('error',function(){
+        try{
+          if((img.getAttribute('src')||'').indexOf('/.netlify/images')!==0)return;
+          img.__sansCdn=1;                       /* cette photo reprend sa version d'origine */
+          img.removeAttribute('srcset');img.setAttribute('src',origine);
+          if(++echecs>=3&&!window.__VESPRA_IMG_HS){window.__VESPRA_IMG_HS=1;toutRetablir();}
+        }catch(e){}
+      });
     }
     function corrige(img){
       if(!img||img.nodeName!=='IMG')return;
@@ -236,8 +264,15 @@
       if(rep&&map[basename(rep)])rep=map[basename(rep)];
       /* une photo envoyée depuis le back-office est servie redimensionnée :
          sinon la page chargerait la photo d'origine, souvent de plusieurs mégaoctets */
-      var final=allege(rep||src,img);
+      /* photo déjà demandée au service d'images : on garde quand même son
+         adresse d'origine sous la main, pour pouvoir y revenir en cas de panne */
+      if(src.indexOf('/.netlify/images')===0){
+        try{var o=decodeURIComponent((src.match(/[?&]url=([^&]+)/)||[])[1]||'');if(o)filet(img,o);}catch(e){}
+      }
+      var depart=rep||src;
+      var final=allege(depart,img);
       if(final&&final!==src){
+        filet(img,depart);
         var nb=+(img.getAttribute('data-vi')||0);if(nb>=3)return;   /* garde-fou anti-boucle */
         img.setAttribute('data-vi',String(nb+1));
         img.removeAttribute('srcset');img.setAttribute('src',final);

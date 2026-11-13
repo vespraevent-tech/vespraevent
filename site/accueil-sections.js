@@ -77,6 +77,7 @@ function ajout(p,add){
 }
 function carte(p,add){
   var c=document.createElement('div');c.className='bc';
+  if(p&&p.id)c.setAttribute('data-id',p.id);   /* permet le repère « déjà dans mon devis » */
   c.innerHTML='<div class="bc-img-wrap"><img class="bc-img" src="'+p.img+'" alt="'+esc(p.name)+'" loading="lazy" decoding="async"></div>'
    +'<div class="bc-body"><div class="bc-cat">'+p.cat+'</div><div class="bc-name">'+p.name+'</div><div class="bc-desc">'+p.desc+'</div><div class="bc-foot"><div class="bc-price">'+(p.vdef?'':'<span class="bc-from">À partir de</span>')+p.price+' €</div>'
    +'<span class="bc-add" aria-hidden="true">+</span></div></div>';

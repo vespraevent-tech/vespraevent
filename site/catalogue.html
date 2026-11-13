@@ -2190,30 +2190,7 @@ function goReserver(){saveCart();window.location.href='reservation.html';}
 
 </script>
 <script id="cat-dans-panier">
-/* Repère « Dans mon panier » sur les cartes dont le produit est déjà au devis : évite les doublons */
-(function(){
-  var st=document.createElement('style');
-  st.textContent='.prod-img-wrap{position:relative}.prod-card.in{box-shadow:0 0 0 2px var(--navy),0 4px 16px rgba(0,0,0,.05)}.cp-badge{position:absolute;top:10px;left:10px;z-index:2;width:22px;height:22px;display:flex;align-items:center;justify-content:center;background:var(--navy);line-height:0;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.25)}';
-  document.head.appendChild(st);
-  function base(it){return String((it&&it.id)||'').split('_')[0]}
-  function dans(id){try{return (cart||[]).some(function(it){return base(it)===id})}catch(e){return false}}
-  function maj(){
-    document.querySelectorAll('#prodGrid .prod-card[data-id]').forEach(function(c){
-      var on=dans(c.getAttribute('data-id'));
-      c.classList.toggle('in',on);
-      var w=c.querySelector('.prod-img-wrap'),b=w&&w.querySelector('.cp-badge');
-      if(on&&w&&!b){b=document.createElement('span');b.className='cp-badge';b.innerHTML='<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2.5 6.4l2.3 2.3 4.7-5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';b.setAttribute('aria-label','Dans mon panier');w.appendChild(b)}
-      if(!on&&b)b.remove();
-    });
-  }
-  var rg=window.renderGrid;
-  window.renderGrid=function(products){
-    rg(products);
-    maj();
-  };
-  var rc=window.renderCart;
-  window.renderCart=function(){var r=rc.apply(this,arguments);try{maj()}catch(e){}return r};
-})();
+/* repère « déjà dans mon devis » : désormais commun à tout le site (panier-coche.js) */
 </script>
 <script src="/catalogue-bo.js" defer></script>
 <script>
@@ -2246,4 +2223,5 @@ function goReserver(){saveCart();window.location.href='reservation.html';}
 <script>window.__vespraSansCentrage=1;</script><script src="/centrer.js?v=5" defer></script>
 <link rel="stylesheet" href="/coherence.css?v=31">
 <script src="/coherence.js?v=7" defer></script>
+<script src="/panier-coche.js" defer></script>
 <script src="/panier-sync.js" defer></script>

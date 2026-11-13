@@ -1874,7 +1874,7 @@ window.addEventListener('vespra-produits-ready',function(){
   if(!wrap||!track)return;
 
   function makeCard(p){
-    const c=document.createElement('div');c.className='bc';
+    const c=document.createElement('div');c.className='bc';if(p&&p.id)c.setAttribute('data-id',p.id);
     // Défilement tactile natif : un swipe ne doit jamais être interprété
     // comme un clic vers la fiche produit.
     let touchStartX=0,touchStartY=0,touchMoved=false;
@@ -3402,3 +3402,4 @@ setTimeout(function(){setInterval(function(){im[k].classList.remove('on');k=(k+1
 <script src="/selects-jolis.js" defer></script>
 <script src="/centrer.js?v=5" defer></script>
 <script src="/panier-sync.js" defer></script>
+<script src="/panier-coche.js" defer></script>

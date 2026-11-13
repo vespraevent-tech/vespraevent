@@ -771,6 +771,7 @@ function renderGrid(){
   grid.innerHTML='';
   PRODUCTS.forEach(p=>{
     const c=document.createElement('div');c.className='prod-card';
+    if(p&&p.id)c.setAttribute('data-id',p.id);
     const priceLabel=`<span class="prod-from">\u00c0 partir de</span>${p.price} \u20ac`;
     c.innerHTML=`<div class="prod-img-wrap"><img class="prod-img" src="${p.img}" alt="${p.name}" loading="lazy" decoding="async"></div><div class="prod-body"><div class="prod-cat">${p.cat}</div><div class="prod-name">${p.name}</div><div class="prod-desc">${p.desc}</div><div class="prod-foot"><div class="prod-price">${priceLabel}</div><button class="btn-add" onclick="event.stopPropagation();handleAdd('${p.id}')" title="Ajouter au devis">+</button></div></div>`;
     c.onclick=()=>handleAdd(p.id);
@@ -1123,3 +1124,4 @@ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded'
 <link rel="stylesheet" href="/coherence.css?v=15">
 <script src="/coherence.js?v=7" defer></script>
 <script src="/panier-sync.js" defer></script>
+<script src="/panier-coche.js" defer></script>

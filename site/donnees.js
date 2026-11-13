@@ -23,7 +23,16 @@
   window.VESPRA_IMG = function (src, largeur) {
     var s = String(src == null ? '' : src).trim();
     if (!s || s.indexOf('/.netlify/images') === 0) return s;
-    if (s.indexOf('/api/media/') !== 0) return s;
+    var envoi = s.indexOf('/api/media/') === 0;
+    if (!envoi) {
+      /* photo du site : réduite elle aussi, mais seulement si on sait à quelle
+         taille elle est affichée (une vignette de 300 px n'a pas besoin d'une
+         photo de 1080 px). Les logos et dessins (SVG) ne sont jamais touchés. */
+      if (!largeur) return s;
+      if (/^(https?:|data:|blob:)/.test(s)) return s;
+      if (!/\.(webp|jpe?g|png)(\?|$)/i.test(s)) return s;
+      if (s.charAt(0) !== '/') s = '/' + s;
+    }
     var w = largeur || 900;
     try {
       var dpr = window.devicePixelRatio || 1;
