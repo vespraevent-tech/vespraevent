@@ -226,5 +226,5 @@ html body .vcb-b,html body .ch-btn,html body .cc-go,html body .va-btn,html body 
 
 
 /* Panier : bouton secondaire « Ajouter d'autres produits » sous « Réserver » */
-html body .c-continue{display:block;width:100%;margin-top:10px;padding:13px;background:#fff;color:var(--navy,#2B4A6B);border:2px solid var(--navy,#2B4A6B);border-radius:10px;font-family:inherit;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-align:center;cursor:pointer;transition:background .2s,color .2s}
+html body .c-continue{display:block;width:100%;margin-top:8px;padding:8px 12px;background:transparent;color:var(--navy,#2B4A6B);border:1px solid var(--navy,#2B4A6B);border-radius:8px;font-family:inherit;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-align:center;cursor:pointer;transition:background .2s,color .2s}
 html body .c-continue:hover{background:var(--navy,#2B4A6B);color:#fff}
