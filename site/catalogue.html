@@ -602,7 +602,7 @@ transform:none!important;stroke-dashoffset:0!important}}
     <div class="ch-pack-photo" aria-hidden="true"></div>
     <div class="ch-pack-txt">
       <div class="cat-hero-tag">Offre événement</div>
-      <h2 class="cat-hero-h">COMPOSEZ VOTRE<br>PACK MARIAGE</h2>
+      <h2 class="cat-hero-h">COMPOSEZ VOTRE<br>PACK</h2>
       <p class="cat-hero-sub">−10&nbsp;% sur votre devis à partir de 5 produits choisis. La remise s'applique toute seule.</p>
       <a href="pack-mariage.html" class="ch-btn">Composer votre pack</a>
     </div>
@@ -671,10 +671,16 @@ transform:none!important;stroke-dashoffset:0!important}}
       cur=n;busy=false;plan();
     },calme?20:1500);
   }
-  function plan(){clearTimeout(timer);if(calme)return;timer=setTimeout(function(){if(document.hidden)plan();else aller((cur+1)%sl.length);},4000);}
-  /* Diapositive de départ tirée au hasard à chaque visite. */
+  /* Ordre de passage tiré au hasard à chaque visite : la succession des écrans
+     change d'une fois sur l'autre, comme sur la page d'accueil. */
+  var ordre=sl.map(function(_,i){return i;});
+  for(var i=ordre.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=ordre[i];ordre[i]=ordre[j];ordre[j]=t;}
+  var pos=0;
+  function suivant(){pos=(pos+1)%ordre.length;return ordre[pos];}
+  function plan(){clearTimeout(timer);if(calme)return;timer=setTimeout(function(){if(document.hidden)plan();else aller(suivant());},4000);}
+  /* Premier écran : le premier de cet ordre. */
   (function(){
-    var d=Math.floor(Math.random()*sl.length);
+    var d=ordre[0];
     if(d>0){
       var a=sl[0],b=sl[d];
       a.classList.add('ch-off');a.style.visibility='hidden';a.setAttribute('aria-hidden','true');
@@ -683,7 +689,7 @@ transform:none!important;stroke-dashoffset:0!important}}
       cur=d;
     }
   })();
-  dots.forEach(function(d,k){d.addEventListener('click',function(){clearTimeout(timer);aller(k);});});
+  dots.forEach(function(d,k){d.addEventListener('click',function(){clearTimeout(timer);var p=ordre.indexOf(k);if(p>=0)pos=p;aller(k);});});
   plan();
 })();
 </script>

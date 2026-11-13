@@ -781,12 +781,6 @@ transform:none!important;stroke-dashoffset:0!important}}
    hauteurs égalisées) : plus de blocs qui bougent ou changent sous les yeux du visiteur */
 html:not(.hero-pret) body #hero .hero-content,html:not(.hero-pret) body #hero .hero-dots{opacity:0}
 html body #hero .hero-content,html body #hero .hero-dots{transition:opacity .35s ease}
-/* sur téléphone, l'en-tête garde la même hauteur qu'avant (72 % de l'écran) mais elle est
-   fixée d'avance : elle ne varie plus pendant le chargement, le reste de la page ne saute plus */
-@media(max-width:900px){
-  html body .hero{height:max(72svh,540px);min-height:0}
-  html body .hero .hero-slide:first-child{position:absolute;inset:0;height:auto;min-height:0}
-}
 </style>
 <section class="hero" id="hero" aria-roledescription="carrousel" aria-label="À la une">
   <div class="hero-slide hs-on" data-bg="hero-zones-livraison.webp" style="background-image:url('hero-zones-livraison.webp')">

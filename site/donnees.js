@@ -14,6 +14,29 @@
    garde le contenu écrit dans ses fichiers : rien ne disparaît.
    ───────────────────────────────────────────────────────────── */
 (function () {
+  /* ── Verrouillage du défilement (menu burger, fenêtres, galeries) ──────────
+     Les pages bloquaient le défilement avec « body.style.overflow = hidden ».
+     Or la page est désormais rognée sur les côtés (html et body en overflow-x:clip,
+     pour qu'aucun élément hors de l'écran n'élargisse la page sur téléphone) :
+     un overflow posé sur le body le transformait alors en zone de défilement
+     indépendante, la barre du haut n'était plus collée à l'écran et le bouton
+     du menu disparaissait. Le verrou est donc posé sur l'élément racine, ce qui
+     bloque le défilement de la même façon sans rien casser. */
+  function brancher() {
+    try {
+      var b = document.body;
+      if (!b || b.__verrou) return;
+      b.__verrou = 1;
+      var h = document.documentElement.style;
+      Object.defineProperty(b.style, 'overflow', {
+        configurable: true,
+        get: function () { return h.overflow; },
+        set: function (v) { h.overflow = v; }
+      });
+    } catch (e) { /* navigateur sans cette possibilité : comportement d'origine */ }
+  }
+  if (document.body) brancher(); else document.addEventListener('DOMContentLoaded', brancher);
+
   /* ── Photos envoyées depuis le back-office ────────────────────────
      Elles sont enregistrées telles quelles (une photo de téléphone pèse
      souvent plus d'un mégaoctet). Le CDN d'images de Netlify les sert
