@@ -537,9 +537,15 @@ transform:none!important;stroke-dashoffset:0!important}}
   var e=document.getElementById('vsLoad');if(!e)return;
   /* pas d'animation d'accueil dans l'aperçu ni dans l'édition du
      back-office : la page doit s'y afficher tout de suite */
-  if(window.parent!==window||/[?&](edition|apercu)=1/.test(location.search)||!/^\/(index(\.html)?)?$/.test(location.pathname)){e.remove();return}  /* l'animation ne s'affiche qu'à l'arrivée sur l'accueil, jamais sur les autres pages */
-  var deja=false;try{deja=sessionStorage.getItem('vespra_intro')==='1'}catch(x){}
-  if(deja){e.remove();return}                       // uniquement à l'arrivée sur le site
+  if(window.parent!==window||/[?&](edition|apercu)=1/.test(location.search)){e.remove();return}  /* l'animation ne s'affiche qu'à l'arrivée sur l'accueil, jamais sur les autres pages */
+  /* uniquement à l'arrivée sur le site : ni en changeant de page, ni dans un nouvel
+     onglet de la même visite. La date de la dernière visite est gardée dans le
+     navigateur (sessionStorage ne vaut que pour un onglet). */
+  var deja=false,now=Date.now();
+  try{var v=+localStorage.getItem('vespra_intro_t')||0;if(now-v<2*3600*1000)deja=true;}catch(x){}
+  if(!deja){try{if(sessionStorage.getItem('vespra_intro')==='1')deja=true;}catch(x){}}
+  if(deja){e.remove();return}
+  try{localStorage.setItem('vespra_intro_t',String(now))}catch(x){}
   try{sessionStorage.setItem('vespra_intro','1')}catch(x){}
   var t0=Date.now(),MIN=1500,fait=false;
   function fermer(){e.classList.add('vsl-off');setTimeout(function(){e.remove()},520)}
