@@ -953,6 +953,11 @@ function buildDrawerCSS(){
 .vc-btn-secondary{display:block;background:#fff;color:#2B4A6B;text-align:center;padding:13px;border-radius:10px;font-size:14px;font-weight:600;text-decoration:none;border:2px solid #2B4A6B;width:100%;font-family:inherit;cursor:pointer;transition:background .2s,color .2s}
 .vc-btn-secondary:hover{background:#2B4A6B;color:#fff}
 .vc-note{font-size:11px;color:#646D7C;text-align:center;margin-top:10px;line-height:1.5}
+#vc-contact{padding:20px 20px 24px;border-top:1px solid #e8eaed;text-align:center;background:#fff;box-shadow:0 -14px 24px -18px rgba(20,37,58,.28)}
+#vc-contact .vcc-t{font:700 15px/1.3 Inter,system-ui,sans-serif;color:#0C0F14;margin:0 0 6px}
+#vc-contact .vcc-s{font:400 13px/1.5 Inter,system-ui,sans-serif;color:#646D7C;margin:0 0 16px}
+#vc-contact .vcc-l{display:inline-block;margin-top:14px;font:600 13px/1 Inter,system-ui,sans-serif;color:#2B4A6B;text-decoration:none}
+#vc-contact .vcc-l:hover{text-decoration:underline}
 `;
   document.head.appendChild(s);
 }
@@ -979,6 +984,12 @@ function buildDrawerDOM(){
   <a href="reservation.html" class="vc-btn-primary">Envoyer mon devis →</a>
   <button type="button" class="vc-btn-secondary" onclick="closeCart()">Ajouter d'autres produits</button>
   <p class="vc-note">Devis gratuit, sans engagement. Notre équipe vous recontacte sous 24h.</p>
+</div>
+<div id="vc-contact" hidden>
+  <p class="vcc-t">Une question, un projet ?</p>
+  <p class="vcc-s">Décrivez-nous votre événement : nous vous répondons avec un devis sous 24 h.</p>
+  <a href="/reservation.html?demande=devis" class="vc-btn-primary">Envoyer une demande →</a>
+  <a class="vcc-l" href="tel:+33650836828">ou nous appeler : 06 50 83 68 28</a>
 </div>`;
   document.body.appendChild(overlay);
   document.body.appendChild(drawer);
@@ -993,8 +1004,10 @@ function renderDrawer(){
   if(!cart.length){
     body.innerHTML='<div class="vc-empty">Votre devis est vide.<br><br>Parcourez notre catalogue et ajoutez des produits pour obtenir un devis !</div>';
     if(foot)foot.hidden=true;
+    var ct=document.getElementById('vc-contact');if(ct)ct.hidden=false;   /* devis vide : on propose d'écrire */
     return;
   }
+  var ct2=document.getElementById('vc-contact');if(ct2)ct2.hidden=true;
   body.innerHTML=cart.map(function(item,idx){
     var labelHtml=item.label?'<div class="vc-item-label">'+item.label+'</div>':'';
     var priceHtml=(item.price*(item.qty||1))+' €';
