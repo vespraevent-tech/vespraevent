@@ -7503,7 +7503,9 @@ function ouvrirFiche(id, silencieux){
   const p = (window.VESPRA_PRODUITS||[]).find(x=>x.id===id);
   if(!p) return;
   ficheOuverte = id;
-  const f = modifFiche(id) || {};
+  let f = modifFiche(id) || {};
+  /* photos remaniées par le site : l'ancienne photo ou galerie enregistrée avant n'est plus affichée */
+  if({p3:1,p8:1,p13:1,p15:1,p38:1,p39:1,p44:1,p56:1}[id] && String(f.vimg) !== '2' && (f.image || f.photos)){ f = Object.assign({}, f); delete f.image; delete f.photos; }
   const mp = modifsPrix();
   const med = (window.VESPRA_MEDIAS||{})[p.page] || {photos:[], options:{}, subs:[]};
   /* photos de la galerie : celles déjà modifiées, sinon celles de la page
@@ -7812,7 +7814,7 @@ async function enregistrerFiche(id){
     if(Object.keys(e).length) optlib[o.champ] = e;
   });
 
-  const fiche = {id: p.id, type:'produit'};
+  const fiche = {id: p.id, type:'produit', vimg:'2'};
   if(changePhotos){
     fiche.photos = JSON.stringify(photos);
     if(photos[0].s !== (origPhotos[0]||{}).s) fiche.image = photos[0].s;

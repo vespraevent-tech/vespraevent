@@ -23,7 +23,9 @@
     Object.keys(PHOTOS_ORIGINE).forEach(function(id){
       PHOTOS_ORIGINE[id].forEach(function(n){usage[n]=(usage[n]||0)+1;});
     });
+    var ANCIENNES={p3:1,p8:1,p13:1,p15:1,p38:1,p39:1,p44:1,p56:1};
     (Array.isArray(produits)?produits:[]).forEach(function(it){
+      if(it&&it.type==='produit'&&ANCIENNES[it.id]&&String(it.vimg)!=='2')return; /* ancienne photo enregistrée avant le remaniement */
       if(it&&it.type==='produit'&&it.id&&it.image)parId[it.id]=cleanUrl(it.image);
       /* un produit dont la galerie a été choisie photo par photo garde cette
          liste telle quelle : sa photo principale ne doit pas aussi remplacer

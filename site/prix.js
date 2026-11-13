@@ -45,6 +45,11 @@
           var v = nombre(it.prix);
           if (v) prix[it.id] = v;
         } else if (it.type === 'produit') {
+          /* photos remaniées dans cette version : une ancienne photo ou galerie enregistrée avant
+             (sans la marque vimg) ne doit pas écraser les nouvelles ; un nouvel enregistrement du back-office la porte */
+          if ({p3:1,p8:1,p13:1,p15:1,p38:1,p39:1,p44:1,p56:1}[it.id] && String(it.vimg) !== '2' && (it.image || it.photos)) {
+            it = Object.assign({}, it); delete it.image; delete it.photos;
+          }
           fiches[it.id] = it;
         } else {
           nouveaux.push(it);
