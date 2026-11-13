@@ -218,7 +218,7 @@ a{text-decoration:none;color:inherit}img{display:block;max-width:100%}button{cur
 .prod-price small{font-size:13px;font-weight:400;color:var(--g2)}
 .btn-add{background:var(--navy);color:var(--white);width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:300;line-height:1;transition:background .2s,transform .15s}
 .btn-add:hover{background:var(--navy-h);transform:scale(1.1)}
-.reviews{padding:88px 64px;background:var(--white);overflow:hidden}
+.reviews{padding:52px 64px 88px;background:var(--white);overflow:hidden}
 /* Les avis défilent tout seuls, doucement, et le visiteur peut les
    parcourir lui-même : au doigt sur téléphone, à la souris sur
    ordinateur. Le défilement s'arrête dès qu'on le survole ou qu'on
@@ -239,7 +239,7 @@ a{text-decoration:none;color:inherit}img{display:block;max-width:100%}button{cur
 .rv-name{font-size:14px;font-weight:600}
 .rv-date{font-size:12px;color:var(--g2)}
 .rv-badge{display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-size:11px;font-weight:600;color:var(--g2);letter-spacing:.02em}
-.blog{padding:88px 64px;background:var(--g4)}
+.blog{padding:88px 64px 52px;background:var(--g4)}
 .blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:44px}
 .blog-card{background:var(--white);border-radius:var(--rl);overflow:hidden;cursor:pointer;transition:box-shadow .25s,transform .2s}
 .blog-card:hover{box-shadow:0 16px 48px rgba(0,0,0,.08);transform:translateY(-4px)}
@@ -402,8 +402,8 @@ footer{background:var(--black);color:var(--white);padding:64px}
  .bc-price{font-size:13px}
  .bc-add{width:26px;height:26px;font-size:14px}
  .prod-grid{grid-template-columns:1fr}
- .reviews{padding:40px 20px}
- .blog{padding:40px 20px}
+ .reviews{padding:24px 20px 40px}
+ .blog{padding:40px 20px 24px}
   /* Cartes blog compactes sur téléphone : vignette à gauche, texte à droite */
  .blog-grid{grid-template-columns:1fr;gap:12px;margin-top:28px}
  .blog-card:nth-child(3){display:grid}
@@ -3294,10 +3294,10 @@ html:root:root:root:root body .off-cta a.btn-w{background:#fff!important;backgro
   .bests{padding:72px 0!important}
   .bc{width:min(340px,88vw)}
   .bests-head{padding:0 20px;flex-wrap:wrap}.blog-head{flex-wrap:wrap}
-  .blog{padding:72px 20px!important}
+  .blog{padding:72px 20px 36px!important}
   .blog-wrap{margin:0 -20px;padding-left:20px}.blog-card{width:250px}.blog-thumb{height:130px!important}
 }
-@media(min-width:701px){.bests{padding:110px 0!important}.blog{padding:110px 64px!important}}
+@media(min-width:701px){.bests{padding:110px 0!important}.blog{padding:110px 64px 56px!important}}
 
 </style>
 <script>

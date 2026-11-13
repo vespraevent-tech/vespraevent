@@ -14,6 +14,7 @@
 html body .evs,html body .bests,html body .blog,html body .reviews,
 html body .faq,html body .contact-section{padding-top:var(--sec-y);padding-bottom:var(--sec-y)}
 html body .trust,html body .rv{padding-top:var(--sec-y-sm);padding-bottom:var(--sec-y-sm)}
+html body .reviews{padding-top:calc(var(--sec-y) * .5)}
 html body .rf{padding-top:var(--sec-y-sm);padding-bottom:var(--sec-y-sm)}
 html body .cta-engage{padding-top:calc(var(--sec-y) * .8);padding-bottom:calc(var(--sec-y) * .8)}
 
@@ -39,7 +40,7 @@ html body .contact-section{background:var(--g4,#F0F2F5)}
 /* Les anciennes règles « !important » de l'accueil fixaient 110px : on les remplace. */
 @media(min-width:701px){
   html body .bests{padding-top:var(--sec-y)!important;padding-bottom:var(--sec-y)!important}
-  html body .blog{padding:var(--sec-y) var(--edge)!important}
+  html body .blog{padding:var(--sec-y) var(--edge) 52px!important}
 }
 
 /* ===== Touches de finition (le design actuel est conservé) ===== */
