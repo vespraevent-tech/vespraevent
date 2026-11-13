@@ -364,3 +364,15 @@ html body .evs{padding-top:64px!important}
 
 /* Fenêtre produit : bouton d'ajout toujours centré, pleine largeur du contenu (accueil comprise) */
 html body .vm>.btn-p,html body .vm>.btn-submit,html body .vm>.btn-add-cart{display:flex!important;align-items:center;justify-content:center;width:100%!important;margin-left:auto!important;margin-right:auto!important}
+
+/* Aucun élément ne doit jamais élargir la page : sur téléphone, un menu ou un
+   bandeau placé hors de l'écran agrandissait la page au double de sa largeur,
+   et il fallait la décaler vers la droite pour en voir le contenu.
+   « clip » rogne ce qui dépasse sans transformer la page en zone défilante
+   (le menu fixe en haut continue de fonctionner). */
+html{overflow-x:hidden;max-width:100%}
+body{overflow-x:hidden;max-width:100%}
+@supports (overflow:clip){
+  html{overflow-x:clip}
+  body{overflow-x:clip}
+}
