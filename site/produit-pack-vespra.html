@@ -709,7 +709,7 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
 
 <div class="prod-variants">
   <div class="prod-variants-label">Choisissez votre formule</div>
-  <button class="prod-vbtn active" onclick="selectVariant(this,'Pack 20 personnes',50,'pack-vespra-60-v2.webp')">
+  <button class="prod-vbtn active" onclick="selectVariant(this,'Pack 20 personnes',50,'pack-vespra-20-v2.webp')">
     <span class="prod-vbtn-name">20 personnes</span>
     <span class="prod-vbtn-price">50 €</span>
   </button>
@@ -1355,7 +1355,7 @@ function toggleNav(){
   var bt=document.querySelector('.nav-toggle');if(bt){bt.classList.toggle('open',open);bt.setAttribute('aria-expanded',open)}
   document.body.style.overflow=open?'hidden':'';
 }
-let _selectedVariant={label:'Pack 20 personnes',price:50,img:'pack-vespra-60-v2.webp'};
+let _selectedVariant={label:'Pack 20 personnes',price:50,img:'pack-vespra-20-v2.webp'};
 let _caissonOpt=false;
 function caissonInclus(){ return /180 à 250/.test(_selectedVariant.label); }
 function pxCaisson(){ return (window.VESPRA_OPT?window.VESPRA_OPT('optionCaissonPack',40):40); }
@@ -1487,7 +1487,7 @@ function toggleFaq(btn){
 })();
 
 /* — galerie produit — */
-const PG_IMGS=[{"s": "pack-vespra-200-v2.webp", "a": "Pack Vespra 180 à 250 personnes", "t": "pack-vespra-200-v2-t.webp"}, {"s": "pack-vespra-60-v2.webp", "a": "Pack Vespra 40 à 60 personnes", "t": "pack-vespra-60-v2-t.webp"}, {"s": "pack-vespra-100-v2.webp", "a": "Pack Vespra 80 à 100 personnes", "t": "pack-vespra-100-v2-t.webp"}, {"s": "pack-vespra-150-v2.webp", "a": "Pack Vespra 120 à 150 personnes", "t": "pack-vespra-150-v2-t.webp"}];
+const PG_IMGS=[{"s": "pack-vespra-200-v2.webp", "a": "Pack Vespra 180 à 250 personnes", "t": "pack-vespra-200-v2-t.webp"}, {"s": "pack-vespra-20-v2.webp", "a": "Pack Vespra 20 personnes", "t": "pack-vespra-20-v2-t.webp"}, {"s": "pack-vespra-60-v2.webp", "a": "Pack Vespra 40 à 60 personnes", "t": "pack-vespra-60-v2-t.webp"}, {"s": "pack-vespra-100-v2.webp", "a": "Pack Vespra 80 à 100 personnes", "t": "pack-vespra-100-v2-t.webp"}, {"s": "pack-vespra-150-v2.webp", "a": "Pack Vespra 120 à 150 personnes", "t": "pack-vespra-150-v2-t.webp"}];
 let _pgI=0;
 function pgThumbs(){
   const wrap=document.getElementById('prodThumbs');
