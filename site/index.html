@@ -82,7 +82,7 @@ a{text-decoration:none;color:inherit}img{display:block;max-width:100%}button{cur
 #hero-city-ghost{visibility:hidden;white-space:nowrap;padding-right:11px}
 #hero-city-ghost::before{content:attr(data-g)}
 #hero-city{position:absolute;left:0;top:0;white-space:nowrap}
-#hero-city::after{content:none;display:inline-block;vertical-align:-11%;width:5px;height:.72em;margin-left:6px;background:var(--gold);border-radius:2px;animation:blink 1s step-end infinite}
+#hero-city::after{content:'';display:inline-block;vertical-align:-11%;width:5px;height:.72em;margin-left:6px;background:var(--gold);border-radius:2px;animation:blink 1s step-end infinite}
 .hero-h{min-height:calc(4 * .9em)}
 .hero-br-tel{display:none}   /* coupure réservée au téléphone */
 /* le curseur est hors du flux : il ne peut plus décaler le titre ni les boutons */
@@ -2283,7 +2283,7 @@ function fitGhost(){
 fitGhost();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitGhost);
 addEventListener('resize',fitGhost);
-/* animation de la ville supprimée : « Vitré » reste affiché */
+setTimeout(typeCity,4000);
 
 // cale le panneau du menu juste sous la barre
 (function(){
@@ -3295,7 +3295,7 @@ html:root:root:root:root:root body .lnk-fl{font-size:10.2px!important}
  html:root:root:root:root:root body .cart-btn,html:root:root:root:root:root body .reserver-btn{font-size:9.4px!important}
 }
 </style>
-<link rel="stylesheet" href="/coherence.css?v=27">
+<link rel="stylesheet" href="/coherence.css?v=28">
 <script src="/coherence.js?v=7" defer></script>
 
 <script>

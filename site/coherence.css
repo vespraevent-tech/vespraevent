@@ -142,17 +142,13 @@ html body .bests-carousel .bc{backface-visibility:hidden}
 @media(prefers-reduced-motion:no-preference){
 }
 
-/* Menu mobile : le panneau se déplie depuis l'en-tête (0,2 s), les liens apparaissent en cascade rapide */
+/* Menu mobile : fondu rapide avec un très léger glissement (0,16 s), sans cascade */
 @media(max-width:960px){
-  html body .nav-links{display:flex!important;visibility:hidden;opacity:0;pointer-events:none;transform-origin:top;transform:scaleY(.94);
-    transition:transform .22s cubic-bezier(.2,.8,.2,1),opacity .16s ease,visibility 0s linear .22s}
+  html body .nav-links{display:flex!important;visibility:hidden;opacity:0;pointer-events:none;transform:translateY(-8px);
+    transition:opacity .16s ease,transform .18s cubic-bezier(.2,.8,.2,1),visibility 0s linear .18s}
   html body .nav-links.open{visibility:visible;opacity:1;pointer-events:auto;transform:none;
-    transition:transform .22s cubic-bezier(.2,.8,.2,1),opacity .16s ease,visibility 0s}
-  html body .nav-links>*{opacity:0;transition:opacity .12s ease}
-  html body .nav-links.open>*{opacity:1;transition:opacity .2s ease calc(var(--i,0)*.02s + .07s)}
-  html body .nav-links>*:nth-child(1){--i:0}html body .nav-links>*:nth-child(2){--i:1}html body .nav-links>*:nth-child(3){--i:2}
-  html body .nav-links>*:nth-child(4){--i:3}html body .nav-links>*:nth-child(5){--i:4}html body .nav-links>*:nth-child(6){--i:5}
-  html body .nav-links>*:nth-child(n+7){--i:6}
+    transition:opacity .16s ease,transform .18s cubic-bezier(.2,.8,.2,1),visibility 0s}
+  html body .nav-links>*{opacity:1;transform:none;transition:none}
 }
 @media(prefers-reduced-motion:reduce){html body .nav-links,html body .nav-links>*{transition:none!important}}
 
