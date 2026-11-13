@@ -35,6 +35,7 @@
     return {t:haut,b:bas,r:r};
   }
   function recaler(t){
+    if(window.__vespraSansCentrage)return;   /* page qui ne veut aucun défilement automatique (catalogue) */
     if(window.__vespraNoCentrer&&Date.now()-window.__vespraNoCentrer<2500)return;   /* la page vient de se placer elle-même (entrée dans une catégorie) */
     var z=zone(t),H=innerHeight,e=enteteH(),h=z.b-z.t;
     var centre=(z.t+z.b)/2,milieu=(H+e)/2;
