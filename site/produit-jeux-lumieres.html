@@ -702,15 +702,15 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
       <hr class="prod-divider">
 
       <div class="prod-from-label" style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g2)">À partir de</div>
-      <div class="prod-price-main" id="prodPriceDisplay">20 € <small>/ événement</small></div><div class="prod-duree" style="font-size:12px;color:var(--g2);margin-top:4px">Retrait possible le vendredi, retour le lundi.</div>
+      <div class="prod-price-main" id="prodPriceDisplay">30 € <small>/ événement</small></div><div class="prod-duree" style="font-size:12px;color:var(--g2);margin-top:4px">Retrait possible le vendredi, retour le lundi.</div>
 
 <div class="prod-variants">
   <div class="prod-variants-label">Choisissez votre formule</div>
-  <button class="prod-vbtn active" onclick="selectVariant(this,'Set Ibiza — 4 spots',20,'spots-ibiza.webp')">
+  <button class="prod-vbtn" onclick="selectVariant(this,'Set Ibiza — 4 spots',20,'spots-ibiza.webp')">
     <span class="prod-vbtn-name">Set Ibiza — 4 spots</span>
     <span class="prod-vbtn-price">20 €</span>
   </button>
-  <button class="prod-vbtn" onclick="selectVariant(this,'Set Eurolite — 9 spots',30,'spots-eurolite.webp')">
+  <button class="prod-vbtn active" onclick="selectVariant(this,'Set Eurolite — 9 spots',30,'spots-eurolite.webp')">
     <span class="prod-vbtn-name">Set Eurolite — 9 spots</span>
     <span class="prod-vbtn-price">30 €</span>
   </button>
@@ -1290,7 +1290,7 @@ function toggleNav(){
   var bt=document.querySelector('.nav-toggle');if(bt){bt.classList.toggle('open',open);bt.setAttribute('aria-expanded',open)}
   document.body.style.overflow=open?'hidden':'';
 }
-let _selectedVariant={label:'Set Ibiza — 4 spots',price:20,img:'spots-ibiza.webp'};
+let _selectedVariant={label:'Set Eurolite — 9 spots',price:30,img:'spots-eurolite.webp'};
 const FUMEES=[['optionFumee','machine à fumée',10],['optionFumeeM','machine à fumée puissante M-Fog 1500',20],['optionFumeeB','fumée lourde — effet brouillard',60],['optionFumeeN','fumée lourde — effet nuage',150]];
 function fumeesChoisies(){return FUMEES.filter(function(f){var c=document.getElementById(f[0]);return c&&c.checked;});}
 function fumeeTotal(){return fumeesChoisies().reduce(function(t,f){return t+f[2];},0);}

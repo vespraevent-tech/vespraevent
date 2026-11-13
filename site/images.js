@@ -120,7 +120,7 @@
     });
     var fp=fichesPhotos(produits);
     Object.keys(fp.parId).forEach(function(id){
-      if(fp.avecListe[id])return;
+      if(fp.avecListe[id]||id==='p15')return; /* p15 : une photo par variante, jamais remplacées par la photo principale */
       (PHOTOS_ORIGINE[id]||[]).forEach(function(n){
         if(fp.usage[n]===1&&!map[n]&&fp.parId[id]!==n)map[n]=fp.parId[id];
       });
