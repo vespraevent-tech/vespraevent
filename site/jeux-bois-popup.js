@@ -12,7 +12,7 @@
     { k: 'cornhole', n: 'Cornhole', p: 15, max: 2, img: 'jeux-cornhole.webp' },
     { k: 'puissance4', n: 'Puissance 4 géant', p: 15, max: 2, img: 'jeux-puissance4.webp' },
     { k: 'palet', n: 'Palet breton', p: 10, max: 2, img: 'jeux-palet-breton.webp' },
-    { k: 'babyfoot', n: 'Baby-foot', p: 90, max: 1, img: 'jeux-baby-foot.webp' },
+    { k: 'babyfoot', n: 'Baby-foot', p: 90, max: 1, img: 'baby-foot-dessus.webp' },
     { k: 'passe', n: 'Passe-trappe', p: 15, max: 2, img: 'jeux-passe-trappe.webp' },
     { k: 'pack', n: 'Pack 5 jeux', p: 140, avant: 150, max: 1, pack: true, img: 'jeux-cornhole.webp' }
   ];

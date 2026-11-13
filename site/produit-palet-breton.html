@@ -986,7 +986,7 @@ var JX=[
  {k:'cornhole',n:'Cornhole',p:10,max:2,u:true,img:'jeux-cornhole.webp',idx:0},
  {k:'puissance4',n:'Puissance 4 géant',p:10,max:2,u:true,img:'jeux-puissance4.webp',idx:1},
  {k:'palet',n:'Palet breton',p:10,max:2,u:true,img:'jeux-palet-breton.webp',idx:2},
- {k:'babyfoot',n:'Baby-foot',p:90,max:1,u:false,img:'jeux-baby-foot.webp',idx:3},
+ {k:'babyfoot',n:'Baby-foot',p:90,max:1,u:false,img:'baby-foot-dessus.webp',idx:3},
  {k:'passe',n:'Passe-trappe',p:10,max:2,u:true,img:'jeux-passe-trappe.webp',idx:4}
 ];
 var jxSel={};   /* jeu -> quantité (hors pack) */
@@ -1149,7 +1149,7 @@ if(form)form.addEventListener('submit',function(e){
 })();
 
 /* — galerie produit — */
-const PG_IMGS=[{"s": "jeux-cornhole.webp", "a": "Cornhole", "t": "jeux-cornhole-t.webp"}, {"s": "jeux-puissance4.webp", "a": "Puissance 4 géant", "t": "jeux-puissance4-t.webp"}, {"s": "jeux-palet-breton.webp", "a": "Palet breton", "t": "jeux-palet-breton-t.webp"}, {"s": "jeux-baby-foot.webp", "a": "Baby-foot", "t": "jeux-baby-foot-t.webp"}, {"s": "jeux-passe-trappe.webp", "a": "Passe-trappe", "t": "jeux-passe-trappe-t.webp"}];
+const PG_IMGS=[{"s": "jeux-cornhole.webp", "a": "Cornhole", "t": "jeux-cornhole-t.webp"}, {"s": "jeux-puissance4.webp", "a": "Puissance 4 géant", "t": "jeux-puissance4-t.webp"}, {"s": "jeux-palet-breton.webp", "a": "Palet breton", "t": "jeux-palet-breton-t.webp"}, {"s": "baby-foot-dessus.webp", "a": "Baby-foot", "t": "baby-foot-dessus-t.webp"}, {"s": "jeux-passe-trappe.webp", "a": "Passe-trappe", "t": "jeux-passe-trappe-t.webp"}];
 let _pgI=0;
 function pgThumbs(){
   const wrap=document.getElementById('prodThumbs');

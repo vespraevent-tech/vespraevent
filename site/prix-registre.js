@@ -2615,8 +2615,8 @@ window.VESPRA_PRODUITS = [
       "Animations"
     ],
     "desc": "Baby-foot en bois, produit unique, loué pour l'événement.",
-    "img": "jeux-baby-foot.webp",
-    "imgCat": "jeux-baby-foot.webp",
+    "img": "baby-foot-dessus.webp",
+    "imgCat": "baby-foot-dessus.webp",
     "page": "produit-baby-foot.html",
     "prix": 90,
     "prixId": "baby-foot",
@@ -3353,8 +3353,12 @@ window.VESPRA_MEDIAS = {
   "produit-baby-foot.html": {
     "photos": [
       {
-        "s": "jeux-baby-foot.webp",
+        "s": "baby-foot-dessus.webp",
         "a": "Baby-foot en bois à louer — Vespra Event"
+      },
+      {
+        "s": "baby-foot-ambiance.webp",
+        "a": "Détail d'un baby-foot en bois pendant une partie"
       }
     ],
     "options": {},
@@ -3606,7 +3610,7 @@ window.VESPRA_MEDIAS = {
         "a": "Palet breton"
       },
       {
-        "s": "jeux-baby-foot.webp",
+        "s": "baby-foot-dessus.webp",
         "a": "Baby-foot"
       },
       {
