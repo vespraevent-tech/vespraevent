@@ -1167,7 +1167,8 @@ if(urlCat){
     /* l'adresse garde la catégorie : le retour depuis une fiche produit revient ici */
     /* entrée dans une catégorie depuis le choix : nouvelle étape d'historique, pour que « retour » revienne au choix des catégories */
     try{const u='catalogue.html?cat='+(v==='Tous'?'tout':encodeURIComponent(v));if(mode==='push')history.pushState(null,'',u);else if(mode!=='none')history.replaceState(null,'',u);}catch(e){}
-    /* plus aucun défilement automatique en entrant dans une catégorie */
+    /* entrer dans une catégorie : on arrive en haut de la page (l'aperçu au premier clic, lui, ne fait jamais défiler) */
+    window.scrollTo({top:0,behavior:'auto'});setTimeout(function(){window.scrollTo({top:0,behavior:'auto'});},60);
   }
   ul.addEventListener('click',function(e){
     const b=e.target.closest('button[data-i]');if(!b)return;
