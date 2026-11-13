@@ -19,12 +19,13 @@
   /* fiches produit modifiées dans le back-office → remplacements de fichiers
      (seulement pour les fichiers propres à un seul produit) et photo par produit */
   function fichesPhotos(produits){
-    var parId={},usage={},avecListe={};
+    var parId={},usage={},avecListe={},carte={};
     Object.keys(PHOTOS_ORIGINE).forEach(function(id){
       PHOTOS_ORIGINE[id].forEach(function(n){usage[n]=(usage[n]||0)+1;});
     });
     var ANCIENNES={p3:1,p8:1,p13:1,p15:1,p38:1,p39:1,p44:1,p56:1};
     (Array.isArray(produits)?produits:[]).forEach(function(it){
+      if(it&&it.type==='produit'&&it.id&&it.imgcarte)carte[it.id]=cleanUrl(it.imgcarte);
       if(it&&it.type==='produit'&&ANCIENNES[it.id]&&String(it.vimg)!=='2')return; /* ancienne photo enregistrée avant le remaniement */
       if(it&&it.type==='produit'&&it.id&&it.image)parId[it.id]=cleanUrl(it.image);
       /* un produit dont la galerie a été choisie photo par photo garde cette
@@ -34,7 +35,7 @@
         try{var l=JSON.parse(it.photos);if(Array.isArray(l)&&l.length)avecListe[it.id]=true;}catch(e){}
       }
     });
-    return {parId:parId,usage:usage,avecListe:avecListe};
+    return {parId:parId,usage:usage,avecListe:avecListe,carte:carte};
   }
   function norm(t){return String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();}
 
@@ -188,7 +189,7 @@
     try{
       (window.PRODUCTS||[]).forEach(function(p){
         if(!p||!p.id)return;
-        var nouvelle=fp.parId[p.id];
+        var nouvelle=fp.carte[p.id]||fp.parId[p.id];
         if(nouvelle){p.img=nouvelle;}
         else if(p.img&&map[basename(p.img)]){p.img=map[basename(p.img)];}
         if(nouvelle&&p.name)produitsParNom[norm(p.name)]=nouvelle;
