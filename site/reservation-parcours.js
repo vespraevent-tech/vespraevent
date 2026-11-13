@@ -258,7 +258,9 @@
       '  .pc[data-v="1"][data-e="sel"] #pcPanel{display:block}',
       '  .pc[data-v="1"][data-e="coord"] #pcPanel{display:block}',
       '  .pc-st.on i{background:var(--pcn)}',
-      '  .pc-nav.vn{display:flex;justify-content:space-between;align-items:center;margin-top:16px}',
+      '  .pc-nav.vn{display:flex;flex-wrap:nowrap;justify-content:space-between;align-items:stretch;gap:10px;margin-top:16px}',
+      '  .pc-nav.vn .pc-cat{flex:1 1 0;min-width:0;text-align:center;white-space:nowrap;padding:13px 8px!important;font-size:14px!important;display:flex!important;align-items:center;justify-content:center;box-sizing:border-box}',
+      '  .pc-nav.vn .pc-btn{flex:1.3 1 0;min-width:0;white-space:nowrap;padding:13px 8px;font-size:14px;text-align:center}',
       '  .pc-nav.vn .pc-cat{background:#fff;color:var(--pcn);border:1.5px solid var(--pcn);padding:12px 18px;font-size:14px;margin:0}',
 
       '  #formZone .btn-submit{padding:13px;font-size:14px}',
