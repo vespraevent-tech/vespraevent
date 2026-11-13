@@ -1251,8 +1251,8 @@ window.VESPRA_PRODUITS = [
       "Animations"
     ],
     "desc": "Photobooth professionnel pour immortaliser tous les moments forts de votre soirée.",
-    "img": "photobooth.webp",
-    "imgCat": "photobooth.webp",
+    "img": "photobooth-lifestyle.webp",
+    "imgCat": "photobooth-lifestyle.webp",
     "page": "produit-photobooth.html",
     "prix": 130,
     "prixId": null,
@@ -1462,8 +1462,8 @@ window.VESPRA_PRODUITS = [
       "Animations"
     ],
     "desc": "Grand château gonflable multi-activités sur le thème des dinosaures : toboggan en façade, obstacles et filets. Jusqu'à 12 enfants en même temps.",
-    "img": "chateau-dinoworld.webp",
-    "imgCat": "chateau-dinoworld.webp",
+    "img": "chateau-dinoworld-2.webp",
+    "imgCat": "chateau-dinoworld-2.webp",
     "page": "produit-chateau-dinoworld.html",
     "prix": 150,
     "prixId": "chateau-gonflable-3",
@@ -1801,8 +1801,8 @@ window.VESPRA_PRODUITS = [
       "Mobilier, réception et barnums"
     ],
     "desc": "Barnum auto-pliant 4×6 m, de 24 à 25 personnes assises (48 debout) : se monte sans outil, idéal pour un cocktail ou un buffet.",
-    "img": "barnum-4x6.webp",
-    "imgCat": "barnum-4x6.webp",
+    "img": "barnum-situation.webp",
+    "imgCat": "barnum-situation.webp",
     "page": "produit-barnum-4x6.html",
     "prix": 85,
     "prixId": null,
