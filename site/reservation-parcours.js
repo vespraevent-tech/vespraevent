@@ -67,6 +67,8 @@
       '.pc[hidden]{display:none!important}',
       '.pc[data-e="idees"] #cartZone,.pc[data-e="coord"] #cartZone,.pc[data-v="1"] #cartZone{display:none!important}',
       '.pc:not([data-e="idees"]) #pcIdees{display:none}',
+      '.pc #pcVn{display:none!important}',
+      '@media(max-width:640px){.pc[data-v="1"][data-e="sel"] #pcVn{display:flex!important}}',
       '.pc:not([data-e="coord"]) #formZone{display:none!important}',
       '.page-body{max-width:1180px}',
 
@@ -198,10 +200,6 @@
       '.pc-seg.full i{background:var(--pcv)}',
       '@media(max-width:900px){.pc-grid{grid-template-columns:1fr;gap:16px}.pc-panel{position:static}}',
       '@media(max-width:640px){',
-      '  .res-hero{padding:14px 16px!important;border-radius:0 0 18px 18px!important}',
-      '  .res-hero .back-btn,.res-hero-tag,.rea-bar{display:none!important}',
-      '  .res-hero-h{font-size:26px!important;line-height:1!important}',
-      '  .res-hero-h br{display:none}.res-hero-h em{margin-left:.3em}',
       '  .cart-summary,.cart-layout{background:none!important;padding:0!important}',
       '  #formZone .qui-seg span{font-size:12px;padding:6px 6px}',
       '  .page-body{padding:12px 16px 44px!important}',
@@ -242,7 +240,16 @@
       '  .voir-place,.pc-qty,.cs-item-opts{display:none!important}',
       '  .cs-item{flex-wrap:nowrap}.cs-item-name{font-size:14.5px}',
       '  .pc-voir{display:inline-block;background:none;border:0;padding:0;margin:0 16px 8px 0;font:inherit;font-size:12.5px;color:#fff;text-decoration:underline;text-underline-offset:3px;cursor:pointer}',
-      '  .pc-panel.vide .pc-vp{display:none}.pc-panel.vide.open .pc-vp{display:block}',
+      '  .pc-panel.vide .pc-vp{display:block}.pc-panel.vide .pc-voir,.pc-panel.vide .pc-cat{display:none}',
+      '  .pc-panel.vide .pc-k,.pc-panel.vide .pc-ul{display:block}',
+      '  .pc-panel.vide .pc-s{font-size:13px;margin:0 0 8px}',
+      '  .pc-panel.vide{padding:22px 20px}',
+      '  .pc[data-v="1"][data-e="sel"] #pcPanel{display:block}',
+      '  .pc[data-v="1"][data-e="coord"] #pcPanel{display:none}',
+      '  .pc-st.on i{background:var(--pcn)}',
+      '  .pc-nav.vn{display:flex;justify-content:space-between;align-items:center;margin-top:16px}',
+      '  .pc-nav.vn .pc-cat{background:#fff;color:var(--pcn);border:1.5px solid var(--pcn);padding:12px 18px;font-size:14px;margin:0}',
+
       '  .pc-panel.vide .pc-s{font-size:12px;margin:0 0 6px}',
       '  .pc-panel.vide h3{font-size:22px;margin:0 0 6px}',
       '  .pc-cat{padding:7px 15px;font-size:12px;margin-top:2px}',
@@ -267,7 +274,8 @@
     coque.className = 'pc';
     coque.innerHTML =
       '<div class="pc-steps" id="pcSteps"></div>' +
-      '<div class="pc-grid"><aside class="pc-panel" id="pcPanel" aria-label="Récapitulatif du devis"></aside><div class="pc-main" id="pcMain"></div></div>';
+      '<div class="pc-grid"><aside class="pc-panel" id="pcPanel" aria-label="Récapitulatif du devis"></aside><div class="pc-main" id="pcMain"></div></div>' +
+      '<div class="pc-nav vn" id="pcVn"><a class="pc-cat" href="catalogue.html">Voir le catalogue</a><button type="button" class="pc-btn" data-go="coord">Envoyer ma demande</button></div>';
     corps.insertBefore(coque, cart);
     var principal = $('#pcMain', coque);
 
@@ -344,6 +352,14 @@
 
     function dessinerFil() {
       var f = $('#pcSteps');
+      if (vide() && mob.matches) {
+        f.className = 'pc-steps deux';
+        f.innerHTML = [['sel', 'Votre panier'], ['coord', 'Vos coordonnées']].map(function (x, i) {
+          var c = ecran === 'coord' ? 2 : 1, n = i + 1, cl = n === c ? 'on' : (n < c ? 'ok' : '');
+          return '<' + (cl === 'ok' ? 'button type="button" data-go="' + x[0] + '"' : 'div') + ' class="pc-st ' + cl + '"><i></i><span><em>' + (cl === 'ok' ? '✓' : n) + '</em>' + x[1] + '</span></' + (cl === 'ok' ? 'button' : 'div') + '>';
+        }).join('');
+        return;
+      }
       if (vide()) {
         f.className = 'pc-steps un';
         f.innerHTML = '<div class="pc-st on"><i></i><span><em>1</em>Vos coordonnées</span></div>';
@@ -408,7 +424,7 @@
     if (mob.addEventListener) mob.addEventListener('change', function () { maj(); });
     function maj() {
       coque.setAttribute('data-v', vide() ? '1' : '0');
-      if (vide() && ecran !== 'coord') ecran = 'coord';
+      if (vide() && !mob.matches && ecran !== 'coord') ecran = 'coord';
       if (mob.matches && ecran === 'idees') ecran = 'coord';
       coque.setAttribute('data-e', ecran);
       majTitres();
@@ -417,7 +433,7 @@
     }
 
     function aller(cible, sansDefiler) {
-      if (vide()) cible = 'coord';
+      if (vide() && !mob.matches) cible = 'coord';
       if (mob.matches && cible === 'idees') cible = (ecran === 'coord') ? 'sel' : 'coord';
       if (cible === 'idees') calculerIdees();
       ecran = cible;
