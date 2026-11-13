@@ -81,8 +81,13 @@
     if (bc && bc.lastChild && bc.lastChild.nodeType === 3) bc.lastChild.nodeValue = ' › ' + (it.court || it.name);
     var add = q('#addToCartBtn'); if (add) add.setAttribute('data-product-id', it.id);
     try {
-      if (it.photos && typeof PG_IMGS !== 'undefined' && Array.isArray(PG_IMGS)) {
-        PG_IMGS.splice.apply(PG_IMGS, [0, PG_IMGS.length].concat(it.photos));
+      /* photos choisies dans le back-office pour ce produit : elles priment
+         sur celles écrites dans la page (sinon un envoi du client disparaît) */
+      var choisies = null;
+      try { var bo = window.VESPRA_PHOTOS_BO; if (bo && bo[it.id] && bo[it.id].length) choisies = bo[it.id]; } catch (e) {}
+      var photos = choisies || it.photos;
+      if (photos && typeof PG_IMGS !== 'undefined' && Array.isArray(PG_IMGS)) {
+        PG_IMGS.splice.apply(PG_IMGS, [0, PG_IMGS.length].concat(photos));
         var v = document.getElementById('prodThumbs'); if (v) v.innerHTML = '';
         if (typeof pgThumbs === 'function') pgThumbs();
         if (typeof pgShow === 'function') pgShow(0);

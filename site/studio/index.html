@@ -7505,7 +7505,8 @@ function ouvrirFiche(id, silencieux){
   ficheOuverte = id;
   let f = modifFiche(id) || {};
   /* photos remaniées par le site : l'ancienne photo ou galerie enregistrée avant n'est plus affichée */
-  if({p3:1,p8:1,p13:1,p15:1,p38:1,p39:1,p44:1,p56:1,p58:1}[id] && String(f.vimg) !== '2' && (f.image || f.photos)){ f = Object.assign({}, f); delete f.image; delete f.photos; }
+  if({p3:1,p8:1,p13:1,p15:1,p38:1,p39:1,p44:1,p56:1,p58:1}[id] && String(f.vimg) !== '2' && (f.image || f.photos)
+     && (String(f.image||'')+' '+String(f.photos||'')+' '+String(f.imgcarte||'')+' '+String(f.varimg||'')).indexOf('/api/media/') < 0){ f = Object.assign({}, f); delete f.image; delete f.photos; }
   const mp = modifsPrix();
   const med = (window.VESPRA_MEDIAS||{})[p.page] || {photos:[], options:{}, subs:[]};
   /* photos de la galerie : celles déjà modifiées, sinon celles de la page

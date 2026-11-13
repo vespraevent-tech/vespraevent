@@ -26,7 +26,9 @@
     var ANCIENNES={p3:1,p8:1,p13:1,p15:1,p38:1,p39:1,p44:1,p56:1,p58:1};
     (Array.isArray(produits)?produits:[]).forEach(function(it){
       if(it&&it.type==='produit'&&it.id&&it.imgcarte)carte[it.id]=cleanUrl(it.imgcarte);
-      if(it&&it.type==='produit'&&ANCIENNES[it.id]&&String(it.vimg)!=='2')return; /* ancienne photo enregistrée avant le remaniement */
+      if(it&&it.type==='produit'&&ANCIENNES[it.id]&&String(it.vimg)!=='2'
+         &&(String(it.image||'')+' '+String(it.photos||'')+' '+String(it.imgcarte||'')).indexOf('/api/media/')<0)return;
+         /* ancienne liste d'avant le remaniement ; une photo envoyée depuis le back-office est toujours respectée */
       if(it&&it.type==='produit'&&it.id&&it.image)parId[it.id]=cleanUrl(it.image);
       /* un produit dont la galerie a été choisie photo par photo garde cette
          liste telle quelle : sa photo principale ne doit pas aussi remplacer

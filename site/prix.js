@@ -39,6 +39,12 @@
     .then(function (items) {
       if (!Array.isArray(items)) return;
       var prix = {}, fiches = {}, nouveaux = [];
+      /* une fiche contient-elle une photo envoyée depuis le back-office ?
+         Dans ce cas elle n'est jamais écartée : c'est un choix du client. */
+      function envoiClient(it) {
+        return (String(it && it.image || '') + ' ' + String(it && it.photos || '') + ' '
+              + String(it && it.imgcarte || '') + ' ' + String(it && it.varimg || '')).indexOf('/api/media/') >= 0;
+      }
       items.forEach(function (it) {
         if (!it || !it.id) return;
         if (it.type === 'prix') {
@@ -47,10 +53,14 @@
         } else if (it.type === 'produit') {
           /* photos remaniées dans cette version : une ancienne photo ou galerie enregistrée avant
              (sans la marque vimg) ne doit pas écraser les nouvelles ; un nouvel enregistrement du back-office la porte */
-          if ({p3:1,p8:1,p13:1,p15:1,p38:1,p39:1,p44:1,p56:1,p58:1}[it.id] && String(it.vimg) !== '2' && (it.image || it.photos)) {
+          if ({p3:1,p8:1,p13:1,p15:1,p38:1,p39:1,p44:1,p56:1,p58:1}[it.id] && String(it.vimg) !== '2' && (it.image || it.photos)
+              && !envoiClient(it)) {   /* une photo envoyée depuis le back-office est toujours respectée */
             it = Object.assign({}, it); delete it.image; delete it.photos;
           }
           fiches[it.id] = it;
+          /* publiées pour les fiches à variantes : chaque variante a ses photos
+             dans la page, mais le choix du back-office doit rester prioritaire */
+          if (it.photos) { try { window.VESPRA_PHOTOS_BO = window.VESPRA_PHOTOS_BO || {}; window.VESPRA_PHOTOS_BO[it.id] = JSON.parse(it.photos); } catch (e) {} }
         } else {
           nouveaux.push(it);
         }
