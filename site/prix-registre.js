@@ -1627,8 +1627,8 @@ window.VESPRA_PRODUITS = [
       "Son, lumière et vidéo"
     ],
     "desc": "Pack tout-en-un pensé pour accueillir vos invités dans les meilleures conditions.",
-    "img": "pack-vespra-60-v2.webp",
-    "imgCat": "pack-vespra-60-v2.webp",
+    "img": "pack-vespra-200-v2.webp",
+    "imgCat": "pack-vespra-200-v2.webp",
     "page": "produit-pack-vespra.html",
     "prix": 50,
     "prixId": null,
@@ -1688,8 +1688,8 @@ window.VESPRA_PRODUITS = [
       "Mobilier, réception et barnums"
     ],
     "desc": "Barnum pliant 3×3 m, de 8 à 12 personnes assises : le stand d'appoint ou le coin buvette.",
-    "img": "barnum.webp",
-    "imgCat": "barnum.webp",
+    "img": "barnum-situation.webp",
+    "imgCat": "barnum-situation.webp",
     "page": "produit-barnum-3x3.html",
     "prix": 60,
     "prixId": null,
@@ -1876,8 +1876,8 @@ window.VESPRA_PRODUITS = [
     ],
     "nom": "Barnum 4×8 m",
     "desc": "Barnum pliant 4×8 m, de 30 à 40 personnes assises : idéal pour un repas ou un vin d'honneur.",
-    "img": "barnum.webp",
-    "imgCat": "barnum.webp",
+    "img": "barnum-situation.webp",
+    "imgCat": "barnum-situation.webp",
     "page": "produit-barnum-4x8.html",
     "prix": 125,
     "prixId": null,
@@ -1970,8 +1970,8 @@ window.VESPRA_PRODUITS = [
     ],
     "nom": "Barnum 6×10 m",
     "desc": "Barnum pliant 6×10 m, de 60 à 80 personnes assises : la grande réception sous toile.",
-    "img": "barnum.webp",
-    "imgCat": "barnum.webp",
+    "img": "barnum-situation.webp",
+    "imgCat": "barnum-situation.webp",
     "page": "produit-barnum-6x10.html",
     "prix": 190,
     "prixId": null,
@@ -2066,8 +2066,8 @@ window.VESPRA_PRODUITS = [
       "Animations"
     ],
     "desc": "Structure gonflable disco avec effets lumineux intégrés pour une ambiance unique.",
-    "img": "boite-nuit-vespra.webp",
-    "imgCat": "boite-nuit-vespra.webp",
+    "img": "boite-nuit-situation.webp",
+    "imgCat": "boite-nuit-situation.webp",
     "page": "produit-boite-nuit.html",
     "prix": 195,
     "prixId": null,
@@ -2112,14 +2112,22 @@ window.VESPRA_PRODUITS = [
       "Son, lumière et vidéo"
     ],
     "desc": "Boule à facettes avec motorisation et éclairage pour une ambiance disco garantie.",
-    "img": "boule-facettes.webp",
-    "imgCat": "boule-facettes.webp",
+    "img": "boule-facettes-situation.webp",
+    "imgCat": "boule-facettes-situation.webp",
     "page": "produit-boule-facettes.html",
     "prix": 35,
     "prixId": "boule-a-facettes",
     "variantes": [],
     "notices": [],
-    "options": []
+    "options": [
+      {
+        "nom": "Machine à fumée",
+        "prix": 10,
+        "devis": false,
+        "champ": "optionFumee",
+        "id": "p12-opt-fumee"
+      }
+    ]
   },
   {
     "id": "p43",
@@ -2168,8 +2176,8 @@ window.VESPRA_PRODUITS = [
       "Mobilier, réception et barnums"
     ],
     "desc": "Grande tente étoile blanche de 22 m de diamètre, pour mariages et événements d'envergure.",
-    "img": "tente-etoile.webp",
-    "imgCat": "tente-etoile.webp",
+    "img": "tente-etoile-situation.webp",
+    "imgCat": "tente-etoile-situation.webp",
     "page": "produit-tente-etoile-22m.html",
     "prix": 590,
     "prixId": null,
@@ -2249,8 +2257,8 @@ window.VESPRA_PRODUITS = [
     ],
     "nom": "Tente étoile Ø 10 m",
     "desc": "Tente étoile blanche de 10 m de diamètre (13,65 × 8,65 m au sol), environ 50 à 60 personnes assises.",
-    "img": "tente-etoile-star.webp",
-    "imgCat": "tente-etoile-star.webp",
+    "img": "tente-etoile-situation.webp",
+    "imgCat": "tente-etoile-situation.webp",
     "page": "produit-tente-etoile-10m.html",
     "prix": 190,
     "prixId": null,
@@ -2330,8 +2338,8 @@ window.VESPRA_PRODUITS = [
     ],
     "nom": "Tente étoile Ø 14 m",
     "desc": "Tente étoile blanche de 14 m de diamètre (19,10 × 12,10 m au sol), environ 80 personnes assises.",
-    "img": "tente-etoile-star.webp",
-    "imgCat": "tente-etoile-star.webp",
+    "img": "tente-etoile-situation.webp",
+    "imgCat": "tente-etoile-situation.webp",
     "page": "produit-tente-etoile-14m.html",
     "prix": 270,
     "prixId": null,
@@ -2746,8 +2754,8 @@ window.VESPRA_PRODUITS = [
       "Son, lumière et vidéo"
     ],
     "desc": "Système de sonorisation complet pour animer vos soirées et événements, de 20 à 250 personnes.",
-    "img": "sono-30-40.webp",
-    "imgCat": "sono-30-40.webp",
+    "img": "sono-180-250.webp",
+    "imgCat": "sono-180-250.webp",
     "page": "produit-sonorisation.html",
     "prix": 20,
     "prixId": null,
@@ -2869,8 +2877,8 @@ window.VESPRA_PRODUITS = [
       "Son, lumière et vidéo"
     ],
     "desc": "Pack de projecteurs LED et effets de lumières pour sublimer vos espaces.",
-    "img": "spots-ibiza.webp",
-    "imgCat": "spots-eurolite.webp",
+    "img": "jeux-lumieres-situation.webp",
+    "imgCat": "jeux-lumieres-situation.webp",
     "page": "produit-jeux-lumieres.html",
     "prix": 20,
     "prixId": null,
@@ -2892,7 +2900,15 @@ window.VESPRA_PRODUITS = [
       "notice-eurolite-9-spots.pdf",
       "notice-ibiza-4-spots.pdf"
     ],
-    "options": []
+    "options": [
+      {
+        "nom": "Machine à fumée",
+        "prix": 10,
+        "devis": false,
+        "champ": "optionFumee",
+        "id": "p15-opt-fumee"
+      }
+    ]
   },
   {
     "id": "p1",
@@ -2903,8 +2919,8 @@ window.VESPRA_PRODUITS = [
       "Restauration"
     ],
     "desc": "Brasero pour réchauffer vos convives lors de vos soirées en extérieur.",
-    "img": "brasero.webp",
-    "imgCat": "brasero.webp",
+    "img": "brasero-situation.webp",
+    "imgCat": "brasero-situation.webp",
     "page": "produit-brasero.html",
     "prix": 100,
     "prixId": "brasero",
@@ -2971,8 +2987,8 @@ window.VESPRA_PRODUITS = [
       "Animations"
     ],
     "desc": "Machine à pop-corn professionnelle sur chariot avec vitrine chauffante. Maïs en option.",
-    "img": "popcorn.webp",
-    "imgCat": "popcorn.webp",
+    "img": "popcorn-situation.webp",
+    "imgCat": "popcorn-situation.webp",
     "page": "produit-popcorn.html",
     "prix": 20,
     "prixId": "machine-a-pop-corn",
@@ -2997,8 +3013,8 @@ window.VESPRA_PRODUITS = [
       "Effets spéciaux et artifices"
     ],
     "desc": "Une fumée légère pour révéler les faisceaux lumineux et renforcer l'ambiance.",
-    "img": "machine-fumee.webp",
-    "imgCat": "machine-fumee.webp",
+    "img": "machine-fumee-situation.webp",
+    "imgCat": "machine-fumee-situation.webp",
     "page": "produit-machines-effets.html",
     "prix": 10,
     "prixId": "pyrotechnie-2",
@@ -3015,8 +3031,8 @@ window.VESPRA_PRODUITS = [
       "Effets spéciaux et artifices"
     ],
     "desc": "Une animation de bulles pour créer un moment féerique lors de vos événements.",
-    "img": "machine-bulles.webp",
-    "imgCat": "machine-bulles.webp",
+    "img": "machine-bulles-situation.webp",
+    "imgCat": "machine-bulles-situation.webp",
     "page": "produit-machines-effets.html",
     "prix": 10,
     "prixId": "pyrotechnie-1",

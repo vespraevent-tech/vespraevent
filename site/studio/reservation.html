@@ -5409,6 +5409,7 @@ var PK_OPT = {
   guir10:  {nom:'Guirlande 10 m', label:'Guirlande 10 m', prix:9},
   guir20:  {nom:'Guirlande 20 m', label:'Guirlande 20 m', prix:18},
   caisson: {nom:'Caisson de basse', label:'Caisson de basse', prix:40},
+  fumeeOpt: {nom:'Machine à fumée', label:'Machine à fumée', prix:10},
   microFil: {nom:'Micro filaire (SM58)', label:'Micro filaire', prix:10},
   microSF: {nom:'Micro sans fil (SM58)', label:'Micro sans fil', prix:20},
   mais:    {nom:'Maïs à éclater', label:'Maïs à éclater', prix:10},
@@ -5428,6 +5429,7 @@ OPTIONS_PRODUIT['Buvette 4x4m']=[PK_OPT.install,PK_OPT.guir10,PK_OPT.guir20];
 ['Pack Vespra 60 personnes','Pack Vespra 100 personnes','Pack Vespra 150 personnes','Pack Vespra 200 personnes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.microFil,PK_OPT.microSF];});
 ['Pack Vespra 20 personnes','Pack Vespra 40 à 60 personnes','Pack Vespra 80 à 100 personnes','Pack Vespra 120 à 150 personnes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.caisson,PK_OPT.microFil,PK_OPT.microSF];});
 OPTIONS_PRODUIT['Pack Vespra 180 à 250 personnes']=[PK_OPT.microFil,PK_OPT.microSF];
+['Jeux de lumières Ibiza 4 spots','Jeux de lumières Eurolite','Boule à facettes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.fumeeOpt];});
 OPTIONS_PRODUIT["Livre d'or audio"]=[];
 ['Cabine téléphonique','Cabine téléphonique audio / vidéo','Cabine téléphonique audio','Cabine téléphonique vidéo','Cabine téléphonique blanche','Cabine téléphonique rouge','Cabine téléphonique en bois blanc'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.neon];});
 OPTIONS_PRODUIT['Guirlande lumineuse']=[PK_OPT.b3x3,PK_OPT.b4x8,PK_OPT.b6x10,PK_OPT.tente10,PK_OPT.tente14,PK_OPT.tenteet,PK_OPT.buvette];

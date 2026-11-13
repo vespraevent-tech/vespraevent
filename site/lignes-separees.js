@@ -32,6 +32,7 @@
     [/^micro shure sm58$/i, { id: 'p42', name: 'Micro Shure SM58', img: 'micro-shure-sm58.webp' }],
     [/^mange-debout( housse blanche)?$/i, { id: 'p45', name: 'Mange-debout housse blanche', img: 'mange-debout.webp' }],
     [/^spot led sur batterie$/i, { id: 'p43', name: 'Spot LED sur batterie', img: 'spot-led-batterie-ambiance.webp' }],
+    [/^machine à fumée$/i, { id: 'p21', name: 'Machine à fumée', img: 'machine-fumee.webp' }],
     [/^caisson de basse$/i, { id: 'p16', name: 'Caisson de basse', label: 'Caisson de basse', img: 'caisson-basse.webp' }],
     [/^barnum 3\s*[×x]\s*3 m$/i, { id: 'p4', name: 'Barnum', label: 'Barnum 3×3 m', img: 'barnum.webp' }],
     [/^barnum 4\s*[×x]\s*6 m$/i, { id: 'p44', name: 'Barnum', label: 'Barnum 4×6 m', img: 'barnum-4x6.webp' }],

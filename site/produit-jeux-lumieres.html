@@ -25,7 +25,7 @@
 <meta name="geo.placename" content="Vitré">
 <meta name="geo.position" content="48.1242;-1.2100">
 <meta name="ICBM" content="48.1242, -1.2100">
-<link rel="preload" as="image" href="spots-ibiza.webp" fetchpriority="high">
+<link rel="preload" as="image" href="spots-eurolite.webp" fetchpriority="high">
 <link rel="canonical" href="https://www.vespraevent.fr/produit-jeux-lumieres">
 <style>
 :root{color-scheme:light;--black:#0C0F14;--navy:#2B4A6B;--navy-h:#1e3650;--g1:#3D4452;--g2:#646D7C;--g3:#C8CDD8;--g4:#F0F2F5;--white:#FFFFFF;--r:12px;--rl:20px;--pill:999px;--gold:#F59E0B}
@@ -684,7 +684,7 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
     <!-- IMAGE -->
     <div class="prod-img-col">
       <div class="prod-img-main" onclick="pgOpen()" title="Agrandir">
-        <img src="spots-ibiza.webp" alt="Jeux de lumière Ibiza 4 Spots LED — Location Vespra Event" loading="eager" id="prodMainImg" width="1080" height="1080" decoding="async"><span class="pg-zoom" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5M11 8v6M8 11h6"/></svg></span>
+        <img src="spots-eurolite.webp" alt="Jeux de lumière Eurolite 9 spots — Location Vespra Event" loading="eager" id="prodMainImg" width="1080" height="1080" decoding="async"><span class="pg-zoom" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5M11 8v6M8 11h6"/></svg></span>
       </div>
       <div class="prod-img-thumbs" id="prodThumbs"></div>
     </div>
@@ -706,14 +706,23 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
 
 <div class="prod-variants">
   <div class="prod-variants-label">Choisissez votre formule</div>
-  <button class="prod-vbtn active" onclick="selectVariant(this,'Set Ibiza — 4 spots',20)">
+  <button class="prod-vbtn active" onclick="selectVariant(this,'Set Ibiza — 4 spots',20,'spots-ibiza.webp')">
     <span class="prod-vbtn-name">Set Ibiza — 4 spots</span>
     <span class="prod-vbtn-price">20 €</span>
   </button>
-  <button class="prod-vbtn" onclick="selectVariant(this,'Set Eurolite — 9 spots',30)">
+  <button class="prod-vbtn" onclick="selectVariant(this,'Set Eurolite — 9 spots',30,'spots-eurolite.webp')">
     <span class="prod-vbtn-name">Set Eurolite — 9 spots</span>
     <span class="prod-vbtn-price">30 €</span>
   </button>
+</div>
+
+<div class="prod-option-install" style="margin:18px 0;padding:16px;background:#f7f9fc;border-radius:12px;border:1px solid var(--g3)">
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1);margin-bottom:10px">Option supplémentaire</div>
+  <label class="prod-option-check" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:2px solid var(--g3);border-radius:var(--r);cursor:pointer;font-size:14px;transition:border-color .18s" onmouseover="this.style.borderColor='var(--navy)'" onmouseout="this.style.borderColor=(this.querySelector('input').checked?'var(--navy)':'var(--g3)')">
+    <input type="checkbox" id="optionFumee" style="width:18px;height:18px;margin-top:2px;accent-color:var(--navy);flex-shrink:0" onchange="toggleFumee(this)">
+    <span><strong>Machine à fumée</strong><br><span style="color:var(--g2);font-size:12px;line-height:1.5">Grâce à la fumée, les faisceaux lumineux deviennent visibles : l'effet est bien plus joli et l'ambiance bien plus festive. Liquide professionnel accepté dans toutes les salles, sans odeur et inoffensif pour la santé.</span></span>
+    <span style="font-weight:700;color:var(--navy);margin-left:auto;flex-shrink:0;white-space:nowrap">+&nbsp;10&nbsp;€</span>
+  </label>
 </div>
 
 <div class="prod-ctas">
@@ -861,7 +870,7 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
         </div>
       </a>
       <a href="produit-boule-facettes.html" class="rel-card">
-        <div class="rel-img-wrap"><img class="rel-img" src="boule-facettes.webp" alt="Boule à facettes" loading="lazy" decoding="async" width="480" height="360"></div>
+        <div class="rel-img-wrap"><img class="rel-img" src="boule-facettes-situation.webp" alt="Boule à facettes" loading="lazy" decoding="async" width="480" height="360"></div>
         <div class="rel-body">
           <div class="rel-cat">Son, lumière et vidéo</div>
           <div class="rel-title">Boule à facettes</div>
@@ -885,7 +894,7 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
         </div>
       </a>
       <a href="produit-pack-vespra.html" class="rel-card">
-        <div class="rel-img-wrap"><img class="rel-img" src="pack-vespra-60-v2.webp" alt="Pack Vespra" loading="lazy" decoding="async" width="480" height="360"></div>
+        <div class="rel-img-wrap"><img class="rel-img" src="pack-vespra-200-v2.webp" alt="Pack Vespra" loading="lazy" decoding="async" width="480" height="360"></div>
         <div class="rel-body">
           <div class="rel-cat">Son, lumière et vidéo</div>
           <div class="rel-title">Pack Vespra</div>
@@ -1265,20 +1274,28 @@ function toggleNav(){
   var bt=document.querySelector('.nav-toggle');if(bt){bt.classList.toggle('open',open);bt.setAttribute('aria-expanded',open)}
   document.body.style.overflow=open?'hidden':'';
 }
-let _selectedVariant={label:'Set Ibiza — 4 spots',price:20};
-function selectVariant(btn,label,price){
+let _selectedVariant={label:'Set Ibiza — 4 spots',price:20,img:'spots-ibiza.webp'};
+let _fumee=false;
+const PX_FUMEE=10;
+function majPrixJeux(){document.getElementById('prodPriceDisplay').innerHTML=(_selectedVariant.price+(_fumee?PX_FUMEE:0))+' € <small>/ événement</small>';}
+window.majPrixHaut=majPrixJeux;
+function toggleFumee(cb){_fumee=!!cb.checked;cb.closest('label').style.borderColor=_fumee?'var(--navy)':'var(--g3)';majPrixJeux();}
+function selectVariant(btn,label,price,img){
   document.querySelectorAll('.prod-vbtn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  _selectedVariant={label,price};
-  document.getElementById('prodPriceDisplay').innerHTML=price+' € <small>/ événement</small>';
+  _selectedVariant={label,price,img:img||'spots-eurolite.webp'};
+  majPrixJeux();
+  const el=document.getElementById('prodMainImg');
+  if(el&&img&&!el.src.endsWith(img)){el.src=img;el.alt=label+' — Location Vespra Event';}
+  if(typeof pgSync==='function')try{pgSync();}catch(e){}
 }
 function addToCartProduct(){
   addToCart({
     id:'p15',
     name:'Jeux de lumières',
-    label:_selectedVariant.label,
-    price:_selectedVariant.price,
-    img:'spots-eurolite.webp'
+    label:_selectedVariant.label+(_fumee?' + machine à fumée ('+PX_FUMEE+' €)':''),
+    price:_selectedVariant.price+(_fumee?PX_FUMEE:0),
+    img:_selectedVariant.img||'spots-eurolite.webp'
   });
 }
 function toggleFaq(btn){
@@ -1369,7 +1386,7 @@ function toggleFaq(btn){
 })();
 
 /* — galerie produit — */
-const PG_IMGS=[{"s": "spots-ibiza.webp", "a": "Set Ibiza 4 spots sur pied", "t": "spots-ibiza-t.webp"}, {"s": "spots-eurolite.webp", "a": "Set Eurolite 9 spots", "t": "spots-eurolite-t.webp"}, {"s": "jeux-lumieres-situation.webp", "a": "Les jeux de lumière sur une piste de danse pleine", "t": "jeux-lumieres-situation-t.webp"}];
+const PG_IMGS=[{"s": "spots-eurolite.webp", "a": "Set Eurolite 9 spots", "t": "spots-eurolite-t.webp"}, {"s": "spots-ibiza.webp", "a": "Set Ibiza 4 spots sur pied", "t": "spots-ibiza-t.webp"}, {"s": "jeux-lumieres-situation.webp", "a": "Les jeux de lumière sur une piste de danse pleine", "t": "jeux-lumieres-situation-t.webp"}];
 let _pgI=0;
 function pgThumbs(){
   const wrap=document.getElementById('prodThumbs');
@@ -1441,7 +1458,7 @@ addEventListener('keydown',e=>{
 </script>
 <script src="/curseur.js" defer></script>
 <script src="/prix-registre.js" defer></script>
-<script src="/prix.js" defer></script>
+<script src="/prix.js" defer></script><script src="/lignes-separees.js" defer></script>
 
 <script src="/textes.js" defer></script>
 <script src="/fiche.js" defer></script>

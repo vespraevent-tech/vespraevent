@@ -704,6 +704,15 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
       <div class="prod-from-label">Prix</div>
       <div class="prod-price-main" id="prodPriceDisplay">35 € <small>/ événement</small></div><div class="prod-duree" style="font-size:12px;color:var(--g2);margin-top:4px">Retrait possible le vendredi, retour le lundi.</div>
 
+<div class="prod-option-install" style="margin:18px 0;padding:16px;background:#f7f9fc;border-radius:12px;border:1px solid var(--g3)">
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1);margin-bottom:10px">Option supplémentaire</div>
+  <label class="prod-option-check" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:2px solid var(--g3);border-radius:var(--r);cursor:pointer;font-size:14px;transition:border-color .18s" onmouseover="this.style.borderColor='var(--navy)'" onmouseout="this.style.borderColor=(this.querySelector('input').checked?'var(--navy)':'var(--g3)')">
+    <input type="checkbox" id="optionFumee" style="width:18px;height:18px;margin-top:2px;accent-color:var(--navy);flex-shrink:0" onchange="toggleFumee(this)">
+    <span><strong>Machine à fumée</strong><br><span style="color:var(--g2);font-size:12px;line-height:1.5">Grâce à la fumée, les faisceaux de la boule à facettes deviennent visibles : l'effet est bien plus joli et l'ambiance bien plus festive. Liquide professionnel accepté dans toutes les salles, sans odeur et inoffensif pour la santé.</span></span>
+    <span style="font-weight:700;color:var(--navy);margin-left:auto;flex-shrink:0;white-space:nowrap">+&nbsp;10&nbsp;€</span>
+  </label>
+</div>
+
 <div class="prod-ctas">
         <button class="btn-add-cart" id="addToCartBtn" data-product-id="p12" onclick="addToCartProduct()">Ajouter au devis</button><p class="vs-guide-lien" style="margin:14px 0 0;font-size:13px;color:var(--g2)">Le guide : <a href="article-boule-facettes.html" style="text-decoration:underline;text-underline-offset:3px">Boule à facettes : bien l'installer</a></p>
       </div>
@@ -807,7 +816,7 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
         </div>
       </a>
       <a href="produit-jeux-lumieres.html" class="rel-card">
-        <div class="rel-img-wrap"><img class="rel-img" src="spots-eurolite.webp" alt="Jeux de lumières" loading="lazy" decoding="async" width="480" height="360"></div>
+        <div class="rel-img-wrap"><img class="rel-img" src="jeux-lumieres-situation.webp" alt="Jeux de lumières" loading="lazy" decoding="async" width="480" height="360"></div>
         <div class="rel-body">
           <div class="rel-cat">Son, lumière et vidéo</div>
           <div class="rel-title">Jeux de lumières</div>
@@ -831,7 +840,7 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
         </div>
       </a>
       <a href="produit-pack-vespra.html" class="rel-card">
-        <div class="rel-img-wrap"><img class="rel-img" src="pack-vespra-60-v2.webp" alt="Pack Vespra" loading="lazy" decoding="async" width="480" height="360"></div>
+        <div class="rel-img-wrap"><img class="rel-img" src="pack-vespra-200-v2.webp" alt="Pack Vespra" loading="lazy" decoding="async" width="480" height="360"></div>
         <div class="rel-body">
           <div class="rel-cat">Son, lumière et vidéo</div>
           <div class="rel-title">Pack Vespra</div>
@@ -1212,18 +1221,22 @@ function toggleNav(){
   document.body.style.overflow=open?'hidden':'';
 }
 let _selectedVariant={label:'Boule à facettes Ø 40 cm + moteur',price:35};
+let _fumee=false;
+const PX_FUMEE=10;
+function majPrixBoule(){document.getElementById('prodPriceDisplay').innerHTML=(_selectedVariant.price+(_fumee?PX_FUMEE:0))+' € <small>/ événement</small>';}
+function toggleFumee(cb){_fumee=!!cb.checked;cb.closest('label').style.borderColor=_fumee?'var(--navy)':'var(--g3)';majPrixBoule();}
 function selectVariant(btn,label,price){
   document.querySelectorAll('.prod-vbtn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   _selectedVariant={label,price};
-  document.getElementById('prodPriceDisplay').innerHTML=price+' € <small>/ événement</small>';
+  majPrixBoule();
 }
 function addToCartProduct(){
   addToCart({
     id:'p12',
     name:'Boule à Facettes Ø 40 cm',
-    label:_selectedVariant.label,
-    price:_selectedVariant.price,
+    label:_selectedVariant.label+(_fumee?' + machine à fumée ('+PX_FUMEE+' €)':''),
+    price:_selectedVariant.price+(_fumee?PX_FUMEE:0),
     img:'boule-facettes.webp'
   });
 }
@@ -1387,7 +1400,7 @@ addEventListener('keydown',e=>{
 </script>
 <script src="/curseur.js" defer></script>
 <script src="/prix-registre.js" defer></script>
-<script src="/prix.js" defer></script>
+<script src="/prix.js" defer></script><script src="/lignes-separees.js" defer></script>
 
 <script src="/textes.js" defer></script>
 <script src="/fiche.js" defer></script>

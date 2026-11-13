@@ -616,11 +616,11 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
 
 <div class="prod-variants">
         <div class="prod-variants-label">Une ou deux machines</div>
-        <button class="prod-vbtn active" onclick="selectVariant(this,'1 machine',85)" data-price="85">
+        <button class="prod-vbtn active" onclick="selectVariant(this,'1 machine',85,'etincelles-froides.webp')" data-price="85">
           <span class="prod-vbtn-name">1 machine</span>
           <span class="prod-vbtn-price">85 €</span>
         </button>
-        <button class="prod-vbtn" onclick="selectVariant(this,'2 machines',130)" data-price="130">
+        <button class="prod-vbtn" onclick="selectVariant(this,'2 machines',130,'etincelles-froides-lot.webp')" data-price="130">
           <span class="prod-vbtn-name">2 machines</span>
           <span class="prod-vbtn-price">130 €</span>
         </button>
@@ -757,7 +757,7 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
         </div>
       </a>
       <a href="produit-boule-facettes.html" class="rel-card">
-        <div class="rel-img-wrap"><img class="rel-img" src="boule-facettes.webp" alt="Boule à facettes" loading="lazy" decoding="async" width="480" height="360"></div>
+        <div class="rel-img-wrap"><img class="rel-img" src="boule-facettes-situation.webp" alt="Boule à facettes" loading="lazy" decoding="async" width="480" height="360"></div>
         <div class="rel-body">
           <div class="rel-cat">Son, lumière et vidéo</div>
           <div class="rel-title">Boule à facettes</div>
@@ -781,7 +781,7 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
         </div>
       </a>
       <a href="produit-pack-vespra.html" class="rel-card">
-        <div class="rel-img-wrap"><img class="rel-img" src="pack-vespra-60-v2.webp" alt="Pack Vespra" loading="lazy" decoding="async" width="480" height="360"></div>
+        <div class="rel-img-wrap"><img class="rel-img" src="pack-vespra-200-v2.webp" alt="Pack Vespra" loading="lazy" decoding="async" width="480" height="360"></div>
         <div class="rel-body">
           <div class="rel-cat">Son, lumière et vidéo</div>
           <div class="rel-title">Pack Vespra</div>
@@ -972,11 +972,13 @@ window.majOptions = function(){
   var aff = document.getElementById('prodPriceDisplay');
   if (aff) aff.innerHTML = totalCourant() + ' € <small>/ événement</small>';
 };
-window.selectVariant = function(btn, label, price){
+window.selectVariant = function(btn, label, price, img){
   document.querySelectorAll('.prod-vbtn').forEach(function(b){b.classList.remove('active');});
   btn.classList.add('active');
-  _selectedVariant = {label:label, price:price};
+  _selectedVariant = {label:label, price:price, img:img||'etincelles-froides-situation.webp'};
   majOptions();
+  var el = document.getElementById('prodMainImg');
+  if (el && img && !el.src.endsWith(img)) { el.src = img; el.alt = 'Machine à étincelles froides — ' + label + ' — Location Vespra Event'; }
 };
 window.addToCartProduct=function(){
   var opts = optionsLO();

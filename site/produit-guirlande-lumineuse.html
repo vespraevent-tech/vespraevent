@@ -639,6 +639,16 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
   </button>
 </div>
 
+<div class="prod-qty" style="display:flex;align-items:center;gap:14px;margin:2px 0 18px;flex-wrap:wrap">
+  <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g2)">Quantité</span>
+  <span style="display:inline-flex;align-items:center;border:1px solid var(--g3);border-radius:10px">
+    <button type="button" id="qteMoins" onclick="qteGuir(-1)" aria-label="Une guirlande de moins" style="width:36px;height:36px;border:0;background:none;font-size:18px;cursor:pointer;color:var(--navy)">−</button>
+    <b id="qteGuir" style="min-width:30px;text-align:center;font-size:15px">1</b>
+    <button type="button" id="qtePlus" onclick="qteGuir(1)" aria-label="Une guirlande de plus" style="width:36px;height:36px;border:0;background:none;font-size:18px;cursor:pointer;color:var(--navy)">+</button>
+  </span>
+  <span style="font-size:12px;color:var(--g2)">Plusieurs guirlandes ? Choisissez la longueur, puis la quantité.</span>
+</div>
+
 <div class="prod-option-install" style="margin:18px 0;padding:16px;background:#f7f9fc;border-radius:12px;border:1px solid var(--g3)">
   <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1);margin-bottom:10px">Ajouter une structure (option)</div>
   <label class="prod-option-check" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:2px solid var(--g3);border-radius:var(--r);cursor:pointer;font-size:14px;transition:border-color .18s;margin-bottom:8px" onmouseover="this.style.borderColor='var(--navy)'" onmouseout="updateOptionBorder(this)">
@@ -757,7 +767,7 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
         </div>
       </a>
       <a href="produit-boule-facettes.html" class="rel-card">
-        <div class="rel-img-wrap"><img class="rel-img" src="boule-facettes.webp" alt="Boule à facettes" loading="lazy" decoding="async" width="480" height="360"></div>
+        <div class="rel-img-wrap"><img class="rel-img" src="boule-facettes-situation.webp" alt="Boule à facettes" loading="lazy" decoding="async" width="480" height="360"></div>
         <div class="rel-body">
           <div class="rel-cat">Son, lumière et vidéo</div>
           <div class="rel-title">Boule à facettes</div>
@@ -769,7 +779,7 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
         </div>
       </a>
       <a href="produit-pack-vespra.html" class="rel-card">
-        <div class="rel-img-wrap"><img class="rel-img" src="pack-vespra-60-v2.webp" alt="Pack Vespra" loading="lazy" decoding="async" width="480" height="360"></div>
+        <div class="rel-img-wrap"><img class="rel-img" src="pack-vespra-200-v2.webp" alt="Pack Vespra" loading="lazy" decoding="async" width="480" height="360"></div>
         <div class="rel-body">
           <div class="rel-cat">Son, lumière et vidéo</div>
           <div class="rel-title">Pack Vespra</div>
@@ -946,9 +956,11 @@ function getCart(){try{return JSON.parse(localStorage.getItem(KEY)||'[]');}catch
 function saveCart(c){try{localStorage.setItem(KEY,JSON.stringify(c));}catch(e){}}
 function updateBadge(){var n=getCart().reduce(function(s,i){return s+(i.qty||1);},0);document.querySelectorAll('.cart-n,.cart-badge').forEach(function(el){el.textContent=n>0?n:'0';});}
 function updateOptionBorder(el){const cb=el&&el.querySelector('input[type=checkbox]');if(el)el.style.borderColor=cb&&cb.checked?'var(--navy)':'var(--g3)';}
-window.addToCart=function(item){var cart=getCart();var idx=cart.findIndex(function(i){return i.id===item.id&&i.label===item.label;});if(idx>-1){cart[idx].qty=(cart[idx].qty||1)+1;}else{cart.push(Object.assign({},item,{qty:1}));}saveCart(cart);updateBadge();if(typeof openCart==='function')openCart();flashBtn(item.id);};
+window.addToCart=function(item){var cart=getCart();var idx=cart.findIndex(function(i){return i.id===item.id&&i.label===item.label;});if(idx>-1){cart[idx].qty=(cart[idx].qty||1)+(item.qty||1);}else{cart.push(Object.assign({},item,{qty:item.qty||1}));}saveCart(cart);updateBadge();if(typeof openCart==='function')openCart();flashBtn(item.id);};
 function flashBtn(id){document.querySelectorAll('[data-product-id="'+id+'"]').forEach(function(btn){btn.textContent='✓ Ajouté au devis !';btn.style.background='#22c55e';setTimeout(function(){btn.textContent='Ajouter au devis';btn.style.background='';},1800);});}
 var _selectedVariant={label:'10 m',price:9};
+var _qte=1,QTE_MAX=10;
+window.qteGuir=function(d){_qte=Math.max(1,Math.min(QTE_MAX,_qte+d));var e=document.getElementById('qteGuir');if(e)e.textContent=_qte;var m=document.getElementById('qteMoins'),p=document.getElementById('qtePlus');if(m)m.style.opacity=_qte<=1?'.35':'';if(p)p.style.opacity=_qte>=QTE_MAX?'.35':'';window.majOptions();};
 window.updateOptionBorder = function (el){ if (!el) return; var cb = el.querySelector('input[type=checkbox]'); el.style.borderColor = cb && cb.checked ? 'var(--navy)' : 'var(--g3)'; };
 var updateOptionBorder = window.updateOptionBorder;
 var STRUCTURES = [["optionBarnum1", "barnum 3×3 m", 60], ["optionBarnum2", "barnum 4×8 m", 125], ["optionBarnum3", "barnum 6×10 m", 190], ["optionTente", "tente étoile 22 m", 590], ["optionBuvette", "buvette 4 comptoirs", 265]];
@@ -966,7 +978,7 @@ window.majOptions = function(){
     var cb = document.getElementById(o[0]);
     if (cb) updateOptionBorder(cb.closest('label'));
   });
-  var total = _selectedVariant.price + optionsLO().reduce(function(t,o){return t+o.prix;}, 0);
+  var total = _selectedVariant.price*_qte + optionsLO().reduce(function(t,o){return t+o.prix;}, 0);
   var el = document.getElementById('prodPriceDisplay');
   if (el) el.innerHTML = total + ' € <small>/ événement</small>';
 };
@@ -979,7 +991,13 @@ window.selectVariant=function(btn,label,price){
 window.addToCartProduct=function(){
   var opts = optionsLO();
   var suffixe = opts.map(function(o){return ' + ' + o.nom + ' (' + o.prix + ' €)';}).join('');
-  window.addToCart({id:'p33_'+Date.now(), name:'Guirlande lumineuse' + suffixe, label:_selectedVariant.label, price:_selectedVariant.price + opts.reduce(function(t,o){return t+o.prix;}, 0), img:'guirlande-lumineuse.webp'});
+  var optsTotal = opts.reduce(function(t,o){return t+o.prix;}, 0);
+  if (opts.length) {
+    /* avec une structure : une seule ligne, la quantité est dans le libellé */
+    window.addToCart({id:'p33_'+Date.now(), name:'Guirlande lumineuse' + suffixe, label:_selectedVariant.label + (_qte>1?' × '+_qte:''), price:_selectedVariant.price*_qte + optsTotal, img:'guirlande-lumineuse.webp'});
+  } else {
+    for (var k=0;k<_qte;k++) window.addToCart({id:'p33', name:'Guirlande lumineuse', label:_selectedVariant.label, price:_selectedVariant.price, img:'guirlande-lumineuse.webp'});
+  }
 };
 updateBadge();
 })();
