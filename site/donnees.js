@@ -63,7 +63,7 @@
      la bonne apparaissait d'un coup. La page reste donc invisible le
      temps que ces réglages arrivent et soient appliqués, puis s'affiche
      une seule fois. Garde-fou : si le serveur tarde, elle s'affiche
-     quand même au bout de 0,7 seconde. */
+     quand même au bout de 0,4 seconde. */
   var voileLeve = false, dcl = false, donneesPretes = false, minuteur = null;
   try {
     var st = document.createElement('style');
@@ -82,11 +82,17 @@
     setTimeout(function () { h.classList.remove('v-fin'); }, 400);
   }
   function verifier() {
-    if (dcl && donneesPretes) setTimeout(leverVoile, 90);
+    if (dcl && donneesPretes) setTimeout(leverVoile, 30);
   }
-  document.addEventListener('DOMContentLoaded', function () { dcl = true; verifier(); });
-  if (document.readyState !== 'loading') dcl = true;
-  minuteur = setTimeout(leverVoile, 700);
+  /* on n'attend que la fin de la lecture de la page, pas l'exécution de tous
+     les scripts : la page s'affiche au moment où le navigateur la dessine,
+     sans seconde blanche supplémentaire. */
+  function pageLue() { dcl = true; verifier(); }
+  if (document.readyState === 'loading') {
+    document.addEventListener('readystatechange', function () { if (document.readyState !== 'loading') pageLue(); });
+    document.addEventListener('DOMContentLoaded', pageLue);
+  } else pageLue();
+  minuteur = setTimeout(leverVoile, 400);
   window.VESPRA_LEVER_VOILE = leverVoile;
 
 
@@ -124,32 +130,70 @@
     } catch (x) {}
   }
 
+  /* ── mémoire courte des réglages du back-office ──────────────────
+     Sans elle, chaque page attend la réponse du serveur avant de
+     s'afficher : le visiteur voit une page vide, puis tout apparaît d'un
+     coup. La dernière réponse est donc gardée dans le navigateur et
+     réutilisée telle quelle pendant quelques minutes : la page suivante
+     s'affiche immédiatement, déjà juste. La réponse du serveur est
+     quand même redemandée en arrière-plan, pour la fois d'après. */
+  var CLE_CACHE = 'vespra_site_' + page, DUREE_CACHE = 10 * 60 * 1000;
+  function normaliser(d) {
+    return {
+      theme: (d && d.theme) || {},
+      textes: (d && d.textes) || [],
+      notices: (d && d.notices) || [],
+      produits: (d && d.produits) || [],
+      google: (d && d.google) || [],
+      images: (d && d.images) || [],
+      miseEnPage: (d && d.miseEnPage) || [],
+      salles: (d && d.salles) || [],
+      prestataires: (d && d.prestataires) || [],
+      catalogue: (d && d.catalogue) || [],
+      entreprise: (d && d.entreprise) || {},
+      ambiance: (d && d.ambiance && !Array.isArray(d.ambiance)) ? d.ambiance : {},
+      bandeau: (d && d.bandeau && !Array.isArray(d.bandeau)) ? d.bandeau : {},
+    };
+  }
+  function garder(d) {
+    try { localStorage.setItem(CLE_CACHE, JSON.stringify({ t: Date.now(), d: d })); } catch (e) {}
+  }
+  function enMemoire() {
+    try {
+      var v = JSON.parse(localStorage.getItem(CLE_CACHE) || 'null');
+      if (!v || !v.d || Date.now() - v.t > DUREE_CACHE) return null;
+      return normaliser(v.d);
+    } catch (e) { return null; }
+  }
+  function rafraichirEnFond() {
+    try {
+      fetch('/api/site?page=' + encodeURIComponent(page), { headers: { accept: 'application/json' }, cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) { if (d) garder(d); })
+        .catch(function () {});
+    } catch (e) {}
+  }
+
   function charger() {
     if (promesse) return promesse;
+    var garde = enMemoire();
+    if (garde) {
+      /* la page s'affiche tout de suite avec les derniers réglages connus */
+      if (garde.entreprise) {
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { remplirEntreprise(garde.entreprise); });
+        else remplirEntreprise(garde.entreprise);
+      }
+      donneesPretes = true; verifier();
+      rafraichirEnFond();
+      promesse = Promise.resolve(garde);
+      return promesse;
+    }
     promesse = fetch('/api/site?page=' + encodeURIComponent(page), {
       headers: { accept: 'application/json', 'cache-control': 'no-cache' },
       cache: 'no-store',
     })
       .then(function (r) { return r.ok ? r.json() : VIDE; })
-      .then(function (d) {
-        /* on complète ce qui manquerait, pour que les scripts n'aient
-           jamais à vérifier la forme de ce qu'ils reçoivent */
-        return {
-          theme: (d && d.theme) || {},
-          textes: (d && d.textes) || [],
-          notices: (d && d.notices) || [],
-          produits: (d && d.produits) || [],
-          google: (d && d.google) || [],
-          images: (d && d.images) || [],
-          miseEnPage: (d && d.miseEnPage) || [],
-          salles: (d && d.salles) || [],
-          prestataires: (d && d.prestataires) || [],
-          catalogue: (d && d.catalogue) || [],
-          entreprise: (d && d.entreprise) || {},
-          ambiance: (d && d.ambiance && !Array.isArray(d.ambiance)) ? d.ambiance : {},
-          bandeau: (d && d.bandeau && !Array.isArray(d.bandeau)) ? d.bandeau : {},
-        };
-      })
+      .then(function (d) { garder(d); return normaliser(d); })
       .catch(function () { return VIDE; })
       .then(function (d) {
         /* informations de l'entreprise : avant que le voile ne se lève */

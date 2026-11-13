@@ -868,6 +868,7 @@ function renderGrid(products){
   grid.innerHTML='';
   products.forEach(p=>{
     const c=document.createElement('div');c.className='prod-card';
+    if(p&&p.id)c.setAttribute('data-id',p.id);   /* l'identifiant suit la carte, même quand l'ordre change */
     const priceLabel=(typeof p.vdef==='number')?`${p.price} €`:`<span class="prod-from">À partir de</span>${p.price} €`;
     const imgHtml=p.img?`<img class="prod-img" src="${p.img}" alt="${p.name}" loading="lazy" decoding="async">`:`<div class="prod-img prod-img-placeholder" aria-hidden="true">${(p.name||'?').charAt(0)}</div>`;
     c.innerHTML=`<div class="prod-img-wrap">${imgHtml}</div><div class="prod-body"><div class="prod-cat">${normCat(p.cat)}</div><div class="prod-name">${p.name}</div><div class="prod-desc">${p.desc}</div><div class="prod-foot"><div class="prod-price">${priceLabel}</div><button class="btn-add${(p.id==='p22'||p.qteMax||(p.variants&&p.variants.length)||(p.options&&p.options.length))?' btn-config':''}" onclick="event.stopPropagation();handleAdd('${p.id}')" title="${(p.id==='p22'||p.qteMax||(p.variants&&p.variants.length)||(p.options&&p.options.length))?'Choisir les options':'Ajouter au devis'}">+</button></div></div>`;
@@ -1944,8 +1945,6 @@ body:has(.c-drawer.open) .pm-bar,body:has(.vm-ov.open) .pm-bar,body:has(.c-overl
   var _rg=window.renderGrid;
   window.renderGrid=function(products){
     _rg(products);
-    var g=document.getElementById('prodGrid');
-    if(g)[].slice.call(g.children).forEach(function(c,i){if(products[i])c.setAttribute('data-id',products[i].id)});
     try{maj();}catch(e){}
   };
 
@@ -2051,3 +2050,4 @@ body:has(.c-drawer.open) .pm-bar,body:has(.vm-ov.open) .pm-bar,body:has(.c-overl
 <script src="/centrer.js?v=5" defer></script>
 <link rel="stylesheet" href="/coherence.css?v=31">
 <script src="/coherence.js?v=7" defer></script>
+<script src="/panier-sync.js" defer></script>
