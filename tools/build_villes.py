@@ -219,7 +219,7 @@ def faq_items(d, kind):
         order = ['livre', 'prix', 'communes', 'photos', 'format', 'salles', 'cadre', 'duree', 'install', 'domaines', 'mariage', 'cout', 'retrait', 'evenements', 'reserver', 'assistance', 'inclus', 'organisation']
     else:
         L['prix'] = (f"Combien coûte la location d'un photobooth à {n} ?", "À partir de 130 € : photos numériques illimitées, également incluses dans toutes les autres formules. À partir de 190 €, profitez en plus de photos papier imprimées en instantané : 200 photos pour 190 €, 300 photos pour 240 €, 400 photos pour 290 € ou photos illimitées pour 420 €, avec une formule personnalisable possible sur devis. Livraison en plus." if sl != 'vitre' else "À partir de 130 € : photos numériques illimitées, également incluses dans toutes les autres formules. À partir de 190 €, profitez en plus de photos papier imprimées en instantané : 200 photos pour 190 €, 300 photos pour 240 €, 400 photos pour 290 € ou photos illimitées pour 420 €, avec une formule personnalisable possible sur devis. Livraison offerte à Vitré.")
-        L['pack'] = ("Quel pack son et lumière choisir ?", "Le Pack Vespra va de 70 € pour 60 personnes à 150 € pour 200 personnes.")
+        L['pack'] = ("Quel pack son et lumière choisir ?", "Le Pack Vespra va de 50 € pour 20 personnes à 130 € pour 250 personnes.")
         L['voir'] = ("Peut-on voir le matériel avant de réserver ?", "Oui, sur rendez-vous à Vitré, sans engagement.")
         L['remise'] = ("Y a-t-il une remise si je loue plusieurs produits ?", "Oui : −10 % dès 5 produits, appliqués automatiquement sur votre devis.")
         L['paiement'] = ("Comment se règle la location ?", "Le virement est privilégié, la carte et les espèces sont acceptées le jour J.")

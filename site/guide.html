@@ -130,7 +130,7 @@ let hist=[],cur=null,back=false;
 
 /* ---------- Catalogue : prix selon le nombre d'invités (g = 0..3) ---------- */
 const P={
-pack:{n:'Pack Vespra',hook:'Sono, jeux de lumière et machine à fumée : l\'ambiance de soirée prête à l\'emploi, sans rien brancher de compliqué.',star:1,def:g=>g,vars:[{l:'60 personnes',p:70,img:'pack-vespra-60-v2'},{l:'100 personnes',p:80,img:'pack-vespra-100-v2'},{l:'150 personnes',p:125,img:'pack-vespra-150-v2'},{l:'200 personnes',p:150,img:'pack-vespra-200-v2'}]},
+pack:{n:'Pack Vespra',hook:'Sono, jeux de lumière et machine à fumée : l\'ambiance de soirée prête à l\'emploi, sans rien brancher de compliqué.',star:1,def:g=>[0,1,3,4][g],vars:[{l:'20 personnes',p:50,img:'pack-vespra-60-v2'},{l:'40 à 60 personnes',p:70,img:'pack-vespra-60-v2'},{l:'80 à 100 personnes',p:80,img:'pack-vespra-100-v2'},{l:'120 à 150 personnes',p:100,img:'pack-vespra-150-v2'},{l:'180 à 250 personnes',p:130,img:'pack-vespra-200-v2'}]},
 jeux:{n:'Jeux de lumières',hook:'Des faisceaux colorés qui font danser la salle.',def:g=>g<=1?0:1,vars:[{l:'Ibiza 4 spots',p:20,img:'ambiance-soiree'},{l:'Eurolite 9 spots',p:30,img:'ambiance-soiree'}]},
 spot:{opt:1,n:'Spots LED sur batterie',img:'spot-led-batterie-ambiance',hook:'Sans fil, posés où vous voulez : ils éclairent les murs, les tables, les arbres. La salle devient un décor.',p:20},
 boule:{n:'Boule à facettes',img:'boule-facettes-situation',hook:'Le classique qui fait toujours son effet : des milliers de reflets sur les murs et les robes.',p:35},
@@ -217,7 +217,7 @@ function fcol(k,d){const c=C('feux'),tot=Object.values(c.col).reduce((a,b)=>a+b,
 
 /* ---------- Prix en direct : ceux du back-office, partout pareil ---------- */
 const MAP={
- pack:['pack-vespra-1','pack-vespra-2','pack-vespra-3','pack-vespra-4'],
+ pack:['pack-vespra-1','pack-vespra-2','pack-vespra-3','pack-vespra-4','pack-vespra-5'],
  jeux:['jeux-de-lumieres-1','jeux-de-lumieres-2'],
  sono:['sonorisation-1','sonorisation-2','sonorisation-3','sonorisation-4','sonorisation-5'],
  etin:['etincelles-froides-1','etincelles-froides-2'],
@@ -366,7 +366,7 @@ function setVar(id,k){S.vars[id]=+k;render(true)}
 function tg(id){S.off[id]=!S.off[id];render(true)}
 function addSug(id){S.picks[id]=true;render(true)}
 const CAT={
-pack:x=>({id:'p8',name:'Pack Vespra',label:'Pack '+x.v.split(' ')[0]+' personnes',img:x.img+'.webp'}),
+pack:x=>({id:'p8',name:'Pack Vespra',label:'Pack '+x.v,img:x.img+'.webp'}),
 jeux:x=>({id:'p15',name:'Jeux de lumières',label:x.v,img:x.img+'.webp'}),
 spot:x=>({id:'p43',name:'Spot LED sur batterie',price:P.spot.p,qty:C('spot').q,img:'spot-led-batterie-ambiance.webp'}),
 boule:x=>({id:'p12',name:'Boule à facettes',img:'boule-facettes.webp'}),

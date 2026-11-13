@@ -1153,6 +1153,11 @@ var P=[
   ['Pack Vespra 100 personnes','sono',80,['100 personnes'],'Pack 100'],
   ['Pack Vespra 150 personnes','sono',125,['150 personnes'],'Pack 150'],
   ['Pack Vespra 200 personnes','sono',150,['200 personnes'],'Pack 200'],
+  ['Pack Vespra 20 personnes','sono',50,['20 personnes'],'Pack 20'],
+  ['Pack Vespra 40 à 60 personnes','sono',70,['40 à 60 personnes'],'Pack 40-60'],
+  ['Pack Vespra 80 à 100 personnes','sono',80,['80 à 100 personnes'],'Pack 80-100'],
+  ['Pack Vespra 120 à 150 personnes','sono',100,['120 à 150 personnes'],'Pack 120-150'],
+  ['Pack Vespra 180 à 250 personnes','sono',130,['180 à 250 personnes'],'Pack 180-250'],
   ['Sono 20 personnes','sono',20,['20 personnes'],'Sono 20'],
   ['Sono 40/60 personnes','sono',40,['40/60 personnes'],'Sono 40/60'],
   ['Sono 80/100 personnes','sono',50,['80/100 personnes'],'Sono 80/100'],
@@ -3438,9 +3443,9 @@ window.showCaAcomptes=function(){caTab='acomptes';ca();};
 var DEFAULT_EQUIP_GROUPS=[
   
   {id:'sono_s',label:'Sono petite',stock:1,cat:null,isVariants:false,
-   products:['Pack Vespra 60 personnes','Sono 40/60 personnes']},
+   products:['Pack Vespra 60 personnes','Pack Vespra 20 personnes','Pack Vespra 40 à 60 personnes','Sono 40/60 personnes']},
   {id:'sono_l',label:'Sono grande',stock:1,cat:null,isVariants:false,
-   products:['Pack Vespra 100 personnes','Pack Vespra 150 personnes','Sono 80/100 personnes']},
+   products:['Pack Vespra 100 personnes','Pack Vespra 150 personnes','Pack Vespra 80 à 100 personnes','Pack Vespra 120 à 150 personnes','Pack Vespra 180 à 250 personnes','Sono 80/100 personnes']},
   {id:'spots_led',label:'Spots LED sur batterie',stock:12,cat:null,isVariants:false,
    products:['Spot LED sur batterie']},
 ];
@@ -5421,6 +5426,8 @@ OPTIONS_PRODUIT['Buvette 4x4m']=[PK_OPT.install,PK_OPT.guir10,PK_OPT.guir20];
 ['Tente étoile 10m','Tente étoile 14m','Tente étoile 22m'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.install,PK_OPT.eclair,PK_OPT.guir10,PK_OPT.guir20];});
 ['Sono 20 personnes','Sono 40/60 personnes','Sono 80/100 personnes','Sonorisation — 120 à 150 personnes','Sonorisation — 180 à 250 personnes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.caisson,PK_OPT.microFil,PK_OPT.microSF];});
 ['Pack Vespra 60 personnes','Pack Vespra 100 personnes','Pack Vespra 150 personnes','Pack Vespra 200 personnes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.microFil,PK_OPT.microSF];});
+['Pack Vespra 20 personnes','Pack Vespra 40 à 60 personnes','Pack Vespra 80 à 100 personnes','Pack Vespra 120 à 150 personnes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.caisson,PK_OPT.microFil,PK_OPT.microSF];});
+OPTIONS_PRODUIT['Pack Vespra 180 à 250 personnes']=[PK_OPT.microFil,PK_OPT.microSF];
 OPTIONS_PRODUIT["Livre d'or audio"]=[];
 ['Cabine téléphonique','Cabine téléphonique audio / vidéo','Cabine téléphonique audio','Cabine téléphonique vidéo','Cabine téléphonique blanche','Cabine téléphonique rouge','Cabine téléphonique en bois blanc'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.neon];});
 OPTIONS_PRODUIT['Guirlande lumineuse']=[PK_OPT.b3x3,PK_OPT.b4x8,PK_OPT.b6x10,PK_OPT.tente10,PK_OPT.tente14,PK_OPT.tenteet,PK_OPT.buvette];

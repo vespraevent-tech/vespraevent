@@ -113,8 +113,8 @@ window.VESPRA_PRIX_REGISTRE = [
   {
     "i": "pack-vespra-1",
     "n": "Pack Vespra",
-    "v": "Pack 60 personnes",
-    "p": 70,
+    "v": "20 personnes",
+    "p": 50,
     "pg": "produit-pack-vespra.html",
     "vi": 0,
     "ci": "p8",
@@ -123,8 +123,8 @@ window.VESPRA_PRIX_REGISTRE = [
   {
     "i": "pack-vespra-2",
     "n": "Pack Vespra",
-    "v": "Pack 100 personnes",
-    "p": 80,
+    "v": "40 à 60 personnes",
+    "p": 70,
     "pg": "produit-pack-vespra.html",
     "vi": 1,
     "ci": "p8",
@@ -133,8 +133,8 @@ window.VESPRA_PRIX_REGISTRE = [
   {
     "i": "pack-vespra-3",
     "n": "Pack Vespra",
-    "v": "Pack 150 personnes",
-    "p": 125,
+    "v": "80 à 100 personnes",
+    "p": 80,
     "pg": "produit-pack-vespra.html",
     "vi": 2,
     "ci": "p8",
@@ -143,12 +143,31 @@ window.VESPRA_PRIX_REGISTRE = [
   {
     "i": "pack-vespra-4",
     "n": "Pack Vespra",
-    "v": "Pack 200 personnes",
-    "p": 150,
+    "v": "120 à 150 personnes",
+    "p": 100,
     "pg": "produit-pack-vespra.html",
     "vi": 3,
     "ci": "p8",
     "cvi": 3
+  },
+  {
+    "i": "pack-vespra-5",
+    "n": "Pack Vespra",
+    "v": "180 à 250 personnes",
+    "p": 130,
+    "pg": "produit-pack-vespra.html",
+    "vi": 4,
+    "ci": "p8",
+    "cvi": 4
+  },
+  {
+    "i": "pack-vespra-opt-1",
+    "n": "Pack Vespra",
+    "v": "Option : Caisson de basse",
+    "p": 40,
+    "pg": "produit-pack-vespra.html",
+    "opt": 1,
+    "champ": "optionCaissonPack"
   },
   {
     "i": "barnums-1",
@@ -1611,32 +1630,38 @@ window.VESPRA_PRODUITS = [
     "img": "pack-vespra-60-v2.webp",
     "imgCat": "pack-vespra-60-v2.webp",
     "page": "produit-pack-vespra.html",
-    "prix": 70,
+    "prix": 50,
     "prixId": null,
     "variantes": [
       {
         "prixId": "pack-vespra-1",
-        "label": "Pack 60 personnes",
-        "labelCat": "Pack 60 personnes",
-        "prix": 70
+        "label": "20 personnes",
+        "labelCat": "20 personnes",
+        "prix": 50
       },
       {
         "prixId": "pack-vespra-2",
-        "label": "Pack 100 personnes",
-        "labelCat": "Pack 100 personnes",
-        "prix": 80
+        "label": "40 à 60 personnes",
+        "labelCat": "40 à 60 personnes",
+        "prix": 70
       },
       {
         "prixId": "pack-vespra-3",
-        "label": "Pack 150 personnes",
-        "labelCat": "Pack 150 personnes",
-        "prix": 125
+        "label": "80 à 100 personnes",
+        "labelCat": "80 à 100 personnes",
+        "prix": 80
       },
       {
         "prixId": "pack-vespra-4",
-        "label": "Pack 200 personnes",
-        "labelCat": "Pack 200 personnes",
-        "prix": 150
+        "label": "120 à 150 personnes",
+        "labelCat": "120 à 150 personnes",
+        "prix": 100
+      },
+      {
+        "prixId": "pack-vespra-5",
+        "label": "180 à 250 personnes",
+        "labelCat": "180 à 250 personnes",
+        "prix": 130
       }
     ],
     "notices": [
@@ -1644,7 +1669,15 @@ window.VESPRA_PRODUITS = [
       "notice-stagepas-400bt.pdf",
       "notice-syrincs-d112sp.pdf"
     ],
-    "options": []
+    "options": [
+      {
+        "nom": "Caisson de basse",
+        "prix": 40,
+        "devis": false,
+        "champ": "optionCaissonPack",
+        "id": "pack-vespra-opt-1"
+      }
+    ]
   },
   {
     "id": "p4",
@@ -3073,19 +3106,19 @@ window.VESPRA_MEDIAS = {
     "photos": [
       {
         "s": "pack-vespra-60-v2.webp",
-        "a": "Pack Vespra 60 personnes"
+        "a": "Pack Vespra 40 à 60 personnes"
       },
       {
         "s": "pack-vespra-100-v2.webp",
-        "a": "Pack Vespra 100 personnes"
+        "a": "Pack Vespra 80 à 100 personnes"
       },
       {
         "s": "pack-vespra-150-v2.webp",
-        "a": "Pack Vespra 150 personnes"
+        "a": "Pack Vespra 120 à 150 personnes"
       },
       {
         "s": "pack-vespra-200-v2.webp",
-        "a": "Pack Vespra 200 personnes"
+        "a": "Pack Vespra 180 à 250 personnes"
       }
     ],
     "options": {
