@@ -741,12 +741,13 @@ window.VESPRA_PRIX_REGISTRE = [
     "v": "",
     "p": 60,
     "pg": "produit-machines-effets.html",
-    "vi": 2,
+    "vi": 3,
     "ci": "p40",
     "cvi": -1,
     "pgs": [
       "produit-fumee-lourde-brouillard.html",
-      "produit-fumee-lourde-nuage.html"
+      "produit-fumee-lourde-nuage.html",
+      "produit-fumee-m-fog-1500.html"
     ]
   },
   {
@@ -755,12 +756,28 @@ window.VESPRA_PRIX_REGISTRE = [
     "v": "",
     "p": 150,
     "pg": "produit-machines-effets.html",
-    "vi": 3,
+    "vi": 4,
     "ci": "p41",
     "cvi": -1,
     "pgs": [
       "produit-fumee-lourde-brouillard.html",
-      "produit-fumee-lourde-nuage.html"
+      "produit-fumee-lourde-nuage.html",
+      "produit-fumee-m-fog-1500.html"
+    ]
+  },
+  {
+    "i": "machine-fumee-m-fog-1500",
+    "n": "Machine à fumée puissante M-Fog 1500",
+    "v": "",
+    "p": 20,
+    "pg": "produit-machines-effets.html",
+    "vi": 2,
+    "ci": "p58",
+    "cvi": -1,
+    "pgs": [
+      "produit-fumee-lourde-brouillard.html",
+      "produit-fumee-lourde-nuage.html",
+      "produit-fumee-m-fog-1500.html"
     ]
   },
   {
@@ -1192,7 +1209,8 @@ window.VESPRA_PRIX_REGISTRE = [
     "cvi": -1,
     "pgs": [
       "produit-fumee-lourde-brouillard.html",
-      "produit-fumee-lourde-nuage.html"
+      "produit-fumee-lourde-nuage.html",
+      "produit-fumee-m-fog-1500.html"
     ]
   },
   {
@@ -1206,7 +1224,8 @@ window.VESPRA_PRIX_REGISTRE = [
     "cvi": -1,
     "pgs": [
       "produit-fumee-lourde-brouillard.html",
-      "produit-fumee-lourde-nuage.html"
+      "produit-fumee-lourde-nuage.html",
+      "produit-fumee-m-fog-1500.html"
     ]
   },
   {
@@ -3018,6 +3037,24 @@ window.VESPRA_PRODUITS = [
     "page": "produit-machines-effets.html",
     "prix": 10,
     "prixId": "pyrotechnie-2",
+    "variantes": [],
+    "notices": [],
+    "options": []
+  },
+  {
+    "id": "p58",
+    "ref": "p58",
+    "nom": "Machine à fumée puissante M-Fog 1500",
+    "cat": "Effets spéciaux et artifices",
+    "cats": [
+      "Effets spéciaux et artifices"
+    ],
+    "desc": "Machine à fumée professionnelle de 1500 W, environ 320 m³/min : beaucoup plus puissante que la petite machine, pour bien révéler les faisceaux lumineux.",
+    "img": "fumee-m-fog-1500.webp",
+    "imgCat": "fumee-m-fog-1500.webp",
+    "page": "produit-fumee-m-fog-1500.html",
+    "prix": 20,
+    "prixId": "machine-fumee-m-fog-1500",
     "variantes": [],
     "notices": [],
     "options": []

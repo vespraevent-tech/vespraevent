@@ -705,11 +705,27 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
       <div class="prod-price-main" id="prodPriceDisplay">35 € <small>/ événement</small></div><div class="prod-duree" style="font-size:12px;color:var(--g2);margin-top:4px">Retrait possible le vendredi, retour le lundi.</div>
 
 <div class="prod-option-install" style="margin:18px 0;padding:16px;background:#f7f9fc;border-radius:12px;border:1px solid var(--g3)">
-  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1);margin-bottom:10px">Option supplémentaire</div>
-  <label class="prod-option-check" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:2px solid var(--g3);border-radius:var(--r);cursor:pointer;font-size:14px;transition:border-color .18s" onmouseover="this.style.borderColor='var(--navy)'" onmouseout="this.style.borderColor=(this.querySelector('input').checked?'var(--navy)':'var(--g3)')">
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1);margin-bottom:6px">Option : ajouter de la fumée</div>
+  <p style="margin:0 0 12px;color:var(--g2);font-size:12px;line-height:1.5">Rend les faisceaux de la boule à facettes visibles : bien plus joli. <button type="button" class="fumee-vp" onclick="var d=document.getElementById('fumeeSuite');var o=d.style.display==='none';d.style.display=o?'block':'none';this.textContent=o?'voir moins':'voir plus'" style="background:none;border:0;padding:0;font:inherit;font-size:11px;color:var(--g2);text-decoration:underline;cursor:pointer">voir plus</button><span id="fumeeSuite" style="display:none;margin-top:6px">Grâce à la fumée, l'effet est bien plus joli et l'ambiance bien plus festive. Liquide professionnel accepté dans toutes les salles, sans odeur et inoffensif pour la santé. Toutes nos machines à fumée sont complémentaires.</span></p>
+  <label class="prod-option-check" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:2px solid var(--g3);border-radius:var(--r);cursor:pointer;font-size:14px;transition:border-color .18s;margin-top:0px" onmouseover="this.style.borderColor='var(--navy)'" onmouseout="this.style.borderColor=(this.querySelector('input').checked?'var(--navy)':'var(--g3)')">
     <input type="checkbox" id="optionFumee" style="width:18px;height:18px;margin-top:2px;accent-color:var(--navy);flex-shrink:0" onchange="toggleFumee(this)">
-    <span><strong>Machine à fumée</strong><br><span style="color:var(--g2);font-size:12px;line-height:1.5">Rend les faisceaux de la boule à facettes visibles : bien plus joli. <button type="button" class="fumee-vp" onclick="event.stopPropagation();var d=document.getElementById('fumeeSuite');var o=d.style.display==='none';d.style.display=o?'block':'none';this.textContent=o?'voir moins':'voir plus'" style="background:none;border:0;padding:0;font:inherit;font-size:11px;color:var(--g2);text-decoration:underline;cursor:pointer">voir plus</button><span id="fumeeSuite" style="display:none;margin-top:6px">Grâce à la fumée, l'effet est bien plus joli et l'ambiance bien plus festive. Liquide professionnel accepté dans toutes les salles, sans odeur et inoffensif pour la santé.</span></span></span>
+    <span><strong>Machine à fumée</strong><br><span style="color:var(--g2);font-size:12px">La petite machine, fumée légère</span></span>
     <span style="font-weight:700;color:var(--navy);margin-left:auto;flex-shrink:0;white-space:nowrap">+&nbsp;10&nbsp;€</span>
+  </label>
+  <label class="prod-option-check" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:2px solid var(--g3);border-radius:var(--r);cursor:pointer;font-size:14px;transition:border-color .18s;margin-top:8px" onmouseover="this.style.borderColor='var(--navy)'" onmouseout="this.style.borderColor=(this.querySelector('input').checked?'var(--navy)':'var(--g3)')">
+    <input type="checkbox" id="optionFumeeM" style="width:18px;height:18px;margin-top:2px;accent-color:var(--navy);flex-shrink:0" onchange="toggleFumee(this)">
+    <span><strong>Machine à fumée puissante M-Fog 1500</strong><br><span style="color:var(--g2);font-size:12px">1500 W, environ 320 m³/min : remplit la salle en quelques secondes</span></span>
+    <span style="font-weight:700;color:var(--navy);margin-left:auto;flex-shrink:0;white-space:nowrap">+&nbsp;20&nbsp;€</span>
+  </label>
+  <label class="prod-option-check" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:2px solid var(--g3);border-radius:var(--r);cursor:pointer;font-size:14px;transition:border-color .18s;margin-top:8px" onmouseover="this.style.borderColor='var(--navy)'" onmouseout="this.style.borderColor=(this.querySelector('input').checked?'var(--navy)':'var(--g3)')">
+    <input type="checkbox" id="optionFumeeB" style="width:18px;height:18px;margin-top:2px;accent-color:var(--navy);flex-shrink:0" onchange="toggleFumee(this)">
+    <span><strong>Fumée lourde — effet brouillard</strong><br><span style="color:var(--g2);font-size:12px">Une fumée qui reste au sol, aspect de brouillard</span></span>
+    <span style="font-weight:700;color:var(--navy);margin-left:auto;flex-shrink:0;white-space:nowrap">+&nbsp;60&nbsp;€</span>
+  </label>
+  <label class="prod-option-check" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:2px solid var(--g3);border-radius:var(--r);cursor:pointer;font-size:14px;transition:border-color .18s;margin-top:8px" onmouseover="this.style.borderColor='var(--navy)'" onmouseout="this.style.borderColor=(this.querySelector('input').checked?'var(--navy)':'var(--g3)')">
+    <input type="checkbox" id="optionFumeeN" style="width:18px;height:18px;margin-top:2px;accent-color:var(--navy);flex-shrink:0" onchange="toggleFumee(this)">
+    <span><strong>Fumée lourde — effet nuage</strong><br><span style="color:var(--g2);font-size:12px">Un vrai nuage au sol, débit très rapide</span></span>
+    <span style="font-weight:700;color:var(--navy);margin-left:auto;flex-shrink:0;white-space:nowrap">+&nbsp;150&nbsp;€</span>
   </label>
 </div>
 
@@ -1221,10 +1237,11 @@ function toggleNav(){
   document.body.style.overflow=open?'hidden':'';
 }
 let _selectedVariant={label:'Boule à facettes Ø 40 cm + moteur',price:35};
-let _fumee=false;
-const PX_FUMEE=10;
-function majPrixBoule(){document.getElementById('prodPriceDisplay').innerHTML=(_selectedVariant.price+(_fumee?PX_FUMEE:0))+' € <small>/ événement</small>';}
-function toggleFumee(cb){_fumee=!!cb.checked;cb.closest('label').style.borderColor=_fumee?'var(--navy)':'var(--g3)';majPrixBoule();}
+const FUMEES=[['optionFumee','machine à fumée',10],['optionFumeeM','machine à fumée puissante M-Fog 1500',20],['optionFumeeB','fumée lourde — effet brouillard',60],['optionFumeeN','fumée lourde — effet nuage',150]];
+function fumeesChoisies(){return FUMEES.filter(function(f){var c=document.getElementById(f[0]);return c&&c.checked;});}
+function fumeeTotal(){return fumeesChoisies().reduce(function(t,f){return t+f[2];},0);}
+function majPrixBoule(){document.getElementById('prodPriceDisplay').innerHTML=(_selectedVariant.price+fumeeTotal())+' € <small>/ événement</small>';}
+function toggleFumee(cb){cb.closest('label').style.borderColor=cb.checked?'var(--navy)':'var(--g3)';majPrixBoule();}
 function selectVariant(btn,label,price){
   document.querySelectorAll('.prod-vbtn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
@@ -1235,8 +1252,8 @@ function addToCartProduct(){
   addToCart({
     id:'p12',
     name:'Boule à Facettes Ø 40 cm',
-    label:_selectedVariant.label+(_fumee?' + machine à fumée ('+PX_FUMEE+' €)':''),
-    price:_selectedVariant.price+(_fumee?PX_FUMEE:0),
+    label:_selectedVariant.label+fumeesChoisies().map(function(f){return ' + '+f[1]+' ('+f[2]+' €)';}).join(''),
+    price:_selectedVariant.price+fumeeTotal(),
     img:'boule-facettes.webp'
   });
 }

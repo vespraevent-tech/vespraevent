@@ -1173,6 +1173,7 @@ var P=[
   ['Spot LED sur batterie','lumieres',20,['Standard'],'Spot LED'],
   ['Machine à fumée','lumieres',10,['Standard'],'Fumée'],
   ['Machine à bulles','lumieres',10,['Standard'],'Bulles'],
+  ['Machine à fumée puissante M-Fog 1500','lumieres',20,['Standard'],'Fumée M-Fog 1500'],
   ['Machine à fumée lourde effet brouillard','lumieres',60,['Standard'],'Fumée lourde brouillard'],
   ['Machine à fumée lourde effet nuage','lumieres',150,['Standard'],'Fumée lourde nuage'],
   ['Barnum 3x3m','barnum',60,['3x3m'],'Barnum 3x3'],
@@ -2002,7 +2003,7 @@ function getProds(){
   if(!saved) return defaults;
   var savedProds=JSON.parse(saved);
   // Migration : déplacer les produits d'éclairage de sono vers lumieres
-  var lightNames=['Jeux de lumières Ibiza','Jeux de lumières Eurolite','Boule à facettes','Spot LED','Machine à fumée','Machine à bulles'];
+  var lightNames=['Jeux de lumières Ibiza','Jeux de lumières Eurolite','Boule à facettes','Spot LED','Machine à fumée','Machine à fumée puissante M-Fog 1500','Machine à bulles'];
   savedProds.forEach(function(p){
     if(p.cat==='sono'&&lightNames.some(function(n){return p.name.indexOf(n)>=0;})) p.cat='lumieres';
   });
@@ -5416,6 +5417,7 @@ var PK_OPT = {
   fumeeS:  {nom:'Machine à fumée lourde effet brouillard', label:'Machine à fumée lourde effet brouillard', prix:60},
   fumeeP:  {nom:'Machine à fumée lourde effet nuage', label:'Machine à fumée lourde effet nuage', prix:150},
   fumeeL:  {nom:'Machine à fumée', label:'Machine à fumée', prix:10},
+  fumeeM:  {nom:'Machine à fumée puissante M-Fog 1500', label:'Machine à fumée puissante M-Fog 1500', prix:20},
   bulles:  {nom:'Machine à bulles', label:'Machine à bulles', prix:10}
 };
 /* les options de chaque produit, d'après le catalogue du site */
@@ -5429,7 +5431,7 @@ OPTIONS_PRODUIT['Buvette 4x4m']=[PK_OPT.install,PK_OPT.guir10,PK_OPT.guir20];
 ['Pack Vespra 60 personnes','Pack Vespra 100 personnes','Pack Vespra 150 personnes','Pack Vespra 200 personnes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.microFil,PK_OPT.microSF];});
 ['Pack Vespra 20 personnes','Pack Vespra 40 à 60 personnes','Pack Vespra 80 à 100 personnes','Pack Vespra 120 à 150 personnes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.caisson,PK_OPT.microFil,PK_OPT.microSF];});
 OPTIONS_PRODUIT['Pack Vespra 180 à 250 personnes']=[PK_OPT.microFil,PK_OPT.microSF];
-['Jeux de lumières Ibiza 4 spots','Jeux de lumières Eurolite','Boule à facettes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.fumeeOpt];});
+['Jeux de lumières Ibiza 4 spots','Jeux de lumières Eurolite','Boule à facettes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.fumeeOpt,PK_OPT.fumeeM,PK_OPT.fumeeS,PK_OPT.fumeeP];});
 OPTIONS_PRODUIT["Livre d'or audio"]=[];
 ['Cabine téléphonique','Cabine téléphonique audio / vidéo','Cabine téléphonique audio','Cabine téléphonique vidéo','Cabine téléphonique blanche','Cabine téléphonique rouge','Cabine téléphonique en bois blanc'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.neon];});
 OPTIONS_PRODUIT['Guirlande lumineuse']=[PK_OPT.b3x3,PK_OPT.b4x8,PK_OPT.b6x10,PK_OPT.tente10,PK_OPT.tente14,PK_OPT.tenteet,PK_OPT.buvette];
@@ -5437,10 +5439,11 @@ OPTIONS_PRODUIT['Néon lumineux']=[];
 OPTIONS_PRODUIT['Machine à étincelles froides']=[PK_OPT.sachet];
 OPTIONS_PRODUIT['Baby-foot']=[PK_OPT.cornhole,PK_OPT.palet,PK_OPT.puiss4,PK_OPT.passetr];
 OPTIONS_PRODUIT['Machine à pop-corn']=[PK_OPT.mais];
-OPTIONS_PRODUIT['Machine à fumée lourde effet brouillard']=[PK_OPT.fumeeP,PK_OPT.fumeeL,PK_OPT.bulles];
-OPTIONS_PRODUIT['Machine à fumée lourde effet nuage']=[PK_OPT.fumeeS,PK_OPT.fumeeL,PK_OPT.bulles];
-OPTIONS_PRODUIT['Machine à fumée']=[PK_OPT.fumeeS,PK_OPT.fumeeP,PK_OPT.bulles];
-OPTIONS_PRODUIT['Machine à bulles']=[PK_OPT.fumeeS,PK_OPT.fumeeP,PK_OPT.fumeeL];
+OPTIONS_PRODUIT['Machine à fumée lourde effet brouillard']=[PK_OPT.fumeeP,PK_OPT.fumeeL,PK_OPT.fumeeM,PK_OPT.bulles];
+OPTIONS_PRODUIT['Machine à fumée lourde effet nuage']=[PK_OPT.fumeeS,PK_OPT.fumeeL,PK_OPT.fumeeM,PK_OPT.bulles];
+OPTIONS_PRODUIT['Machine à fumée']=[PK_OPT.fumeeM,PK_OPT.fumeeS,PK_OPT.fumeeP,PK_OPT.bulles];
+OPTIONS_PRODUIT['Machine à fumée puissante M-Fog 1500']=[PK_OPT.fumeeL,PK_OPT.fumeeS,PK_OPT.fumeeP,PK_OPT.bulles];
+OPTIONS_PRODUIT['Machine à bulles']=[PK_OPT.fumeeS,PK_OPT.fumeeP,PK_OPT.fumeeL,PK_OPT.fumeeM];
 OPTIONS_PRODUIT["Feux d'artifice de jour"]=PK_COULEURS.map(function(c){
   return {nom:'Canon '+c[0]+(c[1]?' (premium)':''), label:c[0], prix:c[1], compte:true, cat:'feux'};
 });
