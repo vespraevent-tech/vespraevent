@@ -242,14 +242,19 @@
       '  .cs-item{flex-wrap:nowrap}.cs-item-name{font-size:14.5px}',
       '  .pc-voir{display:inline-block;background:none;border:0;padding:0;margin:0 16px 8px 0;font:inherit;font-size:12.5px;color:#fff;text-decoration:underline;text-underline-offset:3px;cursor:pointer}',
       '  .pc-panel.vide>.pc-k,.pc-panel.vide>.pc-ul,.pc-panel.vide>.pc-vp,.pc-panel.vide>.pc-voir,.pc-panel.vide>.pc-cat{display:none}',
-      '  .pc-panel.vide{padding:22px 20px;background:#3F6A97}',
+      '  .pc-panel.vide{padding:22px 20px}',
       '  .pc-panel.vide h3{display:block;font-size:26px;margin:0 0 8px}',
       '  .pc-m{display:block}',
       '  .pc-m .pc-s{font-size:14px;margin:0 0 10px;color:#fff}',
       '  .pc-m .pc-more{display:none}.pc-panel.open .pc-m .pc-more{display:block}',
-      '  .pc-m .pc-voir{display:inline-block;margin:0 16px 4px 0}',
+      '  .pc[data-e="sel"] .pc-m .pc-more{display:block}',
+      '  .pc-m .pc-voir{display:inline;margin:0 0 0 4px;font-size:14px;font-weight:600}',
       '  .pc-m .pc-cat{display:inline-block;margin:6px 0 0}',
-      '  .pc[data-e="sel"] .pc-m .pc-voir,.pc[data-e="sel"] .pc-m .pc-more,.pc[data-e="sel"] .pc-m .pc-cat{display:none!important}',
+      '  .pc[data-e="sel"] .pc-m .pc-voir,.pc[data-e="sel"] .pc-m .pc-cat{display:none!important}',
+      '  .pc-st span{font-size:13px;gap:8px}',
+      '  .pc-st em{width:24px;height:24px;font-size:13px;font-weight:700}',
+      '  .pc-st.on em,.pc-st.ok em{background:var(--pcn);color:#fff}',
+      '  .pc-st i{height:4px;margin-bottom:9px}',
       '  .pc[data-v="1"][data-e="sel"] #pcPanel{display:block}',
       '  .pc[data-v="1"][data-e="coord"] #pcPanel{display:block}',
       '  .pc-st.on i{background:var(--pcn)}',
@@ -394,12 +399,10 @@
           etapeLi('', '', 'Envoi du devis', 'Réponse sous 24 h') + '</ul>' +
           '<div class="pc-vp"><p class="pc-s">Vous pouvez envoyer votre demande avec un devis vide. Précisez dans la case « Message » le matériel que vous souhaitez.</p>' +
           '<p class="pc-s">Vous souhaitez connaître les prix ? Rendez-vous sur notre catalogue et ajoutez le matériel qui vous plaît à votre devis.</p></div>' +
-          '<button type="button" class="pc-voir" aria-expanded="false">Voir plus</button>' +
           '<a class="pc-cat" href="catalogue.html">Voir le catalogue</a>' +
-          '<div class="pc-m"><p class="pc-s">Vous pouvez tout de même envoyer votre demande avec un devis vide.</p>' +
+          '<div class="pc-m"><p class="pc-s">Vous pouvez tout de même envoyer votre demande avec un devis vide.<button type="button" class="pc-voir" aria-expanded="false">Voir plus</button></p>' +
           '<div class="pc-more"><p class="pc-s">Précisez dans la case « Message » le matériel que vous souhaitez.</p>' +
           '<p class="pc-s">Pour connaître nos prix, rendez-vous sur le catalogue et ajoutez le matériel qui vous plaît à votre devis.</p></div>' +
-          '<button type="button" class="pc-voir" aria-expanded="false">Voir plus</button>' +
           '<a class="pc-cat" href="catalogue.html">Voir le catalogue</a></div>';
         return;
       }
