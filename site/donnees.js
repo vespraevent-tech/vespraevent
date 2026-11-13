@@ -64,6 +64,7 @@
   if (page.indexOf('.') === -1) page += '.html';
 
   var promesse = null;
+  var CLE_CACHE = 'vespra_site', DUREE_CACHE = 10 * 60 * 1000;
 
   /* ── voile anti-clignotement ───────────────────────────────────
      La page est écrite avec les photos, l'ordre et les textes du
@@ -74,7 +75,15 @@
      une seule fois. Garde-fou : si le serveur tarde, elle s'affiche
      quand même au bout de 0,4 seconde. */
   var voileLeve = false, dcl = false, donneesPretes = false, minuteur = null;
+  /* Réglages déjà connus (visite précédente de moins de dix minutes) : il n'y a
+     plus rien à attendre, donc plus de raison de masquer la page. Elle se
+     dessine au fur et à mesure, comme n'importe quel site, et le catalogue
+     apparaît dès que le navigateur l'a lu. */
+  var dejaConnus = false;
+  try { var mem = JSON.parse(localStorage.getItem(CLE_CACHE) || 'null'); dejaConnus = !!(mem && mem.d && Date.now() - mem.t <= DUREE_CACHE); } catch (e) {}
+  if (dejaConnus) { voileLeve = true; }
   try {
+    if (dejaConnus) throw 0;
     var st = document.createElement('style');
     st.id = 'v-voile-style';
     st.textContent = 'html.v-attente body{opacity:0!important}html.v-fin body{transition:opacity .18s ease}';
@@ -146,22 +155,31 @@
      réutilisée telle quelle pendant quelques minutes : la page suivante
      s'affiche immédiatement, déjà juste. La réponse du serveur est
      quand même redemandée en arrière-plan, pour la fois d'après. */
-  var CLE_CACHE = 'vespra_site_' + page, DUREE_CACHE = 10 * 60 * 1000;
+  /* la réponse couvre tout le site : chaque page ne garde que ce qui la concerne */
+  function pourPage(liste) {
+    if (!Array.isArray(liste)) return [];
+    return liste.filter(function (x) { return !x || !x.page || x.page === page; });
+  }
   function normaliser(d) {
     return {
       theme: (d && d.theme) || {},
-      textes: (d && d.textes) || [],
-      notices: (d && d.notices) || [],
+      textes: pourPage((d && d.textes) || []),
+      notices: pourPage((d && d.notices) || []),
       produits: (d && d.produits) || [],
       google: (d && d.google) || [],
       images: (d && d.images) || [],
-      miseEnPage: (d && d.miseEnPage) || [],
+      miseEnPage: pourPage((d && d.miseEnPage) || []),
       salles: (d && d.salles) || [],
       prestataires: (d && d.prestataires) || [],
       catalogue: (d && d.catalogue) || [],
       entreprise: (d && d.entreprise) || {},
       ambiance: (d && d.ambiance && !Array.isArray(d.ambiance)) ? d.ambiance : {},
       bandeau: (d && d.bandeau && !Array.isArray(d.bandeau)) ? d.bandeau : {},
+      /* classement des catégories du catalogue, réglé dans le back-office */
+      categoriesCatalogue: (d && d.categoriesCatalogue) || [],
+      categoriesSupprimees: (d && d.categoriesSupprimees) || [],
+      categoriesConnus: (d && d.categoriesConnus) || [],
+      prestations: (d && d.prestations) || [],
     };
   }
   function garder(d) {
@@ -176,7 +194,7 @@
   }
   function rafraichirEnFond() {
     try {
-      fetch('/api/site?page=' + encodeURIComponent(page), { headers: { accept: 'application/json' }, cache: 'no-store' })
+      fetch('/api/site', { headers: { accept: 'application/json' }, cache: 'no-store' })
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (d) { if (d) garder(d); })
         .catch(function () {});
@@ -193,11 +211,14 @@
         else remplirEntreprise(garde.entreprise);
       }
       donneesPretes = true; verifier();
+      /* les réglages sont déjà connus : rien à attendre, la page peut s'afficher
+         dès qu'elle commence à se dessiner. */
+      clearTimeout(minuteur); minuteur = setTimeout(leverVoile, 150);
       rafraichirEnFond();
       promesse = Promise.resolve(garde);
       return promesse;
     }
-    promesse = fetch('/api/site?page=' + encodeURIComponent(page), {
+    promesse = fetch('/api/site', {
       headers: { accept: 'application/json', 'cache-control': 'no-cache' },
       cache: 'no-store',
     })

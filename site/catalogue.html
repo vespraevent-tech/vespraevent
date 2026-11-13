@@ -1113,9 +1113,13 @@ if(urlCat){
   const fallbackImageByName=Object.fromEntries(P.map(c=>[c[0],c[1]]));
   const fallbackNames=P.map(c=>c[0]);
   try{
-    const r=await fetch('/api/site',{credentials:'same-origin',cache:'no-store',headers:{'cache-control':'no-cache'}});
-    if(r.ok){
-      const d=await r.json();
+    /* les réglages sont déjà demandés une seule fois pour toute la page (donnees.js)
+       et gardés quelques minutes : la liste des catégories s'affiche sans attendre
+       un nouvel aller-retour avec le serveur. */
+    const d=(typeof window.VESPRA_DONNEES==='function')
+      ? await window.VESPRA_DONNEES()
+      : await (await fetch('/api/site',{credentials:'same-origin',cache:'no-store',headers:{'cache-control':'no-cache'}})).json();
+    {
       let cfg=Array.isArray(d.categoriesCatalogue)?d.categoriesCatalogue.slice():[];
       if(cfg.length){
         cfg.sort((a,b)=>(a.ordre||0)-(b.ordre||0));
