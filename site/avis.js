@@ -17,7 +17,7 @@
    Photobooth · Pack Vespra · Barnums · Boîte de nuit gonflable ·
    Boule a Facettes · Tente Etoile · Sonorisation · Caisson de basse ·
    Karaoke · Jeux de lumières · Machines à effets · Machine a Popcorn ·
-   Brasero · Buvette · Videoprojecteur · Mega Ventilateur
+   Brasero · Buvette · Videoprojecteur · Ventilateur événementiel
    ═══════════════════════════════════════════════════════════════ */
 
 window.VESPRA_AVIS = [

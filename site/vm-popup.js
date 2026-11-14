@@ -52,7 +52,7 @@ var PRODUCTS=[
   {id:'p23',cat:'Effets spéciaux et artifices',cats:['Effets spéciaux et artifices'],name:'Machine à bulles',price:10,desc:"Une animation de bulles pour créer un moment féerique lors de vos événements.",img:'machine-bulles-situation.webp',page:'produit-machines-effets.html'},
   {id:'p58',cat:'Effets spéciaux et artifices',cats:['Effets spéciaux et artifices'],name:'Machine à fumée puissante M-Fog 1500',price:20,desc:"Machine à fumée professionnelle de 1500 W, environ 320 m³/min : beaucoup plus puissante que la petite machine, pour bien révéler les faisceaux lumineux.",img:'fumee-m-fog-1500.webp',page:'produit-fumee-m-fog-1500.html',options:[{id:'fumee',label:'Machine à fumée',price:10},{id:'fbrou',label:'Fumée lourde — effet brouillard',price:60},{id:'fnuage',label:'Fumée lourde — effet nuage',price:150}]},
 
-  {id:'p7',cat:'Confort',cats:['Confort'],name:'Méga ventilateur',price:10,desc:"Ventilateur industriel grand diamètre pour garder la fraîcheur sous vos barnums et tentes de réception.",img:'ventilateur.webp',page:'produit-mega-ventilateur.html'},
+  {id:'p7',cat:'Confort',cats:['Confort'],name:'Ventilateur événementiel',price:10,desc:"Ventilateur industriel grand diamètre pour garder la fraîcheur sous vos barnums et tentes de réception.",img:'ventilateur.webp',page:'produit-mega-ventilateur.html'},
 ];
 
 var _vmp=null,cart=[];

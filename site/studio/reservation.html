@@ -1194,7 +1194,7 @@ var P=[
   ['Guirlande 10 m','barnum',9,['Standard'],'Guirlande 10 m'],
   ['Guirlande 20 m','barnum',18,['Standard'],'Guirlande 20 m'],
   ['Guirlande lumineuse','lumieres',null,['10 m','20 m','40 m'],'Guirlande',{'10 m':9,'20 m':18,'40 m':36,'30 m':25}],
-  ['Méga ventilateur','barnum',10,['Standard'],'Ventilateur'],
+  ['Ventilateur événementiel','barnum',10,['Standard'],'Ventilateur'],
   ['Chauffage','barnum',null,['Sur devis'],'Chauffage'],
   ['Mange-debout housse blanche','barnum',13,['Standard'],'Mange-debout'],
   ['Mini bounce crocodile','animation',80,['Standard'],'Mini bounce'],
@@ -5483,7 +5483,7 @@ function pkCatsSite(p){
   if(n==='Panneau de direction') return ['Animation'];
   if(n==='Brasero') return ['Restauration'];
   if(/^Machine à pop-corn/.test(n)) return ['Restauration','Animation'];
-  if(n==='Méga ventilateur') return ['Confort'];
+  if(n==='Ventilateur événementiel') return ['Confort'];
   return [];
 }
 function pkEstOption(nom){return PK_SEULEMENT_OPTION.some(function(k){return nom.indexOf(k)===0;});}

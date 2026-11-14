@@ -1230,7 +1230,7 @@ window.VESPRA_PRIX_REGISTRE = [
   },
   {
     "i": "mega-ventilateur",
-    "n": "Méga ventilateur",
+    "n": "Ventilateur événementiel",
     "v": "",
     "p": 10,
     "pg": "produit-mega-ventilateur.html",
@@ -3080,7 +3080,7 @@ window.VESPRA_PRODUITS = [
   {
     "id": "p7",
     "ref": "p7",
-    "nom": "Méga ventilateur",
+    "nom": "Ventilateur événementiel",
     "cat": "Confort",
     "cats": [
       "Confort"
@@ -3654,7 +3654,7 @@ window.VESPRA_MEDIAS = {
     "photos": [
       {
         "s": "ventilateur.webp",
-        "a": "Méga ventilateur"
+        "a": "Ventilateur événementiel"
       }
     ],
     "options": {},

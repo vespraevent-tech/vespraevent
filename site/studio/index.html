@@ -5139,6 +5139,7 @@ function qteMaxProduit(nom){
   if(/spot led/.test(n)) return 12;
   if(/guirlande/.test(n)) return 10;
   if(/fontaine/.test(n)) return 4;
+  if(/ventilateur/.test(n)) return 4;
   return 1;
 }
 function mdOrga(i, v){ if(!mdLignes[i]) return; const n = Number(String(v||'').replace(',', '.').replace(/[^\d.]/g, '')); mdLignes[i].orga = (isFinite(n) && n > 0) ? Math.min(5000, Math.round(n*100)/100) : ''; mdRendre(); }
@@ -8822,7 +8823,7 @@ const PAGES_SITE = [
   ['produit-karaoke.html','Fiche — Pack karaoké'], ['produit-livre-or-audio.html',"Fiche — Livre d'or audio"],
   ['produit-machines-effets.html','Fiche — Machines à fumée et à bulles'], ['produit-popcorn.html','Fiche — Machine à pop-corn'],
   ['produit-boule-facettes.html','Fiche — Boule à facettes'], ['produit-spot-led-batterie.html','Fiche — Spot LED sur batterie'], ['produit-buvette.html','Fiche — Buvette'],
-  ['produit-caisson-basse.html','Fiche — Caisson de basse'], ['produit-micro-shure-sm58.html','Fiche — Micro Shure SM58'], ['produit-ecran-projection.html','Fiche — Écran de projection'], ['produit-mega-ventilateur.html','Fiche — Méga ventilateur'],
+  ['produit-caisson-basse.html','Fiche — Caisson de basse'], ['produit-micro-shure-sm58.html','Fiche — Micro Shure SM58'], ['produit-ecran-projection.html','Fiche — Écran de projection'], ['produit-mega-ventilateur.html','Fiche — Ventilateur événementiel'],
   ['produit-tente-etoile-10m.html','Fiche — Tente étoile 10 m'], ['produit-tente-etoile-14m.html','Fiche — Tente étoile 14 m'], ['produit-tente-etoile-22m.html','Fiche — Tente étoile 22 m'], ['produit-videoprojecteur.html','Fiche — Vidéoprojecteur'],
   ['article-barnums.html','Article — Barnums'], ['article-boite-nuit.html','Article — Boîte de nuit'],
   ['article-brasero.html','Article — Brasero'], ['article-karaoke.html','Article — Karaoké'],
