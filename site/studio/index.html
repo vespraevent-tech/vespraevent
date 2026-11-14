@@ -3514,6 +3514,8 @@ async function completerOptionsPlanning(){
       }
       /* prix « négocié » fantôme : l'ancien prix tout compris n'est plus un prix d'origine
          une fois les options détaillées sur leurs propres lignes */
+      /* réservation abîmée (options en tête de liste, détachées de leur produit) : remise en ordre une fois pour toutes */
+      { const rep = reparerOptionsOrphelines(r.products); if(rep !== r.products){ r.products = rep; await api('/data', {method:'POST', body: JSON.stringify({collection:'reservations', item:{id:String(r.id), d: JSON.stringify(r)}})}); } }
       let nettoye = false;
       r.products.forEach((p, i) => {
         if(!p || p.estOption || p.variant === 'Option' || p.prixInitial == null) return;
@@ -5405,41 +5407,11 @@ async function reporterAuPlanning(d, avant, chg){
       const cleFine = p => cle(p) + '|' + (p.variant||'') + '|' + (Number(p.price)||0);
       const ancien = produitsDepuisDemande(avant, r.dateStart, r.dateEnd, r.id);
       const nouveau = produitsDepuisDemande(d, r.dateStart, r.dateEnd, r.id);
-      const reste = nouveau.slice();
-      const retires = [];
-      ancien.forEach(p => {
-        const i = reste.findIndex(q => cleFine(q) === cleFine(p));
-        if(i >= 0) reste.splice(i, 1); else retires.push(p);
-      });
-      /* « reste » = lignes nouvelles ou modifiées ; « retires » = anciennes lignes disparues ou modifiées */
-      if(retires.length || reste.length){
-        panierChange = true;
-        let prods = (r.products || []).slice();
-        retires.forEach(p => {
-          const i = prods.findIndex(q => cle(q) === cle(p));
-          if(i >= 0) prods.splice(i, 1);
-        });
-        /* un produit ajouté va en fin de liste ; une option ajoutée se range
-           juste après SON produit (et ses autres options), jamais à la fin :
-           sinon elle se retrouverait rattachée au dernier produit de la liste */
-        reste.forEach(p => {
-          if(!p.estOption){ prods.push(p); return; }
-          const iNouv = nouveau.indexOf(p);
-          let iParent = -1;
-          for(let k = iNouv - 1; k >= 0; k--){ if(!nouveau[k].estOption){ iParent = k; break; } }
-          if(iParent < 0){ prods.push(p); return; }
-          const parentNom = nouveau[iParent].name;
-          const rang = nouveau.slice(0, iParent).filter(x => !x.estOption && x.name === parentNom).length;
-          let vus = -1, pos = -1;
-          prods.forEach((q, j) => { if(!q.estOption && q.name === parentNom){ vus++; if(vus === rang) pos = j; } });
-          if(pos < 0){ prods.push(p); return; }
-          let fin = pos + 1;
-          while(fin < prods.length && prods[fin].estOption) fin++;
-          prods.splice(fin, 0, p);
-        });
-        r.products = prods;
-      }
+      const fus = fusionnerProduitsPlanning(r.products || [], ancien, nouveau, cle, cleFine);
+      if(fus){ panierChange = true; r.products = fus; }
     }
+    /* réservation déjà abîmée par l'ancien classement : options orphelines en tête de liste, remises sous leur produit */
+    if(Array.isArray(r.products)){ const rep = reparerOptionsOrphelines(r.products); if(rep !== r.products){ r.products = rep; panierChange = true; } }
     /* prestations de prestataires partenaires : part du prestataire (fonds de tiers) + « Organisation et coordination », reprises de la fiche */
     try{
       const pl = materielListe(d).filter(it => it.presta);
@@ -6572,6 +6544,87 @@ function prixOption(nomProduit, libelleOption, surcharges){
   return 0;
 }
 
+/* Mise à jour du planning quand la demande change : on retire les groupes (produit + ses options) modifiés
+   et on les remet entiers, jamais un produit sans ses options (elles se retrouvaient en tête de liste,
+   détachées de leur produit, et affichées comme des produits à part). */
+function fusionnerProduitsPlanning(actuels, ancien, nouveau, cle, cleFine){
+  const reste = nouveau.slice();
+  const retires = [];
+  ancien.forEach(p => {
+    const i = reste.findIndex(q => cleFine(q) === cleFine(p));
+    if(i >= 0) reste.splice(i, 1); else retires.push(p);
+  });
+  /* « reste » = lignes nouvelles ou modifiées ; « retires » = anciennes lignes disparues ou modifiées */
+  if(!retires.length && !reste.length) return null;
+  let prods = actuels.slice();
+  const dansGroupe = new Set();
+  retires.forEach(p => {
+    if(p.estOption) return;
+    const ia = ancien.indexOf(p);
+    for(let k = ia + 1; k < ancien.length && ancien[k].estOption; k++) dansGroupe.add(ancien[k]);
+  });
+  const poses = new Set();
+  retires.forEach(p => {
+    const i = prods.findIndex(q => cle(q) === cle(p));
+    if(i < 0) return;
+    if(!p.estOption){
+      let fin = i + 1;
+      while(fin < prods.length && prods[fin] && prods[fin].estOption) fin++;
+      /* le produit part avec ses options ; sa version à jour reprend sa place, options comprises */
+      const q = reste.find(x => !x.estOption && !poses.has(x) && cle(x) === cle(p));
+      const groupe = [];
+      if(q){
+        groupe.push(q); poses.add(q);
+        const iN = nouveau.indexOf(q);
+        for(let k = iN + 1; k < nouveau.length && nouveau[k].estOption; k++){ groupe.push(nouveau[k]); poses.add(nouveau[k]); }
+      }
+      prods.splice(i, fin - i, ...groupe);
+    } else if(!dansGroupe.has(p)) prods.splice(i, 1);
+  });
+  /* un produit ajouté va en fin de liste, avec toutes ses options ; une option ajoutée se range
+     juste après SON produit (et ses autres options), jamais à la fin */
+  reste.forEach(p => {
+    if(poses.has(p)) return;
+    if(!p.estOption){
+      prods.push(p);
+      const iN = nouveau.indexOf(p);
+      for(let k = iN + 1; k < nouveau.length && nouveau[k].estOption; k++){ prods.push(nouveau[k]); poses.add(nouveau[k]); }
+      return;
+    }
+    const iNouv = nouveau.indexOf(p);
+    let iParent = -1;
+    for(let k = iNouv - 1; k >= 0; k--){ if(!nouveau[k].estOption){ iParent = k; break; } }
+    if(iParent < 0){ prods.push(p); return; }
+    const parentNom = nouveau[iParent].name;
+    const rang = nouveau.slice(0, iParent).filter(x => !x.estOption && x.name === parentNom).length;
+    let vus = -1, pos = -1;
+    prods.forEach((q, j) => { if(!q.estOption && q.name === parentNom){ vus++; if(vus === rang) pos = j; } });
+    if(pos < 0){ prods.push(p); return; }
+    let fin = pos + 1;
+    while(fin < prods.length && prods[fin].estOption) fin++;
+    prods.splice(fin, 0, p);
+  });
+  return prods;
+}
+/* options sans produit devant elles (début de liste) : doublons écartés, les autres remises sous le premier produit */
+function reparerOptionsOrphelines(prods){
+  const orph = [], out = [];
+  let parent = false;
+  prods.forEach(p => {
+    if(p && p.estOption && !parent){ orph.push(p); return; }
+    if(p && !p.estOption) parent = true;
+    out.push(p);
+  });
+  if(!orph.length) return prods;
+  const iP = out.findIndex(p => p && !p.estOption);
+  if(iP < 0) return prods;
+  const noms = new Set(out.filter(p => p && p.estOption).map(p => p.name));
+  const gardes = orph.filter(o => !noms.has(o.name));
+  let fin = iP + 1;
+  while(fin < out.length && out[fin] && out[fin].estOption) fin++;
+  out.splice(fin, 0, ...gardes);
+  return out;
+}
 function produitsDepuisDemande(d, jour, finJour, ignoreId){
   const produits = [];
   /* plusieurs photobooths : un par exemplaire, chacun avec son numéro (PB1, PB2…) */
