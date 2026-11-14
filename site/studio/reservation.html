@@ -1447,24 +1447,41 @@ function prixDepuisLibelleCompose(p){
   try{ getProds().forEach(function(x){ if(trouve==null && _cleNomProduit(x.name)===k && x.price!=null) trouve=x.price; }); }catch(e){}
   return trouve;
 }
-/* « Vidéoprojecteur + écran de projection » enregistré en une seule ligne : deux produits, deux lignes
-   (le total ne bouge pas : l'écran à 10 €, le reste sur le vidéoprojecteur) */
+/* « Vidéoprojecteur + écran de projection » : une seule ligne. Une ancienne réservation qui l'avait
+   séparé en deux lignes (vidéoprojecteur seul + écran) est remise en une seule ligne, prix additionnés. */
 function migrerProjecteur(r){
   if(!r || !Array.isArray(r.products)) return;
   var i=-1;
   r.products.forEach(function(p,k){
-    if(i<0 && p && /^vid[eé]oprojecteur/i.test(String(p.name||'')) && /[eé]cran/i.test(String(p.variant||'')) && !/sans\s+[eé]cran/i.test(String(p.variant||''))) i=k;
+    if(i<0 && p && !p.estOption && /^vid[eé]oprojecteur/i.test(String(p.name||'')) && /sans\s+[eé]cran/i.test(String(p.variant||''))
+       && r.products[k+1] && !r.products[k+1].estOption && /^[eé]cran( de projection)?$/i.test(String(r.products[k+1].name||'').trim())) i=k;
   });
   if(i<0) return;
-  var p=r.products[i], pr=Number(p.price);
-  if(!isFinite(pr)) return;
-  var ecran=Math.min(10,pr), reste=pr-ecran;
-  var autres=r.products.filter(function(x,k){ return k>i && x && /^(vid[eé]oprojecteur|[eé]cran( de projection)?)$/i.test(String(x.name||'').trim()); });
-  r.products=r.products.filter(function(x){ return autres.indexOf(x)<0; });
-  p.variant='Vidéoprojecteur seul (sans écran)'; p.price=reste;
-  var neuf={name:'Écran de projection',price:ecran};
-  if(p.cat) neuf.cat=p.cat;
-  r.products.splice(i+1,0,neuf);
+  var p=r.products[i], e=r.products[i+1];
+  p.variant='Vidéoprojecteur + écran de projection';
+  p.price=(Number(p.price)||0)+(Number(e.price)||0);
+  r.products.splice(i+1,1);
+  enregistrerResa(r);
+}
+/* options sans produit devant elles (début de liste) : elles s'affichaient comme des produits à part ;
+   les doublons sont écartés, les autres remises sous le premier produit */
+function reparerOptionsOrphelines(r){
+  if(!r || !Array.isArray(r.products)) return;
+  var estOpt=function(p){ return !!p && (p.estOption===true||p.variant==='Option'); };
+  var orph=[],out=[],parent=false;
+  r.products.forEach(function(p){
+    if(estOpt(p) && !parent){ orph.push(p); return; }
+    if(p && !estOpt(p)) parent=true;
+    out.push(p);
+  });
+  if(!orph.length) return;
+  var iP=-1; out.forEach(function(p,k){ if(iP<0 && p && !estOpt(p)) iP=k; });
+  if(iP<0) return;
+  var noms={}; out.forEach(function(p){ if(estOpt(p)) noms[String(p.name)]=1; });
+  var gardes=orph.filter(function(o){ return !noms[String(o.name)]; });
+  var fin=iP+1; while(fin<out.length && estOpt(out[fin])) fin++;
+  Array.prototype.splice.apply(out,[fin,0].concat(gardes));
+  r.products=out;
   enregistrerResa(r);
 }
 function getProductPrice(p){
@@ -6309,7 +6326,7 @@ function detailPrixHTML(r){
      formule dessous, ses options en pastilles, son prix \u00e0 droite. Un tarif
      n\u00e9goci\u00e9 (par ex. 130 \u20ac au lieu de 150 \u20ac) s'enregistre sur la
      r\u00e9servation et ne bouge plus ensuite, m\u00eame si le catalogue change. */
-  try{ migrerProjecteur(r); }catch(e){}
+  try{ migrerProjecteur(r); reparerOptionsOrphelines(r); }catch(e){}
   var _kept=produitsNets(r.products);
   var _lignesProd='';
   var _cartes=[];
@@ -6785,6 +6802,7 @@ function openModalEdit(id) {
   renderSourceSelect();
 
   // Accordéon produits - restaurer les produits de la réservation
+  try{ reparerOptionsOrphelines(r); }catch(e){}
   modalSel=produitsNets(r.products).map(function(p){return Object.assign({},p);});
   modalRed=(r.supplements||[]).some(function(x){return x.offreMariage;});
   modalPresta=[];(r.supplements||[]).forEach(function(x,i,sp){
