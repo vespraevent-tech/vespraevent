@@ -6572,63 +6572,54 @@ function prixOption(nomProduit, libelleOption, surcharges){
    et on les remet entiers, jamais un produit sans ses options (elles se retrouvaient en tête de liste,
    détachées de leur produit, et affichées comme des produits à part). */
 function fusionnerProduitsPlanning(actuels, ancien, nouveau, cle, cleFine){
-  const reste = nouveau.slice();
-  const retires = [];
-  ancien.forEach(p => {
-    const i = reste.findIndex(q => cleFine(q) === cleFine(p));
-    if(i >= 0) reste.splice(i, 1); else retires.push(p);
-  });
-  /* « reste » = lignes nouvelles ou modifiées ; « retires » = anciennes lignes disparues ou modifiées */
-  if(!retires.length && !reste.length) return null;
-  let prods = actuels.slice();
-  const dansGroupe = new Set();
-  retires.forEach(p => {
-    if(p.estOption) return;
-    const ia = ancien.indexOf(p);
-    for(let k = ia + 1; k < ancien.length && ancien[k].estOption; k++) dansGroupe.add(ancien[k]);
-  });
-  const poses = new Set();
-  retires.forEach(p => {
-    const i = prods.findIndex(q => cle(q) === cle(p));
-    if(i < 0) return;
-    if(!p.estOption){
-      let fin = i + 1;
-      while(fin < prods.length && prods[fin] && prods[fin].estOption) fin++;
-      /* le produit part avec ses options ; sa version à jour reprend sa place, options comprises */
-      const q = reste.find(x => !x.estOption && !poses.has(x) && cle(x) === cle(p));
-      const groupe = [];
-      if(q){
-        groupe.push(q); poses.add(q);
-        const iN = nouveau.indexOf(q);
-        for(let k = iN + 1; k < nouveau.length && nouveau[k].estOption; k++){ groupe.push(nouveau[k]); poses.add(nouveau[k]); }
-      }
-      prods.splice(i, fin - i, ...groupe);
-    } else if(!dansGroupe.has(p)) prods.splice(i, 1);
-  });
-  /* un produit ajouté va en fin de liste, avec toutes ses options ; une option ajoutée se range
-     juste après SON produit (et ses autres options), jamais à la fin */
-  reste.forEach(p => {
-    if(poses.has(p)) return;
-    if(!p.estOption){
-      prods.push(p);
-      const iN = nouveau.indexOf(p);
-      for(let k = iN + 1; k < nouveau.length && nouveau[k].estOption; k++){ prods.push(nouveau[k]); poses.add(nouveau[k]); }
-      return;
+  /* on raisonne par groupes « produit + ses options » : jamais d'option séparée de son produit */
+  const grouper = liste => { const g = []; (liste || []).forEach(x => { if(!x) return; if(!x.estOption) g.push({p: x, o: []}); else if(g.length) g[g.length - 1].o.push(x); }); return g; };
+  const sigG = g => cleFine(g.p) + '{' + g.o.map(cleFine).sort().join(',') + '}';
+  const ga = grouper(ancien), gn = grouper(nouveau);
+  if(ga.map(sigG).sort().join(';') === gn.map(sigG).sort().join(';')) return null;
+  const gp = grouper(actuels);
+  const tete = [];                                         /* options isolées en tête de la liste actuelle (réparées plus loin) */
+  for(let k = 0; k < (actuels || []).length && actuels[k] && actuels[k].estOption; k++) tete.push(actuels[k]);
+  /* le groupe de la liste actuelle qui correspond à un groupe de l'ancienne demande : même produit, même rang */
+  const trouve = g => {
+    const rang = ga.filter(x => x.p.name === g.p.name && ga.indexOf(x) < ga.indexOf(g)).length;
+    let vus = -1;
+    for(const x of gp){ if(x.p.name === g.p.name){ vus++; if(vus === rang) return x; } }
+    return null;
+  };
+  /* appariement ancien ↔ nouveau : identiques, puis même produit au même prix, puis même nom de produit */
+  const libres = gn.slice(), paires = [], sansPartenaire = [];
+  const prendre = (g, test) => { const i = libres.findIndex(test); return i >= 0 ? libres.splice(i, 1)[0] : null; };
+  const restantes = [];
+  ga.forEach(g => { const m = prendre(g, x => sigG(x) === sigG(g)); if(m) paires.push([g, m]); else restantes.push(g); });
+  const restantes2 = [];
+  restantes.forEach(g => { const m = prendre(g, x => cleFine(x.p) === cleFine(g.p)); if(m) paires.push([g, m]); else restantes2.push(g); });
+  restantes2.forEach(g => { const m = prendre(g, x => x.p.name === g.p.name); if(m) paires.push([g, m]); else sansPartenaire.push(g); });
+  const sortie = []; let fin = [];
+  const remplacements = new Map(), retraits = new Set();
+  paires.forEach(([g, m]) => {
+    const cible = trouve(g); if(!cible) { fin.push(m); return; }
+    if(sigG(g) === sigG(m)) return;
+    if(cleFine(g.p) === cleFine(m.p)){
+      /* même produit : on ne touche qu'à ses options */
+      const aAjouter = m.o.filter(z => !g.o.some(y => cleFine(y) === cleFine(z)));
+      const retirees = g.o.filter(y => !m.o.some(z => cleFine(z) === cleFine(y)));
+      let opts = cible.o.filter(x => !retirees.some(y => cle(y) === cle(x)));
+      aAjouter.forEach(z => { if(!opts.some(x => cleFine(x) === cleFine(z))) opts.push(z); });
+      remplacements.set(cible, {p: cible.p, o: opts});
+    } else {
+      remplacements.set(cible, {p: m.p, o: m.o});            /* produit modifié : sa version à jour reprend sa place, options comprises */
     }
-    const iNouv = nouveau.indexOf(p);
-    let iParent = -1;
-    for(let k = iNouv - 1; k >= 0; k--){ if(!nouveau[k].estOption){ iParent = k; break; } }
-    if(iParent < 0){ prods.push(p); return; }
-    const parentNom = nouveau[iParent].name;
-    const rang = nouveau.slice(0, iParent).filter(x => !x.estOption && x.name === parentNom).length;
-    let vus = -1, pos = -1;
-    prods.forEach((q, j) => { if(!q.estOption && q.name === parentNom){ vus++; if(vus === rang) pos = j; } });
-    if(pos < 0){ prods.push(p); return; }
-    let fin = pos + 1;
-    while(fin < prods.length && prods[fin].estOption) fin++;
-    prods.splice(fin, 0, p);
   });
-  return prods;
+  sansPartenaire.forEach(g => { const cible = trouve(g); if(cible) retraits.add(cible); });
+  libres.forEach(m => fin.push(m));                          /* produit ajouté : en fin de liste, avec ses options */
+  gp.forEach(g => {
+    if(retraits.has(g)) return;
+    const r = remplacements.get(g) || g;
+    sortie.push(r.p); r.o.forEach(x => sortie.push(x));
+  });
+  fin.forEach(g => { sortie.push(g.p); g.o.forEach(x => sortie.push(x)); });
+  return tete.concat(sortie);
 }
 /* options sans produit devant elles (début de liste) : doublons écartés, les autres remises sous le premier produit */
 function reparerOptionsOrphelines(prods){
@@ -6725,7 +6716,7 @@ function produitsDepuisDemande(d, jour, finJour, ignoreId){
       /* on ne tronque plus le nom d'une option : c'est ainsi qu'une
          couleur entière disparaissait de la fiche */
       produits.push({ name: o, short: String(o), cat: cat || 'photobooth',
-        price: prixOption(it.nom, o, it.optPrix), variant: 'Standard', estOption: true });
+        price: (RE_FEUX.test(it.nom||'') && FEUX_PREMIUM_GEN.test(String(o||'').trim())) ? 0 : prixOption(it.nom, o, it.optPrix), variant: 'Standard', estOption: true });
     });
   });
 
