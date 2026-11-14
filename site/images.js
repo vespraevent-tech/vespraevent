@@ -216,7 +216,7 @@
       return window.VESPRA_IMG(src,w);
     }
     /* si le service d'images ne répond pas, la photo d'origine reprend sa place */
-    var echecs=0;
+    var echecs=0,parPage=null;
     /* service d'images injoignable : toutes les photos reprennent leur version d'origine */
     function toutRetablir(){
       try{
@@ -258,6 +258,20 @@
             if(m&&produitsParNom[m[1]])rep=produitsParNom[m[1]];
           }
         }
+      }
+      /* une carte qui mène à la fiche d'un produit reçoit la photo choisie pour ce produit */
+      if(!rep&&!galerie){
+        try{
+          var lien=img.closest&&img.closest('a[href]');
+          if(lien){
+            var pg=String(lien.getAttribute('href')||'').split(/[?#]/)[0].replace(/^.*\//,'').replace(/\.html$/,'');
+            if(/^produit-/.test(pg)){
+              if(!parPage){parPage={};(window.VESPRA_PRODUITS||[]).forEach(function(q){if(q&&q.id&&q.page)parPage[String(q.page).replace(/\.html$/,'')]=q.id;});}
+              var idp=parPage[pg];
+              if(idp)rep=fp.carte[idp]||fp.parId[idp]||null;
+            }
+          }
+        }catch(e){}
       }
       /* la photo trouvée d'après le nom peut elle-même avoir été remplacée : on va jusqu'au bout,
          sinon deux règles se renvoient la balle à l'infini et la page se fige */
