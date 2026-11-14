@@ -1263,24 +1263,15 @@ function selectVariant(btn,label,price,img){
   if(el&&img){el.style.opacity='0';setTimeout(()=>{el.src=img;el.style.opacity='1';},140);}
 }
 function addToCartProduct(){
-  /* « vidéoprojecteur + écran » : deux produits, deux lignes (20 € + 10 €) */
-  const avecEcran=/écran/i.test(_selectedVariant.label);
+  /* « vidéoprojecteur + écran » : une seule ligne (le vidéoprojecteur avec son écran) */
+  const avecEcran=/écran/i.test(_selectedVariant.label)&&!/sans/i.test(_selectedVariant.label);
   addToCart({
     id:'p20',
     name:'Vidéoprojecteur',
-    label:avecEcran?'':_selectedVariant.label,
-    price:20,
+    label:avecEcran?'Vidéoprojecteur + écran de projection':_selectedVariant.label,
+    price:avecEcran?30:20,
     img:'videoprojecteur.webp'
   });
-  if(avecEcran){
-    addToCart({
-      id:'p47',
-      name:'Écran de projection',
-      label:'',
-      price:10,
-      img:'ecran-projection.webp'
-    });
-  }
 }
 function toggleFaq(btn){
   const item=btn.closest('.faq-item');

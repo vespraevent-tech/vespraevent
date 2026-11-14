@@ -5813,19 +5813,16 @@ function materielListe(d){
       }catch(e){}
       /* « 9 spots » / « 4 spots » décrit le set de lumières choisi (Eurolite, Ibiza), ce n'est pas une option */
       if(/^jeux de lumi[èe]res?/i.test(String(nom))) opts = opts.filter(o => !/^\s*\d+\s*spots?\s*$/i.test(String(o)));
-      /* « vidéoprojecteur + écran » : deux produits, deux lignes (le vidéoprojecteur, puis l'écran de projection) */
+      /* « vidéoprojecteur + écran » : une seule ligne (le vidéoprojecteur avec son écran), jamais deux */
       try{
         if(/^vid[ée]oprojecteur/i.test(String(nom))){
           const fSans = /sans\s+[ée]cran/i.test(String(formule || ''));
-          const dejaSepare = separes.some(x => x.nom === 'Écran de projection');
-          const avecEcran = dejaSepare || (/[ée]cran/i.test(String(formule || '')) && !fSans) || opts.some(o => /[ée]cran/i.test(String(o)));
+          const iEc = separes.findIndex(x => x.nom === 'Écran de projection');
+          const avecEcran = iEc >= 0 || (/[ée]cran/i.test(String(formule || '')) && !fSans) || opts.some(o => /[ée]cran/i.test(String(o)));
           if(avecEcran){
-            formule = 'Vidéoprojecteur seul (sans écran)';
+            formule = 'Vidéoprojecteur + écran de projection';
             opts = opts.filter(o => !/[ée]cran|^vid[ée]oprojecteur/i.test(String(o)));
-            if(!dejaSepare){
-              const fe = ficheProduit('Écran de projection', '');
-              separes.push({ nom: 'Écran de projection', formule: '', options: [], prix: (fe && Number(fe.prix)) || 10, qte: 1 });
-            }
+            if(iEc >= 0) separes.splice(iEc, 1);
           }
         }
       }catch(e){}
@@ -6590,6 +6587,8 @@ function produitsDepuisDemande(d, jour, finJour, ignoreId){
     let nom = it.nom + (it.qte > 1 ? ' ×' + it.qte : '');
     let court = (it.nom || '') + (it.qte > 1 ? ' ×' + it.qte : '');
     let variante = it.formule || 'Standard';
+    /* vidéoprojecteur avec écran : un seul produit, une seule mention courte */
+    if(/^vid[ée]oprojecteur/i.test(String(it.nom||'')) && /[ée]cran/i.test(String(it.formule||'')) && !/sans\s+[ée]cran/i.test(String(it.formule||''))){ court = 'Vidéoprojecteur + écran'; variante = 'Avec écran'; }
     if(cat === 'photobooth'){
       /* partout « PB1 », « PB2 »… : le numéro du photobooth réservé,
          le premier libre sur la période (et pas déjà pris dans cette demande) */
