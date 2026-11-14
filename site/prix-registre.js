@@ -1237,6 +1237,46 @@ window.VESPRA_PRIX_REGISTRE = [
     "vi": -1,
     "ci": "p7",
     "cvi": -1
+  },
+  {
+    "i": "chauffage-pyramide-1",
+    "n": "Chauffage pyramide à gaz",
+    "v": "Sans bouteille de gaz",
+    "p": 50,
+    "pg": "produit-chauffage-pyramide.html",
+    "vi": 0,
+    "ci": "p59",
+    "cvi": 0
+  },
+  {
+    "i": "chauffage-pyramide-2",
+    "n": "Chauffage pyramide à gaz",
+    "v": "Avec bouteille de gaz",
+    "p": 80,
+    "pg": "produit-chauffage-pyramide.html",
+    "vi": 1,
+    "ci": "p59",
+    "cvi": 1
+  },
+  {
+    "i": "chauffage-parasol-1",
+    "n": "Chauffage parasol à gaz",
+    "v": "Sans bouteille de gaz",
+    "p": 40,
+    "pg": "produit-chauffage-parasol.html",
+    "vi": 0,
+    "ci": "p60",
+    "cvi": 0
+  },
+  {
+    "i": "chauffage-parasol-2",
+    "n": "Chauffage parasol à gaz",
+    "v": "Avec bouteille de gaz",
+    "p": 70,
+    "pg": "produit-chauffage-parasol.html",
+    "vi": 1,
+    "ci": "p60",
+    "cvi": 1
   }
 ];
 
@@ -1399,12 +1439,12 @@ window.VESPRA_PRODUITS = [
   {
     "id": "p53",
     "ref": "p53",
-    "nom": "Chauffage",
+    "nom": "Chauffage fioul pour barnum",
     "cat": "Confort",
     "cats": [
       "Confort"
     ],
-    "desc": "Chauffage pour garder vos invités au chaud. Tarif sur devis.",
+    "desc": "Chauffage à fioul 30 kW à combustion indirecte, installé par nos soins avec gaine d'air chaud, pour barnum et tente. 2 appareils disponibles. Tarif sur devis.",
     "img": "",
     "imgCat": "",
     "page": "",
@@ -3094,10 +3134,110 @@ window.VESPRA_PRODUITS = [
     "variantes": [],
     "notices": [],
     "options": []
+  },
+  {
+    "id": "p59",
+    "ref": "p59",
+    "nom": "Chauffage pyramide à gaz",
+    "cat": "Confort",
+    "cats": [
+      "Confort"
+    ],
+    "desc": "Chauffage pyramide à gaz pour l'extérieur : terrasse, cocktail, mariage. Avec ou sans bouteille de gaz.",
+    "img": "chauffage-pyramide.webp",
+    "imgCat": "chauffage-pyramide.webp",
+    "page": "produit-chauffage-pyramide.html",
+    "prix": 50,
+    "prixId": null,
+    "variantes": [
+      {
+        "prixId": "chauffage-pyramide-1",
+        "label": "Sans bouteille de gaz",
+        "labelCat": "Sans bouteille de gaz",
+        "prix": 50
+      },
+      {
+        "prixId": "chauffage-pyramide-2",
+        "label": "Avec bouteille de gaz",
+        "labelCat": "Avec bouteille de gaz",
+        "prix": 80
+      }
+    ],
+    "notices": [],
+    "options": []
+  },
+  {
+    "id": "p60",
+    "ref": "p60",
+    "nom": "Chauffage parasol à gaz",
+    "cat": "Confort",
+    "cats": [
+      "Confort"
+    ],
+    "desc": "Chauffage parasol à gaz pour l'extérieur : terrasse, cocktail, mariage. Avec ou sans bouteille de gaz.",
+    "img": "chauffage-parasol.webp",
+    "imgCat": "chauffage-parasol.webp",
+    "page": "produit-chauffage-parasol.html",
+    "prix": 40,
+    "prixId": null,
+    "variantes": [
+      {
+        "prixId": "chauffage-parasol-1",
+        "label": "Sans bouteille de gaz",
+        "labelCat": "Sans bouteille de gaz",
+        "prix": 40
+      },
+      {
+        "prixId": "chauffage-parasol-2",
+        "label": "Avec bouteille de gaz",
+        "labelCat": "Avec bouteille de gaz",
+        "prix": 70
+      }
+    ],
+    "notices": [],
+    "options": []
   }
 ]
 /* photos de la galerie, descriptions d'options et sous-titres de variantes d'origine, par fiche */
 window.VESPRA_MEDIAS = {
+  "produit-chauffage-pyramide.html": {
+    "photos": [
+      {
+        "s": "chauffage-pyramide.webp",
+        "a": "Chauffage pyramide à gaz au coucher du soleil"
+      },
+      {
+        "s": "chauffage-pyramide-2.webp",
+        "a": "Flamme du chauffage pyramide"
+      },
+      {
+        "s": "chauffage-pyramide-3.webp",
+        "a": "Chauffage pyramide à gaz et sa housse"
+      }
+    ],
+    "options": {},
+    "subs": [
+      "",
+      ""
+    ]
+  },
+  "produit-chauffage-parasol.html": {
+    "photos": [
+      {
+        "s": "chauffage-parasol.webp",
+        "a": "Chauffage parasol à gaz en extérieur"
+      },
+      {
+        "s": "chauffage-parasol-2.webp",
+        "a": "Chauffage parasol à gaz, vue détourée"
+      }
+    ],
+    "options": {},
+    "subs": [
+      "",
+      ""
+    ]
+  },
   "produit-photobooth.html": {
     "photos": [
       {

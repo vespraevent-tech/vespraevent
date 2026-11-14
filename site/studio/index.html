@@ -5140,6 +5140,7 @@ function qteMaxProduit(nom){
   if(/guirlande/.test(n)) return 10;
   if(/fontaine/.test(n)) return 4;
   if(/ventilateur/.test(n)) return 4;
+  if(/chauffage/.test(n)) return 2;
   return 1;
 }
 function mdOrga(i, v){ if(!mdLignes[i]) return; const n = Number(String(v||'').replace(',', '.').replace(/[^\d.]/g, '')); mdLignes[i].orga = (isFinite(n) && n > 0) ? Math.min(5000, Math.round(n*100)/100) : ''; mdRendre(); }
