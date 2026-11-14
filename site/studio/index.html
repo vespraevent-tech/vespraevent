@@ -4812,7 +4812,7 @@ function prestaIdLocal(nom){ const t = String(nom||'').toLowerCase(); return /ca
 function prestaNomLocal(nom){ const id = prestaIdLocal(nom); return id === 'candice' ? 'Candice' : (id === 'emmanuel' ? 'Emmanuel' : ''); }
 function estPresta(nom){ return PRESTATIONS.indexOf(String(nom||'').trim()) >= 0; }
 /* ordre des catégories : celui du catalogue du site ; chaque catégorie regroupe ses produits (tous les châteaux ensemble, tous les barnums ensemble…) */
-const ORDRE_CATS = ['Photobooth et accessoires','Voitures de collection','Animations','Son, lumière et vidéo','Effets spéciaux et artifices','Châteaux gonflables','Mobilier, réception et barnums','Restauration','Confort','Décoration','Jeux en bois'];
+const ORDRE_CATS = ['Photobooth et accessoires','Voitures de collection','Animations','Son, lumière et vidéo','Effets spéciaux et artifices','Châteaux gonflables','Mobilier, réception et barnums','Restauration','Chauffage et ventilation','Décoration','Jeux en bois'];
 function catalogueOptionsHTML(){
   const cmp = (a, b) => String(a.nom).localeCompare(String(b.nom), 'fr', {sensitivity:'base', numeric:true});
   const groupes = {};
@@ -7341,7 +7341,7 @@ async function saveProductOrder(){
 
 /* ══ CATÉGORIES DU CATALOGUE ══ */
 const CAT_ADMIN_DEFAUT=[
- ['Photobooth et accessoires','photobooth-lifestyle.webp'],['Voitures de collection','ford-mustang.webp'],['Animations','karaoke.webp'],['Son, lumière et vidéo','jeux-lumieres-situation.webp'],['Effets spéciaux et artifices','etincelles-froides-situation.webp'],['Châteaux gonflables','boite-nuit-situation.webp'],['Mobilier, réception et barnums','barnum-situation.webp'],['Restauration','popcorn-situation.webp'],['Confort','ventilateur.webp'],['Décoration','guirlande-lumineuse.webp'],['Jeux en bois','jeux-cornhole.webp']
+ ['Photobooth et accessoires','photobooth-lifestyle.webp'],['Voitures de collection','ford-mustang.webp'],['Animations','karaoke.webp'],['Son, lumière et vidéo','jeux-lumieres-situation.webp'],['Effets spéciaux et artifices','etincelles-froides-situation.webp'],['Châteaux gonflables','boite-nuit-situation.webp'],['Mobilier, réception et barnums','barnum-situation.webp'],['Restauration','popcorn-situation.webp'],['Chauffage et ventilation','ventilateur.webp'],['Décoration','guirlande-lumineuse.webp'],['Jeux en bois','jeux-cornhole.webp']
 ];
 const CAT_ADMIN_ANCIENS={'Décoration et signalétique':'Décoration'};
 let catAdminData=[],catAdminSupprimees=[],catAdminOuverte=null,catAdminAjout='';

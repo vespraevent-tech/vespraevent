@@ -41,9 +41,9 @@ var PRODUCTS=[
   {id:'p48',cat:'Décoration',cats:['Décoration'],name:"Panneau de direction",price:40,desc:"Panneau de direction personnalisé : 5 flèches comprises, pour guider vos invités tout le week-end.",img:'panneau-direction.webp',page:'produit-panneau-direction.html',vdef:0,variants:[{label:'Week-end · 5 flèches personnalisées',price:40,nom:'Panneau de direction'}]},
   {id:'p49',cat:'Restauration',cats:['Restauration'],name:"Fontaine à cocktail",price:50,desc:"Fontaine à cocktail blanche, pour un vin d'honneur élégant. Tarif à l'événement.",img:'fontaine-cocktail.webp',page:'produit-fontaine-cocktail.html',vdef:0,variants:[{label:"L'événement",price:50,nom:'Fontaine à cocktail'}]},
   {id:'p52',cat:'Restauration',cats:['Restauration'],name:"Machine à glaçons",price:20,desc:"Machine à glaçons : des glaçons frais pour vos boissons et vos cocktails. Tarif pour le week-end.",img:'machine-glacons.webp'},
-  {id:'p53',cat:'Confort',cats:['Confort'],name:"Chauffage fioul pour barnum",price:0,devis:true,desc:"Chauffage à fioul 30 kW à combustion indirecte, installé par nos soins avec gaine d'air chaud, pour barnum et tente. 2 appareils disponibles. Tarif sur devis.",img:'',qteMax:2},
-  {id:'p59',cat:'Confort',cats:['Confort'],name:'Chauffage pyramide à gaz',price:50,desc:"Chauffage pyramide à gaz pour l'extérieur : terrasse, cocktail, mariage. Avec ou sans bouteille de gaz. Usage extérieur uniquement.",img:'chauffage-pyramide.webp',page:'produit-chauffage-pyramide.html',qteMax:2,variants:[{label:'Sans bouteille de gaz',price:50,page:'produit-chauffage-pyramide.html',img:'chauffage-pyramide.webp'},{label:'Avec bouteille de gaz',price:80,page:'produit-chauffage-pyramide.html',img:'chauffage-pyramide.webp'}]},
-  {id:'p60',cat:'Confort',cats:['Confort'],name:'Chauffage parasol à gaz',price:40,desc:"Chauffage parasol à gaz pour l'extérieur : terrasse, cocktail, mariage. Avec ou sans bouteille de gaz. Usage extérieur uniquement.",img:'chauffage-parasol.webp',page:'produit-chauffage-parasol.html',qteMax:2,variants:[{label:'Sans bouteille de gaz',price:40,page:'produit-chauffage-parasol.html',img:'chauffage-parasol.webp'},{label:'Avec bouteille de gaz',price:70,page:'produit-chauffage-parasol.html',img:'chauffage-parasol.webp'}]},
+  {id:'p53',qteNom:'appareils',cat:'Chauffage et ventilation',cats:['Chauffage et ventilation'],name:"Chauffage fioul pour barnum",price:0,devis:true,desc:"Chauffage à fioul 30 kW à combustion indirecte, installé par nos soins avec gaine d'air chaud, pour barnum et tente. 2 appareils disponibles. Tarif sur devis.",img:'',qteMax:2},
+  {id:'p59',qteNom:'appareils',cat:'Chauffage et ventilation',cats:['Chauffage et ventilation'],name:'Chauffage pyramide à gaz',price:50,desc:"Chauffage pyramide à gaz pour l'extérieur : terrasse, cocktail, mariage. Avec ou sans bouteille de gaz. Usage extérieur uniquement.",img:'chauffage-pyramide.webp',page:'produit-chauffage-pyramide.html',qteMax:2,variants:[{label:'Sans bouteille de gaz',price:50,page:'produit-chauffage-pyramide.html',img:'chauffage-pyramide.webp'},{label:'Avec bouteille de gaz',price:80,page:'produit-chauffage-pyramide.html',img:'chauffage-pyramide.webp'}]},
+  {id:'p60',qteNom:'appareils',cat:'Chauffage et ventilation',cats:['Chauffage et ventilation'],name:'Chauffage parasol à gaz',price:40,desc:"Chauffage parasol à gaz pour l'extérieur : terrasse, cocktail, mariage. Avec ou sans bouteille de gaz. Usage extérieur uniquement.",img:'chauffage-parasol.webp',page:'produit-chauffage-parasol.html',qteMax:2,variants:[{label:'Sans bouteille de gaz',price:40,page:'produit-chauffage-parasol.html',img:'chauffage-parasol.webp'},{label:'Avec bouteille de gaz',price:70,page:'produit-chauffage-parasol.html',img:'chauffage-parasol.webp'}]},
   {id:'p54',cat:'Châteaux gonflables',cats:['Châteaux gonflables','Animations'],name:"Mini bounce crocodile",price:80,desc:"Mini château gonflable crocodile avec toboggan : compact, il se pose dans un jardin ou une cour. Idéal pour un anniversaire d'enfants à la maison.",img:'chateau-mini-bounce-crocodile.webp',page:'produit-mini-bounce-crocodile.html'},
   {id:'p55',cat:'Châteaux gonflables',cats:['Châteaux gonflables','Animations'],name:"Bouncedome gonflable avec toboggan Amazone Safari",price:100,desc:"Bouncedome gonflable sur le thème de la jungle, avec toboggan : un dôme couvert, des animaux et un explorateur, pour un anniversaire d'enfants qui sort de l'ordinaire.",img:'chateau-bouncedome-amazone-safari.webp',page:'produit-bouncedome-amazone-safari.html'},
   {id:'p56',cat:'Châteaux gonflables',cats:['Châteaux gonflables','Animations'],name:"Multiplay château gonflable Dinoworld",price:150,desc:"Grand château gonflable multi-activités sur le thème des dinosaures : toboggan en façade, obstacles et filets. Jusqu'à 12 enfants en même temps.",img:'chateau-dinoworld-2.webp',page:'produit-chateau-dinoworld.html'},
@@ -54,7 +54,7 @@ var PRODUCTS=[
   {id:'p23',cat:'Effets spéciaux et artifices',cats:['Effets spéciaux et artifices'],name:'Machine à bulles',price:10,desc:"Une animation de bulles pour créer un moment féerique lors de vos événements.",img:'machine-bulles-situation.webp',page:'produit-machines-effets.html'},
   {id:'p58',cat:'Effets spéciaux et artifices',cats:['Effets spéciaux et artifices'],name:'Machine à fumée puissante M-Fog 1500',price:20,desc:"Machine à fumée professionnelle de 1500 W, environ 320 m³/min : beaucoup plus puissante que la petite machine, pour bien révéler les faisceaux lumineux.",img:'fumee-m-fog-1500.webp',page:'produit-fumee-m-fog-1500.html',options:[{id:'fumee',label:'Machine à fumée',price:10},{id:'fbrou',label:'Fumée lourde — effet brouillard',price:60},{id:'fnuage',label:'Fumée lourde — effet nuage',price:150}]},
 
-  {id:'p7',cat:'Confort',cats:['Confort'],name:'Ventilateur événementiel',price:10,desc:"Ventilateur industriel grand diamètre pour garder la fraîcheur sous vos barnums et tentes de réception.",img:'ventilateur.webp',page:'produit-mega-ventilateur.html'},
+  {id:'p7',qteMax:4,qteNom:'ventilateurs',cat:'Chauffage et ventilation',cats:['Chauffage et ventilation'],name:'Ventilateur événementiel',price:10,desc:"Ventilateur industriel grand diamètre pour garder la fraîcheur sous vos barnums et tentes de réception.",img:'ventilateur.webp',page:'produit-mega-ventilateur.html'},
 ];
 
 var _vmp=null,cart=[];
@@ -128,8 +128,10 @@ function vmQteMaj(){
   var m=document.getElementById('vmQteMoins'),p=document.getElementById('vmQtePlus');
   if(m)m.disabled=n<=1; if(p)p.disabled=n>=reste;
   var note=document.getElementById('vmQteNote');
-  if(note)note.textContent=reste<=0?'Les '+_vmp.qteMax+' '+(_vmp.qteNom||'spots')+' sont déjà dans votre devis.':(_vmp.qteMax+' disponibles · '+_vmp.price+' € l\u2019unité');
-  document.getElementById('vmPrice').textContent=(_vmp.price*n)+' €'+(n>1?' · '+n+' '+(_vmp.qteNom||'spots'):'');
+  var unit=_vmp.price;try{if(_vmp.variants&&_vmp.variants.length){var so=document.getElementById('vmSelect'),oo=so&&so.options[so.selectedIndex];if(oo&&+oo.dataset.price>0)unit=+oo.dataset.price;}}catch(e){}
+  var surDevis=_vmp.devis&&!(unit>0);
+  if(note)note.textContent=reste<=0?'Les '+_vmp.qteMax+' '+(_vmp.qteNom||'spots')+' sont déjà dans votre devis.':(_vmp.qteMax+' disponibles'+(surDevis?' · tarif sur devis':' · '+unit+' € l\u2019unité'));
+  document.getElementById('vmPrice').textContent=surDevis?('Sur devis'+(n>1?' · '+n+' '+(_vmp.qteNom||'spots'):'')):((unit*n)+' €'+(n>1?' · '+n+' '+(_vmp.qteNom||'spots'):''));
 }
 function vmQteStep(d){window._vmQteMain=(window._vmQteMain||1)+d;vmQteMaj()}
 function vmQteHTML(){
@@ -249,6 +251,7 @@ function updateVMPrice(){
   vmSyncOptions();
   vmQteVMaj();
   if(opt){var q=(_vmp&&_vmp.qteVar)?(window._vmQV||1):1;document.getElementById('vmPrice').textContent=(opt.dataset.price*q)+' €'+(q>1?' · '+q+' pièces':'')+(opt.dataset.note?' ('+opt.dataset.note+')':'');}
+  if(_vmp&&_vmp.qteMax&&!_vmp.qteVar)vmQteMaj();
   if(opt&&opt.dataset.img){document.getElementById('vmImg').src=opt.dataset.img;}
 }
 function confirmVM(){
@@ -272,6 +275,7 @@ function confirmVM(){
     if(!opt){showToast('Sélectionnez une formule');return}
     var qv=1;
     if(_vmp.qteVar){var rv=_vmp.qteVar-vmQteVDeja();if(rv<=0){showToast('3 maximum de cette taille dans votre devis.');return}qv=Math.min(window._vmQV||1,rv)}
+    else if(_vmp.qteMax){var rm=vmQteReste();if(rm<=0){showToast('Les '+_vmp.qteMax+' '+(_vmp.qteNom||'appareils')+' sont déjà dans votre devis.');return}qv=Math.min(window._vmQteMain||1,rm)}
     addToCart({qty:qv>1?qv:undefined,id:_vmp.id+'_'+Date.now(),name:opt.dataset.nom?opt.dataset.nom+optionsSuffix:`${opt.dataset.fam||_vmp.name} — ${opt.dataset.label}${optionsSuffix}${installSuffix}`,price:parseInt(opt.dataset.price)+optionsPrice,img:opt.dataset.img||_vmp.img,install:installChecked});
   }else{
     var perso='';
@@ -286,7 +290,7 @@ function confirmVM(){
       /* un seul produit, avec sa quantité : « Spot LED sur batterie ×8 » */
       var ex=cart.find(function(i){return i&&i.id===_vmp.id});
       if(ex){ex.qty=(ex.qty||1)+nq;saveCart();renderCart();closeVM();showToast('✓ Ajouté au devis !');setTimeout(function(){openCart();},320);}
-      else addToCart({id:_vmp.id,name:_vmp.name,price:_vmp.price,img:_vmp.img,qty:nq});
+      else addToCart({id:_vmp.id,name:_vmp.name,price:_vmp.price,img:_vmp.img,qty:nq,devis:(_vmp.devis&&!(_vmp.price>0))?true:undefined});
       return;
     }
     addToCart({id:_vmp.id+(perso?'_'+Date.now():''),name:_vmp.name+optionsSuffix+installSuffix,

@@ -1440,9 +1440,9 @@ window.VESPRA_PRODUITS = [
     "id": "p53",
     "ref": "p53",
     "nom": "Chauffage fioul pour barnum",
-    "cat": "Confort",
+    "cat": "Chauffage et ventilation",
     "cats": [
-      "Confort"
+      "Chauffage et ventilation"
     ],
     "desc": "Chauffage à fioul 30 kW à combustion indirecte, installé par nos soins avec gaine d'air chaud, pour barnum et tente. 2 appareils disponibles. Tarif sur devis.",
     "img": "",
@@ -3121,9 +3121,9 @@ window.VESPRA_PRODUITS = [
     "id": "p7",
     "ref": "p7",
     "nom": "Ventilateur événementiel",
-    "cat": "Confort",
+    "cat": "Chauffage et ventilation",
     "cats": [
-      "Confort"
+      "Chauffage et ventilation"
     ],
     "desc": "Ventilateur industriel grand diamètre pour garder la fraîcheur sous vos barnums et tentes de réception.",
     "img": "ventilateur.webp",
@@ -3139,9 +3139,9 @@ window.VESPRA_PRODUITS = [
     "id": "p59",
     "ref": "p59",
     "nom": "Chauffage pyramide à gaz",
-    "cat": "Confort",
+    "cat": "Chauffage et ventilation",
     "cats": [
-      "Confort"
+      "Chauffage et ventilation"
     ],
     "desc": "Chauffage pyramide à gaz pour l'extérieur : terrasse, cocktail, mariage. Avec ou sans bouteille de gaz.",
     "img": "chauffage-pyramide.webp",
@@ -3170,9 +3170,9 @@ window.VESPRA_PRODUITS = [
     "id": "p60",
     "ref": "p60",
     "nom": "Chauffage parasol à gaz",
-    "cat": "Confort",
+    "cat": "Chauffage et ventilation",
     "cats": [
-      "Confort"
+      "Chauffage et ventilation"
     ],
     "desc": "Chauffage parasol à gaz pour l'extérieur : terrasse, cocktail, mariage. Avec ou sans bouteille de gaz.",
     "img": "chauffage-parasol.webp",
