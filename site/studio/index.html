@@ -7519,6 +7519,7 @@ function ouvrirFiche(id, silencieux){
     if(!photos.length && p.img) photos = [{s:p.img, a:p.nom}];
   }
   fichePhotos = photos;
+  ficheMainOuverture = (photos[0] && photos[0].s) || '';
   const img = (photos[0] && photos[0].s) || p.img;
   /* une apostrophe enregistrée avec une barre oblique (\') est remise d'aplomb */
   const labels = f.variantes ? String(f.variantes).replace(/\\(['"])/g, '$1').split('|') : [];
@@ -7654,6 +7655,7 @@ function ouvrirFiche(id, silencieux){
 /* ── photos de la fiche ── */
 let fichePhotos = [];
 let ficheVarImg = [];
+let ficheMainOuverture = '';
 let ficheImgCarte = '';
 function optionsPhotos(sel, vide){
   let h = '<option value="">' + vide + '</option>', trouve = !sel;
@@ -7829,7 +7831,9 @@ async function enregistrerFiche(id){
   const varimgLus = p.variantes.map(function(v,i){ const el = document.getElementById('v-img-'+i); return el ? String(el.value||'') : ''; });
   if(varimgLus.some(Boolean)) fiche.varimg = JSON.stringify(varimgLus);
   const carteEl = document.getElementById('f-imgcarte');
-  if(carteEl && carteEl.value) fiche.imgcarte = carteEl.value;
+  /* nouvelle photo principale choisie sans toucher à l'image de carte : la principale vaut partout, on libère l'ancienne carte */
+  const mainChange = photos[0] && ficheMainOuverture && photos[0].s !== ficheMainOuverture;
+  if(carteEl && carteEl.value && !(mainChange && carteEl.value === ficheImgCarte)) fiche.imgcarte = carteEl.value;
   const comps = [];
   [0,1,2,3].forEach(function(k){
     const el = document.getElementById('f-comp-'+k);
