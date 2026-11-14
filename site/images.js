@@ -193,6 +193,7 @@
         if(!p||!p.id)return;
         var nouvelle=fp.carte[p.id]||fp.parId[p.id];
         if(!nouvelle&&p.img&&map[basename(p.img)])nouvelle=map[basename(p.img)];
+        if(!nouvelle&&!p.img&&p.id==='p53')nouvelle='chauffage-fioul.webp';   /* chauffage fioul à cheminée, sans photo dans la liste d'origine */
         /* allégée dès maintenant : les cartes et les aperçus sont construits à partir de p.img */
         if(nouvelle)p.img=(window.VESPRA_IMG?window.VESPRA_IMG(nouvelle,900):nouvelle);
         if(nouvelle&&p.name)produitsParNom[norm(p.name)]=nouvelle;
