@@ -492,7 +492,9 @@
 
   /* ---------- fenêtre produit ---------- */
   function popupReset(ov) {
-    ['vmSuivant', 'vmRetour'].forEach(function (id) { var e = document.getElementById(id); if (e) e.remove(); });
+    var ac = document.getElementById('vmActs');
+    if (ac) { var b0 = ac.querySelector('button[onclick*="confirmVM"]'); if (b0) { ['flex', 'width', 'min-width', 'max-width', 'margin', 'padding', 'border-radius'].forEach(function (k) { b0.style.removeProperty(k); }); ac.parentNode.insertBefore(b0, ac); } ac.remove(); }
+    var sv0 = document.getElementById('vmSuivant'); if (sv0) sv0.remove();
     ov.querySelectorAll('[data-etape]').forEach(function (e) { RAZ(e); e.removeAttribute('data-etape'); });
   }
   function popupPreparer(ov) {
@@ -513,11 +515,16 @@
       op.removeAttribute('data-etape'); RAZ(op);
       ok.removeAttribute('data-etape'); RAZ(ok);
       var q = document.getElementById('vmQteV'); if (q && !q.hidden) { q.setAttribute('data-etape', '1'); IMP(q, 'none'); }
+      var ac = document.createElement('div');
+      ac.id = 'vmActs'; ac.style.cssText = 'display:flex;gap:10px;align-items:stretch;margin:16px ' + (innerWidth >= 900 ? 34 : 22) + 'px ' + (innerWidth >= 900 ? 34 : 30) + 'px';
       var r = document.createElement('button');
-      r.type = 'button'; r.id = 'vmRetour'; r.textContent = '← Modifier la formule';
-      r.style.cssText = 'background:none;border:0;color:var(--navy);font:600 13px Inter,system-ui,sans-serif;cursor:pointer;padding:0;margin:0 0 12px;text-decoration:underline';
+      r.type = 'button'; r.id = 'vmRetour'; r.setAttribute('aria-label', 'Revenir au choix de la formule');
+      r.innerHTML = '<span aria-hidden="true">←</span> Retour';
+      r.style.cssText = 'flex:0 0 auto;padding:0 22px;border:2px solid var(--g3);border-radius:999px;background:#fff;color:var(--navy);font:600 13px Inter,system-ui,sans-serif;letter-spacing:.04em;cursor:pointer';
       r.onclick = function () { popupPreparer(ov); };
-      op.insertBefore(r, op.firstChild);
+      ok.parentNode.insertBefore(ac, ok);
+      ac.appendChild(r); ac.appendChild(ok);
+      [['flex', '1'], ['width', 'auto'], ['min-width', '0'], ['max-width', 'none'], ['margin', '0'], ['padding', '15px 16px'], ['border-radius', '999px']].forEach(function (d) { ok.style.setProperty(d[0], d[1], 'important'); });
     };
   }
   function surveillerPopup() {
@@ -555,17 +562,18 @@
     var sv = document.createElement('button');
     sv.type = 'button'; sv.id = 'btnSuivantOpt'; sv.className = 'btn-add-cart'; sv.textContent = 'Suivant';
     var retour = document.createElement('button');
-    retour.type = 'button'; retour.textContent = '← Modifier la formule';
-    retour.style.cssText = 'background:none;border:0;color:var(--navy);font:600 13px Inter,system-ui,sans-serif;cursor:pointer;padding:0;margin:0 0 12px;text-decoration:underline';
+    retour.type = 'button'; retour.innerHTML = '<span aria-hidden="true">←</span> Retour'; retour.setAttribute('aria-label', 'Revenir au choix de la formule');
+    retour.style.cssText = 'flex:0 0 auto;padding:0 22px;border:2px solid var(--g3);border-radius:var(--r);background:#fff;color:var(--navy);font:600 13px Inter,system-ui,sans-serif;letter-spacing:.04em;cursor:pointer';
     function etape1() {
       RAZ(bloc); IMP(ctas, 'none'); sv.style.removeProperty('display');
       opts.forEach(function (o) { IMP(o, 'none'); });
-      retour.remove();
+      retour.remove(); ctas.style.removeProperty('flex-direction');
     }
     function etape2() {
       IMP(bloc, 'none'); RAZ(ctas); IMP(sv, 'none');
       opts.forEach(function (o) { RAZ(o); });
-      opts[0].parentNode.insertBefore(retour, opts[0]);
+      ctas.style.setProperty('flex-direction', 'row'); ctas.insertBefore(retour, ctas.firstChild);
+      [].forEach.call(ctas.children, function (c) { if (c !== retour) c.style.flex = '1'; });
     }
     sv.onclick = etape2; retour.onclick = etape1;
     ctas.parentNode.insertBefore(sv, ctas);
