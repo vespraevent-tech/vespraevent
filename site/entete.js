@@ -507,7 +507,7 @@
     function cache(e) { e.setAttribute('data-etape', '1'); IMP(e, 'none'); }
     cache(op); cache(ok);
     var sv = document.createElement('button');
-    sv.type = 'button'; sv.id = 'vmSuivant'; sv.className = ok.className; sv.style.cssText = ok.style.cssText; sv.style.removeProperty('display'); ['background:var(--navy)','color:#fff','border-color:var(--navy)','border-radius:8px','width:auto','padding:15px 44px'].forEach(function (d) { var k = d.split(':'); sv.style.setProperty(k[0], k[1], 'important'); }); sv.textContent = 'Suivant';
+    sv.type = 'button'; sv.id = 'vmSuivant'; sv.className = ok.className; sv.style.cssText = ok.style.cssText; sv.style.removeProperty('display'); ['background:var(--navy)','color:#fff','border-color:var(--navy)','border-radius:8px','width:auto','min-width:0','padding:13px 30px'].forEach(function (d) { var k = d.split(':'); sv.style.setProperty(k[0], k[1], 'important'); }); sv.textContent = 'Suivant';
     ok.parentNode.insertBefore(sv, ok);
     sv.onclick = function () {
       sv.remove();
