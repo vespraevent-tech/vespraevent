@@ -2298,7 +2298,7 @@ window.VESPRA_PRODUITS = [
       "Mobilier, réception et barnums",
       "Restauration"
     ],
-    "desc": "Mange-debout avec housse blanche : plateau de 90 cm, 110 cm de hauteur. 13 € l'unité, 10 disponibles.",
+    "desc": "Mange-debout avec housse blanche ou noire : plateau de 80 cm, 110 cm de hauteur. 13 € l'unité, 10 disponibles.",
     "img": "mange-debout.webp",
     "imgCat": "mange-debout.webp",
     "page": "produit-mange-debout.html",
