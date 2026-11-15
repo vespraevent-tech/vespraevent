@@ -581,3 +581,95 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fiche); else fiche();
 })();
+
+/* Produits à plusieurs couleurs choisies en même temps (mange-debout : 3 verts, 2 noirs, 5 blancs…).
+   Le pop-up propose une ligne par couleur avec sa propre quantité ; le prix total se met à jour. */
+(function () {
+  var NUANCES = { blanche: '#ffffff', noire: '#1b1f27', brune: '#7a4b2a', or: '#c9a227', verte: '#3f7d4e', terracotta: '#c4663f' };
+  function nuance(label) { var k = String(label || '').toLowerCase().split(/[\s(]/)[0]; return NUANCES[k] || '#d8dde5'; }
+  function produit() { try { return _vmp; } catch (e) { return null; } }
+  function dejaAuDevis(id) { try { return vmDejaAuDevis(id); } catch (e) { return 0; } }
+  var q = [];
+  function total() { return q.reduce(function (t, n) { return t + (n || 0); }, 0); }
+  function prixTotal(p) { return q.reduce(function (t, n, i) { return t + (n || 0) * (+p.variants[i].price || 0); }, 0); }
+  function reste(p) { return Math.max(0, (p.qteMax || 10) - dejaAuDevis(p.id)); }
+  function maj(p) {
+    var box = document.getElementById('vmMulti'); if (!box) return;
+    var t = total(), r = reste(p);
+    q.forEach(function (n, i) {
+      var l = box.querySelector('[data-i="' + i + '"]'); if (!l) return;
+      l.querySelector('output').textContent = n || 0;
+      l.querySelector('.mm').disabled = !n;
+      l.querySelector('.mp').disabled = t >= r;
+    });
+    var note = box.querySelector('.mc-note');
+    note.textContent = r <= 0 ? 'Les ' + (p.qteMax || 10) + ' ' + (p.qteNom || 'articles') + ' sont déjà dans votre devis.' : (p.qteMax || 10) + ' disponibles';
+    var pr = document.getElementById('vmPrice');
+    if (pr) pr.textContent = t ? prixTotal(p) + ' € · ' + t + ' ' + (p.qteNom || 'articles') : p.price + ' €';
+  }
+  function monter(ov) {
+    var p = produit(); if (!p || !p.multi || !p.variants || !p.variants.length) return;
+    var vz = document.getElementById('vmVariants'); if (!vz) return;
+    var old = document.getElementById('vmMulti'); if (old) old.remove();
+    var oq = document.getElementById('vmQteBox'); if (oq) oq.remove();
+    vz.setAttribute('data-multi', '1'); vz.style.setProperty('display', 'none', 'important');
+    q = p.variants.map(function () { return 0; });
+    var bs = 'width:30px;height:30px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-size:17px;line-height:1;cursor:pointer;color:var(--black);padding:0';
+    var rows = p.variants.map(function (v, i) {
+      var extra = /\+\s*\d+\s*€/.exec(v.label), nom = String(v.label).replace(/\s*\(\+\s*\d+\s*€\)/, '');
+      return '<div data-i="' + i + '" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px' + (i ? ';border-top:1px solid var(--g4,#e8ebf0)' : '') + '">'
+        + '<span style="display:inline-flex;align-items:center;gap:10px;font-size:14px;color:var(--black)"><i style="width:16px;height:16px;border-radius:50%;background:' + nuance(v.label) + ';border:1.5px solid #b9c0cb;flex:none"></i>' + nom
+        + (extra ? '<small style="color:var(--g2);font-weight:600">' + extra[0].replace(/\s+/g, ' ') + '</small>' : '') + '</span>'
+        + '<span style="display:inline-flex;align-items:center;gap:10px;flex:none"><button type="button" class="mm" aria-label="Un de moins" style="' + bs + '">−</button>'
+        + '<output style="min-width:20px;text-align:center;font-size:15px;font-weight:700">0</output>'
+        + '<button type="button" class="mp" aria-label="Un de plus" style="' + bs + '">+</button></span></div>';
+    }).join('');
+    vz.insertAdjacentHTML('afterend', '<div id="vmMulti" style="margin:4px auto 16px">'
+      + '<div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g2);margin-bottom:8px">' + (p.varTitre || 'Couleur') + '</div>'
+      + '<div style="border:1px solid var(--g3);border-radius:8px;background:#fff;overflow:hidden">' + rows + '</div>'
+      + '<div class="mc-note" style="font-size:12px;color:var(--g2);margin-top:6px"></div></div>');
+    var box = document.getElementById('vmMulti');
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      var i = +b.closest('[data-i]').getAttribute('data-i');
+      if (b.classList.contains('mp') && total() < reste(p)) q[i]++;
+      if (b.classList.contains('mm') && q[i] > 0) q[i]--;
+      maj(p);
+    });
+    maj(p);
+  }
+  function demonter() {
+    var m = document.getElementById('vmMulti'); if (m) m.remove();
+    var vz = document.getElementById('vmVariants');
+    if (vz && vz.getAttribute('data-multi')) { vz.removeAttribute('data-multi'); vz.style.removeProperty('display'); }
+  }
+  function surveiller() {
+    var ov = document.getElementById('vmOv');
+    if (!ov || ov._multi) return;
+    ov._multi = true;
+    var etat = ov.classList.contains('open');
+    new MutationObserver(function () {
+      var o = ov.classList.contains('open');
+      if (o && !etat) { demonter(); monter(ov); }
+      if (!o && etat) demonter();
+      etat = o;
+    }).observe(ov, { attributes: true, attributeFilter: ['class'] });
+    if (etat) monter(ov);
+  }
+  new MutationObserver(surveiller).observe(document.documentElement, { childList: true, subtree: true });
+  surveiller();
+  /* « Ajouter au devis » : une ligne de devis par couleur choisie */
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('#vmOv button[onclick*="confirmVM"]');
+    var p = produit();
+    if (!b || !p || !p.multi || !document.getElementById('vmMulti')) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    if (!total()) { try { showToast('Choisissez au moins un article'); } catch (x) {} return; }
+    var items = [], t = Date.now();
+    q.forEach(function (n, i) {
+      if (n > 0) items.push({ id: p.id + '_' + t + '_' + i, name: p.variants[i].nom || (p.name + ' — ' + p.variants[i].label), price: +p.variants[i].price, img: p.img, qty: n > 1 ? n : undefined });
+    });
+    items.forEach(function (it) { window.addToCart(it); });
+    try { closeVM(); } catch (x) {}
+  }, true);
+})();

@@ -707,7 +707,7 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
     <!-- INFO -->
     <div class="prod-info-col">
       <div class="prod-cat-tag">Mobilier, réception et barnums</div>
-      <h1 class="prod-title">MANGE-DEBOUT <span class="prod-title-2">HOUSSE BLANCHE OU NOIRE</span></h1>
+      <h1 class="prod-title">MANGE-DEBOUT <span class="prod-title-2">HOUSSE AU CHOIX</span></h1>
 
       <a href="#avis" class="prod-rating" title="Voir les avis clients">
         <span class="prod-stars">★★★★★</span>
@@ -719,21 +719,17 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
       <div class="prod-from-label">Prix</div>
       <div class="prod-price-main" id="prodPriceDisplay">10 € <small>/ événement</small></div><div class="prod-duree" style="font-size:12px;color:var(--g2);margin-top:4px">Retrait possible le vendredi, retour le lundi.</div>
 
-<div class="prod-option-install" style="margin:18px 0 0;padding:16px;background:#f7f9fc;border-radius:12px;border:1px solid var(--g3)">
-  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1);margin-bottom:10px">Couleur de la housse</div>
-  <div role="radiogroup" aria-label="Couleur de la housse" style="display:flex;gap:8px;flex-wrap:wrap">
-<button type="button" class="md-col on" data-c="blanche" data-x="0" role="radio" aria-checked="true" style="display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:2px solid var(--navy);border-radius:10px;background:#fff;font:600 14px Inter,system-ui,sans-serif;color:var(--black);cursor:pointer"><i style="width:16px;height:16px;border-radius:50%;background:#ffffff;border:1.5px solid #b9c0cb"></i>Blanche</button>
-<button type="button" class="md-col" data-c="noire" data-x="0" role="radio" aria-checked="false" style="display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:2px solid var(--g3);border-radius:10px;background:#fff;font:600 14px Inter,system-ui,sans-serif;color:var(--black);cursor:pointer"><i style="width:16px;height:16px;border-radius:50%;background:#1b1f27;border:1.5px solid #b9c0cb"></i>Noire</button>
-<button type="button" class="md-col" data-c="brune" data-x="5" role="radio" aria-checked="false" style="display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:2px solid var(--g3);border-radius:10px;background:#fff;font:600 14px Inter,system-ui,sans-serif;color:var(--black);cursor:pointer"><i style="width:16px;height:16px;border-radius:50%;background:#7a4b2a;border:1.5px solid #b9c0cb"></i>Brune<small style="color:var(--g2);font-weight:600"> +5 €</small></button>
-<button type="button" class="md-col" data-c="or" data-x="5" role="radio" aria-checked="false" style="display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:2px solid var(--g3);border-radius:10px;background:#fff;font:600 14px Inter,system-ui,sans-serif;color:var(--black);cursor:pointer"><i style="width:16px;height:16px;border-radius:50%;background:#c9a227;border:1.5px solid #b9c0cb"></i>Or<small style="color:var(--g2);font-weight:600"> +5 €</small></button>
-<button type="button" class="md-col" data-c="verte" data-x="5" role="radio" aria-checked="false" style="display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:2px solid var(--g3);border-radius:10px;background:#fff;font:600 14px Inter,system-ui,sans-serif;color:var(--black);cursor:pointer"><i style="width:16px;height:16px;border-radius:50%;background:#3f7d4e;border:1.5px solid #b9c0cb"></i>Verte<small style="color:var(--g2);font-weight:600"> +5 €</small></button>
-<button type="button" class="md-col" data-c="terracotta" data-x="5" role="radio" aria-checked="false" style="display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:2px solid var(--g3);border-radius:10px;background:#fff;font:600 14px Inter,system-ui,sans-serif;color:var(--black);cursor:pointer"><i style="width:16px;height:16px;border-radius:50%;background:#c4663f;border:1.5px solid #b9c0cb"></i>Terracotta<small style="color:var(--g2);font-weight:600"> +5 €</small></button>
+<div id="mdMulti" style="margin:18px 0 14px">
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1);margin-bottom:8px">Couleur de la housse</div>
+  <div style="border:1px solid var(--g3);border-radius:8px;background:#fff;overflow:hidden">
+<div class="md-row" data-c="blanche" data-x="0" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px"><span style="display:inline-flex;align-items:center;gap:10px;font-size:14px;color:var(--black)"><i style="width:16px;height:16px;border-radius:50%;background:#ffffff;border:1.5px solid #b9c0cb;flex:none"></i>Blanche</span><span style="display:inline-flex;align-items:center;gap:10px;flex:none"><button type="button" class="mm" aria-label="Une housse blanche de moins" style="width:30px;height:30px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-size:17px;line-height:1;cursor:pointer;color:var(--black);padding:0">−</button><output style="min-width:20px;text-align:center;font-size:15px;font-weight:700">0</output><button type="button" class="mp" aria-label="Une housse blanche de plus" style="width:30px;height:30px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-size:17px;line-height:1;cursor:pointer;color:var(--black);padding:0">+</button></span></div>
+<div class="md-row" data-c="noire" data-x="0" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px;border-top:1px solid var(--g4,#e8ebf0)"><span style="display:inline-flex;align-items:center;gap:10px;font-size:14px;color:var(--black)"><i style="width:16px;height:16px;border-radius:50%;background:#1b1f27;border:1.5px solid #b9c0cb;flex:none"></i>Noire</span><span style="display:inline-flex;align-items:center;gap:10px;flex:none"><button type="button" class="mm" aria-label="Une housse noire de moins" style="width:30px;height:30px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-size:17px;line-height:1;cursor:pointer;color:var(--black);padding:0">−</button><output style="min-width:20px;text-align:center;font-size:15px;font-weight:700">0</output><button type="button" class="mp" aria-label="Une housse noire de plus" style="width:30px;height:30px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-size:17px;line-height:1;cursor:pointer;color:var(--black);padding:0">+</button></span></div>
+<div class="md-row" data-c="brune" data-x="5" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px;border-top:1px solid var(--g4,#e8ebf0)"><span style="display:inline-flex;align-items:center;gap:10px;font-size:14px;color:var(--black)"><i style="width:16px;height:16px;border-radius:50%;background:#7a4b2a;border:1.5px solid #b9c0cb;flex:none"></i>Brune<small style="color:var(--g2);font-weight:600"> +5 €</small></span><span style="display:inline-flex;align-items:center;gap:10px;flex:none"><button type="button" class="mm" aria-label="Une housse brune de moins" style="width:30px;height:30px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-size:17px;line-height:1;cursor:pointer;color:var(--black);padding:0">−</button><output style="min-width:20px;text-align:center;font-size:15px;font-weight:700">0</output><button type="button" class="mp" aria-label="Une housse brune de plus" style="width:30px;height:30px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-size:17px;line-height:1;cursor:pointer;color:var(--black);padding:0">+</button></span></div>
+<div class="md-row" data-c="or" data-x="5" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px;border-top:1px solid var(--g4,#e8ebf0)"><span style="display:inline-flex;align-items:center;gap:10px;font-size:14px;color:var(--black)"><i style="width:16px;height:16px;border-radius:50%;background:#c9a227;border:1.5px solid #b9c0cb;flex:none"></i>Or<small style="color:var(--g2);font-weight:600"> +5 €</small></span><span style="display:inline-flex;align-items:center;gap:10px;flex:none"><button type="button" class="mm" aria-label="Une housse or de moins" style="width:30px;height:30px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-size:17px;line-height:1;cursor:pointer;color:var(--black);padding:0">−</button><output style="min-width:20px;text-align:center;font-size:15px;font-weight:700">0</output><button type="button" class="mp" aria-label="Une housse or de plus" style="width:30px;height:30px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-size:17px;line-height:1;cursor:pointer;color:var(--black);padding:0">+</button></span></div>
+<div class="md-row" data-c="verte" data-x="5" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px;border-top:1px solid var(--g4,#e8ebf0)"><span style="display:inline-flex;align-items:center;gap:10px;font-size:14px;color:var(--black)"><i style="width:16px;height:16px;border-radius:50%;background:#3f7d4e;border:1.5px solid #b9c0cb;flex:none"></i>Verte<small style="color:var(--g2);font-weight:600"> +5 €</small></span><span style="display:inline-flex;align-items:center;gap:10px;flex:none"><button type="button" class="mm" aria-label="Une housse verte de moins" style="width:30px;height:30px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-size:17px;line-height:1;cursor:pointer;color:var(--black);padding:0">−</button><output style="min-width:20px;text-align:center;font-size:15px;font-weight:700">0</output><button type="button" class="mp" aria-label="Une housse verte de plus" style="width:30px;height:30px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-size:17px;line-height:1;cursor:pointer;color:var(--black);padding:0">+</button></span></div>
+<div class="md-row" data-c="terracotta" data-x="5" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px;border-top:1px solid var(--g4,#e8ebf0)"><span style="display:inline-flex;align-items:center;gap:10px;font-size:14px;color:var(--black)"><i style="width:16px;height:16px;border-radius:50%;background:#c4663f;border:1.5px solid #b9c0cb;flex:none"></i>Terracotta<small style="color:var(--g2);font-weight:600"> +5 €</small></span><span style="display:inline-flex;align-items:center;gap:10px;flex:none"><button type="button" class="mm" aria-label="Une housse terracotta de moins" style="width:30px;height:30px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-size:17px;line-height:1;cursor:pointer;color:var(--black);padding:0">−</button><output style="min-width:20px;text-align:center;font-size:15px;font-weight:700">0</output><button type="button" class="mp" aria-label="Une housse terracotta de plus" style="width:30px;height:30px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-size:17px;line-height:1;cursor:pointer;color:var(--black);padding:0">+</button></span></div>
   </div>
-  <p style="margin:10px 0 0;font-size:12px;color:var(--g2)">Blanc et noir compris. Brun, or, vert ou terracotta : 5 € de plus par housse.</p>
-</div>
-<div class="prod-qte" style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:14px 0;padding:9px 14px;border:1px solid var(--g3);border-radius:8px;background:#fff">
-  <div style="min-width:0"><span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1)">Quantité</span><span style="display:block;font-size:12px;color:var(--g2);margin-top:2px">10 mange-debout disponibles</span></div>
-  <span style="display:inline-flex;align-items:center;gap:10px;flex:none"><button style="width:30px;height:30px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-size:17px;line-height:1;cursor:pointer;color:var(--black);padding:0" type="button" id="mqMoins" aria-label="Un mange-debout de moins">−</button><b id="mqN" style="min-width:20px;text-align:center;font-size:15px">1</b><button style="width:30px;height:30px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-size:17px;line-height:1;cursor:pointer;color:var(--black);padding:0" type="button" id="mqPlus" aria-label="Un mange-debout de plus">+</button></span>
+  <p style="margin:8px 0 0;font-size:12px;color:var(--g2)"><span id="mdDispo">10 mange-debout disponibles</span> · blanc et noir compris, brun, or, vert ou terracotta : 5 € de plus par housse.</p>
 </div>
 
 <div class="prod-ctas">
@@ -1229,28 +1225,37 @@ function toggleNav(){
 }
 let _qte=1;
 const MAX_SPOTS=10;
-var _couleur='blanche',_extra=0;var IDC={blanche:'p45',noire:'p45n',brune:'p45b',or:'p45o',verte:'p45v',terracotta:'p45t'};
-function spotsPanier(){try{return JSON.parse(localStorage.getItem('vespra_cart')||'[]').reduce(function(n,i){return n+(String(i.id).indexOf('p45')===0?(i.qty||1):0);},0);}catch(e){return 0;}}
+var MAX_MD=10;
+function mdPanier(){try{return JSON.parse(localStorage.getItem('vespra_cart')||'[]').reduce(function(n,i){return n+(String(i.id).indexOf('p45')===0?(i.qty||1):0);},0);}catch(e){return 0;}}
+function mdRows(){return [].slice.call(document.querySelectorAll('#mdMulti .md-row'));}
+function mdTotal(){return mdRows().reduce(function(t,r){return t+(+r.querySelector('output').textContent||0);},0);}
 function majQte(){
-  var dispo=Math.max(0,MAX_SPOTS-spotsPanier());
-  if(_qte>Math.max(1,dispo))_qte=Math.max(1,dispo);
-  document.getElementById('mqN').textContent=_qte;
-  document.getElementById('mqMoins').disabled=_qte<=1;
-  document.getElementById('mqPlus').disabled=_qte>=dispo;
-  document.getElementById('prodPriceDisplay').innerHTML=((10+_extra)*_qte)+' € <small>/ événement'+(_qte>1?' · '+_qte+' mange-debout':'')+'</small>';
+  var reste=Math.max(0,MAX_MD-mdPanier()),t=mdTotal(),prix=0;
+  mdRows().forEach(function(r){var n=+r.querySelector('output').textContent||0;prix+=n*(10+(+r.dataset.x||0));r.querySelector('.mm').disabled=!n;r.querySelector('.mp').disabled=t>=reste;});
+  document.getElementById('mdDispo').textContent=reste<=0?'Les 10 mange-debout sont déjà dans votre devis':reste+' mange-debout disponibles';
+  document.getElementById('prodPriceDisplay').innerHTML=(t?prix:10)+' € <small>/ événement'+(t>1?' · '+t+' mange-debout':'')+'</small>';
 }
 window.majPrixPrincipalHook=majQte;
 document.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('.md-col').forEach(function(b){b.onclick=function(){_couleur=b.dataset.c;_extra=+b.dataset.x||0;majQte();document.querySelectorAll('.md-col').forEach(function(x){var on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-checked',on);x.style.borderColor=on?'var(--navy)':'var(--g3)';});};});
-  document.getElementById('mqMoins').onclick=function(){if(_qte>1){_qte--;majQte();}};
-  document.getElementById('mqPlus').onclick=function(){if(_qte<Math.max(1,MAX_SPOTS-spotsPanier())){_qte++;majQte();}};
+  document.getElementById('mdMulti').addEventListener('click',function(e){
+    var b=e.target.closest('button');if(!b)return;
+    var o=b.closest('.md-row').querySelector('output'),n=+o.textContent||0;
+    if(b.classList.contains('mp')&&mdTotal()<Math.max(0,MAX_MD-mdPanier()))n++;
+    if(b.classList.contains('mm')&&n>0)n--;
+    o.textContent=n;majQte();
+  });
   majQte();
 });
+var IDC={blanche:'p45',noire:'p45n',brune:'p45b',or:'p45o',verte:'p45v',terracotta:'p45t'};
 function addToCartProduct(){
-  var dispo=MAX_SPOTS-spotsPanier();
+  var dispo=MAX_MD-mdPanier();
   if(dispo<=0){alert('Vous avez déjà 10 mange-debout dans votre devis : c\'est tout ce que nous avons.');return;}
-  if(_qte>dispo){_qte=dispo;majQte();}
-  for(var i=0;i<_qte;i++) addToCart({id:IDC[_couleur],name:'Mange-debout housse '+_couleur,price:10+_extra,img:'mange-debout.webp'});
+  if(!mdTotal()){alert('Choisissez au moins un mange-debout (couleur et quantité).');return;}
+  mdRows().forEach(function(r){
+    var n=+r.querySelector('output').textContent||0,c=r.dataset.c;
+    for(var i=0;i<n;i++) addToCart({id:IDC[c],name:'Mange-debout housse '+c,price:10+(+r.dataset.x||0),img:'mange-debout.webp'});
+    r.querySelector('output').textContent=0;
+  });
   majQte();
 }
 function toggleFaq(btn){
