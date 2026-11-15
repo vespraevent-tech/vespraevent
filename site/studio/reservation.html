@@ -1808,10 +1808,23 @@ function getCatColorsForRes(r){
 function renderDots(cols){
   return cols.map(function(c){return '<span style="display:inline-block;width:6px;height:6px;border-radius:2px;background:'+c+';flex-shrink:0"></span>';}).join('');
 }
+/* Bande de couleurs : une réservation affiche une couleur par produit (et non plus
+   seulement celle du premier), en bas de sa barre, séparée de la couleur principale
+   par un filet clair. Vide s'il n'y a qu'une couleur. */
+function bandeCouleurs(cols,h){
+  if(!cols||cols.length<2) return '';
+  h=h||5;var n=cols.length,st=[];
+  cols.forEach(function(c,i){var a=(i*100/n).toFixed(2),b=((i+1)*100/n).toFixed(2);st.push(c+' '+a+'%',c+' '+b+'%');});
+  return ';background-image:linear-gradient(#ffffffcc,#ffffffcc),linear-gradient(90deg,'+st.join(',')+')'
+    +';background-size:100% 1px,100% '+h+'px;background-repeat:no-repeat;background-position:0 calc(100% - '+h+'px),0 100%';
+}
+function titreProduits(r){
+  return String((r.products||[]).map(function(x){return x.short||x.name;}).join(' \u00b7 ')).replace(/"/g,'&quot;');
+}
 function buildLeftStyle(cols){
   var bg=cols[0]||'#FFFFFF';
   var fg=getColorText(bg);
-  return 'border-left:3px solid '+bg+';background:'+bg+';color:'+fg+';padding-left:7px';
+  return 'border-left:3px solid '+bg+';background-color:'+bg+';color:'+fg+';padding-left:7px'+bandeCouleurs(cols,6);
 }
 
 // Month view
@@ -1918,7 +1931,7 @@ function renderWeekRow(week,td,singleRes,multiRes){
     var iso=dateToIso(day);var isToday=day.toDateString()===td.toDateString();
     var singEvH=singleRes.filter(function(r){return r.dateStart===iso;}).map(function(r){
       var cols=getCatColorsForRes(r);var lname=lastName(r.client);var tot=calcResTotal(r);
-      return '<div class="event" style="'+buildLeftStyle(cols)+'" data-res-id="'+r.id+'">'
+      return '<div class="event" title="'+titreProduits(r)+'" style="'+buildLeftStyle(cols)+'" data-res-id="'+r.id+'">'
         +'<button class="del-ev" data-res-id="'+r.id+'">&#215;</button>'
         +'<div style="display:flex;align-items:center;gap:4px;margin-bottom:2px">'
         +'<span style="font:700 11px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+(aLivraison(r)?'<span style="font:700 8.5px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;letter-spacing:.05em;opacity:.6">LIV</span> ':'')+lname+'</span>'
@@ -1935,10 +1948,10 @@ function renderWeekRow(week,td,singleRes,multiRes){
     var lp=(ev.cS/7*100).toFixed(2)+'%';var wp=((ev.cE-ev.cS+1)/7*100).toFixed(2)+'%';
     var bottomPx=(maxSlot-ev.slot)*24+4;
     var br=(ev.isFD?'6px':'0')+' '+(ev.isLD?'6px':'0')+' '+(ev.isLD?'6px':'0')+' '+(ev.isFD?'6px':'0');
-    var bgStyle='background:'+mc+';color:'+mtxt+';border:1px solid '+mc+';border-left:3px solid '+mc;
+    var bgStyle='background-color:'+mc+';color:'+mtxt+';border:1px solid '+mc+';border-left:3px solid '+mc+bandeCouleurs(cols,5);
     var lname=lastName(r.client);var prods=(r.products||[]).map(function(x){return x.short||x.name;}).join(' \u00b7 ');
     var tot=calcResTotal(r);
-    return '<div class="span-ev" data-res-id="'+r.id+'" style="position:absolute;left:'+lp+';width:'+wp+';bottom:'+bottomPx+'px;'+bgStyle+';border-radius:'+br+';color:'+mc+';height:22px;display:flex;align-items:center;padding:0 7px;gap:5px;overflow:hidden;white-space:nowrap;cursor:pointer;font:600 10.5px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;box-sizing:border-box;z-index:2">'
+    return '<div class="span-ev" title="'+titreProduits(r)+'" data-res-id="'+r.id+'" style="position:absolute;left:'+lp+';width:'+wp+';bottom:'+bottomPx+'px;'+bgStyle+';border-radius:'+br+';color:'+mc+';height:22px;display:flex;align-items:center;padding:0 7px;gap:5px;overflow:hidden;white-space:nowrap;cursor:pointer;font:600 10.5px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;box-sizing:border-box;z-index:2">'
       +(ev.isFD?'<b style="flex-shrink:0;margin-right:3px">'+(aLivraison(r)?'<span style="font:700 8.5px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;letter-spacing:.05em;opacity:.6">LIV</span> ':'')+lname+(tot>0?' <span style="font:500 9px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;opacity:.9">'+tot+' \u20ac</span>':'')+'</b><span style="overflow:hidden;text-overflow:ellipsis;flex:1;font:400 9.5px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;opacity:.8">'+prods+'</span><span style="display:flex;gap:2px;flex-shrink:0;margin-left:3px">'+renderDots(cols)+'</span>':'')
       +'<button class="del-ev" data-res-id="'+r.id+'" style="border:none;background:none;cursor:pointer;font-size:12px;opacity:0;margin-left:auto;flex-shrink:0">&#215;</button>'
       +'</div>';
