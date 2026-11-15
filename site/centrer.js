@@ -5,9 +5,19 @@
       s'est ouvert — au milieu de l'écran. Rien ne bouge si c'est déjà bien placé. */
 (function(){
   try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(e){}
-  function haut(){if(!location.hash)window.scrollTo(0,0);}
+  /* Arrivée sur une page : tout de suite en haut, une seule fois. Dès que le visiteur a touché
+     la page (molette, doigt, clavier, clic), on ne la repositionne plus jamais d'elle-même. */
+  var touche=false;
+  ['wheel','touchstart','keydown','mousedown'].forEach(function(t){addEventListener(t,function(){touche=true;},{passive:true,once:true});});
+  var nav=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{};
+  var restaure=nav.type==='reload'||nav.type==='back_forward';   /* seul cas où le navigateur peut avoir replacé la page plus bas */
+  function haut(){
+    if(touche||location.hash)return;
+    if(!restaure&&window.scrollY>0)return;   /* arrivée normale : si la page est déjà descendue, c'est le visiteur */
+    window.scrollTo({top:0,left:0,behavior:'instant'});
+  }
   haut();
-  addEventListener('load',function(){haut();setTimeout(haut,60);});
+  addEventListener('DOMContentLoaded',haut);
   addEventListener('pageshow',function(e){if(e.persisted)haut();});
 
   var reduit=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
