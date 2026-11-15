@@ -660,7 +660,7 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
         </button>
       </div>
 <div id="blocCouleur" style="display:none;align-items:center;gap:8px;margin:0 0 6px;flex-wrap:wrap"><span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1)">Couleur</span><button type="button" class="col-chip" data-c="blanche" onclick="setCouleur('blanche')">Blanche</button><button type="button" class="col-chip on" data-c="rouge" onclick="setCouleur('rouge')">Rouge</button></div>
-<p id="noteCabine" style="display:none;margin:6px 0 14px;font-size:13px;color:var(--g2)"><strong>Une cabine téléphonique est incluse</strong> dans la formule Premium : le vidéobooth est installé à l'intérieur.</p>
+<p id="noteCabine" style="display:none;margin:6px 0 14px;font-size:13px;color:var(--g2)"><strong>Une cabine téléphonique est incluse</strong> dans la formule Premium : le vidéobooth est installé à l'intérieur. La photo montre la cabine blanche ; la cabine rouge est identique.</p>
 <div class="prod-option-install" style="margin:18px 0;padding:16px;background:#f7f9fc;border-radius:12px;border:1px solid var(--g3)">
   <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1);margin-bottom:10px">Option</div>
   <label class="fo-card prod-option-check" style="margin-bottom:8px" onmouseout="updateOptionBorder(this)">
@@ -986,7 +986,7 @@ window.updateOptionBorder = function (el){
 var updateOptionBorder = window.updateOptionBorder;
 window.majPhoto = function(){
   var im=document.getElementById('prodMainImg'); if(!im) return;
-  var src = FORM==='Standard' ? 'videobooth-standard.webp' : (COUL==='blanche' ? 'cabine-telephonique-audio.webp' : 'videobooth-premium-rouge.webp');
+  var src = FORM==='Standard' ? 'videobooth-standard.webp' : (COUL==='blanche' ? 'cabine-telephonique-audio.webp' : 'cabine-telephonique-audio.webp');
   if(im.getAttribute('src')!==src){ im.style.opacity='0'; setTimeout(function(){im.src=src;im.style.opacity='1';},120); }
 };
 window.majOptions = function(){
@@ -1024,7 +1024,7 @@ window.addToCartProduct=function(){
     id: 'p46_' + Date.now(),
     name: 'Vidéobooth ' + (prem ? 'Premium (cabine ' + COUL + ')' : 'Standard') + suffixe,
     price: prixFormule() + opts.reduce(function(t,o){return t+o.prix;}, 0),
-    img: prem ? (COUL==='blanche' ? 'cabine-telephonique-audio.webp' : 'videobooth-premium-rouge.webp') : 'videobooth-standard.webp',
+    img: prem ? (COUL==='blanche' ? 'cabine-telephonique-audio.webp' : 'cabine-telephonique-audio.webp') : 'videobooth-standard.webp',
     /* ce que lit le back-office : la fiche, la formule du catalogue et les options */
     baseName: 'Vidéobooth',
     formule: prem ? 'Premium · cabine ' + COUL : 'Standard',
@@ -1099,7 +1099,7 @@ if(form)form.addEventListener('submit',function(e){
 })();
 
 /* — galerie produit — */
-const PG_IMGS=[{"s": "videobooth-standard.webp", "a": "Vidéobooth Standard"}, {"s": "videobooth-standard-2.webp", "a": "Vidéobooth Standard, vue complète avec fleurs"}, {"s": "videobooth-premium-rouge.webp", "a": "Vidéobooth Premium dans la cabine rouge"}, {"s": "cabine-telephonique-audio.webp", "a": "Vidéobooth Premium dans la cabine blanche"}];
+const PG_IMGS=[{"s": "videobooth-standard.webp", "a": "Vidéobooth Standard"}, {"s": "cabine-telephonique-audio.webp", "a": "Vidéobooth Premium dans la cabine téléphonique"}];
 let _pgI=0;
 function pgThumbs(){
   const wrap=document.getElementById('prodThumbs');
