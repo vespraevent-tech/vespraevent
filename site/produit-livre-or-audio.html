@@ -652,20 +652,16 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
 <div id="blocOptCab" class="prod-option-install" style="margin:0 0 18px;padding:16px;background:#f7f9fc;border-radius:12px;border:1px solid var(--g3)">
   <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1);margin-bottom:10px">Options</div>
   <label class="fo-card prod-option-check" style="margin-bottom:0" onmouseout="updateOptionBorder(this)">
-    <input type="checkbox" id="optionNeon" onchange="majOptions()">
-    <span><strong>Néon lumineux</strong><br><span class="fo-sub">Le texte est celui du néon «&nbsp;Laisser un message&nbsp;».</span></span>
-    <span class="fo-prix">+&nbsp;20&nbsp;€</span>
+    <input type="checkbox" id="optionCabLO" onchange="majOptions()">
+    <span><strong>Cabine téléphonique décor</strong><br><span class="fo-sub">Une cabine en décor, en plus du livre d'or audio.</span></span>
+    <span class="fo-prix" data-p="optionCabine">+&nbsp;60&nbsp;€</span>
   </label>
-</div>
-<div id="blocCabLO" style="margin:0 0 18px;padding:16px;background:#f7f9fc;border-radius:12px;border:1px solid var(--g3)">
-  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1);margin-bottom:4px">Ajouter une cabine ou un vidéobooth</div>
-  <p style="margin:0 0 10px;font-size:13px;color:var(--g2)">C'est <strong>en plus</strong> du livre d'or audio : une cabine ou un vidéobooth s'ajoute, ils ne le remplacent pas.</p>
-  <label class="fo-card on" style="margin-bottom:8px"><input type="radio" name="cabLO" value="" checked onchange="majOptions()"><span><strong>Livre d'or audio seul</strong></span></label>
-  <label class="fo-card" style="margin-bottom:8px"><input type="radio" name="cabLO" value="cabine" onchange="majOptions()"><span><strong>Cabine téléphonique seule</strong><br><span class="fo-sub">Une cabine en décor, en plus du livre d'or audio.</span></span><span class="fo-prix" data-p="optionCabine">+&nbsp;60&nbsp;€</span></label>
-  <label class="fo-card" style="margin-bottom:8px"><input type="radio" name="cabLO" value="vbstd" onchange="majOptions()"><span><strong>Vidéobooth Standard</strong><br><span class="fo-sub">Un vidéobooth (écran tactile, caméra) en plus du livre d'or audio. Sans cabine.</span></span><span class="fo-prix" data-p="optionVbStd">+&nbsp;190&nbsp;€</span></label>
-  <label class="fo-card" style="margin-bottom:0"><input type="radio" name="cabLO" value="vbprem" onchange="majOptions()"><span><strong>Vidéobooth Premium</strong><br><span class="fo-sub">Le vidéobooth installé dans une cabine téléphonique : une cabine en plus du livre d'or audio.</span></span><span class="fo-prix" data-p="optionVbPrem">+&nbsp;240&nbsp;€</span></label>
   <div id="blocCouleurLO" style="display:none;align-items:center;gap:8px;margin:12px 0 0;flex-wrap:wrap"><span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1)">Couleur</span><button type="button" class="col-chip on" data-c="blanche" onclick="setCouleurLO('blanche')">Blanche</button><button type="button" class="col-chip" data-c="rouge" onclick="setCouleurLO('rouge')">Rouge</button></div>
-  <p style="margin:12px 0 0;font-size:13px"><a href="produit-videobooth.html" style="text-decoration:underline">Voir le Vidéobooth</a> · <a href="produit-cabine-telephonique.html" style="text-decoration:underline">Voir la cabine téléphonique</a></p>
+</div>
+<div id="blocVoirVB" style="margin:0 0 18px;padding:16px;background:#f7f9fc;border-radius:12px;border:1px solid var(--g3)">
+  <p style="margin:0 0 10px;font-size:13px;color:var(--g2)">Pour un livre d'or vidéo (livre d'or audio inclus) :</p>
+  <a href="produit-videobooth.html" class="fo-card" style="display:flex;justify-content:space-between;margin-bottom:8px;text-decoration:none"><span><strong>Vidéobooth Standard</strong></span><span class="fo-prix">190&nbsp;€&nbsp;→</span></a>
+  <a href="produit-videobooth.html?f=premium" class="fo-card" style="display:flex;justify-content:space-between;margin-bottom:0;text-decoration:none"><span><strong>Vidéobooth Premium</strong></span><span class="fo-prix">240&nbsp;€&nbsp;→</span></a>
 </div>
 <div class="prod-ctas">
         <button class="btn-add-cart" id="addToCartBtn" data-product-id="p10" onclick="addToCartProduct()">Ajouter au devis</button>
@@ -1009,15 +1005,10 @@ window.setCouleurLO=function(c){
   document.querySelectorAll('#blocCouleurLO .col-chip').forEach(function(b){b.classList.toggle('on',b.dataset.c===c);});
   window.majOptions();
 };
-function cabChoix(){ var r=document.querySelector('input[name="cabLO"]:checked'); return r?r.value:''; }
+function cabChoix(){ var c=document.getElementById('optionCabLO'); return c&&c.checked?'cabine':''; }
 function optionsLO(){
-  var n = document.getElementById('optionNeon');
   var liste = [];
-  var c = cabChoix();
-  if (c==='cabine') liste.push({champ:'optionCabine', nom:'Cabine téléphonique seule ('+COUL_LO+')', prix:prixOpt('optionCabine',60)});
-  if (c==='vbstd')  liste.push({champ:'optionVbStd',   nom:'Vidéobooth Standard',                   prix:prixOpt('optionVbStd',190)});
-  if (c==='vbprem') liste.push({champ:'optionVbPrem',  nom:'Vidéobooth Premium (cabine '+COUL_LO+')', prix:prixOpt('optionVbPrem',240)});
-  if (n && n.checked) liste.push({champ:'optionNeon',   nom:'néon lumineux',       prix:prixOpt('optionNeon',20)});
+  if (cabChoix()==='cabine') liste.push({champ:'optionCabine', nom:'Cabine téléphonique décor ('+COUL_LO+')', prix:prixOpt('optionCabine',60)});
   return liste;
 }
 window.updateOptionBorder = function (el){
@@ -1028,10 +1019,9 @@ window.updateOptionBorder = function (el){
 var updateOptionBorder = window.updateOptionBorder;
 window.majOptions = function(){
   var cc=cabChoix(), bc=document.getElementById('blocCouleurLO');
-  if(bc) bc.style.display=(cc==='cabine'||cc==='vbprem')?'flex':'none';
-  document.querySelectorAll('input[name="cabLO"]').forEach(function(r){var l=r.closest('label'); if(l) l.classList.toggle('on',r.checked);});
-  document.querySelectorAll('#blocCabLO [data-p]').forEach(function(e){var v=prixOpt(e.getAttribute('data-p'),null); if(v!==null) e.innerHTML='+&nbsp;'+v+'&nbsp;€';});
-  ['optionNeon'].forEach(function(id){
+  if(bc) bc.style.display=(cc==='cabine')?'flex':'none';
+    document.querySelectorAll('#blocOptCab [data-p]').forEach(function(e){var v=prixOpt(e.getAttribute('data-p'),null); if(v!==null) e.innerHTML='+&nbsp;'+v+'&nbsp;€';});
+  ['optionCabLO'].forEach(function(id){
     var cb = document.getElementById(id);
     if (cb) updateOptionBorder(cb.closest('label'));
   });
