@@ -4225,7 +4225,7 @@ window.VESPRA_MEDIAS = {
         "a": "Vidéobooth Standard, vue complète avec fleurs"
       },
       {
-        "s": "cabine-telephonique-rouge.webp",
+        "s": "videobooth-premium-rouge.webp",
         "a": "Vidéobooth Premium dans la cabine rouge"
       },
       {
