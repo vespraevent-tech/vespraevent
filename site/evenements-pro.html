@@ -758,7 +758,7 @@ const PRODUCTS=[
   {id:'p47',cat:'Son, lumière et vidéo',cats:['Son, lumière et vidéo'],name:'Écran de projection',price:10,desc:"Écran de projection sur pied, à associer au vidéoprojecteur pour une image nette et lumineuse.",img:'ecran-projection.webp',page:'produit-ecran-projection.html',variants:[]},
   {id:'p15',cat:'Son, lumière et vidéo',cats:['Son, lumière et vidéo'],name:'Jeux de lumières',price:20,desc:"Pack de projecteurs LED et effets de lumières pour sublimer vos espaces.",img:'jeux-lumieres-situation.webp',page:'produit-jeux-lumieres.html',variants:[{label:'Ibiza 4 spots',price:20,page:'produit-jeux-lumieres.html',img:'spots-ibiza.webp'},{label:'Eurolite 9 spots',price:30,page:'produit-jeux-lumieres.html',img:'spots-eurolite.webp'}],options:[{id:'fumee',label:'Machine à fumée',price:10},{id:'mfog',label:'Machine à fumée puissante M-Fog 1500',price:20},{id:'fbrou',label:'Fumée lourde — effet brouillard',price:60},{id:'fnuage',label:'Fumée lourde — effet nuage',price:150}]},
   {id:'p43',cat:'Son, lumière et vidéo',cats:['Son, lumière et vidéo','Décoration'],name:'Spot LED sur batterie',price:20,desc:"Spot LED sur batterie Starville BEL4 (4 × 15 W) : 15 heures d'autonomie, changement de couleur, DMX, fonctionne même en plein jour. Fourni avec flycases et accessoires. 12 disponibles.",img:'spot-led-batterie-ambiance.webp',page:'produit-spot-led-batterie.html',qteMax:12},
-  {id:'p45',cat:'Mobilier, réception et barnums',cats:['Mobilier, réception et barnums','Restauration'],name:"Mange-debout housse blanche",price:13,desc:"Mange-debout avec housse blanche ou noire : plateau de 80 cm, 110 cm de hauteur. 10 disponibles.",img:'mange-debout.webp',page:'produit-mange-debout.html',qteMax:10,qteNom:'mange-debout'},
+  {id:'p45',cat:'Mobilier, réception et barnums',cats:['Mobilier, réception et barnums','Restauration'],name:"Mange-debout housse blanche",price:10,desc:"Mange-debout avec housse blanche ou noire : plateau de 80 cm, 110 cm de hauteur. 10 disponibles.",img:'mange-debout.webp',page:'produit-mange-debout.html',qteMax:10,qteNom:'mange-debout'},
   {id:'p1',cat:'Restauration',cats:['Restauration'],name:'Brasero',price:100,desc:"Brasero pour réchauffer vos convives lors de vos soirées en extérieur.",img:'brasero-situation.webp',page:'produit-brasero.html'},
   {id:'p19',cat:'Son, lumière et vidéo',cats:['Son, lumière et vidéo'],name:'Caisson de basse',price:40,desc:"Caisson de basse actif pour renforcer votre sonorisation. Compatible avec tous nos packs sono.",img:'caisson-basse.webp',page:'produit-caisson-basse.html'},
   {id:'p11',cat:'Restauration',cats:['Restauration','Animations'],name:'Machine à Pop Corn',price:20,desc:"Machine à pop-corn professionnelle sur chariot avec vitrine chauffante. Maïs en option.",img:'popcorn-situation.webp',page:'produit-popcorn.html',options:[{id:'mais',label:"Maïs à éclater",price:10}]},
@@ -892,7 +892,8 @@ function handleAdd(id){
   }
   vmSyncOptions();
   window._vmQteMain=1;
-  if(p.qteMax){ document.getElementById('vmBody').insertAdjacentHTML('beforeend', vmQteHTML()); vmQteMaj(); }
+  {var _qb0=document.getElementById('vmQteBox');if(_qb0)_qb0.remove();}
+  if(p.qteMax){ var _vz0=document.getElementById('vmVariants'); if(_vz0)_vz0.insertAdjacentHTML('afterend', vmQteHTML()); else document.getElementById('vmBody').insertAdjacentHTML('beforeend', vmQteHTML()); vmQteMaj(); }
   document.getElementById('vmOv').classList.add('open');
 }
 
@@ -911,14 +912,14 @@ function vmQteMaj(){
 }
 function vmQteStep(d){window._vmQteMain=(window._vmQteMain||1)+d;vmQteMaj()}
 function vmQteHTML(){
-  var b='width:38px;height:38px;border:2px solid var(--g3);border-radius:10px;background:#fff;font-size:20px;line-height:1;cursor:pointer';
-  return '<div style="margin:6px 0 18px;padding:14px 16px;background:#f7f9fc;border-radius:12px;border:1px solid var(--g3)">'
-   +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1);margin-bottom:10px">Quantité</div>'
-   +'<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">'
+  var b='width:30px;height:30px;border:1px solid var(--g3);border-radius:8px;background:#fff;font-size:17px;line-height:1;cursor:pointer;color:var(--black);padding:0';
+  return '<div id="vmQteBox" style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:4px auto 16px;padding:10px 0;border-top:1px solid var(--g4,#e8ebf0);border-bottom:1px solid var(--g4,#e8ebf0)">'
+   +'<div style="min-width:0"><span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1)">Quantité</span>'
+   +'<span id="vmQteNote" style="display:block;color:var(--g2);font-size:12px;margin-top:2px"></span></div>'
+   +'<span style="display:inline-flex;align-items:center;gap:10px;flex:none">'
    +'<button type="button" id="vmQteMoins" aria-label="Un de moins" onclick="vmQteStep(-1)" style="'+b+'">−</button>'
-   +'<b id="vmQteN" style="min-width:22px;text-align:center;font-size:18px">1</b>'
-   +'<button type="button" id="vmQtePlus" aria-label="Un de plus" onclick="vmQteStep(1)" style="'+b+'">+</button>'
-   +'<span id="vmQteNote" style="color:var(--g2);font-size:13px"></span></div></div>';
+   +'<b id="vmQteN" style="min-width:20px;text-align:center;font-size:15px">1</b>'
+   +'<button type="button" id="vmQtePlus" aria-label="Un de plus" onclick="vmQteStep(1)" style="'+b+'">+</button></span></div>';
 }
 /* ── produits personnalisables ─────────────────────────────────────
    Le client écrit lui-même le texte qui sera imprimé. On le lui

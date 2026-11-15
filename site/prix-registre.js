@@ -402,7 +402,7 @@ window.VESPRA_PRIX_REGISTRE = [
     "i": "mange-debout",
     "n": "Mange-debout housse blanche",
     "v": "",
-    "p": 13,
+    "p": 10,
     "pg": "produit-mange-debout.html",
     "vi": -1,
     "ci": "p45",
@@ -2298,11 +2298,11 @@ window.VESPRA_PRODUITS = [
       "Mobilier, réception et barnums",
       "Restauration"
     ],
-    "desc": "Mange-debout avec housse blanche ou noire : plateau de 80 cm, 110 cm de hauteur. 13 € l'unité, 10 disponibles.",
+    "desc": "Mange-debout avec housse blanche ou noire : plateau de 80 cm, 110 cm de hauteur. 10 € l'unité, 10 disponibles.",
     "img": "mange-debout.webp",
     "imgCat": "mange-debout.webp",
     "page": "produit-mange-debout.html",
-    "prix": 13,
+    "prix": 10,
     "prixId": "mange-debout",
     "variantes": [],
     "notices": [],
@@ -2807,6 +2807,7 @@ window.VESPRA_PRODUITS = [
     "cat": "Son, lumière et vidéo",
     "cats": [
       "Son, lumière et vidéo",
+      "Mobilier, réception et barnums",
       "Décoration"
     ],
     "desc": "Guirlande lumineuse à grosses ampoules, en 10, 20 ou 40 m : l'ambiance guinguette pour vos soirées.",

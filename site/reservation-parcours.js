@@ -33,7 +33,7 @@
                 img: 'photobooth-2-t.webp', hote: /photobooth/i, texte: 'Lot de déguisement' },
       guir:   { type: 'produit', nom: 'Guirlande lumineuse 10 m', sous: 'Ambiance guinguette', prix: 9,
                 img: 'guirlande-lumineuse-t.webp', id: 'guir', max: 10 },
-      mange:  { type: 'produit', nom: 'Mange-debout', sous: 'Housse blanche', prix: 13,
+      mange:  { type: 'produit', nom: 'Mange-debout', sous: 'Housse blanche', prix: 10,
                 img: 'mange-debout-t.webp', id: 'md', max: 10 }
     };
 
