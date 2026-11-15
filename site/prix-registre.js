@@ -1527,8 +1527,8 @@ window.VESPRA_PRODUITS = [
       "Mobilier, réception et barnums"
     ],
     "desc": "Chauffage à fioul 30 kW à combustion indirecte, installé par nos soins avec gaine d'air chaud, pour barnum et tente. 2 appareils disponibles. Tarif sur devis.",
-    "img": "",
-    "imgCat": "",
+    "img": "chauffage-fioul.webp",
+    "imgCat": "chauffage-fioul.webp",
     "page": "",
     "prix": 0,
     "prixId": "chauffage",
