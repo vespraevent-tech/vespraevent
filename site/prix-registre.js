@@ -1359,9 +1359,9 @@ window.VESPRA_PRODUITS = [
     "id": "p3",
     "ref": "p3",
     "nom": "Photobooth",
-    "cat": "Photobooth et accessoires",
+    "cat": "Photobooth et Vidéobooth",
     "cats": [
-      "Photobooth et accessoires",
+      "Photobooth et Vidéobooth",
       "Animations"
     ],
     "desc": "Photobooth professionnel pour immortaliser tous les moments forts de votre soirée.",
@@ -1523,7 +1523,8 @@ window.VESPRA_PRODUITS = [
     "nom": "Chauffage fioul pour barnum",
     "cat": "Chauffage et ventilation",
     "cats": [
-      "Chauffage et ventilation"
+      "Chauffage et ventilation",
+      "Mobilier, réception et barnums"
     ],
     "desc": "Chauffage à fioul 30 kW à combustion indirecte, installé par nos soins avec gaine d'air chaud, pour barnum et tente. 2 appareils disponibles. Tarif sur devis.",
     "img": "",
@@ -1691,9 +1692,9 @@ window.VESPRA_PRODUITS = [
     "id": "p24",
     "ref": "p24",
     "nom": "Panneau de bienvenue",
-    "cat": "Photobooth et accessoires",
+    "cat": "Photobooth et Vidéobooth",
     "cats": [
-      "Photobooth et accessoires",
+      "Photobooth et Vidéobooth",
       "Décoration"
     ],
     "desc": "Panneau en bois blanc à paroi vitrée ruisselante : l'eau coule en continu derrière vos prénoms et votre date. Jardinières fleuries comprises.",
@@ -2554,9 +2555,9 @@ window.VESPRA_PRODUITS = [
     "id": "p10",
     "ref": "p10",
     "nom": "Livre d'or audio",
-    "cat": "Photobooth et accessoires",
+    "cat": "Photobooth et Vidéobooth",
     "cats": [
-      "Photobooth et accessoires",
+      "Photobooth et Vidéobooth",
       "Animations"
     ],
     "desc": "Téléphone vintage qui enregistre les messages vocaux de vos invités, jusqu'à 100 heures. Se loue seul, ou avec une cabine ou un Vidéobooth en plus. Pour l'écran tactile et la vidéo, voir le Vidéobooth (dès 190 €).",
@@ -2602,9 +2603,9 @@ window.VESPRA_PRODUITS = [
     "id": "p31",
     "ref": "p31",
     "nom": "Cabine téléphonique",
-    "cat": "Photobooth et accessoires",
+    "cat": "Photobooth et Vidéobooth",
     "cats": [
-      "Photobooth et accessoires",
+      "Photobooth et Vidéobooth",
       "Animations",
       "Décoration"
     ],
@@ -2637,9 +2638,9 @@ window.VESPRA_PRODUITS = [
     "id": "p46",
     "ref": "p46",
     "nom": "Vidéobooth",
-    "cat": "Photobooth et accessoires",
+    "cat": "Photobooth et Vidéobooth",
     "cats": [
-      "Photobooth et accessoires",
+      "Photobooth et Vidéobooth",
       "Animations"
     ],
     "desc": "Livre d'or vidéo avec écran tactile. Standard 190 € (sans cabine) ou Premium 240 € dans une cabine téléphonique rouge ou blanche.",
@@ -2690,9 +2691,9 @@ window.VESPRA_PRODUITS = [
     "id": "p32",
     "ref": "p32",
     "nom": "Néon lumineux",
-    "cat": "Photobooth et accessoires",
+    "cat": "Photobooth et Vidéobooth",
     "cats": [
-      "Photobooth et accessoires",
+      "Photobooth et Vidéobooth",
       "Décoration"
     ],
     "desc": "Néon lumineux avec le message de votre choix, seul ou dans une cabine téléphonique.",
@@ -3258,7 +3259,8 @@ window.VESPRA_PRODUITS = [
     "nom": "Ventilateur événementiel",
     "cat": "Chauffage et ventilation",
     "cats": [
-      "Chauffage et ventilation"
+      "Chauffage et ventilation",
+      "Mobilier, réception et barnums"
     ],
     "desc": "Ventilateur industriel grand diamètre pour garder la fraîcheur sous vos barnums et tentes de réception.",
     "img": "ventilateur.webp",
@@ -3276,7 +3278,9 @@ window.VESPRA_PRODUITS = [
     "nom": "Chauffage pyramide à gaz",
     "cat": "Chauffage et ventilation",
     "cats": [
-      "Chauffage et ventilation"
+      "Chauffage et ventilation",
+      "Mobilier, réception et barnums",
+      "Restauration"
     ],
     "desc": "Chauffage pyramide à gaz pour l'extérieur : terrasse, cocktail, mariage. Avec ou sans bouteille de gaz.",
     "img": "chauffage-pyramide.webp",
@@ -3307,7 +3311,9 @@ window.VESPRA_PRODUITS = [
     "nom": "Chauffage parasol à gaz",
     "cat": "Chauffage et ventilation",
     "cats": [
-      "Chauffage et ventilation"
+      "Chauffage et ventilation",
+      "Mobilier, réception et barnums",
+      "Restauration"
     ],
     "desc": "Chauffage parasol à gaz pour l'extérieur : terrasse, cocktail, mariage. Avec ou sans bouteille de gaz.",
     "img": "chauffage-parasol.webp",
