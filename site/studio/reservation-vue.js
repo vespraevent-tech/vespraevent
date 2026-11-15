@@ -335,6 +335,29 @@
   }
   window.libelleMaterielResa = libelleMateriel;
 
+  /* Libellé le plus court possible pour les barres du planning : le produit seulement,
+     sans taille, formule ni option (« PB1 », « Barnum », « Brasero »…). Le détail est dans la fiche. */
+  function nomCourt(p) {
+    var n = String(p.name || p.short || '').replace(/\\'/g, "'").trim();
+    var pb = /^Photobooth\s*(\d)?\s*(?:$|[\u2014\u2013-])/i.exec(n) || /^PB\s*(\d)\b/i.exec(n);
+    if (pb) return 'PB' + (pb[1] || '');
+    n = n.split(/\s+[\u2014\u2013-]\s+/)[0].replace(/\(.*?\)/g, '')
+      .replace(/\b\d+\s*[x\u00d7]\s*\d+\s*m?\b/gi, '').replace(/\u00d8\s*\d+\s*m\b/gi, '')
+      .replace(/\b\d+\s*(?:personnes?|pers\.?|tirages?|photos?|canons?|spots?|machines?|m)\b/gi, '')
+      .replace(/\s{2,}/g, ' ').replace(/[\s.,;:\u00b7-]+$/, '').trim();
+    if (/^Sono(risation)?\b/i.test(n)) return 'Sono';
+    return n || 'Produit';
+  }
+  function libelleBarre(r) {
+    var ps = (r && r.products || []).filter(Boolean), ordre = [], nb = {};
+    ps.forEach(function (p, i) {
+      if (typeof window.estOptionProduit === 'function' ? window.estOptionProduit(p, i) : p.estOption === true) return;
+      var n = nomCourt(p);
+      if (!nb[n]) { nb[n] = 0; ordre.push(n); }
+      nb[n]++;
+    });
+    return ordre.map(function (n) { return nb[n] > 1 ? n + ' \u00d7' + nb[n] : n; });
+  }
   /* nombre de produits d'une réservation (les options — cadre photo, néon… — ne comptent pas) */
   function nbProduits(r) {
     return (r.products || []).filter(function (p, i) {
@@ -342,11 +365,11 @@
     }).length;
   }
   /* les premiers éléments du matériel, une puce devant chacun, puis « +N » */
-  function puces(texte) {
-    var l = String(texte || '').split(' \u00b7 ').filter(Boolean);
+  function puces(liste) {
+    var l = (liste || []).filter(Boolean);
     if (!l.length) return esc('Matériel à compléter');
-    return l.slice(0, 3).map(function (x) { return '<i class="pc"></i>' + esc(x); }).join(' ')
-      + (l.length > 3 ? ' <b style="font-weight:700">+' + (l.length - 3) + '</b>' : '');
+    return l.slice(0, 4).map(function (x) { return '<i class="pc"></i>' + esc(x); }).join(' ')
+      + (l.length > 4 ? ' <b style="font-weight:700">+' + (l.length - 4) + '</b>' : '');
   }
   function barreHtml(r, a, b, w0, w1, lane) {
     var cols = couleurs(r), c = cols[0] || '#EDE6D8', txt = window.getColorText(c);
@@ -361,7 +384,7 @@
     var col = jours(w0, a) + 1, span = jours(a, b) + 1;
     return '<div class="span-ev' + cl + cr + '" data-res-id="' + esc(r.id) + '" style="grid-column:' + col + '/span ' + span + ';grid-row:' + (lane + 2)
       + ';background:' + c + ';color:' + txt + '" title="' + esc(r.client) + '">'
-      + '<span class="t"><b>' + esc(r.client || '') + '</b><small>' + puces(prods.join(' · ')) + '</small></span>'
+      + '<span class="t"><b>' + esc(r.client || '') + '</b><small>' + puces(libelleBarre(r)) + '</small></span>'
       + '<span class="r">' + (nb ? '<em class="vn-nb" title="' + nb + ' produit' + (nb > 1 ? 's' : '') + '">' + nb + '</em>' : '')
       + '<i class="vn-led ' + (livre ? 'oui' : 'non') + '" title="' + (livre ? 'Livraison / montage' : 'Retrait sur place') + '"></i></span></div>';
   }
