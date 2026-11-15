@@ -733,6 +733,16 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
           <span><strong>Lot de déguisement</strong><br><span style="color:var(--g2);font-size:12px">Valise d'accessoires — 30+ props thématiques</span></span>
           <span style="font-weight:700;color:var(--navy);margin-left:auto;flex-shrink:0">+20 €</span>
         </label>
+        <label class="prod-option-check" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:2px solid var(--g3);border-radius:var(--r);cursor:pointer;margin-bottom:8px;font-size:14px;transition:border-color .18s" onmouseover="this.style.borderColor='var(--navy)'" onmouseout="updateOptionBorder(this)">
+          <input type="checkbox" id="optionCadre" style="width:18px;height:18px;margin-top:2px;accent-color:var(--navy);flex-shrink:0" onchange="updatePhotoboothOptions()">
+          <span><strong>Cadre photo personnalisable</strong><br><span style="color:var(--g2);font-size:12px">Personnalisation du cadre avec vos couleurs, prénoms et date</span></span>
+          <span style="font-weight:700;color:var(--navy);margin-left:auto;flex-shrink:0">+10 €</span>
+        </label>
+        <label class="prod-option-check" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:2px solid var(--g3);border-radius:var(--r);cursor:pointer;margin-bottom:8px;font-size:14px;transition:border-color .18s" onmouseover="this.style.borderColor='var(--navy)'" onmouseout="updateOptionBorder(this)">
+          <input type="checkbox" id="optionUsb" style="width:18px;height:18px;margin-top:2px;accent-color:var(--navy);flex-shrink:0" onchange="updatePhotoboothOptions()">
+          <span><strong>Clé USB</strong><br><span style="color:var(--g2);font-size:12px">Toutes les photos sur une clé USB, remise après l'événement</span></span>
+          <span style="font-weight:700;color:var(--navy);margin-left:auto;flex-shrink:0">+10 €</span>
+        </label>
       </div>
 
       <div class="prod-ctas">
@@ -1422,16 +1432,17 @@ function selectVariant(btn,label,price){
 }
 let _prixTouche=false;
 function majPrixHaut(){
-  const PX_C=(window.VESPRA_OPT?window.VESPRA_OPT('optionCadre',20):20), PX_D=(window.VESPRA_OPT?window.VESPRA_OPT('optionDeguisement',20):20);
-  const t=_selectedVariant.price+(_photoOpts.cadre?PX_C:0)+(_photoOpts.deguisement?PX_D:0);
+  const PX_C=(window.VESPRA_OPT?window.VESPRA_OPT('optionCadre',20):20), PX_D=(window.VESPRA_OPT?window.VESPRA_OPT('optionDeguisement',20):20), PX_U=(window.VESPRA_OPT?window.VESPRA_OPT('optionUsb',10):10);
+  const t=_selectedVariant.price+(_photoOpts.cadre?PX_C:0)+(_photoOpts.deguisement?PX_D:0)+(_photoOpts.usb?PX_U:0);
   document.getElementById('prodPriceDisplay').innerHTML=t+' € <small>/ événement</small>';
 }
 
 /* ── Options ── */
-let _photoOpts={cadre:false,deguisement:false};
+let _photoOpts={cadre:false,deguisement:false,usb:false};
 function updatePhotoboothOptions(){
   _photoOpts.cadre=document.getElementById('optionCadre').checked;
   _photoOpts.deguisement=document.getElementById('optionDeguisement').checked;
+  _photoOpts.usb=!!(document.getElementById('optionUsb')&&document.getElementById('optionUsb').checked);
   _prixTouche=true;majPrixHaut();
 }
 function updateOptionBorder(el){
@@ -1444,8 +1455,10 @@ function addToCartProduct(){
   const opts=[];
   const PX_CADRE=(window.VESPRA_OPT?window.VESPRA_OPT('optionCadre',20):20), PX_DEG=(window.VESPRA_OPT?window.VESPRA_OPT('optionDeguisement',20):20);
   if(_photoOpts.cadre) opts.push('Cadre personnalisé +'+PX_CADRE+'€');
+  const PX_USB=(window.VESPRA_OPT?window.VESPRA_OPT('optionUsb',10):10);
   if(_photoOpts.deguisement) opts.push('Déguisements +'+PX_DEG+'€');
-  const optPrice=(_photoOpts.cadre?PX_CADRE:0)+(_photoOpts.deguisement?PX_DEG:0);
+  if(_photoOpts.usb) opts.push('Clé USB +'+PX_USB+'€');
+  const optPrice=(_photoOpts.cadre?PX_CADRE:0)+(_photoOpts.deguisement?PX_DEG:0)+(_photoOpts.usb?PX_USB:0);
   const optSuffix=opts.length?' + '+opts.join(' + '):'';
   addToCart({
     id:'p3',

@@ -71,6 +71,15 @@ window.VESPRA_PRIX_REGISTRE = [
     "champ": "optionDeguisement"
   },
   {
+    "i": "photobooth-opt-3",
+    "n": "Photobooth",
+    "v": "Option : Clé USB",
+    "p": 10,
+    "pg": "produit-photobooth.html",
+    "opt": 1,
+    "champ": "optionUsb"
+  },
+  {
     "i": "canons-poudre-1",
     "n": "Feux d'artifice de jour",
     "v": "4 canons",
@@ -740,6 +749,15 @@ window.VESPRA_PRIX_REGISTRE = [
     "champ": "optionNeon"
   },
   {
+    "i": "videobooth-opt-2",
+    "n": "Vidéobooth",
+    "v": "Option : Clé USB",
+    "p": 10,
+    "pg": "produit-videobooth.html",
+    "opt": 1,
+    "champ": "optionUsb"
+  },
+  {
     "i": "neon-lumineux",
     "n": "Néon lumineux",
     "v": "",
@@ -1399,6 +1417,13 @@ window.VESPRA_PRODUITS = [
         "devis": false,
         "champ": "optionDeguisement",
         "id": "photobooth-opt-2"
+      },
+      {
+        "nom": "Clé USB",
+        "prix": 10,
+        "devis": false,
+        "champ": "optionUsb",
+        "id": "photobooth-opt-3"
       }
     ]
   },
@@ -2651,6 +2676,13 @@ window.VESPRA_PRODUITS = [
         "devis": false,
         "champ": "optionNeon",
         "id": "videobooth-opt-1"
+      },
+      {
+        "nom": "Clé USB",
+        "prix": 10,
+        "devis": false,
+        "champ": "optionUsb",
+        "id": "videobooth-opt-2"
       }
     ]
   },
@@ -4187,6 +4219,10 @@ window.VESPRA_MEDIAS = {
       {
         "s": "videobooth-standard.webp",
         "a": "Vidéobooth Standard"
+      },
+      {
+        "s": "videobooth-standard-2.webp",
+        "a": "Vidéobooth Standard, vue complète avec fleurs"
       },
       {
         "s": "cabine-telephonique-rouge.webp",
