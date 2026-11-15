@@ -481,3 +481,95 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', monter); else monter();
 })();
+
+/* Parcours en deux étapes : 1) la formule, 2) les options, puis « Ajouter au devis ».
+   S'applique à toutes les fenêtres produit (catalogue, accueil, pages ville) et à
+   toutes les fiches produit qui ont à la fois plusieurs formules et des options. */
+(function () {
+  var IMP = function (el, d) { if (el) el.style.setProperty('display', d, 'important'); };
+  var RAZ = function (el) { if (el) el.style.removeProperty('display'); };
+  var BTN_CSS = 'display:block;width:100%;';
+
+  /* ---------- fenêtre produit ---------- */
+  function popupReset(ov) {
+    ['vmSuivant', 'vmRetour'].forEach(function (id) { var e = document.getElementById(id); if (e) e.remove(); });
+    ov.querySelectorAll('[data-etape]').forEach(function (e) { RAZ(e); e.removeAttribute('data-etape'); });
+  }
+  function popupPreparer(ov) {
+    popupReset(ov);
+    var vv = document.getElementById('vmVariants'), sel = document.getElementById('vmSelect');
+    var op = document.getElementById('vmOptions'), ok = ov.querySelector('.vm > button[onclick*="confirmVM"]');
+    if (!vv || !op || !ok) return;
+    if (vv.hidden || !vv.children.length || (sel && sel.options.length < 2)) return;
+    if (op.style.display === 'none' || !op.querySelector('input')) return;
+    function cache(e) { e.setAttribute('data-etape', '1'); IMP(e, 'none'); }
+    cache(op); cache(ok);
+    var sv = document.createElement('button');
+    sv.type = 'button'; sv.id = 'vmSuivant'; sv.className = ok.className; sv.style.cssText = ok.style.cssText; sv.style.removeProperty('display'); ['background:var(--navy)','color:#fff','border-color:var(--navy)'].forEach(function (d) { var k = d.split(':'); sv.style.setProperty(k[0], k[1], 'important'); }); sv.textContent = 'Suivant';
+    ok.parentNode.insertBefore(sv, ok);
+    sv.onclick = function () {
+      sv.remove();
+      cache(vv);
+      op.removeAttribute('data-etape'); RAZ(op);
+      ok.removeAttribute('data-etape'); RAZ(ok);
+      var q = document.getElementById('vmQteV'); if (q && !q.hidden) { q.setAttribute('data-etape', '1'); IMP(q, 'none'); }
+      var r = document.createElement('button');
+      r.type = 'button'; r.id = 'vmRetour'; r.textContent = '← Modifier la formule';
+      r.style.cssText = 'background:none;border:0;color:var(--navy);font:600 13px Inter,system-ui,sans-serif;cursor:pointer;padding:0;margin:0 0 12px;text-decoration:underline';
+      r.onclick = function () { popupPreparer(ov); };
+      op.insertBefore(r, op.firstChild);
+    };
+  }
+  function surveillerPopup() {
+    var ov = document.getElementById('vmOv');
+    if (!ov || ov._etapes) return;
+    ov._etapes = true;
+    var etat = ov.classList.contains('open');
+    new MutationObserver(function () {
+      var o = ov.classList.contains('open');
+      if (o && !etat) popupPreparer(ov);
+      if (!o && etat) popupReset(ov);
+      etat = o;
+    }).observe(ov, { attributes: true, attributeFilter: ['class'] });
+    if (etat) popupPreparer(ov);
+  }
+  new MutationObserver(surveillerPopup).observe(document.documentElement, { childList: true, subtree: true });
+  surveillerPopup();
+
+  /* ---------- fiche produit ---------- */
+  function fiche() {
+    var ctas = document.querySelector('.prod-ctas');
+    if (!ctas || document.getElementById('btnSuivantOpt')) return;
+    var vb = [].filter.call(document.querySelectorAll('.prod-vbtn'), function (b) { return /selectVariant/.test(b.getAttribute('onclick') || ''); });
+    if (vb.length < 2) return;
+    var bloc = vb[0].parentElement;
+    var racine = ctas.parentElement;
+    /* remonter le bloc des formules jusqu'à un enfant direct de la colonne */
+    while (bloc && bloc.parentElement !== racine) bloc = bloc.parentElement;
+    if (!bloc) return;
+    var opts = [];
+    for (var e = bloc.nextElementSibling; e && e !== ctas && !e.contains(ctas); e = e.nextElementSibling) {
+      if (e.querySelector('input[type=checkbox],input[type=radio]')) opts.push(e);
+    }
+    if (!opts.length) return;
+    var sv = document.createElement('button');
+    sv.type = 'button'; sv.id = 'btnSuivantOpt'; sv.className = 'btn-add-cart'; sv.textContent = 'Suivant';
+    var retour = document.createElement('button');
+    retour.type = 'button'; retour.textContent = '← Modifier la formule';
+    retour.style.cssText = 'background:none;border:0;color:var(--navy);font:600 13px Inter,system-ui,sans-serif;cursor:pointer;padding:0;margin:0 0 12px;text-decoration:underline';
+    function etape1() {
+      RAZ(bloc); IMP(ctas, 'none'); sv.style.removeProperty('display');
+      opts.forEach(function (o) { IMP(o, 'none'); });
+      retour.remove();
+    }
+    function etape2() {
+      IMP(bloc, 'none'); RAZ(ctas); IMP(sv, 'none');
+      opts.forEach(function (o) { RAZ(o); });
+      opts[0].parentNode.insertBefore(retour, opts[0]);
+    }
+    sv.onclick = etape2; retour.onclick = etape1;
+    ctas.parentNode.insertBefore(sv, ctas);
+    etape1();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fiche); else fiche();
+})();
