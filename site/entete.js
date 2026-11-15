@@ -592,7 +592,7 @@
   var q = [];
   function total() { return q.reduce(function (t, n) { return t + (n || 0); }, 0); }
   function prixTotal(p) { return q.reduce(function (t, n, i) { return t + (n || 0) * (+p.variants[i].price || 0); }, 0); }
-  function reste(p) { return Math.max(0, (p.qteMax || 10) - dejaAuDevis(p.id)); }
+  function reste(p) { return Infinity; }
   function maj(p) {
     var box = document.getElementById('vmMulti'); if (!box) return;
     var t = total(), r = reste(p);
@@ -602,10 +602,8 @@
       l.querySelector('.mm').disabled = !n;
       l.querySelector('.mp').disabled = t >= r;
     });
-    var note = box.querySelector('.mc-note');
-    note.textContent = r <= 0 ? 'Les ' + (p.qteMax || 10) + ' ' + (p.qteNom || 'articles') + ' sont déjà dans votre devis.' : (p.qteMax || 10) + ' disponibles';
     var pr = document.getElementById('vmPrice');
-    if (pr) pr.textContent = t ? prixTotal(p) + ' € · ' + t + ' ' + (p.qteNom || 'articles') : p.price + ' €';
+    if (pr) pr.textContent = (t ? prixTotal(p) : p.price) + ' €';
   }
   function monter(ov) {
     var p = produit(); if (!p || !p.multi || !p.variants || !p.variants.length) return;
@@ -618,8 +616,8 @@
     var rows = p.variants.map(function (v, i) {
       var extra = /\+\s*\d+\s*€/.exec(v.label), nom = String(v.label).replace(/\s*\(\+\s*\d+\s*€\)/, '');
       return '<div data-i="' + i + '" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px' + (i ? ';border-top:1px solid var(--g4,#e8ebf0)' : '') + '">'
-        + '<span style="display:inline-flex;align-items:center;gap:10px;font-size:14px;color:var(--black)"><i style="width:16px;height:16px;border-radius:50%;background:' + nuance(v.label) + ';border:1.5px solid #b9c0cb;flex:none"></i>' + nom
-        + (extra ? '<small style="color:var(--g2);font-weight:600">' + extra[0].replace(/\s+/g, ' ') + '</small>' : '') + '</span>'
+        + '<span style="display:inline-flex;align-items:center;gap:10px;font-size:14px;color:var(--black)"><i style="width:16px;height:16px;border-radius:50%;background:' + nuance(v.label) + ';border:1.5px solid #b9c0cb;flex:none"></i>'
+        + '<span style="display:inline-flex;align-items:baseline;gap:8px">' + nom + (extra ? '<small style="color:var(--g2);font-weight:600;font-size:12px">' + extra[0].replace(/\s+/g, ' ') + '</small>' : '') + '</span></span>'
         + '<span style="display:inline-flex;align-items:center;gap:10px;flex:none"><button type="button" class="mm" aria-label="Un de moins" style="' + bs + '">−</button>'
         + '<output style="min-width:20px;text-align:center;font-size:15px;font-weight:700">0</output>'
         + '<button type="button" class="mp" aria-label="Un de plus" style="' + bs + '">+</button></span></div>';
@@ -627,12 +625,12 @@
     vz.insertAdjacentHTML('afterend', '<div id="vmMulti" style="margin:4px auto 16px">'
       + '<div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g2);margin-bottom:8px">' + (p.varTitre || 'Couleur') + '</div>'
       + '<div style="border:1px solid var(--g3);border-radius:8px;background:#fff;overflow:hidden">' + rows + '</div>'
-      + '<div class="mc-note" style="font-size:12px;color:var(--g2);margin-top:6px"></div></div>');
+      + '<div class="mc-note" style="font-size:12px;color:var(--g2);margin-top:6px">' + (p.dispo || '') + '</div></div>');
     var box = document.getElementById('vmMulti');
     box.addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b) return;
       var i = +b.closest('[data-i]').getAttribute('data-i');
-      if (b.classList.contains('mp') && total() < reste(p)) q[i]++;
+      if (b.classList.contains('mp')) q[i]++;
       if (b.classList.contains('mm') && q[i] > 0) q[i]--;
       maj(p);
     });
