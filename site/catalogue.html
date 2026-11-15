@@ -7,7 +7,7 @@
    la réponse arrive ainsi pendant que le reste se charge, au lieu d'attendre. */
 try{window.__VESPRA_SITE=fetch('/api/site',{headers:{accept:'application/json'},cache:'no-store'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}catch(e){}</script>
 <title>Catalogue Location Événementielle Vitré — Tarifs | Vespra Event</title>
-<link rel="stylesheet" href="/boutons-petits.css?v=2">
+<link rel="preload" as="style" href="/renvois.css?v=627"><link rel="preload" as="style" href="/mobile.css?v=627"><link rel="preload" as="style" href="/fluide.css?v=627"><link rel="preload" as="style" href="/boutons.css?v=688"><link rel="preload" as="style" href="/coherence.css?v=31"><style id="anti-saut">body{opacity:0}</style><script>setTimeout(function(){var e=document.getElementById("anti-saut");e&&e.remove()},2500)</script><noscript><style>body{opacity:1!important}</style></noscript><link rel="stylesheet" href="/boutons-petits.css?v=2">
 <link rel="stylesheet" href="/bandeau.css">
 <script>(function(){try{var q=new URLSearchParams(location.search),h=document.documentElement;if(!q.get('evt'))h.classList.add('cc-wait');if(!(q.get('cat')||q.get('q')||q.get('evt')))h.classList.add('cc-pre');setTimeout(function(){h.classList.remove('cc-wait','cc-pre')},1500)}catch(e){}})()</script>
 <style>
@@ -1212,14 +1212,10 @@ if(urlCat){
     if(document.body.classList.contains('cat-choose'))return;
     const c=document.querySelector('#prodGrid .prod-card')||document.getElementById('prodGrid');if(!c)return;
     const n=document.querySelector('.nav');const h=n?Math.round(n.getBoundingClientRect().height):64;
-    window.scrollTo({top:Math.max(0,c.getBoundingClientRect().top+scrollY-h-14),behavior:'auto'});
+    window.scrollTo({top:Math.max(0,c.getBoundingClientRect().top+scrollY-h-14),behavior:'instant'});
   }
   try{history.scrollRestoration='manual';}catch(e){}
-  window.addEventListener('pageshow',function(ev){if(ev.persisted){allerPremierProduit();setTimeout(allerPremierProduit,80);}});
-  /* le contenu se met en place pendant la première seconde : on recale tant que le visiteur n'a pas touché à la page */
-  let _touche=false;['wheel','touchstart','keydown','mousedown'].forEach(function(t){window.addEventListener(t,function(){_touche=true;},{passive:true,once:true});});
-  function recaleArrivee(){[0,120,350,700,1200,2000].forEach(function(d){setTimeout(function(){if(!_touche)allerPremierProduit();},d);});}
-  window.addEventListener('load',function(){if(location.search.indexOf('cat=')>=0)recaleArrivee();});
+  /* arrivée sur la page (lien depuis une autre page, retour arrière) : aucun défilement forcé, on reste où le navigateur nous met */
 
   let selectedIndex=-1,armedIndex=-1;
   function choisir(v,mode){
@@ -1231,7 +1227,7 @@ if(urlCat){
     /* entrée dans une catégorie depuis le choix : nouvelle étape d'historique, pour que « retour » revienne au choix des catégories */
     try{const u='catalogue.html?cat='+(v==='Tous'?'tout':encodeURIComponent(v));if(mode==='push')history.pushState(null,'',u);else if(mode!=='none')history.replaceState(null,'',u);}catch(e){}
     /* entrer dans une catégorie : on arrive en haut de la page (l'aperçu au premier clic, lui, ne fait jamais défiler) */
-    allerPremierProduit();setTimeout(allerPremierProduit,60);setTimeout(allerPremierProduit,260);
+    if(mode==='push')allerPremierProduit();
   }
   ul.addEventListener('click',function(e){
     const b=e.target.closest('button[data-i]');if(!b)return;
@@ -1251,7 +1247,7 @@ if(urlCat){
   });
   const q=new URLSearchParams(location.search);
   if(!(q.get('cat')||q.get('q')||q.get('evt'))){document.body.classList.add('cat-choose');selectedIndex=0;armedIndex=0;show(0);updateCrumb('');}
-  else{const v=document.getElementById('filterSelect').value;if(v!=='Tous')choisir(v);else{updateCrumb('');recaleArrivee();}}
+  else{const v=document.getElementById('filterSelect').value;if(v!=='Tous')choisir(v);else{updateCrumb('');}}
   document.documentElement.classList.remove('cc-wait','cc-pre');
   try{
     const sig=x=>JSON.stringify([x&&x.categoriesCatalogue||[],x&&x.categoriesSupprimees||[]]);
@@ -2263,7 +2259,7 @@ function goReserver(){saveCart();window.location.href='reservation.html';}
 
 <script src="/selects-jolis.js" defer></script>
 <script>window.__vespraSansCentrage=1;</script><script src="/centrer.js?v=5" defer></script>
-<link rel="stylesheet" href="/coherence.css?v=31">
+<link rel="stylesheet" href="/coherence.css?v=31"><script>(function(){var e=document.getElementById("anti-saut");e&&e.remove()})()</script>
 <script src="/coherence.js?v=7" defer></script>
 <script src="/panier-coche.js" defer></script>
 <script src="/panier-sync.js" defer></script>
