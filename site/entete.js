@@ -507,7 +507,7 @@
     function cache(e) { e.setAttribute('data-etape', '1'); IMP(e, 'none'); }
     cache(op); cache(ok);
     var sv = document.createElement('button');
-    sv.type = 'button'; sv.id = 'vmSuivant'; sv.className = ok.className; sv.style.cssText = ok.style.cssText; sv.style.removeProperty('display'); ['background:var(--navy)','color:#fff','border-color:var(--navy)'].forEach(function (d) { var k = d.split(':'); sv.style.setProperty(k[0], k[1], 'important'); }); sv.textContent = 'Suivant';
+    sv.type = 'button'; sv.id = 'vmSuivant'; sv.className = ok.className; sv.style.cssText = ok.style.cssText; sv.style.removeProperty('display'); ['background:var(--navy)','color:#fff','border-color:var(--navy)','border-radius:8px','width:auto','padding:15px 44px'].forEach(function (d) { var k = d.split(':'); sv.style.setProperty(k[0], k[1], 'important'); }); sv.textContent = 'Suivant';
     ok.parentNode.insertBefore(sv, ok);
     sv.onclick = function () {
       sv.remove();
@@ -520,11 +520,11 @@
       var r = document.createElement('button');
       r.type = 'button'; r.id = 'vmRetour'; r.setAttribute('aria-label', 'Revenir au choix de la formule');
       r.innerHTML = '<span aria-hidden="true">←</span> Retour';
-      r.style.cssText = 'flex:0 0 auto;padding:0 24px;border:2px solid var(--g3);border-radius:999px;background:#fff;color:var(--navy);font:600 13px Inter,system-ui,sans-serif;letter-spacing:.04em;cursor:pointer';
+      r.style.cssText = 'flex:0 0 auto;padding:0 24px;border:2px solid var(--g3);border-radius:8px;background:#fff;color:var(--navy);font:600 13px Inter,system-ui,sans-serif;letter-spacing:.04em;cursor:pointer';
       r.onclick = function () { popupPreparer(ov); };
       ok.parentNode.insertBefore(ac, ok);
       ac.appendChild(r); ac.appendChild(ok);
-      [['flex', '0 1 auto'], ['width', 'auto'], ['min-width', '0'], ['max-width', 'none'], ['margin', '0'], ['padding', '15px 34px'], ['border-radius', '999px']].forEach(function (d) { ok.style.setProperty(d[0], d[1], 'important'); });
+      [['flex', '0 1 auto'], ['width', 'auto'], ['min-width', '0'], ['max-width', 'none'], ['margin', '0'], ['padding', '15px 34px'], ['border-radius', '8px']].forEach(function (d) { ok.style.setProperty(d[0], d[1], 'important'); });
     };
   }
   function surveillerPopup() {
@@ -560,7 +560,7 @@
     }
     if (!opts.length) return;
     var sv = document.createElement('button');
-    sv.type = 'button'; sv.id = 'btnSuivantOpt'; sv.className = 'btn-add-cart'; sv.textContent = 'Suivant';
+    sv.type = 'button'; sv.id = 'btnSuivantOpt'; sv.className = 'btn-add-cart'; sv.textContent = 'Suivant'; sv.style.setProperty('border-radius', '8px', 'important');
     var retour = document.createElement('button');
     retour.type = 'button'; retour.innerHTML = '<span aria-hidden="true">←</span> Retour'; retour.setAttribute('aria-label', 'Revenir au choix de la formule');
     retour.style.cssText = 'flex:0 0 auto;padding:0 22px;border:2px solid var(--g3);border-radius:var(--r);background:#fff;color:var(--navy);font:600 13px Inter,system-ui,sans-serif;letter-spacing:.04em;cursor:pointer';
@@ -573,7 +573,7 @@
       IMP(bloc, 'none'); RAZ(ctas); IMP(sv, 'none');
       opts.forEach(function (o) { RAZ(o); });
       ctas.style.setProperty('flex-direction', 'row'); ctas.insertBefore(retour, ctas.firstChild);
-      [].forEach.call(ctas.children, function (c) { if (c !== retour) c.style.flex = '1'; });
+      [].forEach.call(ctas.children, function (c) { if (c !== retour) { c.style.flex = '1'; c.style.setProperty('border-radius', '8px', 'important'); } });
     }
     sv.onclick = etape2; retour.onclick = etape1;
     ctas.parentNode.insertBefore(sv, ctas);
