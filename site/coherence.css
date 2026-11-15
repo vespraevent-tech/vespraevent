@@ -387,3 +387,6 @@ html body .reviews-wrap{margin-left:calc(50% - 50vw);margin-right:calc(50% - 50v
 
 /* Fenêtre produit : le bouton « Ajouter au devis » reste compact et centré (pas sur toute la largeur) */
 html body .vm>.btn-p,html body .vm>.btn-submit,html body .vm>button[onclick*="confirmVM"]{width:auto!important;min-width:190px!important;max-width:calc(100% - 44px)!important;padding:13px 32px!important;border-radius:8px!important;margin-left:auto!important;margin-right:auto!important;display:flex!important;justify-content:center}
+
+/* « Meilleures locations » : plus de pastilles sous le carrousel (trop nombreuses) */
+html body .bests-dots{display:none!important}

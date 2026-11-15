@@ -90,7 +90,7 @@ a{text-decoration:none;color:inherit}img{display:block;max-width:100%}button{cur
 .prod-price-main small{font-size:20px;color:var(--g2);font-family:'Inter',sans-serif;font-weight:400;letter-spacing:normal}
 .prod-short-desc{font-size:14px;color:var(--g1);line-height:1.7;margin:16px 0 20px}
 .prod-variants{margin-bottom:24px}
-.prod-variants-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1);margin-bottom:10px}
+.prod-vbtn-txt{display:flex;flex-direction:column;gap:2px;min-width:0;text-align:left}.prod-vbtn-sub{font-size:12px;font-weight:400;color:var(--g2)}.prod-variants-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1);margin-bottom:10px}
 .prod-vbtn{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border:2px solid var(--g3);border-radius:var(--r);background:var(--white);cursor:pointer;transition:border-color .18s,background .18s;text-align:left;font-family:'Inter',sans-serif;margin-bottom:8px}
 .prod-vbtn:last-child{margin-bottom:0}
 .prod-vbtn:hover,.prod-vbtn.active{border-color:var(--navy);background:rgba(43,74,107,.04)}
@@ -714,6 +714,25 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
       <div class="prod-from-label">Prix</div>
       <div class="prod-price-main" id="prodPriceDisplay">150 € <small>/ événement</small></div><div class="prod-duree" style="font-size:12px;color:var(--g2);margin-top:4px">Retrait possible le vendredi, retour le lundi.</div>
 
+<div class="prod-variants" style="margin-top:18px">
+  <div class="prod-variants-label">Choisissez votre château</div>
+  <button class="prod-vbtn" type="button" onclick="location.href='produit-mini-bounce-crocodile.html'" aria-label="Voir Mini bounce crocodile">
+    <span class="prod-vbtn-txt"><span class="prod-vbtn-name">Mini bounce crocodile</span><span class="prod-vbtn-sub">3,4 × 3 m · jusqu'à 4 personnes</span></span>
+    <span class="prod-vbtn-price">80 €</span>
+  </button>
+  <button class="prod-vbtn" type="button" onclick="location.href='produit-bouncedome-amazone-safari.html'" aria-label="Voir Bouncedome Amazone Safari">
+    <span class="prod-vbtn-txt"><span class="prod-vbtn-name">Bouncedome Amazone Safari</span><span class="prod-vbtn-sub">4,2 × 4,8 m · jusqu'à 8 personnes</span></span>
+    <span class="prod-vbtn-price">100 €</span>
+  </button>
+  <button class="prod-vbtn active" onclick="selectVariant(this,"Multiplay château gonflable Dinoworld",150)">
+    <span class="prod-vbtn-txt"><span class="prod-vbtn-name">Multiplay Dinoworld</span><span class="prod-vbtn-sub">5,5 × 5 m · jusqu'à 12 personnes</span></span>
+    <span class="prod-vbtn-price">150 €</span>
+  </button>
+  <button class="prod-vbtn" type="button" onclick="location.href='produit-chateau-summer-party.html'" aria-label="Voir Multiplay Summer Party">
+    <span class="prod-vbtn-txt"><span class="prod-vbtn-name">Multiplay Summer Party</span><span class="prod-vbtn-sub">5,5 × 5 m · jusqu'à 12 personnes</span></span>
+    <span class="prod-vbtn-price">150 €</span>
+  </button>
+</div>
 <div class="prod-ctas">
         <button class="btn-add-cart" id="addToCartBtn" data-product-id="p56" onclick="addToCartProduct()">Ajouter au devis</button><p class="vs-guide-lien" style="margin:14px 0 0;font-size:13px;color:var(--g2)">Le guide : <a href="article-chateau-gonflable.html" style="text-decoration:underline;text-underline-offset:3px">Location de château gonflable à Vitré</a></p>
       </div>
