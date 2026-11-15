@@ -4955,8 +4955,10 @@ function prixLigne(l){
 const PRIX_ANCIENS = { 'photobooth': { '300': 235 } };
 function prixAncienVariante(nomProduit, label){
   const n = String(nomProduit||'').toLowerCase();
-  if(n.indexOf('photobooth') === -1) return null;
+  const nSans = n.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if(nSans.indexOf('photobooth') === -1 && !/video ?booth/.test(nSans)) return null;
   const m = /(\d+)/.exec(String(label||''));
+  if(/video ?booth/.test(n.normalize('NFD').replace(/[\u0300-\u036f]/g,'')) && /premium/i.test(String(label))) return 149;   /* ancienne cabine vidéo, 149 € */
   return m && PRIX_ANCIENS.photobooth[m[1]] != null && /tirage|photo/i.test(String(label)) ? PRIX_ANCIENS.photobooth[m[1]] : null;
 }
 function prixUnitaire(l, ancien){
@@ -5695,15 +5697,31 @@ function materielListe(d){
         brutOptions = bouts.join(', ');
       }
       let opts = optionsListe(brutOptions);
+      /* Vidéobooth : « Vidéobooth Standard », « Vidéobooth Premium (cabine rouge) » → le produit et sa formule */
+      try{
+        const mvb = /^vid[ée]o\s?booth\s*(standard|premium)?\s*(?:\(\s*(?:cabine\s+)?(blanche|rouge)\s*\))?\s*(.*)$/i.exec(String(nom).trim());
+        if(mvb){
+          nom = 'Vidéobooth';
+          const prem = /^premium$/i.test(mvb[1] || '') || (!mvb[1] && !!mvb[2]);
+          if(!formule) formule = prem ? 'Premium · cabine ' + (mvb[2] ? mvb[2].toLowerCase() : 'blanche') : 'Standard';
+          if(mvb[3] && !opts.length) opts = optionsListe(mvb[3]);
+        }
+      }catch(e){}
       /* anciennes demandes de la cabine audio / vidéo : le site écrivait « Cabine téléphonique vidéo (rouge) ».
          Le nom ressemblait à la cabine seule (60 €) : on le rattache à la bonne fiche, avec sa formule. */
       try{
         const mcab = /^cabine t[ée]l[ée]phonique\s+(audio|vid[ée]o)\b(?!\s*\/)\s*(?:\(\s*(blanche|rouge)\s*\))?\s*(.*)$/i.exec(String(nom).trim());
         if(mcab){
-          nom = 'Cabine téléphonique vidéo' + (mcab[3] ? ' ' + mcab[3] : '');
-          /* depuis la fin de la formule audio : « vidéo » = la cabine à 149 €, sans option vidéo en plus */
-          if(!formule) formule = /^vid/i.test(mcab[1]) ? 'Vidéo' : 'Audio';
-          if(mcab[2] && !opts.some(o => /blanche|rouge/i.test(String(o)))) opts.push('Cabine ' + mcab[2].toLowerCase());
+          if(/^vid/i.test(mcab[1])){
+            /* l'ancienne cabine vidéo (149 €) est devenue le Vidéobooth Premium : même cabine, renommée.
+               Son ancien tarif reste celui des demandes déjà reçues (voir prixAncienVariante). */
+            nom = 'Vidéobooth';
+            formule = 'Premium · cabine ' + (mcab[2] ? mcab[2].toLowerCase() : 'blanche');
+          } else {
+            nom = 'Cabine téléphonique vidéo' + (mcab[3] ? ' ' + mcab[3] : '');
+            if(!formule) formule = 'Audio';
+            if(mcab[2] && !opts.some(o => /blanche|rouge/i.test(String(o)))) opts.push('Cabine ' + mcab[2].toLowerCase());
+          }
         }
       }catch(e){}
       /* ancien libellé tout-en-un : « Photobooth — Formule illimitée + Cadre photo
@@ -8912,7 +8930,7 @@ const PAGES_SITE = [
   ['produit-panneau-direction.html','Fiche — Panneau de direction'], ['produit-fontaine-cocktail.html','Fiche — Fontaine à cocktail'], ['produit-citroen-traction.html','Fiche — Citroën Traction'], ['produit-ford-mustang.html','Fiche — Ford Mustang'],
   ['produit-cornhole.html','Fiche — Cornhole'], ['produit-palet-breton.html','Fiche — Palet breton'], ['produit-puissance-4-geant.html','Fiche — Puissance 4 géant'], ['produit-passe-trappe.html','Fiche — Passe-trappe'],
   ['produit-cabine-telephonique.html','Fiche — Cabine téléphonique (60 €)'],
-  ['produit-cabine-telephonique-audio-video.html','Fiche — Cabine téléphonique vidéo'],
+  ['produit-videobooth.html','Fiche — Vidéobooth'],
   ['article-cabine-telephonique-video.html','Article — Livre d\'or vidéo'],
   ['produit-neon-lumineux.html','Fiche — Néon lumineux'],
   ['produit-guirlande-lumineuse.html','Fiche — Guirlande lumineuse'],

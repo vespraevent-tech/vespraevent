@@ -656,6 +656,15 @@ window.VESPRA_PRIX_REGISTRE = [
     "champ": "optionNeon"
   },
   {
+    "i": "cabine-telephonique-opt-2",
+    "n": "Cabine téléphonique",
+    "v": "Option : Vidéobooth intégré dans la cabine",
+    "p": 180,
+    "pg": "produit-cabine-telephonique.html",
+    "opt": 1,
+    "champ": "optionVideobooth"
+  },
+  {
     "i": "livre-d-or-audio-opt-2",
     "n": "Livre d'or audio",
     "v": "Option : Néon lumineux",
@@ -665,21 +674,68 @@ window.VESPRA_PRIX_REGISTRE = [
     "champ": "optionNeon"
   },
   {
-    "i": "cabine-telephonique-audio-video",
-    "n": "Cabine téléphonique vidéo",
-    "v": "Vidéo",
-    "p": 149,
-    "pg": "produit-cabine-telephonique-audio-video.html",
-    "vi": -1,
-    "ci": "p46",
-    "cvi": -1
+    "i": "livre-d-or-audio-opt-3",
+    "n": "Livre d'or audio",
+    "v": "Option : Cabine téléphonique seule",
+    "p": 60,
+    "pg": "produit-livre-or-audio.html",
+    "opt": 1,
+    "champ": "optionCabine"
   },
   {
-    "i": "cabine-telephonique-audio-video-opt-1",
-    "n": "Cabine téléphonique vidéo",
+    "i": "livre-d-or-audio-opt-4",
+    "n": "Livre d'or audio",
+    "v": "Option : Vidéobooth Standard",
+    "p": 190,
+    "pg": "produit-livre-or-audio.html",
+    "opt": 1,
+    "champ": "optionVbStd"
+  },
+  {
+    "i": "livre-d-or-audio-opt-5",
+    "n": "Livre d'or audio",
+    "v": "Option : Vidéobooth Premium",
+    "p": 240,
+    "pg": "produit-livre-or-audio.html",
+    "opt": 1,
+    "champ": "optionVbPrem"
+  },
+  {
+    "i": "videobooth-1",
+    "n": "Vidéobooth",
+    "v": "Standard",
+    "p": 190,
+    "pg": "produit-videobooth.html",
+    "vi": 0,
+    "ci": "p46",
+    "cvi": 0
+  },
+  {
+    "i": "videobooth-2",
+    "n": "Vidéobooth",
+    "v": "Premium · cabine blanche",
+    "p": 240,
+    "pg": "produit-videobooth.html",
+    "vi": 1,
+    "ci": "p46",
+    "cvi": 1
+  },
+  {
+    "i": "videobooth-3",
+    "n": "Vidéobooth",
+    "v": "Premium · cabine rouge",
+    "p": 240,
+    "pg": "produit-videobooth.html",
+    "vi": 1,
+    "ci": "p46",
+    "cvi": 2
+  },
+  {
+    "i": "videobooth-opt-1",
+    "n": "Vidéobooth",
     "v": "Option : Néon lumineux",
     "p": 20,
-    "pg": "produit-cabine-telephonique-audio-video.html",
+    "pg": "produit-videobooth.html",
     "opt": 1,
     "champ": "optionNeon"
   },
@@ -2478,7 +2534,7 @@ window.VESPRA_PRODUITS = [
       "Photobooth et accessoires",
       "Animations"
     ],
-    "desc": "Téléphone vintage qui enregistre les messages vocaux de vos invités, jusqu'à 100 heures. Se loue seul. Pour l'écran tactile et la vidéo, voir la cabine vidéo (149 €).",
+    "desc": "Téléphone vintage qui enregistre les messages vocaux de vos invités, jusqu'à 100 heures. Se loue seul, ou avec une cabine ou un Vidéobooth en plus. Pour l'écran tactile et la vidéo, voir le Vidéobooth (dès 190 €).",
     "img": "telephone-vintage-2.webp",
     "imgCat": "telephone-vintage-2.webp",
     "page": "produit-livre-or-audio.html",
@@ -2487,6 +2543,27 @@ window.VESPRA_PRODUITS = [
     "variantes": [],
     "notices": [],
     "options": [
+      {
+        "nom": "Cabine téléphonique seule",
+        "prix": 60,
+        "devis": false,
+        "champ": "optionCabine",
+        "id": "livre-d-or-audio-opt-3"
+      },
+      {
+        "nom": "Vidéobooth Standard",
+        "prix": 190,
+        "devis": false,
+        "champ": "optionVbStd",
+        "id": "livre-d-or-audio-opt-4"
+      },
+      {
+        "nom": "Vidéobooth Premium",
+        "prix": 240,
+        "devis": false,
+        "champ": "optionVbPrem",
+        "id": "livre-d-or-audio-opt-5"
+      },
       {
         "nom": "Néon lumineux",
         "prix": 20,
@@ -2506,7 +2583,7 @@ window.VESPRA_PRODUITS = [
       "Animations",
       "Décoration"
     ],
-    "desc": "Cabine à portes vitrées, blanche ou rouge, en décor. Pour les messages vidéo et l'écran tactile : la cabine vidéo, 149 €.",
+    "desc": "Cabine à portes vitrées, blanche ou rouge, en décor. Pour les messages vidéo et l'écran tactile : le Vidéobooth premium, 240 € avec la cabine.",
     "img": "cabine-decor-blanche.webp",
     "imgCat": "cabine-decor-blanche.webp",
     "page": "produit-cabine-telephonique.html",
@@ -2515,6 +2592,13 @@ window.VESPRA_PRODUITS = [
     "variantes": [],
     "notices": [],
     "options": [
+      {
+        "nom": "Vidéobooth intégré dans la cabine",
+        "prix": 180,
+        "devis": false,
+        "champ": "optionVideobooth",
+        "id": "cabine-telephonique-opt-2"
+      },
       {
         "nom": "Néon lumineux",
         "prix": 20,
@@ -2527,19 +2611,38 @@ window.VESPRA_PRODUITS = [
   {
     "id": "p46",
     "ref": "p46",
-    "nom": "Cabine téléphonique vidéo",
+    "nom": "Vidéobooth",
     "cat": "Photobooth et accessoires",
     "cats": [
       "Photobooth et accessoires",
       "Animations"
     ],
-    "desc": "Cabine blanche ou rouge avec livre d'or vidéo et écran tactile : une caméra et un micro captent le message de chaque invité. 149 € l'événement.",
-    "img": "cabine-telephonique-rouge.webp",
-    "imgCat": "cabine-telephonique-rouge.webp",
-    "page": "produit-cabine-telephonique-audio-video.html",
-    "prix": 149,
-    "prixId": "cabine-telephonique-audio-video",
-    "variantes": [],
+    "desc": "Livre d'or vidéo avec écran tactile. Standard 190 € (sans cabine) ou Premium 240 € dans une cabine téléphonique rouge ou blanche.",
+    "img": "videobooth-standard.webp",
+    "imgCat": "videobooth-standard.webp",
+    "page": "produit-videobooth.html",
+    "prix": 190,
+    "prixId": null,
+    "variantes": [
+      {
+        "prixId": "videobooth-1",
+        "label": "Standard",
+        "labelCat": "Standard",
+        "prix": 190
+      },
+      {
+        "prixId": "videobooth-2",
+        "label": "Premium · cabine blanche",
+        "labelCat": "Premium · cabine blanche",
+        "prix": 240
+      },
+      {
+        "prixId": "videobooth-3",
+        "label": "Premium · cabine rouge",
+        "labelCat": "Premium · cabine rouge",
+        "prix": 240
+      }
+    ],
     "notices": [],
     "options": [
       {
@@ -2547,7 +2650,7 @@ window.VESPRA_PRODUITS = [
         "prix": 20,
         "devis": false,
         "champ": "optionNeon",
-        "id": "cabine-telephonique-audio-video-opt-1"
+        "id": "videobooth-opt-1"
       }
     ]
   },
@@ -4079,28 +4182,26 @@ window.VESPRA_MEDIAS = {
     "options": {},
     "subs": []
   },
-  "produit-cabine-telephonique-audio-video.html": {
+  "produit-videobooth.html": {
     "photos": [
       {
+        "s": "videobooth-standard.webp",
+        "a": "Vidéobooth Standard"
+      },
+      {
         "s": "cabine-telephonique-rouge.webp",
-        "a": "Cabine téléphonique rouge, avec le téléphone"
+        "a": "Vidéobooth Premium dans la cabine rouge"
       },
       {
         "s": "cabine-telephonique-audio.webp",
-        "a": "Cabine téléphonique blanche, portes vitrées"
-      },
-      {
-        "s": "telephone-vintage-2.webp",
-        "a": "Téléphone vintage du livre d'or audio, installé dans la cabine"
+        "a": "Vidéobooth Premium dans la cabine blanche"
       }
     ],
-    "options": {
-      "optionNeon": {
-        "nom": "Néon lumineux",
-        "desc": "Il éclaire l'intérieur et signale le coin messages. Le texte est celui du néon « Laisser un message »."
-      }
-    },
-    "subs": []
+    "options": {},
+    "subs": [
+      "",
+      ""
+    ]
   },
   "produit-mini-bounce-crocodile.html": {
     "photos": [

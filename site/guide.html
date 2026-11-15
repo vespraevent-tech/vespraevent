@@ -387,7 +387,7 @@ photo:x=>{const c=C('photo'),L=['Photobooth Digital (numérique)','200 tirages p
 livre:x=>({id:'p10',name:'Livre d\'or audio',img:'telephone-vintage-2.webp'}),
 panneau:x=>{const c=C('panneau'),m=[['Ligne d\'accueil',c.accroche],['Prénoms',c.noms],['Phrase',c.phrase],['Date',c.date]].filter(y=>y[1]&&y[1].trim()).map(y=>y[0]+' : '+y[1].trim()).join(' · ');return{id:'p24_'+Date.now(),name:'Panneau de bienvenue',label:m||'Texte à préciser',perso:m,img:'panneau-bienvenue.webp'}},
 neon:x=>({id:'p32',name:'Néon lumineux',img:'neon-lumineux.webp'}),
-cabine:x=>({id:'p46',name:'Cabine téléphonique vidéo (rouge)',img:'cabine-telephonique-rouge.webp'}),
+cabine:x=>({id:'p46',name:'Vidéobooth Premium (cabine rouge)',img:'cabine-telephonique-rouge.webp'}),
 mange:x=>({id:'p45',name:'Mange-debout housse blanche',price:P.mange.unit,qty:[2,4,6,10][x.k],img:'mange-debout.webp'}),
 brasero:x=>({id:'p1',name:'Brasero',img:'brasero-situation.webp'}),
 popcorn:x=>({id:'p11',name:'Machine à Pop Corn',img:'popcorn-situation.webp'}),

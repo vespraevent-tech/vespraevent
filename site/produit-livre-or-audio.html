@@ -657,14 +657,20 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
     <span class="fo-prix">+&nbsp;20&nbsp;€</span>
   </label>
 </div>
-<div style="margin:0 0 18px;padding:16px;background:#f7f9fc;border-radius:12px;border:1px solid var(--g3)">
-  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1);margin-bottom:10px">Avec écran tactile et vidéo</div>
-  <a class="fo-card" href="produit-cabine-telephonique-audio-video.html?f=video" style="margin-bottom:0"><span><strong>Cabine téléphonique vidéo</strong><br><span class="fo-sub">Écran tactile, souvenirs vidéo et sonores de vos invités.</span></span><span class="fo-prix">149&nbsp;€&nbsp;›</span></a>
+<div id="blocCabLO" style="margin:0 0 18px;padding:16px;background:#f7f9fc;border-radius:12px;border:1px solid var(--g3)">
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1);margin-bottom:4px">Ajouter une cabine ou un vidéobooth</div>
+  <p style="margin:0 0 10px;font-size:13px;color:var(--g2)">C'est <strong>en plus</strong> du livre d'or audio : une cabine ou un vidéobooth s'ajoute, ils ne le remplacent pas.</p>
+  <label class="fo-card on" style="margin-bottom:8px"><input type="radio" name="cabLO" value="" checked onchange="majOptions()"><span><strong>Livre d'or audio seul</strong></span></label>
+  <label class="fo-card" style="margin-bottom:8px"><input type="radio" name="cabLO" value="cabine" onchange="majOptions()"><span><strong>Cabine téléphonique seule</strong><br><span class="fo-sub">Une cabine en décor, en plus du livre d'or audio.</span></span><span class="fo-prix" data-p="optionCabine">+&nbsp;60&nbsp;€</span></label>
+  <label class="fo-card" style="margin-bottom:8px"><input type="radio" name="cabLO" value="vbstd" onchange="majOptions()"><span><strong>Vidéobooth Standard</strong><br><span class="fo-sub">Un vidéobooth (écran tactile, caméra) en plus du livre d'or audio. Sans cabine.</span></span><span class="fo-prix" data-p="optionVbStd">+&nbsp;190&nbsp;€</span></label>
+  <label class="fo-card" style="margin-bottom:0"><input type="radio" name="cabLO" value="vbprem" onchange="majOptions()"><span><strong>Vidéobooth Premium</strong><br><span class="fo-sub">Le vidéobooth installé dans une cabine téléphonique : une cabine en plus du livre d'or audio.</span></span><span class="fo-prix" data-p="optionVbPrem">+&nbsp;240&nbsp;€</span></label>
+  <div id="blocCouleurLO" style="display:none;align-items:center;gap:8px;margin:12px 0 0;flex-wrap:wrap"><span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1)">Couleur</span><button type="button" class="col-chip on" data-c="blanche" onclick="setCouleurLO('blanche')">Blanche</button><button type="button" class="col-chip" data-c="rouge" onclick="setCouleurLO('rouge')">Rouge</button></div>
+  <p style="margin:12px 0 0;font-size:13px"><a href="produit-videobooth.html" style="text-decoration:underline">Voir le Vidéobooth</a> · <a href="produit-cabine-telephonique.html" style="text-decoration:underline">Voir la cabine téléphonique</a></p>
 </div>
 <div class="prod-ctas">
         <button class="btn-add-cart" id="addToCartBtn" data-product-id="p10" onclick="addToCartProduct()">Ajouter au devis</button>
       </div>
-      <p class="prod-short-desc">Téléphone vintage qui enregistre les messages vocaux de vos invités, jusqu'à <strong>100 heures</strong>. Se loue seul : vous l'installez comme vous le souhaitez. Pour une version avec cabine, écran tactile et nom de chaque invité sur son message, voir notre <a href="produit-cabine-telephonique-audio-video.html">cabine téléphonique vidéo</a>.</p>
+      <p class="prod-short-desc">Téléphone vintage qui enregistre les messages vocaux de vos invités, jusqu'à <strong>100 heures</strong>. Se loue seul : vous l'installez comme vous le souhaitez. Pour une version vidéo avec écran tactile et nom de chaque invité sur son message, ajoutez un <a href="produit-videobooth.html">Vidéobooth</a> (standard ou dans une cabine).</p>
       <ul class="prod-features">
         <li>Téléphone vintage décoratif — combiné à saisir pour laisser un message</li>
         <li>Enregistrement automatique de chaque message vocal</li>
@@ -673,7 +679,7 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
         <li>Livraison offerte à Vitré</li>
         <li>Installation simple, aucune configuration requise le jour J</li>
         <li>Option : fichier audio de tous les messages livré après l'événement</li>
-        <li>Pour l'écran tactile, les noms sur les fichiers et la vidéo : cabine vidéo (149 €)</li>
+        <li>Pour l'écran tactile, les noms sur les fichiers et la vidéo : Vidéobooth (dès 190 €)</li>
       </ul>
 
 
@@ -878,7 +884,7 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
 
 <script src="/nav-actif.js" defer></script>
 <script src="/contact-bloc.js" defer></script>
-<section class="voir-aussi" aria-label="À lire aussi"><div class="va-in"><div class="va-t">À découvrir aussi</div><div class="va-l"><a href="/article-livre-or-audio">Livre d&#x27;or audio : les voix de vos invités, pas une phrase</a><a href="/produit-cabine-telephonique-audio-video">Location cabine téléphonique vidéo</a><a href="/article-panneau-bienvenue">Panneau de bienvenue à écoulement d&#x27;eau : comment ça marche</a><a href="/article-voiture-collection">Location voiture de collection Vitré : Mustang ou Traction ?</a></div></div></section>
+<section class="voir-aussi" aria-label="À lire aussi"><div class="va-in"><div class="va-t">À découvrir aussi</div><div class="va-l"><a href="/article-livre-or-audio">Livre d&#x27;or audio : les voix de vos invités, pas une phrase</a><a href="/produit-videobooth">Location Vidéobooth</a><a href="/article-panneau-bienvenue">Panneau de bienvenue à écoulement d&#x27;eau : comment ça marche</a><a href="/article-voiture-collection">Location voiture de collection Vitré : Mustang ou Traction ?</a></div></div></section>
 <footer>
   <div class="ft">
     <div>
@@ -990,16 +996,27 @@ window.choisir=function(k){
   var o=document.getElementById('blocOptCab'); if(o) o.style.display=CHOIX?'none':'';
 };
 window.allerCabine=function(couleur){
-  var u={video:'produit-cabine-telephonique-audio-video.html?f=video&c='}[CHOIX];
+  var u={video:'produit-videobooth.html&c='}[CHOIX];
   if(u) location.href=u+couleur;
 };
 var PRIX_BASE_LO = 35;
 function prixOpt(champ, defaut){
   return (window.VESPRA_OPT ? window.VESPRA_OPT(champ, defaut) : defaut);
 }
+var COUL_LO='blanche';
+window.setCouleurLO=function(c){
+  COUL_LO=c;
+  document.querySelectorAll('#blocCouleurLO .col-chip').forEach(function(b){b.classList.toggle('on',b.dataset.c===c);});
+  window.majOptions();
+};
+function cabChoix(){ var r=document.querySelector('input[name="cabLO"]:checked'); return r?r.value:''; }
 function optionsLO(){
   var n = document.getElementById('optionNeon');
   var liste = [];
+  var c = cabChoix();
+  if (c==='cabine') liste.push({champ:'optionCabine', nom:'Cabine téléphonique seule ('+COUL_LO+')', prix:prixOpt('optionCabine',60)});
+  if (c==='vbstd')  liste.push({champ:'optionVbStd',   nom:'Vidéobooth Standard',                   prix:prixOpt('optionVbStd',190)});
+  if (c==='vbprem') liste.push({champ:'optionVbPrem',  nom:'Vidéobooth Premium (cabine '+COUL_LO+')', prix:prixOpt('optionVbPrem',240)});
   if (n && n.checked) liste.push({champ:'optionNeon',   nom:'néon lumineux',       prix:prixOpt('optionNeon',20)});
   return liste;
 }
@@ -1010,6 +1027,10 @@ window.updateOptionBorder = function (el){
 };
 var updateOptionBorder = window.updateOptionBorder;
 window.majOptions = function(){
+  var cc=cabChoix(), bc=document.getElementById('blocCouleurLO');
+  if(bc) bc.style.display=(cc==='cabine'||cc==='vbprem')?'flex':'none';
+  document.querySelectorAll('input[name="cabLO"]').forEach(function(r){var l=r.closest('label'); if(l) l.classList.toggle('on',r.checked);});
+  document.querySelectorAll('#blocCabLO [data-p]').forEach(function(e){var v=prixOpt(e.getAttribute('data-p'),null); if(v!==null) e.innerHTML='+&nbsp;'+v+'&nbsp;€';});
   ['optionNeon'].forEach(function(id){
     var cb = document.getElementById(id);
     if (cb) updateOptionBorder(cb.closest('label'));
