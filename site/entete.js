@@ -516,15 +516,15 @@
       ok.removeAttribute('data-etape'); RAZ(ok);
       var q = document.getElementById('vmQteV'); if (q && !q.hidden) { q.setAttribute('data-etape', '1'); IMP(q, 'none'); }
       var ac = document.createElement('div');
-      ac.id = 'vmActs'; ac.style.cssText = 'display:flex;gap:10px;align-items:stretch;margin:16px ' + (innerWidth >= 900 ? 34 : 22) + 'px ' + (innerWidth >= 900 ? 34 : 30) + 'px';
+      ac.id = 'vmActs'; ac.style.cssText = 'display:flex;gap:10px;align-items:stretch;justify-content:center;margin:16px 22px 0;padding:0 0 40px';
       var r = document.createElement('button');
       r.type = 'button'; r.id = 'vmRetour'; r.setAttribute('aria-label', 'Revenir au choix de la formule');
       r.innerHTML = '<span aria-hidden="true">←</span> Retour';
-      r.style.cssText = 'flex:0 0 auto;padding:0 22px;border:2px solid var(--g3);border-radius:999px;background:#fff;color:var(--navy);font:600 13px Inter,system-ui,sans-serif;letter-spacing:.04em;cursor:pointer';
+      r.style.cssText = 'flex:0 0 auto;padding:0 24px;border:2px solid var(--g3);border-radius:999px;background:#fff;color:var(--navy);font:600 13px Inter,system-ui,sans-serif;letter-spacing:.04em;cursor:pointer';
       r.onclick = function () { popupPreparer(ov); };
       ok.parentNode.insertBefore(ac, ok);
       ac.appendChild(r); ac.appendChild(ok);
-      [['flex', '1'], ['width', 'auto'], ['min-width', '0'], ['max-width', 'none'], ['margin', '0'], ['padding', '15px 16px'], ['border-radius', '999px']].forEach(function (d) { ok.style.setProperty(d[0], d[1], 'important'); });
+      [['flex', '0 1 auto'], ['width', 'auto'], ['min-width', '0'], ['max-width', 'none'], ['margin', '0'], ['padding', '15px 34px'], ['border-radius', '999px']].forEach(function (d) { ok.style.setProperty(d[0], d[1], 'important'); });
     };
   }
   function surveillerPopup() {
