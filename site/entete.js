@@ -378,7 +378,7 @@
    (pages en images, on glisse ou on utilise les flèches).
    ───────────────────────────────────────────────────────────── */
 (function () {
-  var N = 12, i = 0, ouvert = false, btn, ov, img, cpt;
+  var N = 18, i = 0, ouvert = false, btn, ov, img, cpt;
   function css() {
     var s = document.createElement('style');
     s.textContent = [
