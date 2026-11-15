@@ -56,6 +56,10 @@
     '.vn-wk .span-ev.cr{border-top-right-radius:0;border-bottom-right-radius:0;margin-right:0}',
     '.vn-wk .span-ev span.t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}',
     '.vn-wk .span-ev b{font-weight:500}.vn-wk .span-ev small{font-weight:400;opacity:.85;margin-left:8px}',
+    '.vn-wk .span-ev .r{display:flex;align-items:center;gap:7px;flex:none}',
+    '.vn-nb{font-style:normal;border:1px solid currentColor;border-radius:4px;padding:0 5px;font:700 10px/15px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;opacity:.9}',
+    '.vn-wk .span-ev small i.pc{display:inline-block;width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7;margin:0 4px 1px 8px;vertical-align:middle}',
+    '.vn-wk .span-ev small i.pc:first-child{margin-left:0}',
     '.vn-led{flex:none;display:inline-block;width:8px;height:8px;border-radius:2px;border:0;box-shadow:none}',
     '.vn-led.oui{background:#A9D89B}.vn-led.non{background:#E27F75}',
     '.vn-leg{display:flex;gap:16px;align-items:center;margin:-2px 0 10px;font:600 12px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;color:#374151}.vn-leg span{display:inline-flex;align-items:center;gap:6px}',
@@ -331,6 +335,19 @@
   }
   window.libelleMaterielResa = libelleMateriel;
 
+  /* nombre de produits d'une réservation (les options — cadre photo, néon… — ne comptent pas) */
+  function nbProduits(r) {
+    return (r.products || []).filter(function (p, i) {
+      return p && !(typeof window.estOptionProduit === 'function' ? window.estOptionProduit(p, i) : p.estOption === true);
+    }).length;
+  }
+  /* les premiers éléments du matériel, une puce devant chacun, puis « +N » */
+  function puces(texte) {
+    var l = String(texte || '').split(' \u00b7 ').filter(Boolean);
+    if (!l.length) return esc('Matériel à compléter');
+    return l.slice(0, 3).map(function (x) { return '<i class="pc"></i>' + esc(x); }).join(' ')
+      + (l.length > 3 ? ' <b style="font-weight:700">+' + (l.length - 3) + '</b>' : '');
+  }
   function barreHtml(r, a, b, w0, w1, lane) {
     var cols = couleurs(r), c = cols[0] || '#EDE6D8', txt = window.getColorText(c);
     var bord = txt === '#fff' || txt === '#ffffff' || /^#f{3,6}$/i.test(txt);
@@ -339,12 +356,14 @@
     }).join('');
     var prods = [libelleMateriel(r)].filter(Boolean);
     var livre = window.aLivraison(r) || (Number(r.livraisonPrice) || 0) > 0 || (Number(r.montage) || 0) > 0;
+    var nb = nbProduits(r);
     var cl = r.dateStart < w0 ? ' cl' : '', cr = fin(r) > w1 ? ' cr' : '';
     var col = jours(w0, a) + 1, span = jours(a, b) + 1;
     return '<div class="span-ev' + cl + cr + '" data-res-id="' + esc(r.id) + '" style="grid-column:' + col + '/span ' + span + ';grid-row:' + (lane + 2)
       + ';background:' + c + ';color:' + txt + '" title="' + esc(r.client) + '">'
-      + '<span class="t"><b>' + esc(r.client || '') + '</b><small>' + esc(prods.join(' · ') || 'Matériel à compléter') + '</small></span>'
-      + '<i class="vn-led ' + (livre ? 'oui' : 'non') + '" title="' + (livre ? 'Livraison / montage' : 'Retrait sur place') + '"></i></div>';
+      + '<span class="t"><b>' + esc(r.client || '') + '</b><small>' + puces(prods.join(' · ')) + '</small></span>'
+      + '<span class="r">' + (nb ? '<em class="vn-nb" title="' + nb + ' produit' + (nb > 1 ? 's' : '') + '">' + nb + '</em>' : '')
+      + '<i class="vn-led ' + (livre ? 'oui' : 'non') + '" title="' + (livre ? 'Livraison / montage' : 'Retrait sur place') + '"></i></span></div>';
   }
 
   /* rang d'une réservation : catégorie puis produit (Photobooth 1, 2, sono, barnum…) */
