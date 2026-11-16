@@ -74,3 +74,8 @@ html body .art-coul small{font:600 12px Inter,system-ui,sans-serif;color:#7b8798
 html body .art-card figure.art-fig{border:0!important;background:none!important;overflow:visible!important;border-radius:0}
 html body .art-card figure.art-fig img{padding:0!important;height:auto!important;max-height:520px;background:none!important;object-fit:cover;border-radius:24px}
 html body .art-card figure.art-fig figcaption{border-top:0;padding:10px 0 0}
+/* images : pleine largeur de la carte (alignées avec le texte et les boutons), cliquables */
+html body .art-card figure.art-fig img{width:100%!important;max-width:100%!important;margin:0!important}
+html body .art-card figure.art-fig a{display:block;border-radius:24px;transition:transform .25s ease,box-shadow .25s ease}
+html body .art-card figure.art-fig a:hover img{filter:brightness(1.04)}
+html body .art-card figure.art-fig a:focus-visible{outline:3px solid #F59E0B;outline-offset:3px}
