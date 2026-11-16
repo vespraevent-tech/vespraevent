@@ -55,7 +55,7 @@
 .md-o b{font:600 11.5px Inter,system-ui,sans-serif;color:#14304f}
 .md-o.on{border-color:#14304f;color:#0C0F14;background:#f4f7fb}
 .md-o input{accent-color:#14304f;width:14px;height:14px;margin:0}
-.dpc-in{width:56px;text-align:right;font:inherit;font-weight:700;color:inherit;background:#fff;border:1px solid #d5dae3;border-radius:7px;padding:3px 7px}.dpc-in:hover{border-color:#9aa6bd}.dpc-in:focus{outline:2px solid #1f3a5f;outline-offset:0;border-color:#1f3a5f}
+.pk-dv{white-space:nowrap}.pk-dv .dpc-in{width:64px}.dpc-in{width:56px;text-align:right;font:inherit;font-weight:700;color:inherit;background:#fff;border:1px solid #d5dae3;border-radius:7px;padding:3px 7px}.dpc-in:hover{border-color:#9aa6bd}.dpc-in:focus{outline:2px solid #1f3a5f;outline-offset:0;border-color:#1f3a5f}
 .dpc-a{margin-top:8px}
 .dp-p{display:block;line-height:1.35;margin-top:6px;font-size:14px}
 .dp-n .dp-p:first-child{margin-top:0}
@@ -5739,7 +5739,9 @@ function renderProdTags(){
       } else {
         if(mine.length) nbOn++;
         cases.push('<label class="md-o'+(mine.length?' on':'')+'"><input type="checkbox" data-act="opt" data-u="'+par.uid+'" data-o="'+pkEsc(d.nom)+'"'+(mine.length?' checked':'')+'>'
-          +pkEsc(d.label)+'<b>'+(d.devis?'sur devis':'+ '+d.prix+' €')+'</b></label>');
+          +pkEsc(d.label)+(d.devis&&mine.length
+            ? '<b class="pk-dv"><input class="dpc-in" data-u="'+mine[0].uid+'" value="'+String(pr(mine[0])).replace('.',',')+'" aria-label="Prix de '+pkEsc(d.label)+'" onfocus="this.select()" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}"> €</b>'
+            : '<b>'+(d.devis?'sur devis':'+ '+d.prix+' €')+'</b>')+'</label>');
       }
     });
     if(cases.length){
