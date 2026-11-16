@@ -1147,6 +1147,7 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
         <button class="tab" data-tab="resa-planning" onclick="switchTab('resa-planning')">Planning</button>
       </div>
     </div>
+    <button class="tab" data-tab="videobooth" onclick="switchTab('videobooth')">Vidéobooth</button>
     <button class="tab" data-tab="notesfrais" onclick="switchTab('notesfrais')">Notes de frais</button>
     <button class="tab" data-tab="resa-ca" onclick="switchTab('resa-ca')">Chiffre d'affaires</button>
 
@@ -1195,7 +1196,6 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
     <!-- Le parrainage n'est pas une réservation : il a sa propre entrée,
          entre les réservations et les paramètres. -->
     <button class="tab" data-tab="espace" onclick="switchTab('espace')">Espace client <span class="bo-pastille" id="modPastille" hidden>0</span></button>
-    <button class="tab" data-tab="videobooth" onclick="switchTab('videobooth')">Vidéobooth</button>
     <button class="tab" data-tab="parrainage" onclick="switchTab('parrainage')">Parrainage</button>
     <button class="tab" data-tab="resa-documents" onclick="switchTab('resa-documents')">Documents</button>
     <button class="tab" data-tab="settings" onclick="switchTab('settings')">Paramètres</button>
@@ -1889,11 +1889,12 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
     <div class="panel" id="panel-videobooth">
       <div class="toolbar">
         <div>
-          <h2>Vidéobooth</h2>
-          <div class="hint">Les vidéos enregistrées sur la tablette arrivent ici et partent par e-mail à l’invité. Elles restent 30 jours sur le site ; la tablette, elle, garde tout.</div>
+          <h2 id="vbTitre">Vidéobooth</h2>
+          <div class="hint" id="vbSous">Les vidéos enregistrées sur la tablette arrivent ici et partent par e-mail à l’invité. Elles restent 30 jours sur le site ; la tablette, elle, garde tout.</div>
         </div>
         <div class="actions-bar" style="margin-left:auto;padding-top:0;border:0">
-          <select class="dm-tri" id="vbEvt" aria-label="Événement" onchange="vbRendre()"></select>
+          <button class="btn btn-ghost" id="vbRetour" onclick="vbOuvrir('')" hidden>‹ Tous les événements</button>
+          <button class="btn btn-ghost" id="vbRelancer" onclick="vbRelancerEchecs()" hidden>Renvoyer les e-mails non partis</button>
           <button class="btn btn-ghost" onclick="vbCharger()">Actualiser</button>
         </div>
       </div>
@@ -2596,8 +2597,9 @@ function ouvrirPageSite(fichier, onglet){
 
 const VUES_PRODUITS={'produits':'cat','produits-ordre':'ordre','produits-bests':'bests','produits-evt':'evt'};
 /* ── Vidéobooth ── */
-let VB=[];
+let VB=[], VBEVT='';
 function vbEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+const vbNomEvt=v=>v.event||'(sans nom d’événement)';
 async function vbCharger(){
   const z=document.getElementById('vbListe'); if(!z) return;
   z.innerHTML='<div class="hint">Chargement…</div>';
@@ -2606,22 +2608,38 @@ async function vbCharger(){
     VB=d.videos||[];
     const a=document.getElementById('vbAlerte');
     a.style.display=d.cle?'none':'block'; a.textContent=d.cle?'':'La variable VIDEOBOOTH_CLE n’est pas encore définie dans Netlify : la tablette ne pourra pas envoyer ses vidéos.';
-    const evts=[...new Set(VB.map(v=>v.event||'(sans nom)'))];
-    const s=document.getElementById('vbEvt'); const cur=s.value;
-    s.innerHTML='<option value="">Tous les événements</option>'+evts.map(e=>'<option>'+vbEsc(e)+'</option>').join('');
-    if(evts.includes(cur)) s.value=cur;
     vbRendre();
   }catch(e){ z.innerHTML='<div class="hint" style="color:#b03a2a">Chargement impossible : '+vbEsc(e.message)+'</div>'; }
 }
+function vbOuvrir(nom){ VBEVT=nom; vbRendre(); }
 function vbRendre(){
-  const z=document.getElementById('vbListe'); const f=document.getElementById('vbEvt').value;
-  const l=VB.filter(v=>!f||(v.event||'(sans nom)')===f);
-  if(!l.length){ z.innerHTML='<div class="hint" style="padding:24px 0">Aucune vidéo pour l’instant.</div>'; return; }
+  const z=document.getElementById('vbListe'); if(!z) return;
+  const fd=d=>new Date(d).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
   const mo=n=>(n/1048576).toFixed(1).replace('.',',')+' Mo';
-  z.innerHTML='<table style="width:100%;border-collapse:collapse;font-size:13.5px"><thead><tr style="text-align:left;color:#6b7280"><th style="padding:8px">Invité</th><th>E-mail</th><th>Événement</th><th>Date</th><th>Taille</th><th>E-mail envoyé</th><th></th></tr></thead><tbody>'+
+  document.getElementById('vbRetour').hidden=!VBEVT; document.getElementById('vbSous').style.display=VBEVT?'none':'';
+  if(!VBEVT){
+    document.getElementById('vbTitre').textContent='Vidéobooth';
+    document.getElementById('vbRelancer').hidden=true;
+    const ev={}; VB.forEach(v=>{const k=vbNomEvt(v);(ev[k]=ev[k]||[]).push(v);});
+    const noms=Object.keys(ev).sort((a,b)=>String(ev[b][0].cree).localeCompare(String(ev[a][0].cree)));
+    if(!noms.length){ z.innerHTML='<div class="hint" style="padding:24px 0">Aucune vidéo pour l’instant. Elles apparaîtront ici dès que la tablette les enverra.</div>'; return; }
+    z.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px">'+noms.map(n=>{
+      const l=ev[n], ds=l.map(v=>+new Date(v.cree)), d1=Math.min(...ds), d2=Math.max(...ds), ko=l.filter(v=>v.mail!=='envoye').length;
+      const quand=fd(d1)===fd(d2)?fd(d1):fd(d1)+' → '+fd(d2);
+      return '<button type="button" onclick="vbOuvrir(this.dataset.n)" data-n="'+vbEsc(n)+'" style="text-align:left;background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:16px 18px;cursor:pointer;font:inherit">'+
+        '<div style="font:700 16px Poppins,Inter,sans-serif;color:#14304f">'+vbEsc(n)+'</div>'+
+        '<div style="color:#6b7280;font-size:13px;margin:3px 0 10px">'+quand+'</div>'+
+        '<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:15px">'+l.length+' vidéo'+(l.length>1?'s':'')+'</b>'+
+        (ko?'<span style="color:#b03a2a;font-size:12.5px;font-weight:600">'+ko+' e-mail non parti</span>':'<span style="color:#3d6e36;font-size:12.5px;font-weight:600">Tous les e-mails partis</span>')+'</div></button>';}).join('')+'</div>';
+    return;
+  }
+  const l=VB.filter(v=>vbNomEvt(v)===VBEVT).sort((a,b)=>String(a.cree).localeCompare(String(b.cree)));
+  document.getElementById('vbTitre').textContent=VBEVT;
+  document.getElementById('vbRelancer').hidden=!l.some(v=>v.mail!=='envoye');
+  z.innerHTML='<div class="hint" style="margin-bottom:10px">'+l.length+' vidéo'+(l.length>1?'s':'')+'</div><table style="width:100%;border-collapse:collapse;font-size:13.5px"><thead><tr style="text-align:left;color:#6b7280"><th style="padding:8px">Invité</th><th>Adresse e-mail</th><th>Date</th><th>Taille</th><th>E-mail</th><th></th></tr></thead><tbody>'+
   l.map(v=>{const d=new Date(v.cree);const ok=v.mail==='envoye';const j=Math.max(0,30-Math.floor((Date.now()-d)/86400000));
-    return '<tr style="border-top:1px solid #eee8dc"><td style="padding:10px 8px"><b>'+vbEsc(v.prenom)+' '+vbEsc(v.nom)+'</b></td><td>'+vbEsc(v.email)+'</td><td>'+vbEsc(v.event||'')+'</td><td>'+d.toLocaleDateString('fr-FR')+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</td><td>'+mo(v.octets||0)+'</td>'+
-    '<td style="color:'+(ok?'#3d6e36':'#b03a2a')+';font-weight:600">'+(ok?'Oui'+(v.pj?' (jointe)':' (lien)'):'Non'+(v.mailErreur?' — '+vbEsc(v.mailErreur):''))+'</td>'+
+    return '<tr style="border-top:1px solid #eee8dc"><td style="padding:10px 8px"><b>'+vbEsc(v.prenom)+' '+vbEsc(v.nom)+'</b></td><td>'+vbEsc(v.email)+'</td><td>'+d.toLocaleDateString('fr-FR')+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</td><td>'+mo(v.octets||0)+'</td>'+
+    '<td style="color:'+(ok?'#3d6e36':'#b03a2a')+';font-weight:600">'+(ok?'Envoyé'+(v.pj?' (jointe)':' (lien)'):'Non parti'+(v.mailErreur?' — '+vbEsc(v.mailErreur):''))+'</td>'+
     '<td style="white-space:nowrap;text-align:right"><a class="btn btn-ghost" style="text-decoration:none" href="/api/admin/videobooth/video?id='+encodeURIComponent(v.id)+'" download>Télécharger</a> <button class="btn btn-ghost" onclick="vbRenvoyer(\''+v.id+'\')">Renvoyer l’e-mail</button> <button class="btn btn-ghost" onclick="vbSupprimer(\''+v.id+'\')">Supprimer</button><div style="font-size:11px;color:#9aa0ab;margin-top:2px">supprimée du site dans '+j+' j</div></td></tr>';}).join('')+'</tbody></table>';
 }
 async function vbRenvoyer(id){
@@ -2629,14 +2647,20 @@ async function vbRenvoyer(id){
   const m=prompt('Envoyer la vidéo à quelle adresse ?',v.email); if(!m) return;
   try{ const r=await api('/videobooth',{method:'POST',body:JSON.stringify({id,email:m})});
     if(r.ok){ showToast('E-mail envoyé'); } else showToast('E-mail non parti : '+(r.erreur||''),true);
-    vbCharger();
+    await vbCharger();
   }catch(e){ showToast('Échec : '+e.message,true); }
+}
+async function vbRelancerEchecs(){
+  const l=VB.filter(v=>vbNomEvt(v)===VBEVT&&v.mail!=='envoye'); if(!l.length) return;
+  if(!confirm('Renvoyer '+l.length+' e-mail'+(l.length>1?'s':'')+' non parti'+(l.length>1?'s':'')+' ?')) return;
+  let ok=0; for(const v of l){ try{ const r=await api('/videobooth',{method:'POST',body:JSON.stringify({id:v.id})}); if(r.ok) ok++; }catch(e){} }
+  showToast(ok+' sur '+l.length+' e-mail'+(l.length>1?'s':'')+' envoyé'+(ok>1?'s':''), ok!==l.length);
+  await vbCharger();
 }
 async function vbSupprimer(id){
   if(!confirm('Supprimer cette vidéo du site ? (elle reste sur la tablette)')) return;
-  try{ await api('/videobooth?id='+encodeURIComponent(id),{method:'DELETE'}); vbCharger(); }catch(e){ showToast('Échec : '+e.message,true); }
+  try{ await api('/videobooth?id='+encodeURIComponent(id),{method:'DELETE'}); await vbCharger(); }catch(e){ showToast('Échec : '+e.message,true); }
 }
-
 function switchTab(name){
   const vue=VUES_PRODUITS[name];
   if(!vue){
@@ -2701,7 +2725,7 @@ function switchTabBase(name){
     else { filtrerParDefaut(); renderDemandes(); }
   }
   if(name==='espace') espCharger();
-  if(name==='videobooth') vbCharger();
+  if(name==='videobooth'){ VBEVT=''; vbCharger(); }
   if(name==='demandes' && typeof chargerModifs==='function') chargerModifs();
   if(name==='logistique') loadLogistique();
   if(name==='auto') raCharger();
