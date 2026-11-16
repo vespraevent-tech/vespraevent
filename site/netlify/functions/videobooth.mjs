@@ -14,6 +14,7 @@
    ════════════════════════════════════════════════════ */
 import { createHmac } from 'node:crypto';
 import { getStore } from './_blobs.mjs';
+import { htmlVideo } from './_mails-auto.mjs';
 
 export const config = { path: '/api/videobooth/*' };
 
@@ -54,14 +55,8 @@ async function envoyerMail(m, octets, site) {
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) return { ok: false, erreur: "RESEND_API_KEY n'est pas définie dans Netlify" };
   const lien = `${site}/api/videobooth/v/${m.id}?t=${jeton(m.id)}`;
-  const titre = m.event ? esc(m.event) : 'votre événement';
   const pj = octets.byteLength <= PJ_MAX;
-  const html = `<div style="font-family:Arial,Helvetica,sans-serif;color:#1f2933;max-width:520px;margin:0 auto;line-height:1.6">
-    <p>Bonjour ${esc(m.prenom)},</p>
-    <p>Merci d'avoir laissé un message vidéo pour <strong>${titre}</strong>. ${pj ? 'Votre vidéo est jointe à cet e-mail.' : 'Votre vidéo est trop volumineuse pour être jointe : vous pouvez la télécharger avec le lien ci-dessous.'}</p>
-    <p><a href="${lien}" style="display:inline-block;background:#F59E0B;color:#1a1205;text-decoration:none;font-weight:bold;padding:12px 22px;border-radius:8px">Télécharger ma vidéo</a></p>
-    <p style="color:#6b7280;font-size:13px">Ce lien est valable ${GARDE_JOURS} jours. Votre message a aussi été remis aux organisateurs.</p>
-    <p style="color:#6b7280;font-size:13px">Vespra Event</p></div>`;
+  const html = htmlVideo({ prenom: m.prenom, evenement: m.event, lien, pj, jours: GARDE_JOURS, site });
   const body = {
     from: process.env.NOTIFY_FROM || 'Vespra Event <onboarding@resend.dev>',
     to: [m.email],

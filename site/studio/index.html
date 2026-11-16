@@ -1032,6 +1032,7 @@ body.bo-masque .bo-oeil-bar .o-ferme{display:block}
 .fd-modifs .m{padding:6px 0}
 .fd-modifs input{width:100%;border:1px solid #dcd5c8;border-radius:8px;padding:6px 10px;margin:6px 0;font:12px Inter,sans-serif}
 #panel-videobooth{min-width:0;max-width:100%;overflow-x:hidden}#panel-videobooth .toolbar{flex-wrap:wrap;gap:10px}#panel-videobooth .actions-bar{margin-left:0!important;flex-wrap:wrap;gap:8px}
+.ik-elec{flex:0 0 120px}.ik-elec input{width:20px;height:20px;padding:0}.ik-an{margin-top:14px;background:#fff;border:1px solid var(--g3);border-radius:12px;overflow:hidden}.ik-anh{display:flex;justify-content:space-between;gap:10px;padding:12px 16px;background:#f7f5f0;font-size:14px}.ik-l{display:flex;justify-content:space-between;gap:12px;padding:11px 16px;border-top:1px solid #eee8dc;font-size:13.5px;align-items:center}.ik-s{font-size:12px;color:#8a8f98;margin-top:2px}.ik-r{display:flex;align-items:center;gap:12px;white-space:nowrap}.ik-r span{color:#6b7280}.ik-x{background:none;border:0;color:#b03a2a;font-size:20px;cursor:pointer}#ikApercu b{font-size:17px;color:var(--navy)}#ikApercu span{color:#8a8f98;font-size:12.5px}@media(max-width:560px){.ik-l{flex-direction:column;align-items:flex-start}}
 </style>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=7">
   <link rel="manifest" href="/studio/manifest.webmanifest">
@@ -1149,7 +1150,7 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
       </div>
     </div>
     <button class="tab" data-tab="videobooth" onclick="switchTab('videobooth')">Vidéobooth</button>
-    <button class="tab" data-tab="notesfrais" onclick="switchTab('notesfrais')">Notes de frais</button>
+    <button class="tab" data-tab="notesfrais" onclick="switchTab('notesfrais')">Frais</button>
     <button class="tab" data-tab="resa-ca" onclick="switchTab('resa-ca')">Chiffre d'affaires</button>
 
     <button class="tab" data-tab="rdv" onclick="switchTab('rdv')">Rendez-vous <span class="bo-pastille" id="rdvPastille" hidden>0</span></button>
@@ -1867,6 +1868,8 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
     </div>
 
     <div class="panel" id="panel-notesfrais">
+      <div class="sous-onglets"><button type="button" class="songlet on" id="nfOngNotes" onclick="nfOnglet('notes')">Notes de frais</button><button type="button" class="songlet" id="nfOngIK" onclick="nfOnglet('ik')">Indemnités kilométriques</button></div>
+      <div id="nfVueNotes">
       <div class="toolbar">
         <div>
           <h2>Notes de frais</h2>
@@ -1885,6 +1888,22 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
         <div class="nf-bas"><div class="nf-bilan" id="nfBilan"></div><button class="btn" type="button" id="nfGo" onclick="nfGenerer()">Générer la note de frais</button></div>
       </div>
       <div id="nfListe"></div>
+      </div>
+      <div id="nfVueIK" hidden>
+        <div class="toolbar"><div><h2>Indemnités kilométriques</h2>
+          <div class="hint">Barème fiscal officiel des voitures : il couvre l’usure du véhicule, l’assurance et l’entretien (contrairement au carburant seul). Saisissez les kilomètres réellement parcourus (boucle ou aller-retour) : le taux dépend du total de l’année, il est calculé automatiquement.</div></div></div>
+        <div class="nf-form">
+          <label class="nf-c nf-date"><span>Date</span><input type="date" id="ikDate" oninput="ikAper()"></label>
+          <label class="nf-c nf-motif"><span>Destination / motif</span><input type="text" id="ikMotif" placeholder="ex. Livraisons week-end, boucle Fougères" autocomplete="off"></label>
+          <label class="nf-c"><span>Kilomètres</span><input type="text" inputmode="decimal" id="ikKm" oninput="ikAper()"></label>
+          <label class="nf-c nf-benef"><span>Bénéficiaire</span><select id="ikBenef" onchange="ikAper()"></select></label>
+          <label class="nf-c"><span>Puissance fiscale</span><select id="ikCv" onchange="ikReglages()"></select></label>
+          <label class="nf-c ik-elec"><span>Électrique (+20 %)</span><input type="checkbox" id="ikElec" onchange="ikReglages()"></label>
+          <div class="nf-bas"><div class="nf-bilan" id="ikApercu"></div><button class="btn" type="button" onclick="ikAjouter()">Enregistrer le trajet</button></div>
+        </div>
+        <div class="toolbar" style="margin-top:6px"><div class="hint">Trajets enregistrés</div><div class="actions-bar" style="margin-left:auto;padding-top:0;border:0"><button class="btn btn-ghost" type="button" onclick="ikExport()">Exporter (CSV)</button></div></div>
+        <div id="ikListe"></div>
+      </div>
     </div>
 
     <div class="panel" id="panel-videobooth">
@@ -2405,7 +2424,7 @@ const NOMS_PAGES = {
   prestataires:'Ajouter prestataire', 'pages-reco':'Page lieux', 'pages-presta':'Page prestataires', rdv:'Rendez-vous',
   apparence:'Apparence', ambiance:'Ambiance', images:'Images', demandes:'Liste des réservations',
   logistique:'Départs & retours', auto:'Automatisation', 'resa-planning':'Planning',
-  'resa-ca':"Chiffre d'affaires", 'resa-documents':'Documents', notesfrais:'Notes de frais',
+  'resa-ca':"Chiffre d'affaires", 'resa-documents':'Documents', notesfrais:'Frais',
   parrainage:'Parrainage', videobooth:'Vidéobooth', espace:'Espace client', settings:'Paramètres'
 };
 
@@ -9773,6 +9792,7 @@ checkSession();
 <script src="/studio/catalogue.js"></script>
 <script src="/studio/parrainage.js"></script>
 <script src="/studio/notefrais.js"></script>
+<script src="/studio/ik.js"></script>
 <script src="/adresse-autocomplete.js"></script>
 <script src="/studio/facture.js"></script>
 <script>
