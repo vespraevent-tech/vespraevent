@@ -3892,7 +3892,7 @@ window.VESPRA_MEDIAS = {
     "options": {
       "optionMais": {
         "nom": "Maïs à éclater",
-        "desc": "Environ 1 kg de maïs, soit une quarantaine de portions. Sinon, le maïs à pop-corn s'achète en grande surface : comptez environ 100 g pour quatre portions."
+        "desc": "Environ 40 personnes. Pour plus d'invités, ajouter l'option plusieurs fois."
       },
       "optionPots": {
         "nom": "Pots à popcorn",
