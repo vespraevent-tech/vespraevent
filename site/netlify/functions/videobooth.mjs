@@ -12,7 +12,7 @@
    E-mail : la vidéo est jointe si elle fait ≤ 18 Mo (limite Gmail 25 Mo), sinon le lien suffit.
    Le lien est toujours présent dans l'e-mail. Tout est supprimé au bout de 30 jours.
    ════════════════════════════════════════════════════ */
-import { createHmac } from 'node:crypto';
+import { createHmac, createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { getStore } from './_blobs.mjs';
 import { htmlVideo } from './_mails-auto.mjs';
 
@@ -71,7 +71,20 @@ async function envoyerMail(m, octets, site) {
   return { ok: true, pj };
 }
 
-export { envoyerMail, jeton, jetonEvt, GARDE_JOURS };
+/* ── mot de passe de la galerie d'un événement ── */
+const galCle = (label) => createHash('sha256').update('gal:' + label).digest('hex').slice(0, 32);
+const mdpHash = (label, mdp) => createHmac('sha256', process.env.VIDEOBOOTH_CLE || '').update('mdp:' + label + ':' + mdp).digest('hex');
+const cookieVal = (label, h) => createHmac('sha256', process.env.VIDEOBOOTH_CLE || '').update('ck:' + label + ':' + h).digest('hex').slice(0, 40);
+const egal = (a, b) => { const x = Buffer.from(String(a)), y = Buffer.from(String(b)); return x.length === y.length && timingSafeEqual(x, y); };
+async function galLire(st, label) { return st.get('galerie/' + galCle(label), { type: 'json' }).catch(() => null); }
+async function galEcrire(st, label, mdp) {
+  if (!mdp) { await st.delete('galerie/' + galCle(label)).catch(() => {}); return null; }
+  const g = { label, mdp, h: mdpHash(label, mdp), maj: new Date().toISOString() };
+  await st.setJSON('galerie/' + galCle(label), g); return g;
+}
+/* mot de passe lisible : sans 0/O/1/l/I pour éviter les confusions */
+const genMdp = () => { const a = 'abcdefghjkmnpqrstuvwxyz23456789'; const b = randomBytes(6); return Array.from(b, (x) => a[x % a.length]).join(''); };
+export { envoyerMail, jeton, jetonEvt, GARDE_JOURS, galLire, galEcrire, genMdp };
 
 export default async (request) => {
   if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
@@ -87,10 +100,31 @@ export default async (request) => {
   }
 
   /* ── page de partage d'un événement : toutes les vidéos, pour les mariés / organisateurs ── */
-  if (request.method === 'GET' && /\/api\/videobooth\/evenement$/.test(url.pathname)) {
+  if ((request.method === 'GET' || request.method === 'POST') && /\/api\/videobooth\/evenement$/.test(url.pathname)) {
     const label = String(url.searchParams.get('e') || '');
     if (!cle || !label || url.searchParams.get('t') !== jetonEvt(label)) return new Response('Lien invalide', { status: 403 });
     const st = store();
+    const gal = await galLire(st, label);
+    if (gal && gal.h) {
+      const nomCookie = 'vbg_' + galCle(label).slice(0, 12);
+      const ckOk = (request.headers.get('cookie') || '').split(/;\s*/).some((c) => c === nomCookie + '=' + cookieVal(label, gal.h));
+      let erreur = '';
+      if (!ckOk) {
+        if (request.method === 'POST') {
+          let mdp = ''; try { mdp = String((await request.formData()).get('mdp') || ''); } catch {}
+          if (egal(mdpHash(label, mdp.trim()), gal.h)) {
+            return new Response(null, { status: 303, headers: { Location: url.pathname + url.search, 'Set-Cookie': `${nomCookie}=${cookieVal(label, gal.h)}; Path=/api/videobooth; Max-Age=43200; HttpOnly; Secure; SameSite=Lax`, 'Cache-Control': 'no-store' } });
+          }
+          await new Promise((r) => setTimeout(r, 900));
+          erreur = 'Mot de passe incorrect.';
+        }
+        const form = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Galerie protégée</title>
+<style>*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0f2237;font-family:Inter,Arial,sans-serif;color:#fff;padding:16px}form{width:min(380px,100%);background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:26px;text-align:center}small{letter-spacing:.3em;font-size:11px;color:#9fb0c6}h1{font-size:20px;margin:10px 0 4px}p{color:#9fb0c6;font-size:13.5px;margin:0 0 16px}input{width:100%;padding:13px;border-radius:10px;border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.25);color:#fff;font-size:17px;text-align:center;margin-bottom:12px}button{width:100%;padding:13px;border:0;border-radius:10px;background:#F59E0B;color:#1a1205;font:700 15px Arial,sans-serif;cursor:pointer}.e{color:#ffb4a8;font-size:13px;margin-bottom:10px}</style></head><body>
+<form method="post"><small>VESPRA EVENT</small><h1>${esc(label)}</h1><p>Cette galerie est protégée. Saisissez le mot de passe que l’on vous a communiqué.</p>${erreur ? `<div class="e">${esc(erreur)}</div>` : ''}<input name="mdp" type="password" autocomplete="off" autofocus placeholder="Mot de passe" required><button type="submit">Accéder à la galerie</button></form></body></html>`;
+        return new Response(form, { status: erreur ? 401 : 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
+      }
+    }
+    if (request.method !== 'GET') return new Response('Méthode non autorisée', { status: 405 });
     const { blobs } = await st.list({ prefix: 'meta/' });
     const liste = [];
     for (const b of blobs) { const m = await st.get(b.key, { type: 'json' }).catch(() => null); if (m && (m.event || SANS_NOM) === label && Date.parse(m.cree) >= Date.now() - GARDE_JOURS * 86400000) liste.push(m); }

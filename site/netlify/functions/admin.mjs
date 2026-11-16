@@ -40,7 +40,7 @@ import { createHmac, timingSafeEqual, createHash, randomUUID, randomBytes, rando
    introuvable au moment de l'exécution et TOUTE modification depuis le
    back-office échouerait. */
 import { getStore, stockageActif, stats as stockStats } from './_stockage.mjs';
-import { videoStore, envoyerMail as vbEnvoyerMail, jetonEvt as vbJetonEvt } from './videobooth.mjs';
+import { videoStore, envoyerMail as vbEnvoyerMail, jetonEvt as vbJetonEvt, galLire as vbGalLire, galEcrire as vbGalEcrire, genMdp as vbGenMdp } from './videobooth.mjs';
 import * as secu from './_sauvegarde.mjs';
 /* Fabrication du PDF de facture : écrite à la main, sans dépendance,
    pour la même raison que la bibliothèque Blobs est jointe au dossier. */
@@ -2360,7 +2360,19 @@ const gestionnaire = async (request) => {
     const e = String(url.searchParams.get('e') || '');
     if (!e || !process.env.VIDEOBOOTH_CLE) return json({ error: 'Événement ou VIDEOBOOTH_CLE manquant' }, 400);
     const site = (process.env.URL || 'https://www.vespraevent.fr').replace(/\/$/, '');
-    return json({ url: `${site}/api/videobooth/evenement?e=${encodeURIComponent(e)}&t=${vbJetonEvt(e)}` });
+    const st = videoStore();
+    /* chaque événement a son propre mot de passe : créé au premier partage, modifiable ensuite */
+    let g = await vbGalLire(st, e);
+    if (!g || !g.mdp) g = await vbGalEcrire(st, e, vbGenMdp());
+    return json({ url: `${site}/api/videobooth/evenement?e=${encodeURIComponent(e)}&t=${vbJetonEvt(e)}`, mdp: g ? g.mdp : '' });
+  }
+  if (path === '/videobooth/galerie' && request.method === 'POST') {
+    let body = {}; try { body = await request.json(); } catch {}
+    const e = String(body.e || ''); const m = String(body.mdp || '').trim();
+    if (!e) return json({ error: 'Événement manquant' }, 400);
+    if (m && m.length < 4) return json({ error: 'Mot de passe : 4 caractères minimum' }, 400);
+    const g = await vbGalEcrire(videoStore(), e, m.slice(0, 40));
+    return json({ ok: true, mdp: g ? g.mdp : '' });
   }
   if (path === '/videobooth' || path === '/videobooth/video') {
     try {
