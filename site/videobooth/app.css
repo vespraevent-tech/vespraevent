@@ -62,3 +62,32 @@ select option{color:#000}
 #s-form{justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:12vh}
 #s-form form{margin:auto 0}
 @media (max-height:700px){#s-form{gap:10px}#s-form input[type=text],#s-form input[type=email]{padding:12px 14px;font-size:20px}}
+/* ── v5 : s'adapte à toute taille d'écran ── */
+html,body,#app{height:100dvh}
+#app{inset:auto;top:0;left:0;right:0;height:100dvh}
+.ecran{padding:3vh 5vw}
+#s-form{padding-top:3vh}
+#s-form h2{font-size:clamp(30px,5vh,52px)}
+#s-form form{gap:10px;width:min(560px,100%)}
+#s-form label{font-size:14px}
+#s-form input[type=text],#s-form input[type=email]{padding:12px 14px;font-size:20px}
+#s-form .rang{flex-wrap:nowrap;gap:10px;margin-top:4px}
+#s-form .rang .sec{padding:12px 22px;font-size:17px}
+#s-form .rang .gros{padding:13px 26px;font-size:18px;white-space:nowrap}
+#s-form .coche{font-size:13px}
+/* caméra : image entière, sans zoom */
+#v-live,#v-revoir{object-fit:contain}
+#v-live{transform:scaleX(-1)}
+#s-cam.flou #v-live{transform:scaleX(-1) scale(1.1)}
+/* chrono + croix : discrets */
+.rec{top:1.5vh;padding:6px 14px;font-size:15px;gap:8px;white-space:nowrap;flex-wrap:nowrap}
+.rec .pt{width:10px;height:10px}
+.rec b{font-weight:700}
+.croix{top:1.5vh;right:3vw;width:42px;height:42px;font-size:20px;line-height:42px}
+/* boutons de la caméra : fins, une seule ligne, en bas */
+#s-cam .go,#s-cam .stop{bottom:4vh;white-space:nowrap;padding:12px 30px;font-size:16px;border-radius:10px;letter-spacing:.03em}
+#s-cam .stop{background:rgba(217,63,63,.92)}
+.rang.bas .sec,.rang.bas .gros{padding:12px 26px;font-size:16px;white-space:nowrap}
+.rang.bas{bottom:4vh;gap:12px;flex-wrap:nowrap}
+.barre{height:5px}
+.compte span{font-size:clamp(15px,2.6vw,24px);white-space:nowrap}

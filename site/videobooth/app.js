@@ -58,7 +58,7 @@
   function ouvrirCam() {
     montrer('s-cam'); $('s-cam').classList.remove('flou'); $('cam-err').hidden = true; $('compte').hidden = true; $('rec').hidden = true; $('barre').hidden = true;
     $('b-go').hidden = true; $('b-stop').hidden = true; enregistrement = false;
-    var contraintes = { audio: { echoCancellation: true, noiseSuppression: true }, video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, window.innerHeight > window.innerWidth ? { width: { ideal: 1080 }, height: { ideal: 1920 } } : { width: { ideal: 1920 }, height: { ideal: 1080 } }) };
+    var contraintes = { audio: { echoCancellation: true, noiseSuppression: true }, video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, window.innerHeight > window.innerWidth ? { width: { ideal: 1080 }, height: { ideal: 1440 } } : { width: { ideal: 1440 }, height: { ideal: 1080 } }) };
     arreterCam();
     navigator.mediaDevices.getUserMedia(contraintes).then(function (s) {
       flux = s; $('b-go').hidden = false; $('v-live').srcObject = s; $('v-live').play().catch(function () {});
