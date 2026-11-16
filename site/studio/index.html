@@ -3220,6 +3220,7 @@ async function loadLogistique(){
     cache.resas = (resas||[]).filter(x => x && x.id !== 'cfg' && x.d).map(x => {
       try{ return JSON.parse(x.d); }catch(e){ return null; }
     }).filter(Boolean);
+    cache.resas.forEach(figerAcompteResa);
     cache.logistique = {};
     (suivis||[]).forEach(x => {
       if(!x || !x.id) return;
@@ -3551,6 +3552,7 @@ async function loadDemandes(silencieux){
       try { return JSON.parse(x.d); } catch(e) { return null; }
     }).filter(Boolean);
     cache.resas = resas;
+    resas.forEach(figerAcompteResa);
     /* réservations abîmées (options en tête de liste, détachées de leur produit) : remises en ordre */
     resas.forEach(r => {
       if(!r || !Array.isArray(r.products)) return;
@@ -4260,6 +4262,21 @@ async function parrainChoisir(id, statut){
    Le devis généré « avec acompte » le dit sur la fiche ; l'interrupteur
    « Acompte reçu » se coche à la réception du virement, sur la demande
    comme sur la réservation, et reste accordé avec le planning. */
+/* Acompte déjà reçu : son montant est figé sur la réservation (acompteMontant) et ne suit plus les modifications.
+   Une réservation ancienne qui n'en a pas reprend le montant du devis, sinon le calcul du moment. */
+function figerAcompteResa(r){
+  try{
+    if(!r || r.acompte !== true || Number(r.acompteMontant) > 0) return r;
+    if(Number(r.devisAcompte) > 0){ r.acompteMontant = Number(r.devisAcompte); return r; }
+    const nets = typeof window.vespraProduitsNets === 'function' ? window.vespraProduitsNets(r.products) : (r.products||[]);
+    const tot = nets.reduce((t, p) => t + (Number(p && p.price) || 0), 0) + (Number(r.livraisonPrice) || 0) + (Number(r.montage) || 0)
+      + (r.supplements || []).reduce((t, x) => t + (Number(x && (x.prix != null ? x.prix : x.price)) || 0), 0);
+    const dm = (cache.demandes||[]).find(x => x && x.resaId && String(x.resaId) === String(r.id));
+    const pc = Number(r.factureClient && r.factureClient.acomptePct) || Number(r.acomptePct) || Number(dm && dm.devisAcomptePct) || 30;
+    if(tot > 0) r.acompteMontant = Math.round(tot * (pc >= 1 && pc <= 100 ? pc : 30)) / 100;
+  }catch(e){}
+  return r;
+}
 function acompteDemande(d){
   if(!d) return 0;
   if(Number(d.devisAcompte) > 0) return Number(d.devisAcompte);
@@ -4327,7 +4344,7 @@ function acompteBlocHTML(d, r, modeForce){
   autres.forEach(x => { total += x.prix; });
   let montant = total > 0 ? Math.round(total*(Number(d.devisAcomptePct)>=1&&Number(d.devisAcomptePct)<=100?Number(d.devisAcomptePct):30))/100 : (demande > 0 ? demande : 0);
   /* acompte déjà reçu : le montant est figé, il ne suit plus les ajouts faits ensuite */
-  const _fige = r && r.acompte === true ? Number(r.acompteMontant) : 0;
+  const _fige = r && r.acompte === true ? (Number(r.acompteMontant) || (Number(r.devisAcompte) > 0 ? Number(r.devisAcompte) : 0)) : 0;
   window._acMontantFiche = {id: String((r && r.id) || (d && d.id) || ''), montant: montant};
   if(_fige > 0) montant = _fige;
 
@@ -4906,6 +4923,7 @@ async function chargerResasCache(){
   cache.resas = (brut||[]).filter(x => x && x.id !== 'cfg' && x.d).map(x => {
     try{ return JSON.parse(x.d); }catch(e){ return null; }
   }).filter(Boolean);
+  cache.resas.forEach(figerAcompteResa);
 }
 
 /* « Modifier » sur la fiche d'une réservation validée : on modifie ici même,
@@ -5358,8 +5376,8 @@ function mdCharger(d){
       const net = x => String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
       const groupes = [];
       (resa.products||[]).forEach(pr => {
-        if(!pr.estOption && !pr.parent) groupes.push({ nom: net(pr.name + ' ' + (pr.variant||'')), total: Number(pr.price)||0, ok: pr.price != null });
-        else if(groupes.length) groupes[groupes.length-1].total += Number(pr.price)||0;
+        if(!pr.estOption && !pr.parent) groupes.push({ nom: net(pr.name + ' ' + (pr.variant||'')), total: Number(pr.price)||0, ok: pr.price != null, opts: [] });
+        else if(groupes.length){ groupes[groupes.length-1].total += Number(pr.price)||0; groupes[groupes.length-1].opts.push(pr); }
       });
       const pris = {};
       mdLignes.forEach(l => {
@@ -5368,6 +5386,15 @@ function mdCharger(d){
         const gi = groupes.findIndex((g, k) => !pris[k] && g.ok && cle && (g.nom.indexOf(cle) === 0 || cle.indexOf(g.nom.split(' ').slice(0,2).join(' ')) === 0));
         if(gi < 0) return;
         pris[gi] = true;
+        /* le prix de chaque option tel qu'il est enregistré au planning (0 € = offerte) se rouvre tel quel */
+        (l.options||[]).forEach(on => {
+          const q = qteOption(on);
+          const ro = groupes[gi].opts.find(x => memeOption(String(x.short || x.name || ''), q.base));
+          if(!ro || ro.price == null) return;
+          const cat = Number(prixOption(l.produit, on, null)) || 0;
+          const reel = Number(ro.price) || 0;
+          if(Math.abs(reel - cat * q.n) > 0.01){ l.optPrix = l.optPrix || {}; const fo = ficheProduit(l.produit, l.formule); const oc = fo && (fo.options||[]).find(o => memeOption(o.nom, q.base)); if(oc) l.optPrix[oc.nom] = q.n > 1 ? reel / q.n : reel; }
+        });
         const t = Math.round(groupes[gi].total * 100) / 100;
         if(t > 0 && Math.abs(t - prixLigne(l)) > 0.01) l.prixForce = t;
       });
@@ -5755,6 +5782,7 @@ async function reporterAuPlanning(d, avant, chg){
     const ligne = (brut||[]).find(x => x && String(x.id) === String(d.resaId));
     if(!ligne || !ligne.d) return;
     const r = JSON.parse(ligne.d);
+    figerAcompteResa(r);
     const av = avant || {};
     const norm = (k, v) => k === 'livraison' ? (/oui/i.test(String(v||'')) ? 'oui' : 'non') : String(v||'').replace(/\r\n?/g,'\n').trim();
     const change = (k) => !avant || norm(k, av[k]) !== norm(k, d[k]);
@@ -7100,7 +7128,9 @@ function produitsDepuisDemande(d, jour, finJour, ignoreId){
       /* on ne tronque plus le nom d'une option : c'est ainsi qu'une
          couleur entière disparaissait de la fiche */
       produits.push({ name: o, short: String(o), cat: cat || 'photobooth',
-        price: (RE_FEUX.test(it.nom||'') && FEUX_PREMIUM_GEN.test(String(o||'').trim())) ? 0 : prixOption(it.nom, o, it.optPrix), variant: 'Standard', estOption: true });
+        price: (RE_FEUX.test(it.nom||'') && FEUX_PREMIUM_GEN.test(String(o||'').trim())) ? 0 : prixOption(it.nom, o, it.optPrix), variant: 'Standard', estOption: true,
+        /* prix fixé sur la fiche (0 € = option offerte) : le planning ne le remplace jamais par le tarif du catalogue */
+        ...(it.optPrix && Object.keys(it.optPrix).some(k => memeOption(k, o)) ? { prixManuel: true } : {}) });
     });
   });
 

@@ -1495,7 +1495,8 @@ function reparerOptionsOrphelines(r){
 }
 function getProductPrice(p){
   // p = reservation product object {name, cat, price, variant}
-  if(p.price!=null && !(Number(p.price)===0 && !p.prixManuel)) return p.price;
+  /* 0 € est un vrai prix pour une option (offerte) ou une ligne marquée « prix saisi » */
+  if(p.price!=null && !(Number(p.price)===0 && !p.prixManuel && p.estOption!==true)) return p.price;
   if(p.price!=null || true){ var _pc=prixDepuisLibelleCompose(p); if(_pc!=null) return _pc; }
   if(p.price!=null) return p.price;
   // Chercher dans le catalogue
@@ -1609,9 +1610,14 @@ function pctAcompte(r){
 function acompteCalcule(r){ return Math.round(calcResTotal(r)*pctAcompte(r))/100; }
 function acompteAttendu(r){
   if(!r) return 0;
-  var f=Number(r.acompteMontant);
-  if(r.acompte===true && f>0) return f;
-  if(r.acompte===true && Number(r.devisAcompte)>0) return Number(r.devisAcompte);
+  if(r.acompte===true){
+    var f=Number(r.acompteMontant);
+    if(f>0) return f;
+    /* acompte reçu sans montant enregistré : on l'enregistre maintenant (montant du devis, sinon calcul du moment),
+       pour qu'il ne bouge plus quand la réservation change ensuite */
+    r.acompteMontant = Number(r.devisAcompte)>0 ? Number(r.devisAcompte) : acompteCalcule(r);
+    return r.acompteMontant;
+  }
   return acompteCalcule(r);
 }
 /* fige le montant reçu au niveau actuel (appelé AVANT une modification de la réservation) */
@@ -3434,7 +3440,7 @@ window.basculerAcompteRecu=function(id){
   var r=R.find(function(x){return String(x.id)===String(id);});
   if(!r)return;
   r.acompte=!(r.acompte===true);
-  if(r.acompte===true){ r.acompteDate=new Date().toISOString().slice(0,10); delete r.acompteMontant; r.acompteMontant=acompteAttendu(r); }
+  if(r.acompte===true){ r.acompteDate=new Date().toISOString().slice(0,10); delete r.acompteMontant; r.acompteMontant=acompteCalcule(r); }
   else { delete r.acompteDate; delete r.acompteMontant; }
   localStorage.setItem('vespraR',JSON.stringify(R));
   if(typeof fbPutRes==='function')fbPutRes(r);
