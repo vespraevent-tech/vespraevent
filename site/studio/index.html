@@ -9795,7 +9795,7 @@ cache.espComptes = {};
 async function espCharger(){
   const z = document.getElementById('espListe'); if(z && !z.innerHTML) z.innerHTML = '<div class="rech-vide">Chargement…</div>';
   try{ if(!cache.demandes) await loadDemandes(true); if(!cache.resas) await chargerResasCache(); }catch(e){}
-  try{ const l = await api('/espace-comptes') || []; cache.espComptes = {}; l.forEach(c => { cache.espComptes[String(c.email).toLowerCase()] = c; }); }catch(e){}
+  try{ const l = await api('/espace-comptes') || []; cache.espComptes = {}; l.forEach(c => { if(!(cache.espSupprimes && cache.espSupprimes[String(c.email).toLowerCase()])) cache.espComptes[String(c.email).toLowerCase()] = c; }); }catch(e){}
   await chargerModifs(); espRendre();
 }
 function espClients(){
@@ -9860,7 +9860,16 @@ function espOuvrir(email, nom){
   q('espB1').onclick = () => post({email:email, nom:nom, genererCode:true}).then(d => { q('espRes').innerHTML = 'Code à envoyer au client : <b style="font-size:18px;letter-spacing:.2em">' + d.code + '</b><br><small style="color:#646D7C">Notez-le : il ne sera plus affichable.</small>'; espCharger(); }).catch(e => { q('espRes').textContent = e.message; });
   if(a){
     q('espB2').onclick = () => post({email:email, actif:!a.actif}).then(() => { ov.remove(); espCharger(); });
-    q('espB3').onclick = () => { if(!confirm('Supprimer cet espace client ? Ses réservations ne sont pas touchées.')) return; api('/espace-comptes?email=' + encodeURIComponent(email), {method:'DELETE'}).then(() => { delete cache.espComptes[String(email).toLowerCase()]; ov.remove(); espRendre(); espCharger(); }).catch(e => alert('Suppression impossible : ' + (e.message || e))); };
+    q('espB3').onclick = () => {
+      /* confirmation dans la fenêtre elle-même (les boîtes confirm() sont parfois bloquées, surtout sur téléphone) */
+      if(!q('espB3').dataset.sur){ q('espB3').dataset.sur = '1'; q('espB3').textContent = 'Confirmer la suppression'; q('espB3').style.cssText = 'background:#b03a2a;color:#fff;border-color:#b03a2a'; q('espRes').innerHTML = '<span style="color:#b03a2a">Cet espace client sera supprimé (ses réservations ne sont pas touchées). Cliquez à nouveau pour confirmer.</span>'; return; }
+      q('espB3').disabled = true; q('espB3').textContent = 'Suppression…';
+      api('/espace-comptes?email=' + encodeURIComponent(email), {method:'DELETE'}).then(d => {
+        if(d && d.ok === false) throw new Error(d.erreur || 'Le serveur n’a pas confirmé la suppression.');
+        cache.espSupprimes = cache.espSupprimes || {}; cache.espSupprimes[String(email).toLowerCase()] = 1;
+        delete cache.espComptes[String(email).toLowerCase()]; ov.remove(); espRendre(); espCharger();
+      }).catch(e => { q('espB3').disabled = false; q('espB3').textContent = 'Supprimer'; q('espRes').innerHTML = '<span style="color:#9e2a2a">Suppression impossible : ' + esc(e.message || String(e)) + '</span>'; });
+    };
   }
 }
 /* le nom du client, sur une fiche, mène à son espace client */

@@ -1691,6 +1691,9 @@ async function espaceAdmin(request, url, path) {
        la liste des clés peut rester en retard quelques secondes, le compte, lui, n'apparaît plus */
     try { await store.setJSON(cleCompte(email), { email, supprime: true, actif: false, v: Date.now(), supprimeLe: new Date().toISOString() }); } catch {}
     try { await store.delete(cleCompte(email)); } catch {}
+    /* vérification : la relecture doit montrer un compte absent ou marqué supprimé */
+    let reste = null; try { reste = await store.get(cleCompte(email), { type: 'json', consistency: 'strong' }); } catch {}
+    if (reste && !reste.supprime) return json({ ok: false, erreur: 'Le compte est toujours présent après suppression (stockage).' });
     return json({ ok: true });
   }
   if (path === '/espace-modifs' && request.method === 'GET') return json(await demandesModif(''));
