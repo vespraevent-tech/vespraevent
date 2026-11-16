@@ -1238,7 +1238,7 @@ document.addEventListener('DOMContentLoaded',function(){
   document.getElementById('mdMulti').addEventListener('click',function(e){
     var b=e.target.closest('button');if(!b)return;
     var o=b.closest('.md-row').querySelector('output'),n=+o.textContent||0;
-    if(b.classList.contains('mp')){n++;var ci=COUL_IMG[b.closest('.md-row').dataset.c],mi=document.getElementById('prodMainImg');if(ci&&mi){mi.src=ci.s;mi.alt=ci.a+' — Location Vespra Event';document.querySelectorAll('#prodThumbs .prod-thumb').forEach(function(t){t.classList.remove('active')});}}
+    if(b.classList.contains('mp')){n++;var ki=PG_IMGS.findIndex(function(x){return x.c===b.closest('.md-row').dataset.c});if(ki>=0)pgShow(ki);}
     if(b.classList.contains('mm')&&n>0)n--;
     o.textContent=n;majQte();
   });
@@ -1342,8 +1342,7 @@ function toggleFaq(btn){
 })();
 
 /* — galerie produit — */
-const PG_IMGS=[{"s": "mange-debout.webp", "a": "Mange-debout avec housses blanche et noire sur une terrasse", "t": "mange-debout-t.webp"}, {"s": "mange-debout-ambiance-verte.webp", "a": "Mange-debout avec housse verte, cocktail en extérieur", "t": "mange-debout-ambiance-verte-t.webp"}, {"s": "mange-debout-table.webp", "a": "Mange-debout, table haute pliante", "t": "mange-debout-table-t.webp"}];
-const COUL_IMG={"blanche": {"s": "mange-debout-blanche.webp", "a": "Mange-debout avec housse blanche"}, "noire": {"s": "mange-debout-noire.webp", "a": "Mange-debout avec housse noire"}, "brune": {"s": "mange-debout-brune.webp", "a": "Mange-debout avec housse brune"}, "or": {"s": "mange-debout-or.webp", "a": "Mange-debout avec housse or"}, "bleu": {"s": "mange-debout-bleu.webp", "a": "Mange-debout avec housse bleu foncé"}, "bordeaux": {"s": "mange-debout-bordeaux.webp", "a": "Mange-debout avec housse bordeaux"}, "verte": {"s": "mange-debout-verte.webp", "a": "Mange-debout avec housse verte"}, "terracotta": {"s": "mange-debout-terracotta.webp", "a": "Mange-debout avec housse terracotta"}};
+const PG_IMGS=[{"s": "mange-debout.webp", "a": "Mange-debout avec housses blanche et noire sur une terrasse", "t": "mange-debout-t.webp"}, {"s": "mange-debout-ambiance-verte.webp", "a": "Mange-debout avec housse verte, cocktail en extérieur", "t": "mange-debout-ambiance-verte-t.webp"}, {"s": "mange-debout-table.webp", "a": "Mange-debout, table haute pliante", "t": "mange-debout-table-t.webp"}, {"s": "mange-debout-blanche.webp", "a": "Mange-debout avec housse blanche", "t": "mange-debout-blanche-t.webp", "c": "blanche"}, {"s": "mange-debout-noire.webp", "a": "Mange-debout avec housse noire", "t": "mange-debout-noire-t.webp", "c": "noire"}, {"s": "mange-debout-brune.webp", "a": "Mange-debout avec housse brune", "t": "mange-debout-brune-t.webp", "c": "brune"}, {"s": "mange-debout-or.webp", "a": "Mange-debout avec housse or", "t": "mange-debout-or-t.webp", "c": "or"}, {"s": "mange-debout-bleu.webp", "a": "Mange-debout avec housse bleu foncé", "t": "mange-debout-bleu-t.webp", "c": "bleu"}, {"s": "mange-debout-bordeaux.webp", "a": "Mange-debout avec housse bordeaux", "t": "mange-debout-bordeaux-t.webp", "c": "bordeaux"}, {"s": "mange-debout-verte.webp", "a": "Mange-debout avec housse verte", "t": "mange-debout-verte-t.webp", "c": "verte"}, {"s": "mange-debout-terracotta.webp", "a": "Mange-debout avec housse terracotta", "t": "mange-debout-terracotta-t.webp", "c": "terracotta"}];
 let _pgI=0;
 function pgThumbs(){
   const wrap=document.getElementById('prodThumbs');
