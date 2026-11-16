@@ -194,6 +194,32 @@ $('b-stop').onclick = arreterRec;
     if (v === cfg.pin) ouvrirAdmin(); else $('pin-err').textContent = 'Code incorrect.';
   };
   $('pin-in').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('pin-ok').click(); });
+  /* ── décor de Noël : sapins et guirlandes fixes (rien ne bouge) ── */
+  (function () {
+    var cols = ['#F59E0B', '#ffffff', '#e8564a', '#7cc4f2'];
+    var guirlande = (function () {
+      var p = 'M-10,6', b = '';
+      for (var x = 0; x <= 810; x += 90) { p += ' Q' + (x + 45) + ',46 ' + (x + 90) + ',6'; }
+      for (var k = 0; k < 18; k++) { var x2 = 22 + k * 45, y = 6 + 30 * Math.sin(Math.PI * ((k * 45 + 22) % 90) / 90) * 0.92 + 4; b += '<line x1="' + x2 + '" y1="' + (y - 3) + '" x2="' + x2 + '" y2="' + (y + 1) + '" stroke="#ffffff55" stroke-width="1.2"/><ellipse cx="' + x2 + '" cy="' + (y + 7) + '" rx="4.2" ry="6" fill="' + cols[k % 4] + '"/>'; }
+      return '<svg viewBox="0 0 800 60" preserveAspectRatio="xMidYMin slice" width="100%" height="100%"><path d="' + p + '" fill="none" stroke="#ffffff66" stroke-width="1.6"/>' + b + '</svg>';
+    })();
+    function sapin(x, h, id) {
+      var w = h * 0.62, y0 = 118, lum = '';
+      var pts = [[0.28, -0.12], [0.52, 0.1], [0.74, -0.08], [0.4, 0.14], [0.62, -0.22], [0.5, 0.02]];
+      pts.forEach(function (q, i) { lum += '<circle cx="' + (x + (q[1] * w)) + '" cy="' + (y0 - h * (1 - q[0]) - 0) + '" r="2.4" fill="' + cols[(i + id) % 4] + '"/>'; });
+      return '<g><rect x="' + (x - w * 0.05) + '" y="' + (y0 - h * 0.1) + '" width="' + (w * 0.1) + '" height="' + (h * 0.1) + '" fill="#6b4a2f"/>' +
+        '<polygon points="' + x + ',' + (y0 - h) + ' ' + (x + w * 0.3) + ',' + (y0 - h * 0.62) + ' ' + (x - w * 0.3) + ',' + (y0 - h * 0.62) + '" fill="#2f8a5b"/>' +
+        '<polygon points="' + x + ',' + (y0 - h * 0.8) + ' ' + (x + w * 0.4) + ',' + (y0 - h * 0.32) + ' ' + (x - w * 0.4) + ',' + (y0 - h * 0.32) + '" fill="#278253"/>' +
+        '<polygon points="' + x + ',' + (y0 - h * 0.55) + ' ' + (x + w * 0.5) + ',' + (y0 - h * 0.1) + ' ' + (x - w * 0.5) + ',' + (y0 - h * 0.1) + '" fill="#1f6f47"/>' + lum +
+        '<polygon points="' + x + ',' + (y0 - h - 7) + ' ' + (x + 2.6) + ',' + (y0 - h - 1.5) + ' ' + (x + 8) + ',' + (y0 - h - 1.5) + ' ' + (x + 3.6) + ',' + (y0 - h + 2) + ' ' + (x + 5.4) + ',' + (y0 - h + 8) + ' ' + x + ',' + (y0 - h + 4.5) + ' ' + (x - 5.4) + ',' + (y0 - h + 8) + ' ' + (x - 3.6) + ',' + (y0 - h + 2) + ' ' + (x - 8) + ',' + (y0 - h - 1.5) + ' ' + (x - 2.6) + ',' + (y0 - h - 1.5) + '" fill="#F59E0B"/></g>';
+    }
+    var arbres = '', hs = [70, 96, 58, 84, 104, 62, 90, 72, 100, 64], k;
+    for (k = 0; k < 10; k++) arbres += sapin(40 + k * 80, hs[k], k);
+    var sol = '<svg viewBox="0 0 800 120" preserveAspectRatio="xMidYMax meet" width="100%" height="100%"><rect x="0" y="116" width="800" height="4" rx="2" fill="#ffffff55"/>' + arbres + '</svg>';
+    Array.prototype.forEach.call(document.querySelectorAll('.noel-haut'), function (n) { n.innerHTML = guirlande; });
+    Array.prototype.forEach.call(document.querySelectorAll('.noel-bas'), function (n) { n.innerHTML = sol; });
+  })();
+
   /* ── événements : cartes, réglages de chacun, un seul « en cours » ── */
   function nouvelId() { return 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
   function evts() {
@@ -204,7 +230,7 @@ $('b-stop').onclick = arreterRec;
   function appliquerActif() {
     var e = evts().filter(function (x) { return x.id === cfg.actif; })[0];
     cfg.event = e ? (e.nom + (e.date ? ' — ' + e.date : '')) : '';
-    cfg.titre = (e && e.titre) || CFG0.titre; cfg.sous = e ? (e.sous || '') : CFG0.sous; cfg.max = (e && Number(e.max)) || 30; cfg.cam = (e && e.cam) || '';
+    cfg.titre = (e && e.titre) || CFG0.titre; cfg.sous = e ? (e.sous || '') : CFG0.sous; cfg.max = (e && Number(e.max)) || 30; cfg.cam = (e && e.cam) || ''; cfg.noel = !!(e && e.noel); document.body.classList.toggle('noel-on', cfg.noel);
     ecrireCfg(cfg);
   }
   var edite = null;
@@ -226,7 +252,7 @@ $('b-stop').onclick = arreterRec;
   }
   function ouvrirEdition(id) {
     var e = evts().filter(function (x) { return x.id === id; })[0]; if (!e) return; edite = e;
-    $('e-nom').value = e.nom; $('e-date').value = e.date || ''; $('e-titre').value = e.titre || ''; $('e-sous').value = e.sous || ''; $('e-max').value = e.max || 30;
+    $('e-nom').value = e.nom; $('e-noel').checked = !!e.noel; $('e-date').value = e.date || ''; $('e-titre').value = e.titre || ''; $('e-sous').value = e.sous || ''; $('e-max').value = e.max || 30;
     var sel = $('e-cam'); sel.innerHTML = '<option value="">Caméra avant (par défaut)</option>';
     if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) navigator.mediaDevices.enumerateDevices().then(function (d) { d.filter(function (x) { return x.kind === 'videoinput'; }).forEach(function (x, i) { var o = document.createElement('option'); o.value = x.deviceId; o.textContent = x.label || ('Caméra ' + (i + 1)); if (x.deviceId === e.cam) o.selected = true; sel.appendChild(o); }); }).catch(function () {});
     $('e-titre-h').textContent = e.nom || 'Nouvel événement';
@@ -236,7 +262,7 @@ $('b-stop').onclick = arreterRec;
   function lireEdition() {
     if (!edite) return;
     edite.nom = $('e-nom').value.trim(); edite.date = $('e-date').value.trim(); edite.titre = $('e-titre').value.trim() || CFG0.titre; edite.sous = $('e-sous').value.trim();
-    edite.max = Math.min(120, Math.max(5, Number($('e-max').value) || 30)); edite.cam = $('e-cam').value;
+    edite.max = Math.min(120, Math.max(5, Number($('e-max').value) || 30)); edite.cam = $('e-cam').value; edite.noel = $('e-noel').checked;
   }
   function sauverConnexion() { cfg.serveur = $('a-serveur').value.trim(); cfg.cle = $('a-cle').value.trim() || cfg.cle; ecrireCfg(cfg); }
   $('a-serveur').onchange = $('a-cle').onchange = sauverConnexion;

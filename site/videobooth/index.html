@@ -10,11 +10,12 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="/favicon.png">
 <link rel="stylesheet" href="/polices.css?v=1">
-<link rel="stylesheet" href="app.css?v=11">
+<link rel="stylesheet" href="app.css?v=12">
 </head>
 <body>
 <main id="app">
   <section id="s-accueil" class="ecran on">
+    <div class="noel noel-haut" aria-hidden="true"></div><div class="noel noel-bas" aria-hidden="true"></div>
     <button id="cadenas" class="cadenas" type="button" aria-label="Réglages"></button>
     <h1 id="t-accueil">Enregistrer un souvenir</h1>
     <p id="p-accueil">Laissez un petit message vidéo de 30 secondes</p>
@@ -54,6 +55,7 @@
   </section>
 
   <section id="s-merci" class="ecran">
+    <div class="noel noel-haut" aria-hidden="true"></div><div class="noel noel-bas" aria-hidden="true"></div>
     <div class="coche-ok">✓</div>
     <h2>Merci !</h2>
     <p>Votre vidéo vous sera envoyée par e-mail.</p>
@@ -86,6 +88,7 @@
           <label>Titre d’accueil<input id="e-titre" type="text"></label>
           <label>Sous-titre<input id="e-sous" type="text"></label>
         </div>
+        <label class="adm-chk"><input id="e-noel" type="checkbox"><span>Thème Noël : sapins et guirlandes sur l’écran d’accueil et de remerciement</span></label>
         <div class="adm-2">
           <label>Durée maximale (secondes)<input id="e-max" type="number" min="5" max="120"></label>
           <label>Caméra<select id="e-cam"></select></label>
@@ -102,6 +105,6 @@
     <div class="rang"><button id="pin-x" class="sec" type="button">Annuler</button><button id="pin-ok" class="gros" type="button">Valider</button></div>
   </section>
 </main>
-<script src="app.js?v=11"></script>
+<script src="app.js?v=12"></script>
 </body>
 </html>
