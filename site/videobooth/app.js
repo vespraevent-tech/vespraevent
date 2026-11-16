@@ -7,6 +7,11 @@
   function lireCfg() { try { return Object.assign({}, CFG0, JSON.parse(localStorage.getItem('vb-cfg') || '{}')); } catch (e) { return Object.assign({}, CFG0); } }
   function ecrireCfg(c) { try { localStorage.setItem('vb-cfg', JSON.stringify(c)); } catch (e) {} }
   var cfg = lireCfg(); if (!cfg.pin) cfg.pin = '0104';
+  /* appairage rapide : ouvrir /videobooth/#cle=VOTRE_CLE une seule fois enregistre la clé sur la tablette */
+  try {
+    var mh = /[#&?]cle=([^&]+)/.exec(location.hash || '');
+    if (mh) { cfg.cle = decodeURIComponent(mh[1]).trim(); ecrireCfg(cfg); history.replaceState(null, '', location.pathname); }
+  } catch (e) {}
 
   /* ───────── base locale ───────── */
   var DB = null;
@@ -128,7 +133,7 @@ $('b-stop').onclick = arreterRec;
       var att = l.filter(function (v) { return !v.envoye; }).length, tot = l.length;
       var txt = att ? (att + ' vidéo' + (att > 1 ? 's' : '') + ' en attente d’envoi') : (tot ? 'Toutes les vidéos sont envoyées' : '');
       
-      $('a-file').textContent = tot + ' vidéo(s) gardée(s) sur la tablette, dont ' + (tot - att) + ' envoyée(s)' + (att ? ' — ' + att + ' en attente' : '') + (dernierMsg ? ' — ' + dernierMsg : '');
+      $('a-file').textContent = (cfg.cle ? '' : '⚠ Clé de l’appareil vide : aucune vidéo ne peut partir. ') + tot + ' vidéo(s) gardée(s) sur la tablette, dont ' + (tot - att) + ' envoyée(s)' + (att ? ' — ' + att + ' en attente' : '') + (dernierMsg ? ' — ' + dernierMsg : '');
     }).catch(function () {});
   }
   var TAILLE = 3 * 1024 * 1024;
