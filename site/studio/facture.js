@@ -365,15 +365,15 @@
 
       '<div class="fc-champ" id="fcBlocCond">' +
         '<label class="fc-l" for="fcCondMode">Conditions de règlement</label>' +
-        '<div class="fc-ligne">' +
-          '<select class="fc-input fc-input-court" id="fcCondMode" style="width:auto;margin-right:10px;max-width:100%">' +
-            [['', 'Conditions habituelles'], ['commande', 'Totalité à la commande, avant livraison'], ['avant', 'Totalité X jours avant l’événement'],
-             ['apres', 'Totalité X jours après l’événement'], ['reception', 'À réception de la facture']]
+        '<div>' +
+          '<select class="fc-input" id="fcCondMode" style="width:100%;max-width:100%;box-sizing:border-box">' +
+            [['', 'Conditions habituelles'], ['commande', 'À la validation du devis'], ['avant', 'X jours avant l’événement'],
+             ['apres', 'X jours après l’événement'], ['reception', 'À réception de la facture']]
               .map(function (o) { return '<option value="' + o[0] + '"' + (((vu.cond || {}).mode || '') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') +
           '</select>' +
-          '<span id="fcCondJoursBloc" hidden><input class="fc-input fc-input-court" id="fcCondJours" type="number" min="1" max="365" step="1" value="' + (Number((vu.cond || {}).jours) || '') + '" placeholder="jours" style="width:80px"><span class="fc-unite">jours</span></span>' +
+          '<div id="fcCondJoursBloc" style="display:' + ((((vu.cond || {}).mode) === 'avant' || (((vu.cond || {}).mode) === 'apres')) ? 'flex' : 'none') + ';align-items:center;gap:8px;margin-top:8px"><input class="fc-input" id="fcCondJours" type="number" min="1" max="365" step="1" inputmode="numeric" value="' + (Number((vu.cond || {}).jours) || '') + '" placeholder="Nombre" aria-label="Nombre de jours" style="width:110px;max-width:50%;box-sizing:border-box"><span>jours</span></div>' +
         '</div>' +
-        '<input class="fc-input" id="fcCondNote" type="text" maxlength="300" style="margin-top:8px" value="' + txt((vu.cond || {}).note || '') + '" placeholder="Précision libre (facultatif) : ex. virement avant le 10 juin">' +
+        '<input class="fc-input" id="fcCondNote" type="text" maxlength="300" style="margin-top:8px;width:100%;box-sizing:border-box" value="' + txt((vu.cond || {}).note || '') + '" placeholder="Précision libre (facultatif)">' +
         '<p class="fc-aide" id="fcAideCond"></p>' +
       '</div>' +
 
@@ -443,7 +443,7 @@
     }
     function majCond() {
       var mode = zone.querySelector('#fcCondMode').value;
-      zone.querySelector('#fcCondJoursBloc').hidden = !(mode === 'avant' || mode === 'apres');
+      zone.querySelector('#fcCondJoursBloc').style.display = (mode === 'avant' || mode === 'apres') ? 'flex' : 'none';
       var cb = zone.querySelector('#fcAvecAcompte');
       var aide = zone.querySelector('#fcAideCond');
       /* règlement de la totalité : un acompte n'a plus de sens, il est retiré */
@@ -451,7 +451,7 @@
       var j = Number((zone.querySelector('#fcCondJours') || {}).value) || 0;
       var txtAide = {
         '': 'Le document garde ses conditions habituelles.',
-        commande: devis ? 'Le client règle la totalité à la validation du devis ; l’acompte est désactivé.' : 'Totalité à régler à la validation, avant la livraison.',
+        commande: devis ? 'Le client règle la totalité à la validation du devis, avant la livraison ; l’acompte est désactivé.' : 'Totalité à régler à la validation, avant la livraison.',
         avant: j ? 'Totalité à régler au plus tard ' + j + ' jour' + (j > 1 ? 's' : '') + ' avant l’événement.' : 'Indiquez le nombre de jours.',
         apres: j ? 'Totalité à régler ' + j + ' jour' + (j > 1 ? 's' : '') + ' après l’événement.' : 'Indiquez le nombre de jours.',
         reception: 'Totalité à régler à réception de la facture.'

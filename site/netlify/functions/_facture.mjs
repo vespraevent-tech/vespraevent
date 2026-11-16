@@ -301,7 +301,7 @@ export function conditionsReglement(c) {
   const j = (n) => n + ' jour' + (n > 1 ? 's' : '');
   let court = '', long = '';
   if (mode === 'commande') {
-    court = 'à la commande';
+    court = 'à la validation du devis';
     long = 'Règlement de la totalité du montant à la validation du devis, par virement bancaire, avant la livraison du matériel. La réservation est confirmée à réception du paiement.';
   } else if (mode === 'avant' && jours > 0) {
     court = j(jours) + ' avant l\u2019événement';
