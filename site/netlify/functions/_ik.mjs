@@ -24,7 +24,7 @@ export function construireEtatIK({ emetteur, beneficiaire, annee, vehicule, traj
   let cumul = 0;
   const lignes = tri.map((t) => {
     const km = Number(t.km), avant = cumul; cumul += km;
-    return { date: jourFr(t.date) || String(t.date || ''), motif: String(t.motif || ''), depart: String(t.depart || ''), arrivee: String(t.arrivee || ''), etapes: String(t.etapes || ''), client: String(t.client || ''), km, cumul,
+    return { date: jourFr(t.date) || String(t.date || ''), motif: String(t.motif || ''), depart: String(t.depart || ''), arrivee: String(t.arrivee || ''), etapes: String(t.etapes || ''), legs: Array.isArray(t.legs) ? t.legs.slice(0, 20).map((g) => ({ de: String(g.de || ''), vers: String(g.vers || ''), km: Number(g.km) || 0 })) : [], client: String(t.client || ''), km, cumul,
       ind: Math.round((ik(cumul, cv, elec) - ik(avant, cv, elec)) * 100) / 100 };
   });
   const totalKm = cumul, total = Math.round(lignes.reduce((t, l) => t + l.ind, 0) * 100) / 100;
@@ -66,7 +66,7 @@ export function construireEtatIK({ emetteur, beneficiaire, annee, vehicule, traj
   for (const l of lignes) {
     const iti = [l.depart && l.arrivee ? `De ${l.depart} à ${l.arrivee}` : (l.depart ? 'Départ : ' + l.depart : 'Arrivée : ' + l.arrivee), l.etapes ? 'étapes : ' + l.etapes : ''].filter(Boolean).join(' — ');
     const m1 = couper([l.motif || 'Déplacement professionnel', l.client ? '(' + l.client + ')' : ''].filter(Boolean).join(' '), 9, true, lg);
-    const m2 = iti ? couper(iti, 8, false, lg) : [];
+    const m2 = l.legs.length > 1 ? l.legs.flatMap((g) => couper(`${g.de || '?'} > ${g.vers || '?'} : ${nb(g.km, g.km % 1 ? 1 : 0)} km`, 8, false, lg)) : (iti ? couper(iti, 8, false, lg) : []);
     const hh = (m1.length + m2.length) * 11 + 12;
     if (y - hh < 150) { p = nouvelle(); y = A4H - 70; y = entete(p, y); }
     p.texte(X.date, y, l.date, { taille: 9, couleur: NOIR });

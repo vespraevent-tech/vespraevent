@@ -2045,7 +2045,7 @@ const gestionnaire = async (request) => {
         emetteur: ENT.emetteur, beneficiaire: String(corps.beneficiaire || '').slice(0, 120), annee: String(corps.annee || '').slice(0, 4),
         vehicule: { cv: String(v.cv || '5'), elec: v.elec === true, immat: String(v.immat || '').slice(0, 20) },
         reference: String(corps.reference || '').slice(0, 60),
-        trajets: trajets.map((t) => ({ date: String(t.date || '').slice(0, 10), motif: String(t.motif || '').slice(0, 160), client: String(t.client || '').slice(0, 100), depart: String(t.depart || '').slice(0, 160), arrivee: String(t.arrivee || '').slice(0, 160), etapes: String(t.etapes || '').slice(0, 200), km: Number(t.km) || 0 })),
+        trajets: trajets.map((t) => ({ date: String(t.date || '').slice(0, 10), motif: String(t.motif || '').slice(0, 160), client: String(t.client || '').slice(0, 100), depart: String(t.depart || '').slice(0, 160), arrivee: String(t.arrivee || '').slice(0, 160), etapes: String(t.etapes || '').slice(0, 200), legs: (Array.isArray(t.legs) ? t.legs : []).slice(0, 20).map((g) => ({ de: String(g.de || '').slice(0, 120), vers: String(g.vers || '').slice(0, 120), km: Number(g.km) || 0 })), km: Number(t.km) || 0 })),
       });
       const nom = ('etat-km-' + String(corps.beneficiaire || '').replace(/[^A-Za-z0-9]+/g, '-') + '-' + String(corps.annee || '')).slice(0, 80) + '.pdf';
       return new Response(pdf, { status: 200, headers: { 'content-type': 'application/pdf', 'cache-control': 'private, no-store', 'content-disposition': `attachment; filename="${nom}"` } });

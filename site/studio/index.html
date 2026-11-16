@@ -1032,7 +1032,7 @@ body.bo-masque .bo-oeil-bar .o-ferme{display:block}
 .fd-modifs .m{padding:6px 0}
 .fd-modifs input{width:100%;border:1px solid #dcd5c8;border-radius:8px;padding:6px 10px;margin:6px 0;font:12px Inter,sans-serif}
 #panel-videobooth{min-width:0;max-width:100%;overflow-x:hidden}#panel-videobooth .toolbar{flex-wrap:wrap;gap:10px}#panel-videobooth .actions-bar{margin-left:0!important;flex-wrap:wrap;gap:8px}
-.ik-w{flex:1 1 280px}.ik-elec{flex:0 0 120px}.ik-elec input{width:20px;height:20px;padding:0}.ik-an{margin-top:14px;background:#fff;border:1px solid var(--g3);border-radius:12px;overflow:hidden}.ik-anh{display:flex;justify-content:space-between;gap:10px;padding:12px 16px;background:#f7f5f0;font-size:14px}.ik-l{display:flex;justify-content:space-between;gap:12px;padding:11px 16px;border-top:1px solid #eee8dc;font-size:13.5px;align-items:center}.ik-s{font-size:12px;color:#8a8f98;margin-top:2px}.ik-r{display:flex;align-items:center;gap:12px;white-space:nowrap}.ik-r span{color:#6b7280}.ik-x{background:none;border:0;color:#b03a2a;font-size:20px;cursor:pointer}#ikApercu b{font-size:17px;color:var(--navy)}#ikApercu span{color:#8a8f98;font-size:12.5px}@media(max-width:560px){.ik-l{flex-direction:column;align-items:flex-start}}
+.ik-legs .ik-lg{display:grid;grid-template-columns:1fr 1fr 90px 32px;gap:8px;margin-bottom:8px}.ik-legs .ik-lg input{width:100%}.ik-legb{display:flex;gap:8px;flex-wrap:wrap}@media(max-width:620px){.ik-legs .ik-lg{grid-template-columns:1fr 1fr 70px 28px}}.ik-w{flex:1 1 280px}.ik-elec{flex:0 0 120px}.ik-elec input{width:20px;height:20px;padding:0}.ik-an{margin-top:14px;background:#fff;border:1px solid var(--g3);border-radius:12px;overflow:hidden}.ik-anh{display:flex;justify-content:space-between;gap:10px;padding:12px 16px;background:#f7f5f0;font-size:14px}.ik-l{display:flex;justify-content:space-between;gap:12px;padding:11px 16px;border-top:1px solid #eee8dc;font-size:13.5px;align-items:center}.ik-s{font-size:12px;color:#8a8f98;margin-top:2px}.ik-r{display:flex;align-items:center;gap:12px;white-space:nowrap}.ik-r span{color:#6b7280}.ik-x{background:none;border:0;color:#b03a2a;font-size:20px;cursor:pointer}#ikApercu b{font-size:17px;color:var(--navy)}#ikApercu span{color:#8a8f98;font-size:12.5px}@media(max-width:560px){.ik-l{flex-direction:column;align-items:flex-start}}
 </style>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=7">
   <link rel="manifest" href="/studio/manifest.webmanifest">
@@ -1895,10 +1895,9 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
         <div class="nf-form">
           <label class="nf-c nf-date"><span>Date</span><input type="date" id="ikDate" oninput="ikAper()"></label>
           <label class="nf-c nf-motif"><span>Motif (justification)</span><input type="text" id="ikMotif" placeholder="ex. Livraison mariage Cathy, retour du matériel" autocomplete="off"></label>
-          <label class="nf-c"><span>Kilomètres</span><input type="text" inputmode="decimal" id="ikKm" oninput="ikAper()"></label>
-          <label class="nf-c ik-w"><span>Adresse de départ</span><input type="text" id="ikDep" placeholder="ex. Dépôt, 35500 Vitré" autocomplete="off"></label>
-          <label class="nf-c ik-w"><span>Adresse d’arrivée</span><input type="text" id="ikArr" placeholder="ex. Salle des fêtes, 35300 Fougères" autocomplete="off"></label>
-          <label class="nf-c ik-w"><span>Étapes (facultatif, si boucle)</span><input type="text" id="ikEtapes" placeholder="ex. Fougères → Louvigné → Vitré" autocomplete="off"></label>
+          <label class="nf-c"><span>Total kilomètres</span><input type="text" id="ikKm" readonly tabindex="-1" placeholder="0"></label>
+          <div class="ik-legs nf-c" style="flex:1 1 100%"><span>Itinéraire : un tronçon par ligne, avec ses kilomètres (une boucle = plusieurs lignes)</span><div id="ikLegs"></div>
+            <div class="ik-legb"><button type="button" class="btn btn-ghost" onclick="ikLegAdd()">+ Ajouter un tronçon</button><button type="button" class="btn btn-ghost" onclick="ikLegRetour()">↩ Retour au point de départ</button></div></div>
           <label class="nf-c ik-w"><span>Client / événement (facultatif)</span><input type="text" id="ikClient" placeholder="ex. Mariage Cathy — 21 novembre" autocomplete="off"></label>
           <label class="nf-c nf-benef"><span>Bénéficiaire</span><select id="ikBenef" onchange="ikAper()"></select></label>
           <label class="nf-c"><span>Puissance fiscale</span><select id="ikCv" onchange="ikReglages()"></select></label>

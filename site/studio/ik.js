@@ -49,6 +49,31 @@
     return l.length ? l : ['Thomas DEL\'HOMMEAU', 'Damien MARION'];
   }
 
+  /* ── itinéraire par tronçons ── */
+  var legs = [{ de: '', vers: '', km: '' }];
+  function num(v) { return parseFloat(String(v).replace(',', '.')) || 0; }
+  function totalLegs() { return legs.reduce(function (t, l) { return t + num(l.km); }, 0); }
+  window.ikLegsRendre = function () {
+    el('ikLegs').innerHTML = legs.map(function (l, i) {
+      return '<div class="ik-lg"><input type="text" data-i="' + i + '" data-k="de" value="' + esc2(l.de) + '" placeholder="' + (i ? 'Départ du tronçon' : 'Départ (ex. Vitré)') + '" autocomplete="off">' +
+        '<input type="text" data-i="' + i + '" data-k="vers" value="' + esc2(l.vers) + '" placeholder="Arrivée (ex. Vezin-le-Coquet)" autocomplete="off">' +
+        '<input type="text" inputmode="decimal" data-i="' + i + '" data-k="km" value="' + esc2(l.km) + '" placeholder="km" autocomplete="off">' +
+        '<button type="button" class="ik-x" onclick="ikLegDel(' + i + ')" aria-label="Retirer ce tronçon">×</button></div>';
+    }).join('');
+    Array.prototype.forEach.call(el('ikLegs').querySelectorAll('input'), function (inp) {
+      inp.oninput = function () {
+        var i = +inp.dataset.i, k = inp.dataset.k; legs[i][k] = inp.value;
+        if (k === 'vers' && legs[i + 1] && !legs[i + 1].de) { legs[i + 1].de = inp.value; var n = el('ikLegs').querySelector('input[data-i="' + (i + 1) + '"][data-k="de"]'); if (n) n.value = inp.value; }
+        ikTotal();
+      };
+    });
+    ikTotal();
+  };
+  function ikTotal() { var t = totalLegs(); el('ikKm').value = t ? fmt(t, 1) : ''; ikAper(); }
+  window.ikLegAdd = function () { var p = legs[legs.length - 1]; legs.push({ de: p ? p.vers : '', vers: '', km: '' }); ikLegsRendre(); var n = el('ikLegs').querySelectorAll('input[data-k="vers"]'); if (n.length) n[n.length - 1].focus(); };
+  window.ikLegRetour = function () { var p = legs[legs.length - 1]; legs.push({ de: p ? p.vers : '', vers: legs[0].de, km: '' }); ikLegsRendre(); var n = el('ikLegs').querySelectorAll('input[data-k="km"]'); if (n.length) n[n.length - 1].focus(); };
+  window.ikLegDel = function (i) { legs.splice(i, 1); if (!legs.length) legs.push({ de: '', vers: '', km: '' }); ikLegsRendre(); };
+
   window.nfOnglet = function (v) {
     el('nfVueNotes').hidden = v !== 'notes'; el('nfVueIK').hidden = v !== 'ik';
     el('nfOngNotes').classList.toggle('on', v === 'notes'); el('nfOngIK').classList.toggle('on', v === 'ik');
@@ -60,7 +85,7 @@
     cv.value = loc('cv') || '5'; el('ikElec').checked = loc('elec') === '1'; el('ikImmat').value = loc('immat') || '';
     var b = el('ikBenef'), cur = b.value; b.innerHTML = benefs().map(function (x) { return '<option>' + esc2(x) + '</option>'; }).join(''); if (cur) b.value = cur;
     if (!el('ikDate').value) el('ikDate').value = aujourdhui();
-    ikAper();
+    ikLegsRendre();
     if (!charge) ikCharger();
   };
   async function ikCharger() {
@@ -72,7 +97,7 @@
 
   /* aperçu : indemnité du trajet saisi, compte tenu des kilomètres déjà faits cette année */
   window.ikAper = function () {
-    var km = parseFloat(String(el('ikKm').value).replace(',', '.')) || 0, benef = el('ikBenef').value, date = el('ikDate').value || aujourdhui();
+    var km = totalLegs(), benef = el('ikBenef').value, date = el('ikDate').value || aujourdhui();
     var tmp = lignes.concat([{ id: 'zzzz~', date: date, km: km, benef: benef, cv: el('ikCv').value, elec: el('ikElec').checked }]);
     var l = calculer(tmp).filter(function (x) { return x.id === 'zzzz~'; })[0];
     el('ikApercu').innerHTML = km > 0
@@ -81,13 +106,13 @@
   };
 
   window.ikAjouter = async function () {
-    var km = parseFloat(String(el('ikKm').value).replace(',', '.')) || 0;
+    var km = totalLegs(), pleins = legs.filter(function (l) { return num(l.km) > 0; });
     if (km <= 0) { if (typeof showToast === 'function') showToast('Indiquez le nombre de kilomètres', true); return; }
-    var item = { id: 'ik' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), date: el('ikDate').value || aujourdhui(), motif: el('ikMotif').value.trim(), depart: el('ikDep').value.trim(), arrivee: el('ikArr').value.trim(), etapes: el('ikEtapes').value.trim(), client: el('ikClient').value.trim(), immat: el('ikImmat').value.trim(), km: km,
+    var item = { id: 'ik' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), date: el('ikDate').value || aujourdhui(), motif: el('ikMotif').value.trim(), depart: (pleins[0] || {}).de ? pleins[0].de.trim() : '', arrivee: pleins.length ? String(pleins[pleins.length - 1].vers || '').trim() : '', etapes: pleins.slice(0, -1).map(function (l) { return String(l.vers || '').trim(); }).filter(Boolean).join(' > '), legs: pleins.map(function (l) { return { de: String(l.de || '').trim(), vers: String(l.vers || '').trim(), km: num(l.km) }; }), client: el('ikClient').value.trim(), immat: el('ikImmat').value.trim(), km: km,
       benef: el('ikBenef').value, cv: el('ikCv').value, elec: el('ikElec').checked };
     try {
       await api('/data', { method: 'POST', body: JSON.stringify({ collection: 'indemnites-km', item: item }) });
-      lignes.push(item); el('ikKm').value = ''; el('ikMotif').value = ''; el('ikDep').value = ''; el('ikArr').value = ''; el('ikEtapes').value = ''; el('ikClient').value = ''; ikRendre(); ikAper();
+      lignes.push(item); legs = [{ de: '', vers: '', km: '' }]; ikLegsRendre(); el('ikMotif').value = ''; el('ikClient').value = ''; ikRendre(); ikAper();
       if (typeof showToast === 'function') showToast('Trajet enregistré');
     } catch (e) { if (typeof showToast === 'function') showToast('Enregistrement impossible : ' + e.message, true); }
   };
@@ -107,7 +132,7 @@
       var g = annees[a], km = g.reduce(function (t, x) { return t + (Number(x.km) || 0); }, 0), tot = g.reduce(function (t, x) { return t + x.indemnite; }, 0);
       return '<div class="ik-an"><div class="ik-anh"><b>' + a + '</b><span>' + fmt(km, 1) + ' km · <b>' + eur(tot) + '</b></span></div>' +
         g.slice().reverse().map(function (x) {
-          return '<div class="ik-l"><div><b>' + jour(x.date) + '</b> · ' + esc2(x.motif || 'Trajet') + '<div class="ik-s">' + (x.depart || x.arrivee ? esc2((x.depart || '?') + ' → ' + (x.arrivee || '?')) + (x.etapes ? ' (via ' + esc2(x.etapes) + ')' : '') + '<br>' : '') + esc2(x.benef) + ' · ' + esc2((BAREME[x.cv] || {}).nom || '') + (x.elec ? ' · électrique' : '') + ' · cumul ' + fmt(x.cumul, 0) + ' km</div></div>' +
+          return '<div class="ik-l"><div><b>' + jour(x.date) + '</b> · ' + esc2(x.motif || 'Trajet') + '<div class="ik-s">' + (x.legs && x.legs.length ? x.legs.map(function (g) { return esc2((g.de || '?') + ' → ' + (g.vers || '?')) + ' <em>' + fmt(g.km, 1) + ' km</em>'; }).join('<br>') + '<br>' : (x.depart || x.arrivee ? esc2((x.depart || '?') + ' → ' + (x.arrivee || '?')) + '<br>' : '')) + esc2(x.benef) + ' · ' + esc2((BAREME[x.cv] || {}).nom || '') + (x.elec ? ' · électrique' : '') + ' · cumul ' + fmt(x.cumul, 0) + ' km</div></div>' +
             '<div class="ik-r"><span>' + fmt(x.km, 1) + ' km</span><b>' + eur(x.indemnite) + '</b><button type="button" class="ik-x" onclick="ikSupprimer(\'' + x.id + '\')" aria-label="Supprimer">×</button></div></div>';
         }).join('') + '</div>';
     }).join('');
@@ -116,7 +141,7 @@
   window.ikExport = function () {
     var l = calculer(lignes); if (!l.length) return;
     var csv = ['Date;Motif;Départ;Arrivée;Étapes;Client / événement;Bénéficiaire;Puissance;Électrique;Kilomètres;Cumul annuel (km);Indemnité (€)'].concat(l.map(function (x) {
-      return [jour(x.date), x.motif || '', x.depart || '', x.arrivee || '', x.etapes || '', x.client || '', x.benef, (BAREME[x.cv] || {}).nom || '', x.elec ? 'oui' : 'non', fmt(x.km, 1), fmt(x.cumul, 0), fmt(x.indemnite, 2)].map(function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(';');
+      return [jour(x.date), x.motif || '', x.depart || '', x.arrivee || '', (x.legs && x.legs.length ? x.legs.map(function (g) { return (g.de || '?') + ' > ' + (g.vers || '?') + ' (' + fmt(g.km, 1) + ' km)'; }).join(' | ') : (x.etapes || '')), x.client || '', x.benef, (BAREME[x.cv] || {}).nom || '', x.elec ? 'oui' : 'non', fmt(x.km, 1), fmt(x.cumul, 0), fmt(x.indemnite, 2)].map(function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(';');
     })).join('\r\n');
     var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' })); a.download = 'indemnites-kilometriques.csv'; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 3000);
   };
