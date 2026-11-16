@@ -1213,7 +1213,7 @@ var P=[
   ['Livre d\'or audio','animation',35,['Standard'],'Livre d\'or'],
   ['Cabine téléphonique','animation',null,['Blanche','Rouge'],'Cabine',
     {'Blanche':60,'Rouge':60}],
-  ['Vidéobooth','sono',null,['Standard','Premium · cabine blanche','Premium · cabine rouge'],'Vidéobooth',
+  ['Vidéobooth','photobooth',null,['Standard','Premium · cabine blanche','Premium · cabine rouge'],'Vidéobooth',
     {'Standard':190,'Premium · cabine blanche':240,'Premium · cabine rouge':240}],
   ['Néon lumineux','animation',20,['Standard'],'Néon'],
   ['Baby-foot','animation',90,['Standard'],'Baby-foot'],
@@ -1244,7 +1244,7 @@ var P=[
 
 // Catégories (défaut)
 var C=[
-  ['photobooth','Photobooth','#BFE1F6'],
+  ['photobooth','Photobooth et Vidéobooth','#BFE1F6'],
   ['voitures','Voitures de collection','#E9E3D3'],
   ['sono','Sonorisation','#FFE5A0'],
   ['lumieres','Lumière & effets','#FFC8AA'],
@@ -1326,6 +1326,7 @@ function getCats(){
   // Migration : renommer "Sonorisation / Lumière & effets" → "Sonorisation"
   cats.forEach(function(c){
     if(c.id==='sono'&&c.label.indexOf('Lumière')>=0) c.label='Sonorisation';
+    if(c.id==='photobooth'&&/^photo\s*-?booths?$/i.test(String(c.label||'').trim())) c.label='Photobooth et Vidéobooth';
   });
   return cats;
 }
@@ -2039,6 +2040,8 @@ function getProds(){
   var lightNames=['Jeux de lumières Ibiza','Jeux de lumières Eurolite','Boule à facettes','Spot LED','Machine à fumée','Machine à fumée puissante M-Fog 1500','Machine à bulles'];
   savedProds.forEach(function(p){
     if(p.cat==='sono'&&lightNames.some(function(n){return p.name.indexOf(n)>=0;})) p.cat='lumieres';
+    /* le Vidéobooth se range avec les Photobooths */
+    if(p.cat==='sono'&&/^vid[ée]obooth$/i.test(String(p.name||'').trim())) p.cat='photobooth';
   });
   // Migration Photobooth : supprimer les anciennes formules, garder Photobooth 1-4
   var oldPbNames=['Photobooth Digital (numérique)','Formule 200 tirages','Formule 300 tirages','Formule 400 tirages','Formule illimitée','Photobooth personnalisé'];
@@ -4524,7 +4527,7 @@ function ca(){
     // Grouper les Photobooth X par catégorie (afficher "Photobooth" pas "Photobooth 1")
     var cat=cats.find(function(c){return c.id===p.cat;});
     var grp=getEquipGroupByCat(p.cat);
-    var displayName=(grp&&!grp.isVariants)?p.name:(p.cat==='photobooth'?'Photobooth':p.name);
+    var displayName=(grp&&!grp.isVariants)?p.name:((p.cat==='photobooth'&&!/^vid[ée]obooth/i.test(p.name))?'Photobooth':p.name);
     var pr=getProductPrice(p);
     if(pr!=null){
       if(!byProd[displayName])byProd[displayName]={name:displayName,cat:p.cat,price:pr,total:0,count:0};
@@ -4940,8 +4943,8 @@ function ca(){
   var variantStats={};
   byPeriod.forEach(function(r){(r.products||[]).forEach(function(p){
     if(!p.variant||p.variant==='Standard')return;
-    var key=(p.cat==='photobooth'?'Photobooth':p.name)+'||'+p.variant;
-    if(!variantStats[key])variantStats[key]={label:p.variant,product:(p.cat==='photobooth'?'Photobooth':p.name),cat:p.cat,count:0,revenue:0};
+    var key=((p.cat==='photobooth'&&!/^vid[ée]obooth/i.test(p.name))?'Photobooth':p.name)+'||'+p.variant;
+    if(!variantStats[key])variantStats[key]={label:p.variant,product:((p.cat==='photobooth'&&!/^vid[ée]obooth/i.test(p.name))?'Photobooth':p.name),cat:p.cat,count:0,revenue:0};
     variantStats[key].count++;var vpr=getProductPrice(p);if(vpr!=null)variantStats[key].revenue+=vpr;
   });});
   var variantData=Object.values(variantStats).sort(function(a,b){return b.count-a.count;}).slice(0,10);

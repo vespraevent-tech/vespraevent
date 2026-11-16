@@ -342,7 +342,7 @@
      affichait jusqu'ici les couleurs de catégorie, qui ne
      correspondaient à rien de ce qu'on voit sur le calendrier. */
   var FAMILLES = [
-    { cle: 'photobooth', label: 'Photobooth' },
+    { cle: 'photobooth', label: 'Photobooth et Vidéobooth' },
     { cle: 'pack_vespra', label: 'Pack Vespra' },
     { cle: 'sono', label: 'Sonorisation' },
     { cle: 'lumieres', label: 'Jeux de lumières' },
