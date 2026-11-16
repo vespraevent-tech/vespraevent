@@ -40,7 +40,7 @@ import { createHmac, timingSafeEqual, createHash, randomUUID, randomBytes, rando
    introuvable au moment de l'exécution et TOUTE modification depuis le
    back-office échouerait. */
 import { getStore, stockageActif, stats as stockStats } from './_stockage.mjs';
-import { videoStore, envoyerMail as vbEnvoyerMail } from './videobooth.mjs';
+import { videoStore, envoyerMail as vbEnvoyerMail, jetonEvt as vbJetonEvt } from './videobooth.mjs';
 import * as secu from './_sauvegarde.mjs';
 /* Fabrication du PDF de facture : écrite à la main, sans dépendance,
    pour la même raison que la bibliothèque Blobs est jointe au dossier. */
@@ -2338,6 +2338,12 @@ const gestionnaire = async (request) => {
 
   /* ── Sauvegardes et récupération ──────────────────────────────── */
   /* ── Vidéobooth : vidéos reçues de la tablette ── */
+  if (path === '/videobooth/lien' && request.method === 'GET') {
+    const e = String(url.searchParams.get('e') || '');
+    if (!e || !process.env.VIDEOBOOTH_CLE) return json({ error: 'Événement ou VIDEOBOOTH_CLE manquant' }, 400);
+    const site = (process.env.URL || 'https://www.vespraevent.fr').replace(/\/$/, '');
+    return json({ url: `${site}/api/videobooth/evenement?e=${encodeURIComponent(e)}&t=${vbJetonEvt(e)}` });
+  }
   if (path === '/videobooth' || path === '/videobooth/video') {
     try {
       const st = videoStore();

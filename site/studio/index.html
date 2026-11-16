@@ -1895,6 +1895,8 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
         </div>
         <div class="actions-bar" style="margin-left:auto;padding-top:0;border:0">
           <button class="btn btn-ghost" id="vbRetour" onclick="vbOuvrir('')" hidden>‹ Tous les événements</button>
+          <button class="btn btn-ghost" id="vbZip" onclick="vbToutTelecharger()" hidden>Tout télécharger (.zip)</button>
+          <button class="btn btn-ghost" id="vbLien" onclick="vbLienPartage()" hidden>Lien pour les mariés</button>
           <button class="btn btn-ghost" id="vbRelancer" onclick="vbRelancerEchecs()" hidden>Renvoyer les e-mails non partis</button>
           <button class="btn btn-ghost" onclick="vbCharger()">Actualiser</button>
         </div>
@@ -2624,7 +2626,7 @@ function vbRendre(){
   const z=document.getElementById('vbListe'); if(!z) return;
   const fd=d=>new Date(d).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
   const mo=n=>(n/1048576).toFixed(1).replace('.',',')+' Mo';
-  document.getElementById('vbRetour').hidden=!VBEVT; document.getElementById('vbSous').style.display=VBEVT?'none':'';
+  document.getElementById('vbRetour').hidden=!VBEVT; document.getElementById('vbZip').hidden=!VBEVT; document.getElementById('vbLien').hidden=!VBEVT; document.getElementById('vbSous').style.display=VBEVT?'none':'';
   if(!VBEVT){
     document.getElementById('vbTitre').textContent='Vidéobooth';
     document.getElementById('vbRelancer').hidden=true;
@@ -2668,6 +2670,32 @@ async function vbRelancerEchecs(){
   let ok=0; for(const v of l){ try{ const r=await api('/videobooth',{method:'POST',body:JSON.stringify({id:v.id})}); if(r.ok) ok++; }catch(e){} }
   showToast(ok+' sur '+l.length+' e-mail'+(l.length>1?'s':'')+' envoyé'+(ok>1?'s':''), ok!==l.length);
   await vbCharger();
+}
+function vbScript(src){ return new Promise((ok,ko)=>{ if(window.vbZip) return ok(); const s=document.createElement('script'); s.src=src; s.onload=ok; s.onerror=()=>ko(new Error('Chargement impossible')); document.head.appendChild(s); }); }
+async function vbToutTelecharger(){
+  const l=VB.filter(v=>vbNomEvt(v)===VBEVT); if(!l.length) return;
+  const b=document.getElementById('vbZip'), txt=b.textContent; b.disabled=true;
+  try{
+    await vbScript('/videobooth/zip.js');
+    const f=[];
+    for(let i=0;i<l.length;i++){
+      b.textContent='Préparation '+(i+1)+' / '+l.length+'…';
+      const r=await fetch('/api/admin/videobooth/video?id='+encodeURIComponent(l[i].id),{credentials:'same-origin'});
+      if(!r.ok) throw new Error('vidéo '+(i+1)+' introuvable (supprimée ?)');
+      f.push({nom:l[i].fichier,blob:await r.blob()});
+    }
+    const z=await vbZip(f), a=document.createElement('a'); a.href=URL.createObjectURL(z);
+    a.download=(VBEVT.replace(/[\\/:*?"<>|]+/g,' ').trim()||'videos')+'.zip'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);
+    showToast('Archive téléchargée ('+l.length+' vidéo'+(l.length>1?'s':'')+')');
+  }catch(e){ showToast('Échec : '+e.message,true); }
+  b.disabled=false; b.textContent=txt;
+}
+async function vbLienPartage(){
+  try{
+    const r=await api('/videobooth/lien?e='+encodeURIComponent(VBEVT));
+    try{ await navigator.clipboard.writeText(r.url); showToast('Lien copié : à envoyer aux mariés'); }
+    catch(e){ prompt('Copiez ce lien et envoyez-le aux mariés :',r.url); }
+  }catch(e){ showToast('Échec : '+e.message,true); }
 }
 async function vbSupprimer(id){
   if(!confirm('Supprimer cette vidéo du site ? (elle reste sur la tablette)')) return;
