@@ -585,7 +585,7 @@
 /* Produits à plusieurs couleurs choisies en même temps (mange-debout : 3 verts, 2 noirs, 5 blancs…).
    Le pop-up propose une ligne par couleur avec sa propre quantité ; le prix total se met à jour. */
 (function () {
-  var NUANCES = { blanche: '#ffffff', noire: '#1b1f27', brune: '#7a4b2a', or: '#c9a227', bleu: '#1f2a52', bordeaux: '#6b1f2e', verte: '#3f7d4e', terracotta: '#c4663f' };
+  var NUANCES = { sans: '#e9edf2', blanche: '#ffffff', noire: '#1b1f27', brune: '#7a4b2a', or: '#c9a227', bleu: '#1f2a52', bordeaux: '#6b1f2e', verte: '#3f7d4e', terracotta: '#c4663f' };
   function nuance(label) { var k = String(label || '').toLowerCase().split(/[\s(]/)[0]; return NUANCES[k] || '#d8dde5'; }
   function produit() { try { return _vmp; } catch (e) { return null; } }
   function dejaAuDevis(id) { try { return vmDejaAuDevis(id); } catch (e) { return 0; } }
