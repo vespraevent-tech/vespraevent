@@ -79,3 +79,8 @@ html body .art-card figure.art-fig img{width:100%!important;max-width:100%!impor
 html body .art-card figure.art-fig a{display:block;border-radius:24px;transition:transform .25s ease,box-shadow .25s ease}
 html body .art-card figure.art-fig a:hover img{filter:brightness(1.04)}
 html body .art-card figure.art-fig a:focus-visible{outline:3px solid #F59E0B;outline-offset:3px}
+/* images : taille mesurée, alignées à gauche avec le texte et les boutons */
+html body .art-card figure.art-fig{max-width:460px;margin:18px auto 6px 0}
+html body .art-card figure.art-fig img{width:100%!important;max-height:420px}
+html body .art-card figure.art-fig figcaption{text-align:left}
+@media(max-width:900px){html body .art-card figure.art-fig{max-width:100%}}
