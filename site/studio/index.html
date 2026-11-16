@@ -4090,7 +4090,7 @@ function acompteBlocHTML(d, r, modeForce){
   }
   cartes.forEach(c => { total += c.total; });
   autres.forEach(x => { total += x.prix; });
-  const montant = total > 0 ? Math.round(total*0.3*100)/100 : (demande > 0 ? demande : 0);
+  const montant = total > 0 ? Math.round(total*(Number(d.devisAcomptePct)>=1&&Number(d.devisAcomptePct)<=100?Number(d.devisAcomptePct):30))/100 : (demande > 0 ? demande : 0);
 
   const interrupteur =
     '<button type="button" role="switch" aria-checked="' + recu + '" aria-label="Acompte reçu" ' +
@@ -4139,7 +4139,7 @@ function acompteBlocHTML(d, r, modeForce){
            '<div class="dpr t r"><span class="dpr-n">Reste à payer</span><span class="dpr-v">' + eur(0) + '</span></div>';
   }
   else if(recu && total > 0 && montant > 0){
-    bas += '<div class="dpr a"><span class="dpr-n">Acompte versé<i>30 % du total</i></span><span class="dpr-v">− ' + eur(montant) + '</span></div>' +
+    bas += '<div class="dpr a"><span class="dpr-n">Acompte versé</span><span class="dpr-v">− ' + eur(montant) + '</span></div>' +
            '<div class="dpr t r"><span class="dpr-n">Reste à payer</span><span class="dpr-v">' + eur(total - montant) + '</span></div>';
   }
   const blocPrix = '<div class="fd-bloc"><div class="fd-t">Détail du prix</div><div>' + cartesHtml + lignes + bas + '</div></div>';

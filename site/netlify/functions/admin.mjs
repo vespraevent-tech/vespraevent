@@ -843,7 +843,7 @@ async function dossierResa(id, r, logi) {
     lieu: texte(r.place, 200), convives: texte(r.convives, 20), typeEvenement: texte(r.typeEvenement, 60),
     lignes, supplements: supp,
     livraison: !!r.livraison, livraisonPrix: liv, livraisonRetour: r.livraisonRetour !== false, montage: mon,
-    total, acompteDemande: !!r.acompte, acompte: r.acompte ? nombre(Math.round(total * 30) / 100) : 0,
+    total, acompteDemande: !!r.acompte, acompte: r.acompte ? nombre(Math.round(total * (Number(r.factureClient && r.factureClient.acomptePct) || 30)) / 100) : 0,
     virementRecu: !!r.virementRecu,
     documents: { devis: false, facture: total > 0 },
   };
