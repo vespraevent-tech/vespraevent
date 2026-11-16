@@ -6165,7 +6165,7 @@ document.getElementById('saveM').onclick=function(){
   } else {
     var _vb2=(document.getElementById('validated-by')||{value:'Thomas'}).value||'Thomas';
     R.push({
-      id:'r'+Date.now(),
+      id:'r'+Date.now(),_created:new Date().toISOString(),
       client:client,phone:document.getElementById('phone').value.trim(),email:document.getElementById('email').value.trim(),
       dateStart:dateStart,dateEnd:dateEnd,livraison:livraison,
       livraisonPrice:parseFloat((document.getElementById('livraisonPrice')||{value:'0'}).value)||0,

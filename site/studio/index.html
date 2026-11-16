@@ -3637,7 +3637,8 @@ async function loadDemandes(silencieux){
         mail: r.relanceMail !== undefined ? r.relanceMail === true : !!(anciensMarqueurs.get('__planning__' + String(r.id)) || {}).mail,
         /* les notes de la réservation sont la note de la fiche */
         note: noteDepuisResa(r, null),
-        recue: r._created || '',
+        /* date d'entrée : celle enregistrée à la création, sinon lue dans l'identifiant « r<horodatage> » des réservations saisies à la main */
+        recue: r._created || (function(id){ const m = /^r(\d{12,13})$/.exec(String(id || '')); return m ? new Date(Number(m[1])).toISOString() : ''; })(r.id),
         nom: r.client || r.nom || 'Client',
         email: r.email || '',
         telephone: r.phone || r.telephone || '',
