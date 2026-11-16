@@ -1,0 +1,65 @@
+/* ===== Pages d'articles : design « cartes » + sommaire à gauche + produit à droite (fixes au défilement) ===== */
+html body .art-layout{display:grid;grid-template-columns:230px minmax(0,1fr) 300px;gap:34px;align-items:stretch;
+  max-width:1380px;margin:0 auto;padding:44px 32px 56px;
+  background:#edf1f6;box-shadow:0 0 0 100vmax #edf1f6;clip-path:inset(0 -100vmax)}
+html body .art-toc{align-self:start;position:sticky;top:96px;font-size:14px;max-height:calc(100vh - 120px);overflow:auto}
+html body .art-toc b{display:block;font:800 11px Inter,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#7b8798;margin:0 0 12px}
+html body .art-toc a{display:flex;gap:10px;align-items:baseline;padding:9px 0 9px 14px;border-left:2px solid #d5dbe4;color:#4a5667;text-decoration:none;line-height:1.35;transition:color .15s,border-color .15s}
+html body .art-toc a span{flex:none;color:#F59E0B;font-weight:800}
+html body .art-toc a:hover{color:#0f2237}
+html body .art-toc a.on{border-left-color:#F59E0B;color:#0f2237;font-weight:600}
+html body .art-main{min-width:0}
+html body .art-card{background:#fff;border-radius:22px;padding:30px 32px;margin:0 0 18px;box-shadow:0 12px 30px -22px rgba(15,34,55,.45);scroll-margin-top:96px}
+html body .art-card h2{display:flex;align-items:center;gap:14px;font:400 32px/1.05 'Bebas Neue',Impact,sans-serif;letter-spacing:.01em;text-transform:uppercase;color:#0f2237;margin:0 0 14px}
+html body .art-card h2 .art-num{flex:none;width:38px;height:38px;border-radius:12px;background:#F59E0B;color:#1a1205;font:800 15px/38px Inter,system-ui,sans-serif;text-align:center;letter-spacing:0}
+html body .art-card h3{font:700 17px/1.3 Inter,system-ui,sans-serif;color:#0f2237;margin:22px 0 8px}
+html body .art-card p{font:400 16.5px/1.75 Inter,system-ui,sans-serif;color:#3a4553;margin:0 0 16px}
+html body .art-card p:last-child{margin-bottom:0}
+html body .art-card strong{color:#0f2237}
+html body .art-card a:not(.art-voir a):not(.art-assoc-row){color:#2B4A6B;text-underline-offset:3px}
+html body .art-card .art-fig{margin:18px 0 6px}
+html body .art-card .art-fig img{border-radius:16px;width:100%;height:auto}
+html body .art-card ul,html body .art-card ol{list-style:none;padding:0;margin:0 0 16px;counter-reset:n}
+html body .art-card li{position:relative;display:block;padding:11px 14px 11px 48px;margin:0 0 8px;background:#f5f8fb;border-radius:12px;font:400 16px/1.5 Inter,system-ui,sans-serif;color:#3a4553}
+html body .art-card ul li:before{content:"✓";position:absolute;left:14px;top:11px;width:22px;height:22px;border-radius:50%;background:#dff3e7;color:#1f8a4c;font:700 13px/22px Inter,system-ui,sans-serif;text-align:center}
+html body .art-card ol li{counter-increment:n}
+html body .art-card ol li:before{content:counter(n);position:absolute;left:14px;top:11px;width:22px;height:22px;border-radius:50%;background:#0f2237;color:#fff;font:700 12px/22px Inter,system-ui,sans-serif;text-align:center}
+html body .art-card blockquote{margin:16px 0;padding:14px 18px;border-left:4px solid #F59E0B;background:#fff8ec;border-radius:0 12px 12px 0;font:italic 17px/1.5 Fraunces,Georgia,serif;color:#0f2237}
+html body .art-card table{border-radius:12px}
+/* foire aux questions */
+html body .art-card-faq .faq-item{background:#f5f8fb;border:0;border-radius:12px;margin:0 0 8px}
+html body .art-card-faq .faq-q{font:600 15.5px Inter,system-ui,sans-serif;color:#0f2237;padding:14px 16px}
+html body .art-card-faq .faq-a-inner{font-size:15px;color:#3a4553}
+/* petits appels à l'action, discrets */
+html body .art-voir{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
+html body .art-voir a{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #cfd8e3;border-radius:8px;background:#fff;color:#2B4A6B;font:600 12.5px/1.2 Inter,system-ui,sans-serif;text-decoration:none;transition:background .15s,border-color .15s,color .15s}
+html body .art-voir a:hover{background:#2B4A6B;border-color:#2B4A6B;color:#fff}
+html body .art-voir a small{font:500 12px Inter,system-ui,sans-serif;color:#7b8798}
+html body .art-voir a:hover small{color:#d5deea}
+/* matériel associé */
+html body .art-assoc{display:grid;gap:10px}
+html body .art-assoc-row{display:flex;align-items:center;gap:14px;padding:10px 12px;background:#f5f8fb;border-radius:14px;text-decoration:none;color:#0f2237;transition:background .15s}
+html body .art-assoc-row:hover{background:#e9f0f7}
+html body .art-assoc-row img{flex:none;width:64px;height:64px;object-fit:cover;border-radius:10px;background:#fff}
+html body .art-assoc-row span{flex:1;min-width:0;font:700 15px/1.25 Inter,system-ui,sans-serif}
+html body .art-assoc-row small{display:block;font:500 12px Inter,system-ui,sans-serif;color:#7b8798;margin-top:2px}
+html body .art-assoc-row b{font:700 15px Inter,system-ui,sans-serif;color:#2B4A6B;white-space:nowrap}
+html body .art-assoc-row i{font:600 12px Inter,system-ui,sans-serif;font-style:normal;color:#2B4A6B;white-space:nowrap}
+/* produit à droite : reste en haut de l'écran */
+html body .art-sidebar{position:static;align-self:stretch}
+html body .art-sidebar .sidebar-product{position:sticky;top:96px;border:0;border-radius:20px;box-shadow:0 18px 40px -26px rgba(15,34,55,.55);margin:0}
+@media(max-width:1100px){
+  html body .art-layout{grid-template-columns:minmax(0,1fr) 280px;gap:28px;padding:36px 24px 48px}
+  html body .art-toc{display:none}
+}
+@media(max-width:900px){
+  html body .art-layout{grid-template-columns:minmax(0,1fr);gap:0;padding:16px 12px 36px}
+  html body .art-sidebar{margin-top:6px}
+  html body .art-sidebar .sidebar-product{position:static}
+  html body .art-card{padding:22px 20px;border-radius:18px}
+  html body .art-card h2{font-size:27px}
+  html body .art-card p{font-size:16px}
+  html body .art-voir a{padding:9px 14px}
+  html body .art-assoc-row i{display:none}
+}
+html body .art-card .art-fig img{max-height:520px;width:auto;max-width:100%;margin:0 auto;display:block}
