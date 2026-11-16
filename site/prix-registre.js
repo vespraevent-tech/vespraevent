@@ -4417,6 +4417,176 @@ window.VESPRA_MEDIAS = {
     ],
     "options": {},
     "subs": []
+  },
+  "produit-citroen-traction.html": {
+    "photos": [
+      {
+        "s": "citroen-traction.webp",
+        "a": "Citroën Traction"
+      }
+    ],
+    "options": {},
+    "subs": []
+  },
+  "produit-cornhole.html": {
+    "photos": [
+      {
+        "s": "jeux-cornhole.webp",
+        "a": "Cornhole"
+      },
+      {
+        "s": "jeux-puissance4.webp",
+        "a": "Puissance 4 géant"
+      },
+      {
+        "s": "jeux-palet-breton.webp",
+        "a": "Palet breton"
+      },
+      {
+        "s": "baby-foot-dessus.webp",
+        "a": "Baby-foot"
+      },
+      {
+        "s": "jeux-passe-trappe.webp",
+        "a": "Passe-trappe"
+      }
+    ],
+    "options": {},
+    "subs": []
+  },
+  "produit-fontaine-cocktail.html": {
+    "photos": [
+      {
+        "s": "fontaine-cocktail.webp",
+        "a": "Fontaine à cocktail"
+      }
+    ],
+    "options": {},
+    "subs": []
+  },
+  "produit-ford-mustang.html": {
+    "photos": [
+      {
+        "s": "ford-mustang.webp",
+        "a": "Ford Mustang"
+      }
+    ],
+    "options": {},
+    "subs": []
+  },
+  "produit-fumee-m-fog-1500.html": {
+    "photos": [
+      {
+        "s": "fumee-m-fog-1500.webp",
+        "a": "Machine à fumée Stairville M-Fog 1500"
+      },
+      {
+        "s": "fumee-m-fog-1500-5.webp",
+        "a": "Machine à fumée M-Fog 1500, vue de face"
+      },
+      {
+        "s": "fumee-m-fog-1500-2.webp",
+        "a": "Machine à fumée M-Fog 1500 vue de côté"
+      },
+      {
+        "s": "fumee-m-fog-1500-3.webp",
+        "a": "Sortie de fumée de la M-Fog 1500"
+      },
+      {
+        "s": "fumee-m-fog-1500-4.webp",
+        "a": "Panneau de commande de la M-Fog 1500"
+      }
+    ],
+    "options": {},
+    "subs": []
+  },
+  "produit-palet-breton.html": {
+    "photos": [
+      {
+        "s": "jeux-cornhole.webp",
+        "a": "Cornhole"
+      },
+      {
+        "s": "jeux-puissance4.webp",
+        "a": "Puissance 4 géant"
+      },
+      {
+        "s": "jeux-palet-breton.webp",
+        "a": "Palet breton"
+      },
+      {
+        "s": "baby-foot-dessus.webp",
+        "a": "Baby-foot"
+      },
+      {
+        "s": "jeux-passe-trappe.webp",
+        "a": "Passe-trappe"
+      }
+    ],
+    "options": {},
+    "subs": []
+  },
+  "produit-panneau-direction.html": {
+    "photos": [
+      {
+        "s": "panneau-direction.webp",
+        "a": "Panneau de direction personnalisé"
+      }
+    ],
+    "options": {},
+    "subs": []
+  },
+  "produit-passe-trappe.html": {
+    "photos": [
+      {
+        "s": "jeux-cornhole.webp",
+        "a": "Cornhole"
+      },
+      {
+        "s": "jeux-puissance4.webp",
+        "a": "Puissance 4 géant"
+      },
+      {
+        "s": "jeux-palet-breton.webp",
+        "a": "Palet breton"
+      },
+      {
+        "s": "baby-foot-dessus.webp",
+        "a": "Baby-foot"
+      },
+      {
+        "s": "jeux-passe-trappe.webp",
+        "a": "Passe-trappe"
+      }
+    ],
+    "options": {},
+    "subs": []
+  },
+  "produit-puissance-4-geant.html": {
+    "photos": [
+      {
+        "s": "jeux-cornhole.webp",
+        "a": "Cornhole"
+      },
+      {
+        "s": "jeux-puissance4.webp",
+        "a": "Puissance 4 géant"
+      },
+      {
+        "s": "jeux-palet-breton.webp",
+        "a": "Palet breton"
+      },
+      {
+        "s": "baby-foot-dessus.webp",
+        "a": "Baby-foot"
+      },
+      {
+        "s": "jeux-passe-trappe.webp",
+        "a": "Passe-trappe"
+      }
+    ],
+    "options": {},
+    "subs": []
   }
 };
 window.VESPRA_PRODUITS.push({id:'p50',ref:'p50',nom:'Citroën Traction',cat:'Voitures de collection',cats:['Voitures de collection'],desc:'Citroën Traction de collection avec chauffeur : 5 heures, 150 km inclus, carburant et assurance compris.',img:'citroen-traction.webp',imgCat:'citroen-traction.webp',page:'produit-citroen-traction.html',prix:380,prixId:null,variantes:[],notices:[]},{id:'p51',ref:'p51',nom:'Ford Mustang',cat:'Voitures de collection',cats:['Voitures de collection'],desc:'Ford Mustang de collection avec chauffeur : 5 heures, 150 km inclus, carburant et assurance compris.',img:'ford-mustang.webp',imgCat:'ford-mustang.webp',page:'produit-ford-mustang.html',prix:470,prixId:null,variantes:[],notices:[]});
