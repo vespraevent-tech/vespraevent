@@ -149,3 +149,6 @@ html,body,#app{height:100dvh}
 .passer[hidden]{display:none}
 .adm-vocal{display:flex;flex-direction:column;gap:10px;border-top:1px solid rgba(255,255,255,.1);padding-top:10px}
 .adm textarea{width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,.28);border-radius:9px;background:rgba(0,0,0,.25);color:#fff;font:500 15px Inter,sans-serif;resize:vertical}
+
+.cadrage{position:absolute;left:50%;bottom:calc(4vh + 64px);transform:translateX(-50%);z-index:4;max-width:88vw;text-align:center;background:rgba(0,0,0,.5);color:#fff;border-radius:12px;padding:10px 20px;font:500 clamp(14px,2vw,19px) Inter,sans-serif}
+.cadrage[hidden]{display:none}

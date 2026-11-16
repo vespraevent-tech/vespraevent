@@ -86,7 +86,7 @@
     var contraintes = { audio: Object.assign({ echoCancellation: true, noiseSuppression: true }, cfg.mic ? { deviceId: { exact: cfg.mic } } : {}), video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, { width: { ideal: 1920 }, height: { ideal: 1080 } }) };
     arreterCam();
     navigator.mediaDevices.getUserMedia(contraintes).then(function (s) {
-      flux = s; $('b-go').hidden = false; $('v-src').srcObject = s; $('v-src').play().catch(function () {}); boucle = requestAnimationFrame(dessiner);
+      flux = s; $('b-go').hidden = false; $('cadrage').textContent = cfg.cadrage || ''; $('cadrage').hidden = !cfg.cadrage; $('v-src').srcObject = s; $('v-src').play().catch(function () {}); boucle = requestAnimationFrame(dessiner);
       grandAngle(s);
     }).catch(function (e) {
       $('cam-err').textContent = 'Impossible d’accéder à la caméra ou au micro. Autorisez-les dans les réglages de la tablette, puis réessayez.'; $('cam-err').hidden = false; $('b-go').hidden = true;
@@ -138,7 +138,7 @@
     }).catch(function () {});
   }
   $('b-go').onclick = function () {
-    if (!flux) return; $('b-go').hidden = true; $('compte').hidden = false; $('s-cam').classList.add('flou');
+    if (!flux) return; $('cadrage').hidden = true; $('b-go').hidden = true; $('compte').hidden = false; $('s-cam').classList.add('flou');
     if (accueilVocalActif()) {
       $('compte-n').textContent = '☎'; $('compte-msg').textContent = 'Écoutez le message… l’enregistrement commencera après le bip';
       $('b-passer').hidden = false;
@@ -294,7 +294,7 @@ $('b-stop').onclick = arreterRec;
   function appliquerActif() {
     var e = evts().filter(function (x) { return x.id === cfg.actif; })[0];
     cfg.event = e ? (e.nom + (e.date ? ' — ' + e.date : '')) : '';
-    cfg.titre = (e && e.titre) || CFG0.titre; cfg.sous = e ? (e.sous || '') : CFG0.sous; cfg.max = (e && Number(e.max)) || 30; cfg.cam = (e && e.cam) || ''; cfg.noel = !!(e && e.noel); cfg.format = (e && e.fmtV === 2 && e.format) || 'auto'; cfg.mic = (e && e.mic) || ''; document.body.classList.toggle('fmt34', cfg.format === '3:4' || cfg.format === '4:3'); document.body.classList.toggle('noel-on', cfg.noel);
+    cfg.titre = (e && e.titre) || CFG0.titre; cfg.sous = e ? (e.sous || '') : CFG0.sous; cfg.max = (e && Number(e.max)) || 30; cfg.cam = (e && e.cam) || ''; cfg.noel = !!(e && e.noel); cfg.format = (e && e.fmtV === 2 && e.format) || 'auto'; cfg.mic = (e && e.mic) || ''; cfg.cadrage = (e && e.cadrage != null && e.cadrage !== '') ? e.cadrage : 'Vous pouvez incliner doucement la tablette pour vous cadrer'; document.body.classList.toggle('fmt34', cfg.format === '3:4' || cfg.format === '4:3'); document.body.classList.toggle('noel-on', cfg.noel);
     ecrireCfg(cfg);
   }
   var edite = null;
@@ -316,7 +316,7 @@ $('b-stop').onclick = arreterRec;
   }
   function ouvrirEdition(id) {
     var e = evts().filter(function (x) { return x.id === id; })[0]; if (!e) return; edite = e;
-    $('e-nom').value = e.nom; $('e-noel').checked = !!e.noel; $('e-msgon').checked = !!e.msgOn; $('e-msg').value = e.msg || ''; sonLire('accueil-' + e.id).then(function (b) { $('e-son-n').textContent = b ? '✓ fichier chargé' : ''; }); $('e-format').value = (e.fmtV === 2 && e.format) || 'auto'; $('e-date').value = e.date || ''; $('e-titre').value = e.titre || ''; $('e-sous').value = e.sous || ''; $('e-max').value = e.max || 30;
+    $('e-nom').value = e.nom; $('e-noel').checked = !!e.noel; $('e-msgon').checked = !!e.msgOn; $('e-cadrage').value = e.cadrage == null ? '' : e.cadrage; $('e-msg').value = e.msg || ''; sonLire('accueil-' + e.id).then(function (b) { $('e-son-n').textContent = b ? '✓ fichier chargé' : ''; }); $('e-format').value = (e.fmtV === 2 && e.format) || 'auto'; $('e-date').value = e.date || ''; $('e-titre').value = e.titre || ''; $('e-sous').value = e.sous || ''; $('e-max').value = e.max || 30;
     var sel = $('e-cam'); sel.innerHTML = '<option value="">Caméra avant (par défaut)</option>';
     if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) navigator.mediaDevices.enumerateDevices().then(function (d) { d.filter(function (x) { return x.kind === 'videoinput'; }).forEach(function (x, i) { var o = document.createElement('option'); o.value = x.deviceId; o.textContent = x.label || ('Caméra ' + (i + 1)); if (x.deviceId === e.cam) o.selected = true; sel.appendChild(o); }); }).catch(function () {});
     var sm = $('e-mic'); sm.innerHTML = '<option value="">Micro de la tablette (par défaut)</option>';
@@ -338,7 +338,7 @@ $('b-stop').onclick = arreterRec;
   function lireEdition() {
     if (!edite) return;
     edite.nom = $('e-nom').value.trim(); edite.date = $('e-date').value.trim(); edite.titre = $('e-titre').value.trim() || CFG0.titre; edite.sous = $('e-sous').value.trim();
-    edite.max = Math.min(120, Math.max(5, Number($('e-max').value) || 30)); edite.cam = $('e-cam').value; edite.noel = $('e-noel').checked; edite.msgOn = $('e-msgon').checked; edite.msg = $('e-msg').value.trim(); edite.format = $('e-format').value; edite.fmtV = 2; edite.mic = $('e-mic').value;
+    edite.max = Math.min(120, Math.max(5, Number($('e-max').value) || 30)); edite.cam = $('e-cam').value; edite.noel = $('e-noel').checked; edite.msgOn = $('e-msgon').checked; edite.cadrage = $('e-cadrage').value.trim(); edite.msg = $('e-msg').value.trim(); edite.format = $('e-format').value; edite.fmtV = 2; edite.mic = $('e-mic').value;
   }
   function sauverConnexion() { cfg.serveur = $('a-serveur').value.trim(); cfg.cle = $('a-cle').value.trim() || cfg.cle; ecrireCfg(cfg); }
   $('a-serveur').onchange = $('a-cle').onchange = sauverConnexion;
