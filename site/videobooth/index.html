@@ -10,7 +10,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="/favicon.png">
 <link rel="stylesheet" href="/polices.css?v=1">
-<link rel="stylesheet" href="app.css?v=10">
+<link rel="stylesheet" href="app.css?v=11">
 </head>
 <body>
 <main id="app">
@@ -37,7 +37,8 @@
   </section>
 
   <section id="s-cam" class="ecran">
-    <video id="v-live" playsinline muted autoplay></video>
+    <video id="v-src" playsinline muted autoplay style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"></video>
+    <canvas id="v-live"></canvas>
     <button id="b-x" class="croix" type="button" aria-label="Fermer">✕</button>
     <div id="compte" class="compte" hidden><b id="compte-n"></b><span id="compte-msg"></span></div>
     <div id="rec" class="rec" hidden><span class="pt"></span><b id="rec-t">0:00</b><i id="rec-max">/ 0:30</i></div>
@@ -101,6 +102,6 @@
     <div class="rang"><button id="pin-x" class="sec" type="button">Annuler</button><button id="pin-ok" class="gros" type="button">Valider</button></div>
   </section>
 </main>
-<script src="app.js?v=10"></script>
+<script src="app.js?v=11"></script>
 </body>
 </html>

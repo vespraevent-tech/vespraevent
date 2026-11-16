@@ -125,3 +125,6 @@ html,body,#app{height:100dvh}
 .adm-h{gap:12px;justify-content:flex-start}
 #adm-liste .adm-h{justify-content:space-between}
 .adm-carte .badge{position:static;align-self:flex-start;font-style:normal;margin-bottom:4px}
+
+#v-live{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;transform:scaleX(-1)}
+#s-cam.flou #v-live{filter:blur(22px) brightness(.8);transform:scaleX(-1) scale(1.1)}

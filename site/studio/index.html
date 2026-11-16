@@ -1031,6 +1031,7 @@ body.bo-masque .bo-oeil-bar .o-ferme{display:block}
 .fd-modifs b.t{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8a6d1f;margin-bottom:6px}
 .fd-modifs .m{padding:6px 0}
 .fd-modifs input{width:100%;border:1px solid #dcd5c8;border-radius:8px;padding:6px 10px;margin:6px 0;font:12px Inter,sans-serif}
+#panel-videobooth{min-width:0;max-width:100%;overflow-x:hidden}#panel-videobooth .toolbar{flex-wrap:wrap;gap:10px}#panel-videobooth .actions-bar{margin-left:0!important;flex-wrap:wrap;gap:8px}
 </style>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=7">
   <link rel="manifest" href="/studio/manifest.webmanifest">
@@ -2643,11 +2644,15 @@ function vbRendre(){
   const l=VB.filter(v=>vbNomEvt(v)===VBEVT).sort((a,b)=>String(a.cree).localeCompare(String(b.cree)));
   document.getElementById('vbTitre').textContent=VBEVT;
   document.getElementById('vbRelancer').hidden=!l.some(v=>v.mail!=='envoye');
-  z.innerHTML='<div class="hint" style="margin-bottom:10px">'+l.length+' vidéo'+(l.length>1?'s':'')+'</div><table style="width:100%;border-collapse:collapse;font-size:13.5px"><thead><tr style="text-align:left;color:#6b7280"><th style="padding:8px">Invité</th><th>Adresse e-mail</th><th>Date</th><th>Taille</th><th>E-mail</th><th></th></tr></thead><tbody>'+
+  z.innerHTML='<div class="hint" style="margin-bottom:10px">'+l.length+' vidéo'+(l.length>1?'s':'')+'</div><div style="display:flex;flex-direction:column;gap:10px">'+
   l.map(v=>{const d=new Date(v.cree);const ok=v.mail==='envoye';const j=Math.max(0,30-Math.floor((Date.now()-d)/86400000));
-    return '<tr style="border-top:1px solid #eee8dc"><td style="padding:10px 8px"><b>'+vbEsc(v.prenom)+' '+vbEsc(v.nom)+'</b></td><td>'+vbEsc(v.email)+'</td><td>'+d.toLocaleDateString('fr-FR')+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</td><td>'+mo(v.octets||0)+'</td>'+
-    '<td style="color:'+(ok?'#3d6e36':'#b03a2a')+';font-weight:600">'+(ok?'Envoyé'+(v.pj?' (jointe)':' (lien)'):'Non parti'+(v.mailErreur?' — '+vbEsc(v.mailErreur):''))+'</td>'+
-    '<td style="white-space:nowrap;text-align:right"><a class="btn btn-ghost" style="text-decoration:none" href="/api/admin/videobooth/video?id='+encodeURIComponent(v.id)+'" download>Télécharger</a> <button class="btn btn-ghost" onclick="vbRenvoyer(\''+v.id+'\')">Renvoyer l’e-mail</button> <button class="btn btn-ghost" onclick="vbSupprimer(\''+v.id+'\')">Supprimer</button><div style="font-size:11px;color:#9aa0ab;margin-top:2px">supprimée du site dans '+j+' j</div></td></tr>';}).join('')+'</tbody></table>';
+    const btn='class="btn btn-ghost" style="text-decoration:none;padding:7px 12px;font-size:13px"';
+    return '<div style="background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:14px 16px">'+
+      '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><b style="font-size:15px">'+vbEsc(v.prenom)+' '+vbEsc(v.nom)+'</b>'+
+      '<span style="color:'+(ok?'#3d6e36':'#b03a2a')+';font-weight:600;font-size:13px">'+(ok?'E-mail envoyé'+(v.pj?' (vidéo jointe)':' (lien)'):'E-mail non parti'+(v.mailErreur?' — '+vbEsc(v.mailErreur):''))+'</span></div>'+
+      '<div style="color:#4a5565;font-size:13.5px;margin-top:2px;word-break:break-all">'+vbEsc(v.email)+'</div>'+
+      '<div style="color:#8a8f98;font-size:12.5px;margin-top:2px">'+d.toLocaleDateString('fr-FR')+' à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+' · '+mo(v.octets||0)+' · supprimée du site dans '+j+' j</div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><a '+btn+' href="/api/admin/videobooth/video?id='+encodeURIComponent(v.id)+'" download>Télécharger</a><button '+btn+' onclick="vbRenvoyer(\''+v.id+'\')">Renvoyer l’e-mail</button><button '+btn+' onclick="vbSupprimer(\''+v.id+'\')">Supprimer</button></div></div>';}).join('')+'</div>';
 }
 async function vbRenvoyer(id){
   const v=VB.find(x=>x.id===id); if(!v) return;

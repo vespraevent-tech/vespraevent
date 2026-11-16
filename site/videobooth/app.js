@@ -60,14 +60,27 @@
     for (var i = 0; i < l.length; i++) { try { if (window.MediaRecorder && MediaRecorder.isTypeSupported(l[i])) return l[i]; } catch (e) {} }
     return '';
   }
-  function arreterCam() { if (flux) { flux.getTracks().forEach(function (t) { t.stop(); }); flux = null; } $('v-live').srcObject = null; }
+  var cv = $('v-live'), cx = cv.getContext('2d'), boucle = 0;
+  /* Rendu toujours VERTICAL (3:4) : l'image de la caméra est recadrée sur un canvas, et c'est ce canvas qui est filmé. */
+  function dessiner() {
+    var v = $('v-src');
+    if (v.videoWidth) {
+      var vw = v.videoWidth, vh = v.videoHeight, W, H;
+      if (vw / vh > 0.75) { H = Math.min(vh, 1440); W = Math.round(H * 0.75 / 2) * 2; } else { W = Math.min(vw, 1080); H = Math.round(W * 4 / 3 / 2) * 2; }
+      if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
+      var sc = Math.max(W / vw, H / vh), sw = W / sc, sh = H / sc;
+      cx.drawImage(v, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, W, H);
+    }
+    boucle = requestAnimationFrame(dessiner);
+  }
+  function arreterCam() { if (boucle) { cancelAnimationFrame(boucle); boucle = 0; } if (flux) { flux.getTracks().forEach(function (t) { t.stop(); }); flux = null; } $('v-src').srcObject = null; }
   function ouvrirCam() {
     montrer('s-cam'); $('s-cam').classList.remove('flou'); $('cam-err').hidden = true; $('compte').hidden = true; $('rec').hidden = true; $('barre').hidden = true;
     $('b-go').hidden = true; $('b-stop').hidden = true; enregistrement = false;
-    var contraintes = { audio: { echoCancellation: true, noiseSuppression: true }, video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, window.innerHeight > window.innerWidth ? { width: { ideal: 1080 }, height: { ideal: 1440 } } : { width: { ideal: 1440 }, height: { ideal: 1080 } }) };
+    var contraintes = { audio: { echoCancellation: true, noiseSuppression: true }, video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, { width: { ideal: 1920 }, height: { ideal: 1080 } }) };
     arreterCam();
     navigator.mediaDevices.getUserMedia(contraintes).then(function (s) {
-      flux = s; $('b-go').hidden = false; $('v-live').srcObject = s; $('v-live').play().catch(function () {});
+      flux = s; $('b-go').hidden = false; $('v-src').srcObject = s; $('v-src').play().catch(function () {}); boucle = requestAnimationFrame(dessiner);
     }).catch(function (e) {
       $('cam-err').textContent = 'Impossible d’accéder à la caméra ou au micro. Autorisez-les dans les réglages de la tablette, puis réessayez.'; $('cam-err').hidden = false; $('b-go').hidden = true;
       setTimeout(function () { accueil(); }, 7000);
@@ -80,7 +93,8 @@
   };
   function demarrer() {
     morceaux = []; blobFinal = null; mime = meilleurMime();
-    try { rec = mime ? new MediaRecorder(flux, { mimeType: mime, videoBitsPerSecond: 3000000 }) : new MediaRecorder(flux); } catch (e) { rec = new MediaRecorder(flux); }
+    var flot = new MediaStream(cv.captureStream(30).getVideoTracks().concat(flux.getAudioTracks()));
+    try { rec = mime ? new MediaRecorder(flot, { mimeType: mime, videoBitsPerSecond: 3500000 }) : new MediaRecorder(flot); } catch (e) { rec = new MediaRecorder(flot); }
     mime = rec.mimeType || mime || 'video/webm';
     rec.ondataavailable = function (e) { if (e.data && e.data.size) morceaux.push(e.data); };
     rec.onstop = function () {
