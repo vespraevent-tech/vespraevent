@@ -5428,7 +5428,7 @@ var PK_COULEURS = [['Rose',0],['Bleu',0],['Blanc',0],['Rouge',0],['Jaune',10],['
 var PK_OPT = {
   cadre:   {nom:'Cadre photo', label:'Cadre photo personnalisable', prix:20},
   deguis:  {nom:'Déguisement', label:'Lot de déguisement', prix:20},
-  cabine:  {nom:'Cabine téléphonique', label:'Cabine téléphonique seule', prix:60},
+  cabine:  {nom:'Cabine téléphonique', label:'Cabine téléphonique décor', prix:60},
   vbstd:   {nom:'Vidéobooth Standard', label:'Vidéobooth Standard', prix:190},
   vbprem:  {nom:'Vidéobooth Premium', label:'Vidéobooth Premium (avec cabine)', prix:240},
   vbint:   {nom:'Vidéobooth intégré dans la cabine', label:'Vidéobooth intégré dans la cabine', prix:180},
@@ -5476,7 +5476,7 @@ OPTIONS_PRODUIT['Buvette 4x4m']=[PK_OPT.install,PK_OPT.guir10,PK_OPT.guir20];
 ['Pack Vespra 20 personnes','Pack Vespra 40 à 60 personnes','Pack Vespra 80 à 100 personnes','Pack Vespra 120 à 150 personnes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.caisson,PK_OPT.microFil,PK_OPT.microSF];});
 OPTIONS_PRODUIT['Pack Vespra 180 à 250 personnes']=[PK_OPT.microFil,PK_OPT.microSF];
 ['Jeux de lumières Ibiza 4 spots','Jeux de lumières Eurolite','Boule à facettes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.fumeeOpt,PK_OPT.fumeeM,PK_OPT.fumeeS,PK_OPT.fumeeP];});
-OPTIONS_PRODUIT["Livre d'or audio"]=[PK_OPT.cabine,PK_OPT.neon];
+OPTIONS_PRODUIT["Livre d'or audio"]=[PK_OPT.cabine];
 ['Cabine téléphonique','Cabine téléphonique audio / vidéo','Cabine téléphonique audio','Cabine téléphonique vidéo','Cabine téléphonique blanche','Cabine téléphonique rouge','Cabine téléphonique en bois blanc'].forEach(function(n){OPTIONS_PRODUIT[n]=(n==='Cabine téléphonique'||/blanche|rouge|bois/.test(n))?[PK_OPT.vbint,PK_OPT.neon]:[PK_OPT.neon];});
 OPTIONS_PRODUIT['Vidéobooth']=[PK_OPT.usb,PK_OPT.neon];
 OPTIONS_PRODUIT['Guirlande lumineuse']=[PK_OPT.b3x3,PK_OPT.b4x8,PK_OPT.b6x10,PK_OPT.tente10,PK_OPT.tente14,PK_OPT.tenteet,PK_OPT.buvette];

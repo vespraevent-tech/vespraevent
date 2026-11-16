@@ -1824,8 +1824,22 @@ window.VESPRA_PRODUITS = [
         "nom": "Caisson de basse",
         "prix": 40,
         "devis": false,
-        "champ": "optionCaissonPack",
+        "champ": "optionCaisson",
         "id": "pack-vespra-opt-1"
+      },
+      {
+        "nom": "Micro filaire (Shure SM58)",
+        "prix": 10,
+        "devis": false,
+        "champ": "optionMicroFil",
+        "id": "pack-vespra-opt-2"
+      },
+      {
+        "nom": "Micro sans fil (Shure SM58)",
+        "prix": 20,
+        "devis": false,
+        "champ": "optionMicroSF",
+        "id": "pack-vespra-opt-3"
       }
     ]
   },
@@ -2271,11 +2285,32 @@ window.VESPRA_PRODUITS = [
     "notices": [],
     "options": [
       {
-        "nom": "Machine à fumée",
+        "nom": "Machine à fumée légère 400 W",
         "prix": 10,
         "devis": false,
         "champ": "optionFumee",
-        "id": "p12-opt-fumee"
+        "id": "p12-opt-optionFumee"
+      },
+      {
+        "nom": "Machine à fumée 1500 W",
+        "prix": 20,
+        "devis": false,
+        "champ": "optionFumeeM",
+        "id": "p12-opt-optionFumeeM"
+      },
+      {
+        "nom": "Fumée lourde — effet brouillard",
+        "prix": 60,
+        "devis": false,
+        "champ": "optionFumeeB",
+        "id": "p12-opt-optionFumeeB"
+      },
+      {
+        "nom": "Fumée lourde — effet nuage",
+        "prix": 150,
+        "devis": false,
+        "champ": "optionFumeeN",
+        "id": "p12-opt-optionFumeeN"
       }
     ]
   },
@@ -2579,32 +2614,11 @@ window.VESPRA_PRODUITS = [
     "notices": [],
     "options": [
       {
-        "nom": "Cabine téléphonique seule",
+        "nom": "Cabine téléphonique décor",
         "prix": 60,
         "devis": false,
-        "champ": "optionCabine",
+        "champ": "optionCabLO",
         "id": "livre-d-or-audio-opt-3"
-      },
-      {
-        "nom": "Vidéobooth Standard",
-        "prix": 190,
-        "devis": false,
-        "champ": "optionVbStd",
-        "id": "livre-d-or-audio-opt-4"
-      },
-      {
-        "nom": "Vidéobooth Premium",
-        "prix": 240,
-        "devis": false,
-        "champ": "optionVbPrem",
-        "id": "livre-d-or-audio-opt-5"
-      },
-      {
-        "nom": "Néon lumineux",
-        "prix": 20,
-        "devis": false,
-        "champ": "optionNeon",
-        "id": "livre-d-or-audio-opt-2"
       }
     ]
   },
@@ -3107,11 +3121,32 @@ window.VESPRA_PRODUITS = [
     ],
     "options": [
       {
-        "nom": "Machine à fumée",
+        "nom": "Machine à fumée légère 400 W",
         "prix": 10,
         "devis": false,
         "champ": "optionFumee",
-        "id": "p15-opt-fumee"
+        "id": "p15-opt-optionFumee"
+      },
+      {
+        "nom": "Machine à fumée 1500 W",
+        "prix": 20,
+        "devis": false,
+        "champ": "optionFumeeM",
+        "id": "p15-opt-optionFumeeM"
+      },
+      {
+        "nom": "Fumée lourde — effet brouillard",
+        "prix": 60,
+        "devis": false,
+        "champ": "optionFumeeB",
+        "id": "p15-opt-optionFumeeB"
+      },
+      {
+        "nom": "Fumée lourde — effet nuage",
+        "prix": 150,
+        "devis": false,
+        "champ": "optionFumeeN",
+        "id": "p15-opt-optionFumeeN"
       }
     ]
   },
