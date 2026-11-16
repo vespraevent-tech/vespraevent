@@ -4214,8 +4214,44 @@ window.VESPRA_MEDIAS = {
         "a": "Mange-debout avec housses blanche et noire sur une terrasse"
       },
       {
+        "s": "mange-debout-ambiance-verte.webp",
+        "a": "Mange-debout avec housse verte, cocktail en extérieur"
+      },
+      {
         "s": "mange-debout-table.webp",
         "a": "Mange-debout, table haute pliante"
+      },
+      {
+        "s": "mange-debout-blanche.webp",
+        "a": "Mange-debout avec housse blanche"
+      },
+      {
+        "s": "mange-debout-noire.webp",
+        "a": "Mange-debout avec housse noire"
+      },
+      {
+        "s": "mange-debout-brune.webp",
+        "a": "Mange-debout avec housse brune"
+      },
+      {
+        "s": "mange-debout-or.webp",
+        "a": "Mange-debout avec housse or"
+      },
+      {
+        "s": "mange-debout-bleu.webp",
+        "a": "Mange-debout avec housse bleu foncé"
+      },
+      {
+        "s": "mange-debout-bordeaux.webp",
+        "a": "Mange-debout avec housse bordeaux"
+      },
+      {
+        "s": "mange-debout-verte.webp",
+        "a": "Mange-debout avec housse verte"
+      },
+      {
+        "s": "mange-debout-terracotta.webp",
+        "a": "Mange-debout avec housse terracotta"
       }
     ],
     "options": {},
