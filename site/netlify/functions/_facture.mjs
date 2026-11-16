@@ -78,7 +78,9 @@ const L_GRASSE = { ...L_NORMALE, ' ': 278, A: 722, B: 722, C: 722, D: 722, E: 66
 function largeur(texte, taille, gras) {
   const table = gras ? L_GRASSE : L_NORMALE;
   let t = 0;
-  for (const c of String(texte || '')) t += (table[c] !== undefined ? table[c] : 556);
+  const DIV = { '\u2019': 222, '\u2018': 222, '\u00b7': 278, '\u00b0': 400, '\u2013': 556, '\u2014': 1000, '\u00ab': 556, '\u00bb': 556, '\u00a0': 278, '\u202f': 278 };
+  /* lettres accentuées : même largeur que la lettre de base (é = e) */
+  for (const c of String(texte || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')) t += (table[c] !== undefined ? table[c] : (DIV[c] !== undefined ? DIV[c] : 556));
   return (t / 1000) * taille;
 }
 
