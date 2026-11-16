@@ -10,7 +10,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="/favicon.png">
 <link rel="stylesheet" href="/polices.css?v=1">
-<link rel="stylesheet" href="app.css?v=18">
+<link rel="stylesheet" href="app.css?v=21">
 </head>
 <body>
 <main id="app">
@@ -65,16 +65,35 @@
     <p class="petit">L’envoi peut prendre quelques minutes selon la taille de la vidéo. Pensez à vérifier vos courriers indésirables.</p>
   </section>
 
+  <section id="s-acces" class="ecran">
+    <div class="marque" style="position:static;margin-bottom:6px">VESPRA EVENT</div>
+    <h2>Vidéobooth</h2>
+    <p class="petit">Saisissez le mot de passe d’accès</p>
+    <form onsubmit="return false" style="width:min(420px,90vw);display:flex;flex-direction:column;gap:12px"><input id="acces-in" type="password" autocomplete="off" placeholder="Mot de passe" style="text-align:center"><div id="acces-err" class="err"></div><button id="acces-ok" class="gros" type="button">Entrer</button></form>
+  </section>
+
+  <section id="s-sessions" class="ecran">
+    <h2>Choisissez votre session</h2>
+    <div id="sess-cartes" class="adm-cartes" style="width:min(720px,94vw)"></div>
+    <button id="sess-retour" class="sec" type="button">Retour</button>
+  </section>
+
+  <section id="s-sess-mdp" class="ecran">
+    <h2 id="sm-titre">Session</h2>
+    <p class="petit">Saisissez le mot de passe de cette session</p>
+    <form onsubmit="return false" style="width:min(420px,90vw);display:flex;flex-direction:column;gap:12px"><input id="sm-in" type="password" autocomplete="off" placeholder="Mot de passe de la session" style="text-align:center"><div id="sm-err" class="err"></div><div class="rang"><button id="sm-retour" class="sec" type="button">Retour</button><button id="sm-ok" class="gros" type="button">Valider</button></div></form>
+  </section>
+
   <section id="s-admin" class="ecran">
     <div class="adm" id="adm-liste">
-      <header class="adm-h"><h2>Événements</h2><button id="a-close" class="adm-x" type="button" aria-label="Fermer">✕</button></header>
-      <p class="adm-m">Touchez un événement pour le régler. Celui marqué « En cours » est affiché aux invités.</p>
-      <div id="adm-cartes" class="adm-cartes"></div>
+      <header class="adm-h"><h2>Réglages</h2><button id="a-close" class="adm-x" type="button" aria-label="Fermer">✕</button></header>
+      <div id="adm-cartes" hidden></div>
+      <div class="adm-c"><h3>Session en cours</h3><div id="a-sess" class="adm-m"></div><div class="adm-l"><button id="a-chsess" class="adm-b" type="button">Changer de session</button></div></div>
+      <div class="adm-c"><h3>Caméra et micro de cette tablette</h3><div class="adm-2"><label>Caméra<select id="a-cam"></select></label><label>Micro<select id="a-mic"></select></label></div></div>
       <div class="adm-c">
         <h3>Envoi des vidéos</h3>
         <div class="adm-2">
           <label>Adresse du site<input id="a-serveur" type="url" placeholder="vide = ce site"></label>
-          <label>Clé de l’appareil<input id="a-cle" type="text" autocomplete="off"></label>
         </div>
         <div class="adm-l"><button id="a-test" class="adm-b" type="button">Tester la connexion</button><span id="a-test-r" class="adm-m"></span></div>
         <div id="a-file" class="adm-m"></div>
@@ -118,6 +137,6 @@
     <div class="rang"><button id="pin-x" class="sec" type="button">Annuler</button><button id="pin-ok" class="gros" type="button">Valider</button></div>
   </section>
 </main>
-<script src="app.js?v=20"></script>
+<script src="app.js?v=21"></script>
 </body>
 </html>

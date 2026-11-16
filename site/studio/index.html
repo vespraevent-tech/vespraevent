@@ -1930,6 +1930,7 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
         </div>
       </div>
       <div id="vbAlerte" class="hint" style="color:#b03a2a;display:none;margin:0 0 10px"></div>
+      <div id="vbConfig"></div>
       <div id="vbListe"></div>
     </div>
 
@@ -2656,6 +2657,42 @@ function ouvrirPageSite(fichier, onglet){
 }
 
 const VUES_PRODUITS={'produits':'cat','produits-ordre':'ordre','produits-bests':'bests','produits-evt':'evt'};
+/* ── Vidéobooth : accès à la tablette et sessions ── */
+let VBCFG={acces:'',sessions:[]}, VBEDIT=null;
+const vbMdp=()=>{const a='abcdefghjkmnpqrstuvwxyz23456789';let s='';const b=crypto.getRandomValues(new Uint8Array(6));b.forEach(x=>s+=a[x%a.length]);return s;};
+async function vbConfigCharger(){ try{ VBCFG=await api('/videobooth/config'); }catch(e){ VBCFG={acces:'',sessions:[],err:e.message}; } vbConfigRendre(); }
+function vbConfigRendre(){
+  const z=document.getElementById('vbConfig'); if(!z) return;
+  if(VBEVT){ z.innerHTML=''; return; }
+  const c='background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:14px 16px;margin-bottom:14px';
+  const ses=VBCFG.sessions||[];
+  let h='<div style="'+c+'"><div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f">Accès à l’appli de la tablette</div><div style="font-size:12.5px;color:#6b7280;margin:3px 0 10px">Adresse : <b>'+location.origin+'/videobooth/</b> — la tablette demande ce mot de passe, puis la liste des sessions, puis le mot de passe de la session choisie.</div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap"><input id="vbAcces" value="'+vbEsc(VBCFG.acces||'')+'" placeholder="Mot de passe d’accès (6 caractères minimum)" style="flex:1 1 240px;padding:9px 12px;border:1px solid #d9dde5;border-radius:9px;font:600 14px monospace" autocomplete="off"><button class="btn btn-ghost" onclick="document.getElementById(\'vbAcces\').value=vbMdp()">Générer</button><button class="btn" onclick="vbAccesSauver()">Enregistrer</button></div>'+(VBCFG.acces?'':'<div style="color:#b03a2a;font-size:12.5px;margin-top:8px">Aucun mot de passe d’accès défini : la tablette ne peut pas se connecter.</div>')+'</div>';
+  h+='<div style="'+c+'"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f">Sessions (événements)</div><button class="btn" onclick="vbSessEdit(-1)">+ Nouvelle session</button></div>';
+  if(VBEDIT!==null){
+    const e=VBEDIT.i>=0?ses[VBEDIT.i]:{nom:'',date:'',mdp:vbMdp(),titre:'Enregistrer un souvenir',sous:'Laissez un petit message vidéo de 30 secondes',max:30,format:'auto',noel:false,cadrage:'Vous pouvez incliner doucement la tablette pour vous cadrer'};
+    const f=(id,lab,v,ph)=>'<label style="font-size:12px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">'+lab+'<input id="vs-'+id+'" value="'+vbEsc(v==null?'':v)+'" placeholder="'+vbEsc(ph||'')+'" style="padding:8px 10px;border:1px solid #d9dde5;border-radius:8px;font:inherit;font-size:13.5px;color:#111"></label>';
+    h+='<div style="background:#f7f5f0;border-radius:10px;padding:12px;margin:10px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">'+f('nom','Nom de la session',e.nom,'Mariage Sylvie')+f('date','Date',e.date,'21 novembre')+f('mdp','Mot de passe de la session',e.mdp,'')+f('titre','Titre d’accueil',e.titre,'')+f('sous','Sous-titre',e.sous,'')+f('max','Durée maximale (secondes)',e.max,'30')+f('cadrage','Message de cadrage',e.cadrage,'')+
+      '<label style="font-size:12px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">Format de la vidéo<select id="vs-format" style="padding:8px 10px;border:1px solid #d9dde5;border-radius:8px;font:inherit;font-size:13.5px">'+[['auto','Automatique'],['16:9','Paysage 16:9'],['4:3','Paysage 4:3'],['9:16','Story 9:16'],['3:4','Portrait 3:4']].map(o=>'<option value="'+o[0]+'"'+(e.format===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></label>'+
+      '<label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" id="vs-noel"'+(e.noel?' checked':'')+'> Thème Noël</label>'+
+      '<div style="grid-column:1/-1;display:flex;gap:8px"><button class="btn" onclick="vbSessSauver()">Enregistrer la session</button><button class="btn btn-ghost" onclick="vbSessEdit(null)">Annuler</button></div></div>';
+  }
+  h+=ses.length?'<div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">'+ses.map((e,i)=>'<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;border:1px solid #eee8dc;border-radius:10px;padding:10px 12px"><div><b>'+vbEsc(e.nom)+'</b> <span style="color:#6b7280;font-size:13px">'+vbEsc(e.date||'')+'</span><div style="font-size:12px;color:#6b7280">mot de passe : <span style="font-family:monospace;font-weight:700;color:#14304f">'+vbEsc(e.mdp||'(aucun)')+'</span></div></div><div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="vbSessEdit('+i+')">Modifier</button><button class="btn btn-ghost" onclick="vbSessSuppr('+i+')">Supprimer</button></div></div>').join('')+'</div>':'<div class="hint" style="padding:10px 0">Aucune session. Créez-en une pour chaque événement : la tablette la proposera après le mot de passe d’accès.</div>';
+  h+='</div>';
+  z.innerHTML=h;
+}
+function vbSessEdit(i){ VBEDIT=(i===null)?null:{i}; vbConfigRendre(); }
+async function vbConfigPoster(corps,msg){ try{ VBCFG=await api('/videobooth/config',{method:'POST',body:JSON.stringify(corps)}); showToast(msg); }catch(e){ showToast('Échec : '+e.message,true); } VBEDIT=null; vbConfigRendre(); }
+function vbAccesSauver(){ vbConfigPoster({acces:document.getElementById('vbAcces').value.trim()},'Mot de passe d’accès enregistré'); }
+function vbSessSauver(){
+  const v=id=>(document.getElementById('vs-'+id)||{}).value||'';
+  const s={nom:v('nom').trim(),date:v('date').trim(),mdp:v('mdp').trim(),titre:v('titre').trim(),sous:v('sous').trim(),max:Number(v('max'))||30,cadrage:v('cadrage').trim(),format:v('format'),noel:!!document.getElementById('vs-noel').checked};
+  if(!s.nom){ showToast('Indiquez le nom de la session',true); return; }
+  const l=(VBCFG.sessions||[]).slice(); if(VBEDIT.i>=0){ s.id=l[VBEDIT.i].id; l[VBEDIT.i]=s; } else l.push(s);
+  vbConfigPoster({sessions:l},'Session enregistrée');
+}
+function vbSessSuppr(i){ const l=(VBCFG.sessions||[]).slice(); if(!confirm('Supprimer la session « '+l[i].nom+' » ? Les vidéos déjà reçues ne sont pas supprimées.')) return; l.splice(i,1); vbConfigPoster({sessions:l},'Session supprimée'); }
+
 /* ── Vidéobooth ── */
 let VB=[], VBEVT='';
 function vbEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -2670,15 +2707,15 @@ async function vbCharger(){
     const fh=x=>x?new Date(x.date).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):null;
     const et=d.etat||{}; let msg='';
     if(!d.cle) msg='La variable VIDEOBOOTH_CLE n’est pas définie dans Netlify (ou le site n’a pas été redéployé depuis) : la tablette ne peut pas envoyer ses vidéos.';
-    else if(et.refus && (!et.contact || et.refus.date>et.contact.date)) msg='La tablette a essayé d’envoyer le '+fh(et.refus)+' mais sa clé ne correspond pas à celle de Netlify : recopiez la clé dans les réglages de la tablette.';
-    else if(!et.contact) msg='Aucun contact de la tablette pour l’instant. Vérifiez sur la tablette (cadenas, code 0104) : clé saisie, puis « Tester la connexion ».';
+    else if(et.refus && (!et.contact || et.refus.date>et.contact.date)) msg='La tablette a essayé d’envoyer le '+fh(et.refus)+' mais l’accès a été refusé : vérifiez les mots de passe saisis sur la tablette.';
+    else if(!et.contact) msg='Aucun contact de la tablette pour l’instant. Sur la tablette, ouvrez /videobooth/, saisissez le mot de passe d’accès, puis celui de la session.';
     a.style.display=msg?'block':'none'; a.textContent=msg;
     a.style.color=(msg&&d.cle&&et.contact&&!et.refus)?'#6b7280':'#b03a2a';
     if(!msg&&et.contact){ a.style.display='block'; a.style.color='#6b7280'; a.textContent='Dernier contact de la tablette : '+fh(et.contact)+'.'; }
-    vbRendre();
+    vbRendre(); vbConfigCharger();
   }catch(e){ z.innerHTML='<div class="hint" style="color:#b03a2a">Chargement impossible : '+vbEsc(e.message)+'</div>'; }
 }
-function vbOuvrir(nom){ VBEVT=nom; vbRendre(); }
+function vbOuvrir(nom){ VBEVT=nom; vbRendre(); vbConfigRendre(); }
 function vbRendre(){
   const z=document.getElementById('vbListe'); if(!z) return;
   const fd=d=>new Date(d).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});

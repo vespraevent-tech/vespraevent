@@ -84,17 +84,62 @@ async function galEcrire(st, label, mdp) {
 }
 /* mot de passe lisible : sans 0/O/1/l/I pour éviter les confusions */
 const genMdp = () => { const a = 'abcdefghjkmnpqrstuvwxyz23456789'; const b = randomBytes(6); return Array.from(b, (x) => a[x % a.length]).join(''); };
-export { envoyerMail, jeton, jetonEvt, GARDE_JOURS, galLire, galEcrire, genMdp };
+/* ── accès à la tablette : mot de passe général, puis mot de passe de la session ── */
+const b64 = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
+const signer = (o) => { const p = b64(o); return p + '.' + createHmac('sha256', process.env.VIDEOBOOTH_CLE || '').update('tok:' + p).digest('base64url'); };
+function lireJeton(t, type) {
+  const [p, sg] = String(t || '').split('.'); if (!p || !sg) return null;
+  const att = createHmac('sha256', process.env.VIDEOBOOTH_CLE || '').update('tok:' + p).digest('base64url');
+  if (!egal(att, sg)) return null;
+  try { const o = JSON.parse(Buffer.from(p, 'base64url').toString('utf8')); if (o.exp < Date.now() || (type && o.t !== type)) return null; return o; } catch { return null; }
+}
+const hMdp = (kind, v) => createHmac('sha256', process.env.VIDEOBOOTH_CLE || '').update(kind + ':' + v).digest('hex');
+async function accesLire(st) { return st.get('config/acces', { type: 'json' }).catch(() => null); }
+async function accesEcrire(st, mdp) { if (!mdp) { await st.delete('config/acces').catch(() => {}); return null; } const a = { mdp, h: hMdp('acces', mdp), maj: new Date().toISOString() }; await st.setJSON('config/acces', a); return a; }
+async function sessionsLire(st) { const l = await st.get('config/sessions', { type: 'json' }).catch(() => null); return Array.isArray(l) ? l : []; }
+async function sessionsEcrire(st, liste) {
+  const propre = liste.slice(0, 200).map((e) => ({
+    id: String(e.id || ('s' + randomBytes(4).toString('hex'))).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40),
+    nom: String(e.nom || '').slice(0, 80), date: String(e.date || '').slice(0, 40), mdp: String(e.mdp || '').slice(0, 40),
+    titre: String(e.titre || '').slice(0, 80), sous: String(e.sous || '').slice(0, 160), max: Math.min(120, Math.max(5, Number(e.max) || 30)),
+    format: ['auto', '16:9', '4:3', '9:16', '3:4'].includes(e.format) ? e.format : 'auto', noel: !!e.noel, cadrage: String(e.cadrage == null ? '' : e.cadrage).slice(0, 160),
+  })).filter((e) => e.nom);
+  await st.setJSON('config/sessions', propre); return propre;
+}
+const labelSession = (e) => e.nom + (e.date ? ' — ' + e.date : '');
+export { envoyerMail, jeton, jetonEvt, GARDE_JOURS, galLire, galEcrire, genMdp, accesLire, accesEcrire, sessionsLire, sessionsEcrire, labelSession };
 
 export default async (request) => {
   if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
   const url = new URL(request.url);
   const cle = process.env.VIDEOBOOTH_CLE;
 
+  /* ── accès à l'appli de la tablette : mot de passe général ── */
+  if (request.method === 'POST' && /\/api\/videobooth\/(acces|sessions|session)$/.test(url.pathname)) {
+    if (!cle) return rep({ ok: false, erreur: "VIDEOBOOTH_CLE n'est pas définie dans Netlify" }, 500);
+    const st = store(); let d = {}; try { d = await request.json(); } catch {}
+    const route = url.pathname.split('/').pop();
+    if (route === 'acces') {
+      const a = await accesLire(st);
+      if (!a || !a.h) return rep({ ok: false, erreur: 'Aucun mot de passe d’accès n’est défini : créez-le dans le back-office (onglet Vidéobooth).' }, 409);
+      if (!egal(hMdp('acces', String(d.mdp || '').trim()), a.h)) { await new Promise((r) => setTimeout(r, 900)); await noter('refus', 'mot de passe d’accès incorrect'); return rep({ ok: false, erreur: 'Mot de passe incorrect.' }, 401); }
+      await noter('contact', 'accès tablette');
+      const ses = await sessionsLire(st);
+      return rep({ ok: true, acces: signer({ t: 'acces', exp: Date.now() + 12 * 3600e3 }), sessions: ses.map((e) => ({ id: e.id, nom: e.nom, date: e.date })) });
+    }
+    if (!lireJeton(d.acces, 'acces') && !lireJeton(d.acces, 'session')) return rep({ ok: false, erreur: 'Accès expiré : saisissez de nouveau le mot de passe.', expire: true }, 401);
+    if (route === 'sessions') { const ses = await sessionsLire(st); return rep({ ok: true, sessions: ses.map((e) => ({ id: e.id, nom: e.nom, date: e.date })) }); }
+    const ses = (await sessionsLire(st)).find((e) => e.id === String(d.id || ''));
+    if (!ses) return rep({ ok: false, erreur: 'Session introuvable.' }, 404);
+    if (ses.mdp && !egal(hMdp('s', String(d.mdp || '').trim()), hMdp('s', ses.mdp))) { await new Promise((r) => setTimeout(r, 900)); return rep({ ok: false, erreur: 'Mot de passe de la session incorrect.' }, 401); }
+    await noter('contact', 'session ouverte : ' + ses.nom);
+    return rep({ ok: true, jeton: signer({ t: 'session', id: ses.id, exp: Date.now() + 72 * 3600e3 }), session: { id: ses.id, nom: ses.nom, date: ses.date, label: labelSession(ses), titre: ses.titre, sous: ses.sous, max: ses.max, format: ses.format, noel: ses.noel, cadrage: ses.cadrage } });
+  }
+
   /* ── test de connexion depuis les réglages de la tablette ── */
   if (request.method === 'GET' && /\/api\/videobooth\/ping$/.test(url.pathname)) {
     if (!cle) return rep({ ok: false, erreur: "VIDEOBOOTH_CLE n'est pas définie dans Netlify (ou le site n'a pas été redéployé depuis)" });
-    if (request.headers.get('x-appareil') !== cle) { await noter('refus', 'clé de la tablette incorrecte (test)'); return rep({ ok: false, erreur: 'La clé saisie sur la tablette ne correspond pas à celle de Netlify' }); }
+    if (request.headers.get('x-appareil') !== cle && !lireJeton(request.headers.get('x-appareil'), 'session')) { await noter('refus', 'clé de la tablette incorrecte (test)'); return rep({ ok: false, erreur: 'La clé saisie sur la tablette ne correspond pas à celle de Netlify' }); }
     await noter('contact', 'test de connexion');
     return rep({ ok: true, resend: !!process.env.RESEND_API_KEY });
   }
@@ -187,7 +232,7 @@ next().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez l
   /* ── réception d'un morceau ── */
   if (request.method === 'POST' && /\/api\/videobooth\/chunk$/.test(url.pathname)) {
     if (!cle) return rep({ ok: false, erreur: "VIDEOBOOTH_CLE n'est pas définie dans Netlify" }, 500);
-    if (request.headers.get('x-appareil') !== cle) { await noter('refus', 'clé de la tablette incorrecte (envoi)'); return rep({ ok: false, erreur: 'Clé de la tablette refusée' }, 403); }
+    if (request.headers.get('x-appareil') !== cle && !lireJeton(request.headers.get('x-appareil'), 'session')) { await noter('refus', 'clé de la tablette incorrecte (envoi)'); return rep({ ok: false, erreur: 'Clé de la tablette refusée' }, 403); }
     await noter('contact', 'morceau ' + (Number(url.searchParams.get('i')) + 1) + '/' + url.searchParams.get('n'));
     const q = url.searchParams, id = q.get('id') || '';
     const i = Number(q.get('i')), n = Number(q.get('n'));

@@ -186,7 +186,7 @@ $('b-stop').onclick = arreterRec;
       var att = l.filter(function (v) { return !v.envoye; }).length, tot = l.length;
       var txt = att ? (att + ' vidéo' + (att > 1 ? 's' : '') + ' en attente d’envoi') : (tot ? 'Toutes les vidéos sont envoyées' : '');
       
-      $('a-file').textContent = (cfg.cle ? '' : '⚠ Clé de l’appareil vide : aucune vidéo ne peut partir. ') + tot + ' vidéo(s) gardée(s) sur la tablette, dont ' + (tot - att) + ' envoyée(s)' + (att ? ' — ' + att + ' en attente' : '') + (dernierMsg ? ' — ' + dernierMsg : '');
+      $('a-file').textContent = ((cfg.jeton || cfg.cle) ? '' : '⚠ Aucune session ouverte : les vidéos restent sur la tablette. ') + tot + ' vidéo(s) gardée(s) sur la tablette, dont ' + (tot - att) + ' envoyée(s)' + (att ? ' — ' + att + ' en attente' : '') + (dernierMsg ? ' — ' + dernierMsg : '');
     }).catch(function () {});
   }
   var TAILLE = 3 * 1024 * 1024;
@@ -195,7 +195,7 @@ $('b-stop').onclick = arreterRec;
     var n = Math.max(1, Math.ceil(v.blob.size / TAILLE)), i = 0, dernier = {};
     function suite() {
       var q = new URLSearchParams({ id: v.id, i: i, n: n, fichier: v.fichier, type: v.type || '', nom: v.nom, prenom: v.prenom, email: v.email, event: v.event || '', duree: v.duree || 0 });
-      return fetch(base + '/api/videobooth/chunk?' + q.toString(), { method: 'POST', headers: { 'x-appareil': cfg.cle, 'content-type': 'application/octet-stream' }, body: v.blob.slice(i * TAILLE, (i + 1) * TAILLE) }).then(function (r) {
+      return fetch(base + '/api/videobooth/chunk?' + q.toString(), { method: 'POST', headers: { 'x-appareil': (cfg.jeton || cfg.cle), 'content-type': 'application/octet-stream' }, body: v.blob.slice(i * TAILLE, (i + 1) * TAILLE) }).then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (j) {
           if (!r.ok || j.ok === false) throw new Error(j.erreur || ('Serveur : ' + r.status));
           dernier = j; i++; return i < n ? suite() : dernier;
@@ -205,7 +205,7 @@ $('b-stop').onclick = arreterRec;
     return suite();
   }
   function synchro() {
-    if (envoiEnCours || !cfg.cle || !navigator.onLine) { majEtat(); return Promise.resolve(); }
+    if (envoiEnCours || !(cfg.jeton || cfg.cle) || !navigator.onLine) { majEtat(); return Promise.resolve(); }
     envoiEnCours = true;
     return toutes().then(function (l) {
       l = l.filter(function (v) { return !v.envoye; }).sort(function (a, b) { return a.cree < b.cree ? -1 : 1; });
@@ -267,23 +267,23 @@ $('b-stop').onclick = arreterRec;
     return cfg.events;
   }
   function appliquerActif() {
-    var e = evts().filter(function (x) { return x.id === cfg.actif; })[0];
-    cfg.event = e ? (e.nom + (e.date ? ' — ' + e.date : '')) : '';
-    cfg.titre = (e && e.titre) || CFG0.titre; cfg.sous = e ? (e.sous || '') : CFG0.sous; cfg.max = (e && Number(e.max)) || 30; cfg.cam = (e && e.cam) || ''; cfg.noel = !!(e && e.noel); cfg.format = (e && e.fmtV === 2 && e.format) || 'auto'; cfg.mic = (e && e.mic) || ''; cfg.cadrage = (e && e.cadrage != null && e.cadrage !== '') ? e.cadrage : 'Vous pouvez incliner doucement la tablette pour vous cadrer'; document.body.classList.toggle('fmt34', cfg.format === '3:4' || cfg.format === '4:3'); document.body.classList.toggle('noel-on', cfg.noel);
+    var s = cfg.session || null;
+    cfg.event = s ? (s.label || s.nom || '') : '';
+    cfg.titre = (s && s.titre) || CFG0.titre; cfg.sous = s ? (s.sous || '') : CFG0.sous; cfg.max = (s && Number(s.max)) || 30;
+    cfg.noel = !!(s && s.noel); cfg.format = (s && s.format) || 'auto';
+    cfg.cadrage = (s && s.cadrage != null && s.cadrage !== '') ? s.cadrage : (s ? '' : 'Vous pouvez incliner doucement la tablette pour vous cadrer');
+    document.body.classList.toggle('noel-on', cfg.noel); document.body.classList.toggle('fmt34', cfg.format === '3:4' || cfg.format === '4:3');
     ecrireCfg(cfg);
   }
   var edite = null;
   function rendreCartes() {
-    var h = '';
-    evts().forEach(function (e) {
-      h += '<button type="button" class="adm-carte' + (e.id === cfg.actif ? ' on' : '') + '" data-id="' + e.id + '">' + (e.id === cfg.actif ? '<i class="badge">En cours</i>' : '') +
-        '<b></b><span></span></button>';
-    });
-    h += '<button type="button" class="adm-carte nouveau" id="adm-new">+ Nouvel événement</button>';
-    $('adm-cartes').innerHTML = h;
-    var cs = $('adm-cartes').querySelectorAll('.adm-carte[data-id]');
-    evts().forEach(function (e, i) { cs[i].querySelector('b').textContent = e.nom || 'Sans nom'; cs[i].querySelector('span').textContent = e.date || ''; cs[i].onclick = function () { ouvrirEdition(e.id); }; });
-    $('adm-new').onclick = function () { var e = { id: nouvelId(), nom: '', date: '', titre: CFG0.titre, sous: CFG0.sous, max: 30, cam: '' }; cfg.events.push(e); if (!cfg.actif) cfg.actif = e.id; ecrireCfg(cfg); ouvrirEdition(e.id); };
+    var s = cfg.session; $('a-sess').textContent = s ? (s.label || s.nom) : 'Aucune session ouverte';
+    var remplir = function (sel, genre, courant) {
+      sel.innerHTML = '<option value="">' + (genre === 'videoinput' ? 'Caméra avant (par défaut)' : 'Micro de la tablette (par défaut)') + '</option>';
+      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+      navigator.mediaDevices.enumerateDevices().then(function (d) { d.filter(function (x) { return x.kind === genre; }).forEach(function (x, i) { var o = document.createElement('option'); o.value = x.deviceId; o.textContent = x.label || ((genre === 'videoinput' ? 'Caméra ' : 'Micro ') + (i + 1)); if (x.deviceId === courant) o.selected = true; sel.appendChild(o); }); }).catch(function () {});
+    };
+    remplir($('a-cam'), 'videoinput', cfg.cam); remplir($('a-mic'), 'audioinput', cfg.mic);
   }
   function majStock() {
     var el = $('a-stock'); if (!el) return;
@@ -309,7 +309,7 @@ $('b-stop').onclick = arreterRec;
     r.readAsText(f);
   };
   function ouvrirAdmin() {
-    $('a-serveur').value = cfg.serveur; $('a-cle').value = cfg.cle;
+    $('a-serveur').value = cfg.serveur;
     $('adm-edit').hidden = true; $('adm-liste').hidden = false; rendreCartes(); majEtat(); majStock(); montrer('s-admin');
   }
   function ouvrirEdition(id) {
@@ -328,8 +328,8 @@ $('b-stop').onclick = arreterRec;
     edite.nom = $('e-nom').value.trim(); edite.date = $('e-date').value.trim(); edite.titre = $('e-titre').value.trim() || CFG0.titre; edite.sous = $('e-sous').value.trim();
     edite.max = Math.min(120, Math.max(5, Number($('e-max').value) || 30)); edite.cam = $('e-cam').value; edite.noel = $('e-noel').checked; edite.cadrage = $('e-cadrage').value.trim(); edite.format = $('e-format').value; edite.fmtV = 2; edite.mic = $('e-mic').value;
   }
-  function sauverConnexion() { cfg.serveur = $('a-serveur').value.trim(); cfg.cle = $('a-cle').value.trim() || cfg.cle; ecrireCfg(cfg); }
-  $('a-serveur').onchange = $('a-cle').onchange = sauverConnexion;
+  function sauverConnexion() { cfg.serveur = $('a-serveur').value.trim(); cfg.cam = $('a-cam').value; cfg.mic = $('a-mic').value; ecrireCfg(cfg); }
+  $('a-serveur').onchange = $('a-cam').onchange = $('a-mic').onchange = sauverConnexion;
   $('a-close').onclick = function () { sauverConnexion(); appliquerActif(); accueil(); synchro(); };
   $('e-retour').onclick = function () { lireEdition(); appliquerActif(); ouvrirAdmin(); };
   $('e-ok').onclick = function () { lireEdition(); appliquerActif(); ouvrirAdmin(); };
@@ -340,11 +340,11 @@ $('b-stop').onclick = arreterRec;
     edite = null; appliquerActif(); ouvrirAdmin();
   };
   $('a-sync').onclick = function () {
-    if (!cfg.cle) { noterMsg('la clé de l’appareil n’est pas renseignée (champ ci-dessus, puis Enregistrer)'); return majEtat(); }
+    if (!(cfg.jeton || cfg.cle)) { noterMsg('aucune session ouverte : ouvrez une session pour envoyer'); return majEtat(); }
     noterMsg('envoi en cours…'); majEtat(); synchro().then(function () { if (dernierMsg === 'envoi en cours…') noterMsg(''); majEtat(); });
   };
   $('a-test').onclick = function () {
-    var base = ($('a-serveur').value.trim() || location.origin).replace(/\/+$/, ''), cle = $('a-cle').value.trim();
+    var base = ($('a-serveur').value.trim() || location.origin).replace(/\/+$/, ''), cle = (cfg.jeton || cfg.cle || '');
     $('a-test-r').textContent = 'Test en cours…';
     fetch(base + '/api/videobooth/ping', { headers: { 'x-appareil': cle } }).then(function (r) { return r.json().catch(function () { return { ok: false, erreur: 'Réponse inattendue (' + r.status + ')' }; }); }).then(function (j) {
       $('a-test-r').textContent = j.ok ? ('✓ Connexion OK' + (j.resend ? '' : ' — mais l’envoi d’e-mail n’est pas configuré (RESEND_API_KEY manquante)')) : ('✗ ' + (j.erreur || 'échec'));
@@ -369,6 +369,55 @@ $('b-stop').onclick = arreterRec;
   document.addEventListener('pointerdown', function () { garderEveille(); if (document.fullscreenElement == null && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {}); }, { once: true });
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/videobooth/sw.js', { scope: '/videobooth/' }).catch(function () {});
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
-  appliquerActif();
-  ouvrirDb().then(function () { accueil(); synchro(); }).catch(function () { accueil(); $('etat').hidden = false; $('etat').textContent = 'Stockage de la tablette indisponible'; $('etat').classList.add('alerte'); });
+  /* ── accès : mot de passe général → liste des sessions → mot de passe de la session ── */
+  function baseApi() { return (cfg.serveur || location.origin).replace(/\/+$/, ''); }
+  function appelApi(route, corps) {
+    return fetch(baseApi() + '/api/videobooth/' + route, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(corps) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j._st = r.status; return j; }); });
+  }
+  function sessionStockee() { try { var s = JSON.parse(localStorage.getItem('vb-sess') || 'null'); if (s && s.exp > Date.now() && s.jeton && s.session) return s; } catch (e) {} return null; }
+  function accesStocke() { try { var a = JSON.parse(sessionStorage.getItem('vb-acces') || 'null'); if (a && a.exp > Date.now()) return a; } catch (e) {} return null; }
+  function ouvrirSession(s) { cfg.session = s.session; cfg.jeton = s.jeton; appliquerActif(); accueil(); synchro(); }
+  function versAcces() { cfg.session = null; cfg.jeton = ''; ecrireCfg(cfg); $('acces-in').value = ''; $('acces-err').textContent = ''; montrer('s-acces'); setTimeout(function () { $('acces-in').focus(); }, 100); }
+  function rendreSessions(liste) {
+    var z = $('sess-cartes'); z.innerHTML = '';
+    if (!liste.length) { z.innerHTML = '<p>Aucune session pour le moment. Créez-en une dans le back-office.</p>'; }
+    liste.forEach(function (e) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'adm-carte'; b.innerHTML = '<b></b><span></span>'; b.querySelector('b').textContent = e.nom; b.querySelector('span').textContent = e.date || '';
+      b.onclick = function () { choisie = e; $('sm-titre').textContent = e.nom; $('sm-in').value = ''; $('sm-err').textContent = ''; montrer('s-sess-mdp'); setTimeout(function () { $('sm-in').focus(); }, 100); };
+      z.appendChild(b);
+    });
+    montrer('s-sessions');
+  }
+  var choisie = null;
+  function listerSessions() {
+    var a = accesStocke(); if (!a) return versAcces();
+    appelApi('sessions', { acces: a.acces }).then(function (j) { if (j.ok) rendreSessions(j.sessions || []); else versAcces(); }).catch(function () { $('sess-cartes').innerHTML = '<p>Réseau indisponible. Réessayez.</p>'; montrer('s-sessions'); });
+  }
+  $('acces-ok').onclick = function () {
+    var m = $('acces-in').value.trim(); if (!m) return; $('acces-err').textContent = ''; $('acces-ok').disabled = true;
+    appelApi('acces', { mdp: m }).then(function (j) {
+      $('acces-ok').disabled = false;
+      if (!j.ok) { $('acces-err').textContent = j.erreur || 'Connexion impossible.'; return; }
+      try { sessionStorage.setItem('vb-acces', JSON.stringify({ acces: j.acces, exp: Date.now() + 11 * 3600e3 })); } catch (e) {}
+      rendreSessions(j.sessions || []);
+    }).catch(function () { $('acces-ok').disabled = false; $('acces-err').textContent = 'Pas de réseau : branchez la tablette à internet pour ouvrir une session.'; });
+  };
+  $('acces-in').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('acces-ok').click(); });
+  $('sess-retour').onclick = function () { try { sessionStorage.removeItem('vb-acces'); } catch (e) {} versAcces(); };
+  $('sm-retour').onclick = function () { listerSessions(); };
+  $('sm-ok').onclick = function () {
+    var a = accesStocke(); if (!a || !choisie) return versAcces();
+    $('sm-err').textContent = ''; $('sm-ok').disabled = true;
+    appelApi('session', { acces: a.acces, id: choisie.id, mdp: $('sm-in').value.trim() }).then(function (j) {
+      $('sm-ok').disabled = false;
+      if (!j.ok) { $('sm-err').textContent = j.erreur || 'Connexion impossible.'; if (j.expire) versAcces(); return; }
+      var s = { jeton: j.jeton, session: j.session, exp: Date.now() + 70 * 3600e3 };
+      try { localStorage.setItem('vb-sess', JSON.stringify(s)); } catch (e) {}
+      ouvrirSession(s);
+    }).catch(function () { $('sm-ok').disabled = false; $('sm-err').textContent = 'Pas de réseau : réessayez.'; });
+  };
+  $('sm-in').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('sm-ok').click(); });
+  $('a-chsess').onclick = function () { if (!confirm('Fermer la session en cours et en choisir une autre ? Les vidéos déjà enregistrées restent sur la tablette.')) return; try { localStorage.removeItem('vb-sess'); } catch (e) {} cfg.session = null; cfg.jeton = ''; appliquerActif(); if (accesStocke()) listerSessions(); else versAcces(); };
+  function demarrerAppli() { var s = sessionStockee(); if (s) ouvrirSession(s); else versAcces(); }
+  ouvrirDb().then(function () { demarrerAppli(); }).catch(function () { demarrerAppli(); $('etat').hidden = false; $('etat').textContent = 'Stockage de la tablette indisponible'; $('etat').classList.add('alerte'); });
 })();
