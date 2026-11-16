@@ -27,6 +27,7 @@ const rep = (obj, status = 200) =>
   new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json', ...CORS } });
 const esc = (s) => String(s || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const GARDE_JOURS = 30;
+const SANS_NOM = '(sans nom d’événement)';   /* nom affiché dans le back-office pour une vidéo sans événement */
 const PJ_MAX = 18 * 1024 * 1024;
 const idOk = (s) => /^[A-Za-z0-9_-]{6,60}$/.test(s || '');
 const jeton = (id) => createHmac('sha256', process.env.VIDEOBOOTH_CLE || '').update('vb:' + id).digest('hex').slice(0, 32);
@@ -92,7 +93,7 @@ export default async (request) => {
     const st = store();
     const { blobs } = await st.list({ prefix: 'meta/' });
     const liste = [];
-    for (const b of blobs) { const m = await st.get(b.key, { type: 'json' }).catch(() => null); if (m && m.event === label && Date.parse(m.cree) >= Date.now() - GARDE_JOURS * 86400000) liste.push(m); }
+    for (const b of blobs) { const m = await st.get(b.key, { type: 'json' }).catch(() => null); if (m && (m.event || SANS_NOM) === label && Date.parse(m.cree) >= Date.now() - GARDE_JOURS * 86400000) liste.push(m); }
     liste.sort((a, b) => String(a.cree).localeCompare(String(b.cree)));
     const lignes = liste.map((m) => ({ nom: `${m.prenom} ${m.nom}`.trim(), fichier: m.fichier, date: m.cree, mo: Math.round((m.octets || 0) / 104857.6) / 10, href: `/api/videobooth/v/${m.id}?t=${jeton(m.id)}` }));
     const rows = lignes.map((l, i) => `<div class="c"><button class="pl" type="button" data-i="${i}" aria-label="Voir la vidéo de ${esc(l.nom)}"><svg viewBox="0 0 24 24" width="30" height="30" fill="#fff"><path d="M8 5v14l11-7z"/></svg></button><div class="n"><b>${esc(l.nom)}</b><span>${esc(new Date(l.date).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }))}</span></div><a href="${esc(l.href)}&amp;dl=1" download>Télécharger</a></div>`).join('');
