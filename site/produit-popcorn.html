@@ -725,8 +725,14 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
   <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g1);margin-bottom:10px">Option supplémentaire</div>
   <label class="prod-option-check" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:2px solid var(--g3);border-radius:var(--r);cursor:pointer;font-size:14px;transition:border-color .18s" onmouseover="this.style.borderColor='var(--navy)'" onmouseout="updateOptionBorder(this)">
     <input type="checkbox" id="optionMais" style="width:18px;height:18px;margin-top:2px;accent-color:var(--navy);flex-shrink:0" onchange="updateInstallOption()">
-    <span><strong>Maïs à éclater</strong><br><span style="color:var(--g2);font-size:12px">De quoi tenir une soirée. Sinon, le maïs à pop-corn s'achète en grande surface : comptez environ 100 g pour cinq portions.</span></span>
+    <span><strong>Maïs à éclater</strong><br><span style="color:var(--g2);font-size:12px">Environ 1 kg, soit une quarantaine de portions. Sinon, le maïs à pop-corn s'achète en grande surface : comptez environ 100 g pour quatre portions.</span></span>
     <span style="font-weight:700;color:var(--navy);margin-left:auto;flex-shrink:0;white-space:nowrap">+&nbsp;10&nbsp;€</span>
+  </label>
+  <label class="prod-option-check" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border:2px solid var(--g3);border-radius:var(--r);cursor:pointer;font-size:14px;transition:border-color .18s;margin-top:8px" onmouseover="this.style.borderColor='var(--navy)'" onmouseout="updateOptionBorder(this)">
+    <input type="checkbox" id="optionPots" style="width:18px;height:18px;accent-color:var(--navy);flex-shrink:0" onchange="updateInstallOption()">
+    <img src="popcorn-situation-t.webp" alt="Pots à popcorn rouge et blanc" width="56" height="56" loading="lazy" style="flex:none;width:56px;height:56px;object-fit:cover;border-radius:10px">
+    <span><strong>Pots à popcorn</strong><br><span style="color:var(--g2);font-size:12px">Pots rayés rouge et blanc pour servir. Selon le nombre d'invités.</span></span>
+    <span style="font-weight:700;color:var(--navy);margin-left:auto;flex-shrink:0;white-space:nowrap">Sur&nbsp;devis</span>
   </label>
 </div>
 
@@ -1245,7 +1251,7 @@ function toggleNav(){
   document.body.style.overflow=open?'hidden':'';
 }
 let _selectedVariant={label:'Machine à pop-corn',price:20};
-let _maisOpt=false;
+let _potsOpt=false,_maisOpt=false;
 function updateOptionBorder(el){
   const cb=el.querySelector('input[type=checkbox]');
   el.style.borderColor=cb&&cb.checked?'var(--navy)':'var(--g3)';
@@ -1254,6 +1260,7 @@ function updateInstallOption(){
   const cb=document.getElementById('optionMais');
   _maisOpt=!!(cb&&cb.checked);
   if(cb)updateOptionBorder(cb.closest('label'));
+  const cp=document.getElementById('optionPots');_potsOpt=!!(cp&&cp.checked);if(cp)updateOptionBorder(cp.closest('label'));
   document.getElementById('prodPriceDisplay').innerHTML=(_selectedVariant.price+(_maisOpt?(window.VESPRA_OPT?window.VESPRA_OPT('optionMais',10):10):0))+' € <small>/ événement</small>';
 }
 function selectVariant(btn,label,price){
@@ -1266,7 +1273,7 @@ function addToCartProduct(){
   addToCart({
     id:'p11',
     name:'Machine à Pop-corn',
-    label:_selectedVariant.label+(_maisOpt?' + maïs ('+(window.VESPRA_OPT?window.VESPRA_OPT('optionMais',10):10)+' €)':''),
+    label:_selectedVariant.label+(_maisOpt?' + maïs ('+(window.VESPRA_OPT?window.VESPRA_OPT('optionMais',10):10)+' €)':'')+(_potsOpt?' + pots à popcorn (sur devis)':''),
     price:_selectedVariant.price+(_maisOpt?(window.VESPRA_OPT?window.VESPRA_OPT('optionMais',10):10):0),
     img:'popcorn.webp'
   });

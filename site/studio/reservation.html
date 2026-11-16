@@ -1230,6 +1230,7 @@ var P=[
   ['Brasero','restauration',100,['Standard'],'Brasero'],
   ['Machine à pop-corn','restauration',20,['Standard'],'Pop-corn'],
   ['Maïs à éclater','restauration',10,['Standard'],'Maïs'],
+  ['Pots à popcorn','restauration',null,['Sur devis'],'Pots'],
   ['Fontaine à cocktail','restauration',50,['Standard'],'Fontaine'],
   ['Machine à glaçons','restauration',20,['Standard'],'Glaçons'],
   ['Citroën Traction','voitures',380,['Standard'],'Traction'],
@@ -5435,6 +5436,7 @@ var PK_OPT = {
   microFil: {nom:'Micro filaire (SM58)', label:'Micro filaire', prix:10},
   microSF: {nom:'Micro sans fil (SM58)', label:'Micro sans fil', prix:20},
   mais:    {nom:'Maïs à éclater', label:'Maïs à éclater', prix:10},
+  pots:    {nom:'Pots à popcorn', label:'Pots à popcorn', prix:0, devis:true},
   fumeeS:  {nom:'Machine à fumée lourde effet brouillard', label:'Machine à fumée lourde effet brouillard', prix:60},
   fumeeP:  {nom:'Machine à fumée lourde effet nuage', label:'Machine à fumée lourde effet nuage', prix:150},
   fumeeL:  {nom:'Machine à fumée', label:'Machine à fumée', prix:10},
@@ -5460,7 +5462,7 @@ OPTIONS_PRODUIT['Guirlande lumineuse']=[PK_OPT.b3x3,PK_OPT.b4x8,PK_OPT.b6x10,PK_
 OPTIONS_PRODUIT['Néon lumineux']=[];
 OPTIONS_PRODUIT['Machine à étincelles froides']=[PK_OPT.sachet];
 OPTIONS_PRODUIT['Baby-foot']=[PK_OPT.cornhole,PK_OPT.palet,PK_OPT.puiss4,PK_OPT.passetr];
-OPTIONS_PRODUIT['Machine à pop-corn']=[PK_OPT.mais];
+OPTIONS_PRODUIT['Machine à pop-corn']=[PK_OPT.mais,PK_OPT.pots];
 OPTIONS_PRODUIT['Machine à fumée lourde effet brouillard']=[PK_OPT.fumeeP,PK_OPT.fumeeL,PK_OPT.fumeeM,PK_OPT.bulles];
 OPTIONS_PRODUIT['Machine à fumée lourde effet nuage']=[PK_OPT.fumeeS,PK_OPT.fumeeL,PK_OPT.fumeeM,PK_OPT.bulles];
 OPTIONS_PRODUIT['Machine à fumée']=[PK_OPT.fumeeM,PK_OPT.fumeeS,PK_OPT.fumeeP,PK_OPT.bulles];
@@ -5471,7 +5473,7 @@ OPTIONS_PRODUIT["Feux d'artifice de jour"]=PK_COULEURS.map(function(c){
 });
 /* ces lignes n'existent qu'en option d'un produit : on ne les propose pas seules */
 var PK_SEULEMENT_OPTION=['Cadre photo','Déguisement','Installation et démontage',
-  'Sac de lestage','Éclairage (barnum)','Éclairage néon','Guirlande 1','Guirlande 2','Maïs à éclater','Canon '];
+  'Sac de lestage','Éclairage (barnum)','Éclairage néon','Guirlande 1','Guirlande 2','Maïs à éclater','Pots à popcorn','Canon '];
 /* Les catégories du site, dans le même ordre ; un produit peut figurer dans deux catégories comme sur le site */
 var PK_ONGLETS=[
   {id:'Photobooth',label:'Photobooth',color:'#BFE1F6'},

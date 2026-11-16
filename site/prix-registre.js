@@ -1189,6 +1189,15 @@ window.VESPRA_PRIX_REGISTRE = [
     "champ": "optionMais"
   },
   {
+    "i": "machine-a-pop-corn-opt-2",
+    "n": "Machine à Pop Corn",
+    "v": "Option : Pots à popcorn",
+    "p": 0,
+    "pg": "produit-popcorn.html",
+    "opt": 2,
+    "champ": "optionPots"
+  },
+  {
     "i": "jeux-en-bois-1",
     "n": "Jeux en bois",
     "v": "Cornhole",
@@ -3182,7 +3191,7 @@ window.VESPRA_PRODUITS = [
       "Restauration",
       "Animations"
     ],
-    "desc": "Machine à pop-corn professionnelle sur chariot avec vitrine chauffante. Maïs en option.",
+    "desc": "Machine à pop-corn professionnelle sur chariot avec vitrine chauffante. Maïs et pots en option.",
     "img": "popcorn-situation.webp",
     "imgCat": "popcorn-situation.webp",
     "page": "produit-popcorn.html",
@@ -3197,6 +3206,13 @@ window.VESPRA_PRODUITS = [
         "devis": false,
         "champ": "optionMais",
         "id": "machine-a-pop-corn-opt-1"
+      },
+      {
+        "nom": "Pots à popcorn",
+        "prix": 0,
+        "devis": true,
+        "champ": "optionPots",
+        "id": "machine-a-pop-corn-opt-2"
       }
     ]
   },
@@ -3876,7 +3892,11 @@ window.VESPRA_MEDIAS = {
     "options": {
       "optionMais": {
         "nom": "Maïs à éclater",
-        "desc": "De quoi tenir une soirée. Sinon, le maïs à pop-corn s'achète en grande surface : comptez environ 100 g pour cinq portions."
+        "desc": "Environ 1 kg de maïs, soit une quarantaine de portions. Sinon, le maïs à pop-corn s'achète en grande surface : comptez environ 100 g pour quatre portions."
+      },
+      "optionPots": {
+        "nom": "Pots à popcorn",
+        "desc": "Pots rayés rouge et blanc pour servir le pop-corn. Tarif sur devis selon le nombre d'invités."
       }
     },
     "subs": []
