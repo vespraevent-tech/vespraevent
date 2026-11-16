@@ -507,6 +507,12 @@
     })();
     var pctAc = Number((zone.querySelector('#fcPct') || {}).value) || 30;
     var acompte = avecAcompte ? Math.round(totalDocument * pctAc) / 100 : 0;
+    /* facture d'une réservation dont l'acompte est déjà reçu : on déduit ce qui a réellement été versé,
+       pas un pourcentage du total d'aujourd'hui (le matériel a pu changer depuis) */
+    if (!devis && !depuisDemande && avecAcompte && r && r.acompte === true && Number(r.acompteMontant) > 0 && totalDocument > 0) {
+      acompte = Math.round(Number(r.acompteMontant) * 100) / 100;
+      pctAc = Math.round(acompte / totalDocument * 10000) / 100;
+    }
 
     var livraison = nombreOuNul(zone.querySelector('#fcLivraison'));
     var montage = nombreOuNul(zone.querySelector('#fcMontage'));
