@@ -5227,6 +5227,28 @@ function mdCharger(d){
     const stocke = (Number(l.prix) || 0) * (l.qte > 1 ? l.qte : 1);
     if(stocke > 0 && Math.abs(stocke - prixLigne(l)) > 0.01) l.prixForce = stocke;
   });
+  /* un prix modifié directement sur la réservation du planning se rouvre tel quel ici :
+     sinon l'éditeur repartait du panier d'origine et remettait l'ancien prix */
+  try{
+    if(prodsResa.length){
+      const net = x => String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+      const groupes = [];
+      (resa.products||[]).forEach(pr => {
+        if(!pr.estOption && !pr.parent) groupes.push({ nom: net(pr.name + ' ' + (pr.variant||'')), total: Number(pr.price)||0, ok: pr.price != null });
+        else if(groupes.length) groupes[groupes.length-1].total += Number(pr.price)||0;
+      });
+      const pris = {};
+      mdLignes.forEach(l => {
+        if(l.perso || l.presta || l.prixForce != null || estFeux(l)) return;
+        const cle = net(l.produit);
+        const gi = groupes.findIndex((g, k) => !pris[k] && g.ok && cle && (g.nom.indexOf(cle) === 0 || cle.indexOf(g.nom.split(' ').slice(0,2).join(' ')) === 0));
+        if(gi < 0) return;
+        pris[gi] = true;
+        const t = Math.round(groupes[gi].total * 100) / 100;
+        if(t > 0 && Math.abs(t - prixLigne(l)) > 0.01) l.prixForce = t;
+      });
+    }
+  }catch(e){}
   /* photo de départ : si rien n'est touché, le panier d'origine est conservé tel quel */
   window.mdSnap = JSON.stringify(mdLignes);
   window.mdOffre = offreMariageOn(d);
@@ -5245,7 +5267,9 @@ function mdRendre(){
     const p = ficheProduit(l.produit, l.formule);
     const variantes = (p && p.variantes) || [];
     const feux = estFeux(l) && !!l.couleurs;
-    const options = ((p && p.options) || []).filter(o => !(feux && FEUX_PREMIUM_GEN.test(o.nom)));
+    const options = ((p && p.options) || []).filter(o => !(feux && FEUX_PREMIUM_GEN.test(o.nom)))
+      /* livre d'or audio : les formules Vidéobooth ne sont pas des options (lien sur le site) : inutile ici, le prix se règle à la main */
+      .filter(o => !(/livre d.?or/i.test(String(l.produit||'')) && /vid[ée]obooth/i.test(String(o.nom||''))));
     const vCourante = l.perso ? null : varianteDe(variantes, l.formule);
     const optPerso = (variantes.length && mdPersoPossible(l))
       ? '<option value="__perso__"' + (l.perso ? ' selected' : '') + '>Formule personnalisée…</option>' : '';
@@ -5408,7 +5432,18 @@ function mdCouleur(i, nom, delta){
 
 function mdOption(i, nom, on){
   const l = mdLignes[i]; if(!l) return;
-  l.prixForce = null;
+  /* prix saisi à la main : il reste, l'option s'ajoute ou se retire par-dessus */
+  if(l.prixForce != null){
+    try{
+      const p = ficheProduit(l.produit, l.formule), q = qteOption(nom);
+      const o = p && (p.options||[]).find(o => memeOption(o.nom, q.base));
+      const ov = l.optPrix && o && l.optPrix[o.nom] != null ? Number(l.optPrix[o.nom]) : NaN;
+      const delta = o && !o.devis ? (isFinite(ov) ? ov : (Number(o.prix)||0)) * q.n : 0;
+      const deja = (l.options||[]).some(x => memeOption(x, nom));
+      if(on && !deja) l.prixForce = Math.round((l.prixForce + delta) * 100) / 100;
+      if(!on && deja) l.prixForce = Math.max(0, Math.round((l.prixForce - delta) * 100) / 100);
+    }catch(e){ /* on garde le prix tel quel */ }
+  } else l.prixForce = null;
   l.options = l.options || [];
   const j = l.options.findIndex(o => memeOption(o, nom));
   if(on && j === -1) l.options.push(nom);
