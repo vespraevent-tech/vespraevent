@@ -285,9 +285,32 @@ $('b-stop').onclick = arreterRec;
     evts().forEach(function (e, i) { cs[i].querySelector('b').textContent = e.nom || 'Sans nom'; cs[i].querySelector('span').textContent = e.date || ''; cs[i].onclick = function () { ouvrirEdition(e.id); }; });
     $('adm-new').onclick = function () { var e = { id: nouvelId(), nom: '', date: '', titre: CFG0.titre, sous: CFG0.sous, max: 30, cam: '' }; cfg.events.push(e); if (!cfg.actif) cfg.actif = e.id; ecrireCfg(cfg); ouvrirEdition(e.id); };
   }
+  function majStock() {
+    var el = $('a-stock'); if (!el) return;
+    var ligne = function (u, q, p) { return 'Stockage utilisé : ' + (u / 1048576 >= 1024 ? (u / 1073741824).toFixed(2) + ' Go' : Math.round(u / 1048576) + ' Mo') + (q ? ' sur ' + Math.round(q / 1073741824) + ' Go disponibles' : '') + ' · stockage protégé contre l’effacement automatique : ' + (p ? 'oui' : 'non (ne videz jamais les données de Chrome)'); };
+    if (!navigator.storage || !navigator.storage.estimate) { el.textContent = 'Stockage : information indisponible.'; return; }
+    Promise.all([navigator.storage.estimate(), navigator.storage.persisted ? navigator.storage.persisted() : false]).then(function (r) { el.textContent = ligne(r[0].usage || 0, r[0].quota || 0, r[1]); }).catch(function () {});
+  }
+  $('a-exp-cfg').onclick = function () {
+    var copie = JSON.stringify({ vespraVideobooth: 1, exporteLe: new Date().toISOString(), cfg: cfg }, null, 1);
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([copie], { type: 'application/json' })); a.download = 'reglages-videobooth.json'; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 2500);
+  };
+  $('a-imp-cfg').onchange = function () {
+    var f = this.files && this.files[0]; if (!f) return; var self = this;
+    var r = new FileReader();
+    r.onload = function () {
+      try {
+        var j = JSON.parse(r.result); if (!j || !j.vespraVideobooth || !j.cfg || !Array.isArray(j.cfg.events)) throw new Error('fichier non reconnu');
+        if (!confirm('Remplacer les réglages actuels (' + (cfg.events || []).length + ' événement(s)) par ceux du fichier (' + j.cfg.events.length + ' événement(s)) ? Les vidéos de la tablette ne sont pas touchées.')) return;
+        cfg = Object.assign({}, CFG0, j.cfg); if (!cfg.cle) cfg.cle = ''; ecrireCfg(cfg); appliquerActif(); ouvrirAdmin();
+      } catch (e) { alert('Import impossible : ' + e.message); }
+      self.value = '';
+    };
+    r.readAsText(f);
+  };
   function ouvrirAdmin() {
     $('a-serveur').value = cfg.serveur; $('a-cle').value = cfg.cle;
-    $('adm-edit').hidden = true; $('adm-liste').hidden = false; rendreCartes(); majEtat(); montrer('s-admin');
+    $('adm-edit').hidden = true; $('adm-liste').hidden = false; rendreCartes(); majEtat(); majStock(); montrer('s-admin');
   }
   function ouvrirEdition(id) {
     var e = evts().filter(function (x) { return x.id === id; })[0]; if (!e) return; edite = e;

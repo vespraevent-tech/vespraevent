@@ -12,6 +12,7 @@
    ne ré-ajoute que ce qui manque, sauf demande explicite pour une seule
    réservation (et l'ancienne version part alors dans l'historique). */
 import { getStore } from './_stockage.mjs';
+import { getStore as getStoreBlobs } from './_blobs.mjs';
 
 export const DATA_STORE = 'vespra-admin-data';
 export const CLIENT_STORE = 'vespra-clients';
@@ -91,6 +92,18 @@ export async function creerSauvegarde({ motif = 'manuel' } = {}) {
     const cl = await clientsStore.get('clients', { type: 'json', consistency: 'strong' });
     contenu.clients = Array.isArray(cl) ? cl : [];
   } catch (e) { contenu.erreurClients = e.message; }
+
+  /* Vidéobooth : informations des vidéos reçues et mots de passe des galeries (pas les fichiers vidéo, trop lourds :
+     ils restent sur la tablette et 30 jours sur le site, et se téléchargent en .zip depuis le back-office) */
+  try {
+    const vb = getStoreBlobs('videobooth');
+    const lire = async (prefixe) => {
+      const { blobs } = await vb.list({ prefix: prefixe }); const out = [];
+      for (const b of blobs) { const j = await vb.get(b.key, { type: 'json' }).catch(() => null); if (j) out.push(j); }
+      return out;
+    };
+    contenu.videobooth = { videos: await lire('meta/'), galeries: await lire('galerie/') };
+  } catch (e) { contenu.erreurVideobooth = e.message; }
 
   const nbResa = contenu.collections.reservations.filter((x) => x && x.id && x.id !== 'cfg').length;
   const cle = `${jourParis()}_${heureParis()}_${motif === 'auto' ? 'auto' : 'manuel'}_n${nbResa}`;
