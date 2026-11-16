@@ -293,30 +293,32 @@ const GRIS_CLAIR = [0.94, 0.95, 0.96];
 
 /* Conditions de règlement choisies sur la fenêtre Devis / Facture : { mode, jours, note }.
    Renvoie { court, long } ou null quand rien de particulier n'est demandé. */
-export function conditionsReglement(c) {
+export function conditionsReglement(c, avecAcompte = false) {
   if (!c || typeof c !== 'object') return null;
   const mode = String(c.mode || '');
   const jours = Math.min(365, Math.max(0, Math.round(Number(c.jours) || 0)));
   const note = String(c.note || '').replace(/[\u0000-\u001f]+/g, ' ').trim().slice(0, 300);
   const j = (n) => n + ' jour' + (n > 1 ? 's' : '');
+  /* l'acompte, s'il y en a un, se règle à la validation du devis : ces conditions portent sur le reste (ou la totalité) */
+  const debut = avecAcompte ? 'Règlement du solde' : 'Règlement de la totalité du montant';
   let court = '', long = '';
-  if (mode === 'commande') {
-    court = 'à la validation du devis';
-    long = 'Règlement de la totalité du montant à la validation du devis, par virement bancaire, avant la livraison du matériel. La réservation est confirmée à réception du paiement.';
+  if (mode === 'jour') {
+    court = 'le jour de l\u2019événement';
+    long = debut + ' par virement bancaire, le jour de l\u2019événement.';
   } else if (mode === 'avant' && jours > 0) {
     court = j(jours) + ' avant l\u2019événement';
-    long = 'Règlement de la totalité du montant par virement bancaire, au plus tard ' + j(jours) + ' avant la date de l\u2019événement.';
+    long = debut + ' par virement bancaire, au plus tard ' + j(jours) + ' avant la date de l\u2019événement.';
   } else if (mode === 'apres' && jours > 0) {
     court = j(jours) + ' après l\u2019événement';
-    long = 'Règlement de la totalité du montant par virement bancaire, ' + j(jours) + ' après la date de l\u2019événement.';
+    long = debut + ' par virement bancaire, ' + j(jours) + ' après la date de l\u2019événement.';
   } else if (mode === 'reception') {
-    court = 'à réception';
-    long = 'Règlement de la totalité du montant par virement bancaire, à réception de la facture.';
+    court = 'à réception de la facture';
+    long = debut + ' par virement bancaire, à réception de la facture.';
   }
   if (!court && !note) return null;
   if (note) long = (long ? long + ' ' : '') + note;
   if (long && !/[.!?]$/.test(long)) long += '.';
-  return { court, long };
+  return { court, long, lib: avecAcompte ? 'Règlement du solde' : 'Règlement' };
 }
 
 export function construireFacture({ emetteur, client, facture, lignes, reglages }) {
@@ -333,7 +335,7 @@ export function construireFacture({ emetteur, client, facture, lignes, reglages 
   p.texte(D, y - 16, 'N° ' + facture.numero, { taille: 10, gras: true, couleur: NOIR, align: 'droite' });
   p.texte(D, y - 29, 'Date : ' + facture.dateEmission, { taille: 9, couleur: GRIS, align: 'droite' });
   p.texte(D, y - 41, (estDevis ? 'Validité : ' : 'Échéance : ') + facture.echeance
-    + (estDevis && facture.reglementCourt ? '  ·  Règlement : ' + facture.reglementCourt : ''), { taille: 9, couleur: GRIS, align: 'droite' });
+    + (estDevis && facture.reglementCourt ? '  ·  ' + (facture.reglementLib || 'Règlement') + ' : ' + facture.reglementCourt : ''), { taille: 9, couleur: GRIS, align: 'droite' });
   y -= 56;
   p.pave(G, y, D - G, 2.2, NAVY);
   y -= 28;

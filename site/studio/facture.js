@@ -367,7 +367,7 @@
         '<label class="fc-l" for="fcCondMode">Conditions de règlement</label>' +
         '<div>' +
           '<select class="fc-input" id="fcCondMode" style="width:100%;max-width:100%;box-sizing:border-box">' +
-            [['', 'Conditions habituelles'], ['commande', 'À la validation du devis'], ['avant', 'X jours avant l’événement'],
+            [['', 'Conditions habituelles'], ['jour', 'Le jour de l’événement'], ['avant', 'X jours avant l’événement'],
              ['apres', 'X jours après l’événement'], ['reception', 'À réception de la facture']]
               .map(function (o) { return '<option value="' + o[0] + '"' + (((vu.cond || {}).mode || '') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') +
           '</select>' +
@@ -431,7 +431,7 @@
       majAcompteMontant();
     }
     zone.querySelectorAll('input[name="fcType"]').forEach(function (i) { i.addEventListener('change', majType); });
-    zone.querySelector('#fcAvecAcompte').addEventListener('change', majAcompte);
+    zone.querySelector('#fcAvecAcompte').addEventListener('change', function () { majAcompte(); majCond(); });
     zone.querySelector('#fcPct').addEventListener('change', majAcompteMontant);
     function condSaisie() {
       var q = function (x) { return zone.querySelector(x); };
@@ -444,17 +444,15 @@
     function majCond() {
       var mode = zone.querySelector('#fcCondMode').value;
       zone.querySelector('#fcCondJoursBloc').style.display = (mode === 'avant' || mode === 'apres') ? 'flex' : 'none';
-      var cb = zone.querySelector('#fcAvecAcompte');
       var aide = zone.querySelector('#fcAideCond');
-      /* règlement de la totalité : un acompte n'a plus de sens, il est retiré */
-      if (devis && mode) { if (cb.checked) { cb.checked = false; majAcompte(); } cb.disabled = true; } else { cb.disabled = false; }
       var j = Number((zone.querySelector('#fcCondJours') || {}).value) || 0;
+      var reste = zone.querySelector('#fcAvecAcompte').checked ? 'Le solde est à régler' : 'La totalité est à régler';
       var txtAide = {
         '': 'Le document garde ses conditions habituelles.',
-        commande: devis ? 'Le client règle la totalité à la validation du devis, avant la livraison ; l’acompte est désactivé.' : 'Totalité à régler à la validation, avant la livraison.',
-        avant: j ? 'Totalité à régler au plus tard ' + j + ' jour' + (j > 1 ? 's' : '') + ' avant l’événement.' : 'Indiquez le nombre de jours.',
-        apres: j ? 'Totalité à régler ' + j + ' jour' + (j > 1 ? 's' : '') + ' après l’événement.' : 'Indiquez le nombre de jours.',
-        reception: 'Totalité à régler à réception de la facture.'
+        jour: reste + ' le jour de l’événement.',
+        avant: j ? reste + ' au plus tard ' + j + ' jour' + (j > 1 ? 's' : '') + ' avant l’événement.' : 'Indiquez le nombre de jours.',
+        apres: j ? reste + ' ' + j + ' jour' + (j > 1 ? 's' : '') + ' après l’événement.' : 'Indiquez le nombre de jours.',
+        reception: reste + ' à réception de la facture.'
       };
       if (aide) aide.textContent = txtAide[mode] || '';
     }

@@ -2203,7 +2203,8 @@ const gestionnaire = async (request) => {
 
       /* Les prix du site sont TTC : la facture les décompose. */
       const ENT = await lireEntreprise();
-      const condReg = conditionsReglement(envoi ? envoi.cond : { mode: url.searchParams.get('cm'), jours: url.searchParams.get('cj'), note: url.searchParams.get('cn') });
+      const condReg = conditionsReglement(envoi ? envoi.cond : { mode: url.searchParams.get('cm'), jours: url.searchParams.get('cj'), note: url.searchParams.get('cn') },
+        (envoi ? Number(envoi.acompte) : Number(url.searchParams.get('acompte'))) > 0);
       const pdf = construireFacture({
         emetteur: ENT.emetteur,
         client: {
@@ -2234,6 +2235,7 @@ const gestionnaire = async (request) => {
                 : 0),
           acomptePct: envoi ? Number(envoi.acomptePct) || 30 : (Number(url.searchParams.get('pct')) || 30),
           reglementCourt: condReg ? condReg.court : '',
+          reglementLib: condReg ? condReg.lib : '',
         },
         lignes,
         reglages: {
