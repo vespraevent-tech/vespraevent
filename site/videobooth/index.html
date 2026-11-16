@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0f2237">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Vidéobooth Vespra Event</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="/favicon.png">
+<link rel="stylesheet" href="/polices.css?v=1">
+<link rel="stylesheet" href="app.css?v=1">
+</head>
+<body>
+<main id="app">
+  <section id="s-accueil" class="ecran on">
+    <button id="logo" class="logo" type="button" aria-label="Vespra Event">VESPRA EVENT</button>
+    <h1 id="t-accueil">Laissez un message vidéo</h1>
+    <p id="p-accueil">30 secondes pour dire quelques mots aux mariés</p>
+    <button id="b-commencer" class="gros" type="button">Commencer</button>
+    <div id="etat" class="etat" aria-live="polite"></div>
+  </section>
+
+  <section id="s-form" class="ecran">
+    <h2>Qui êtes-vous ?</h2>
+    <form id="form" autocomplete="off" novalidate>
+      <label>Prénom<input id="f-prenom" type="text" inputmode="text" autocapitalize="words" required></label>
+      <label>Nom<input id="f-nom" type="text" inputmode="text" autocapitalize="words" required></label>
+      <label>Adresse e-mail<input id="f-email" type="email" inputmode="email" autocapitalize="none" required></label>
+      <label class="coche"><input id="f-ok" type="checkbox"><span>J’accepte que Vespra Event conserve ma vidéo et mon adresse e-mail 30 jours pour m’envoyer ma vidéo et la remettre aux mariés. Mes données ne sont pas utilisées autrement.</span></label>
+      <div id="f-err" class="err" role="alert"></div>
+      <div class="rang"><button id="f-retour" class="sec" type="button">Retour</button><button class="gros" type="submit">Continuer</button></div>
+    </form>
+  </section>
+
+  <section id="s-cam" class="ecran">
+    <video id="v-live" playsinline muted autoplay></video>
+    <div id="compte" class="compte" hidden></div>
+    <div id="rec" class="rec" hidden><span class="pt"></span><b id="rec-t">0:00</b><i id="rec-max">/ 0:30</i></div>
+    <div id="barre" class="barre" hidden><div id="barre-i"></div></div>
+    <button id="b-go" class="gros go" type="button">Je suis prêt(e)</button>
+    <button id="b-stop" class="stop" type="button" hidden>Terminer l’enregistrement</button>
+    <div id="cam-err" class="err grand" role="alert" hidden></div>
+  </section>
+
+  <section id="s-revoir" class="ecran">
+    <video id="v-revoir" playsinline controls></video>
+    <div class="rang bas"><button id="b-refaire" class="sec" type="button">Recommencer</button><button id="b-fin" class="gros" type="button">Terminer</button></div>
+  </section>
+
+  <section id="s-merci" class="ecran">
+    <div class="coche-ok">✓</div>
+    <h2>Merci !</h2>
+    <p>Vous recevrez votre vidéo par e-mail.</p>
+  </section>
+
+  <section id="s-admin" class="ecran">
+    <h2>Réglages</h2>
+    <div class="grille">
+      <label>Événement<input id="a-event" type="text" placeholder="Mariage Durand — 20 juin"></label>
+      <label>Titre d’accueil<input id="a-titre" type="text"></label>
+      <label>Sous-titre<input id="a-sous" type="text"></label>
+      <label>Adresse du serveur<input id="a-serveur" type="url" placeholder="https://www.vespraevent.fr"></label>
+      <label>Clé de l’appareil<input id="a-cle" type="text" autocomplete="off"></label>
+      <label>Durée maximale (secondes)<input id="a-max" type="number" min="5" max="120"></label>
+      <label>Caméra<select id="a-cam"></select></label>
+      <label>Nouveau code d’accès<input id="a-pin" type="password" inputmode="numeric" placeholder="laisser vide pour ne pas changer"></label>
+    </div>
+    <div id="a-file" class="etat gros-etat"></div>
+    <div class="rang haut">
+      <button id="a-sync" class="sec" type="button">Envoyer maintenant</button>
+      <button id="a-export" class="sec" type="button">Exporter les vidéos en attente</button>
+      <button id="a-save" class="gros" type="button">Enregistrer et fermer</button>
+    </div>
+  </section>
+
+  <section id="s-pin" class="ecran">
+    <h2 id="pin-t">Code d’accès</h2>
+    <input id="pin-in" type="password" inputmode="numeric" autocomplete="off" maxlength="12">
+    <div id="pin-err" class="err"></div>
+    <div class="rang"><button id="pin-x" class="sec" type="button">Annuler</button><button id="pin-ok" class="gros" type="button">Valider</button></div>
+  </section>
+</main>
+<script src="app.js?v=1"></script>
+</body>
+</html>

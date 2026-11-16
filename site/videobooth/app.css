@@ -1,0 +1,49 @@
+:root{--navy:#2B4A6B;--deep:#0f2237;--or:#F59E0B;--w:#fff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--deep);color:#fff;font-family:Inter,system-ui,sans-serif;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+#app{position:fixed;inset:0}
+.ecran{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:5vh 6vw;text-align:center;
+  background:radial-gradient(900px 500px at 85% 0%,rgba(245,158,11,.18),transparent 70%),linear-gradient(135deg,#0b1a2b,#16365a)}
+.ecran.on{display:flex}
+.logo{border:0;background:none;color:#fff;font:400 clamp(26px,4vw,44px) 'Bebas Neue',Impact,sans-serif;letter-spacing:.14em;margin-bottom:2vh}
+h1{margin:0;font:400 clamp(44px,8vw,96px)/1 'Bebas Neue',Impact,sans-serif;letter-spacing:.01em;text-transform:uppercase}
+h2{margin:0;font:400 clamp(36px,6vw,64px)/1 'Bebas Neue',Impact,sans-serif;text-transform:uppercase}
+p{margin:0;font-size:clamp(18px,2.6vw,28px);color:#cdd8e6;max-width:900px;line-height:1.4}
+button{font-family:inherit;cursor:pointer}
+.gros{background:var(--or);color:#1a1205;border:0;border-radius:14px;padding:clamp(16px,2.6vh,28px) clamp(36px,6vw,80px);font:800 clamp(20px,3vw,32px) Inter,system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase;box-shadow:0 18px 40px -18px rgba(245,158,11,.8)}
+.gros:active{transform:scale(.98)}
+.sec{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.5);border-radius:14px;padding:clamp(14px,2.2vh,24px) clamp(24px,4vw,56px);font:700 clamp(17px,2.4vw,26px) Inter,system-ui,sans-serif}
+.stop{background:#d93f3f;color:#fff;border:0;border-radius:14px;padding:18px 40px;font:800 clamp(18px,2.6vw,26px) Inter,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.04em}
+.etat{position:absolute;left:0;right:0;bottom:2.5vh;font-size:13px;color:rgba(255,255,255,.45)}
+.etat.alerte{color:#ffb4a8}
+.rang{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+form{display:flex;flex-direction:column;gap:14px;width:min(640px,100%);text-align:left}
+label{display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;letter-spacing:.04em;color:#cdd8e6}
+input[type=text],input[type=email],input[type=url],input[type=number],input[type=password],select{width:100%;padding:16px 18px;border:2px solid rgba(255,255,255,.28);border-radius:12px;background:rgba(255,255,255,.1);color:#fff;font:500 22px Inter,system-ui,sans-serif;user-select:text;-webkit-user-select:text}
+input:focus,select:focus{outline:none;border-color:var(--or)}
+select option{color:#000}
+.coche{flex-direction:row;align-items:flex-start;gap:12px;font-weight:400;font-size:14px;letter-spacing:0;line-height:1.4}
+.coche input{width:26px;height:26px;margin-top:2px;flex:none;accent-color:var(--or)}
+.err{min-height:22px;color:#ffb4a8;font-size:16px;font-weight:600}
+.err.grand{position:absolute;left:6vw;right:6vw;top:40%;font-size:22px;text-align:center;background:rgba(0,0,0,.6);padding:24px;border-radius:16px}
+#s-cam{padding:0;background:#000;justify-content:flex-end;gap:0}
+#v-live,#v-revoir{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+#v-live{transform:scaleX(-1)}
+#s-revoir{padding:0;background:#000;justify-content:flex-end}
+#s-cam .go,#s-cam .stop{position:absolute;bottom:6vh;left:50%;transform:translateX(-50%);z-index:3}
+.compte{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;font:400 clamp(180px,40vh,420px)/1 'Bebas Neue',Impact,sans-serif;color:#fff;text-shadow:0 8px 60px rgba(0,0,0,.7);background:rgba(0,0,0,.25)}
+.rec{position:absolute;top:3vh;left:50%;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.55);padding:10px 18px;border-radius:999px;font-size:22px}
+.rec .pt{width:14px;height:14px;border-radius:50%;background:#ff3b3b;animation:cl 1s infinite}
+.rec i{font-style:normal;color:#aab6c6}
+@keyframes cl{50%{opacity:.25}}
+.barre{position:absolute;left:0;right:0;bottom:0;height:8px;background:rgba(255,255,255,.2);z-index:3}
+.barre div{height:100%;width:0;background:var(--or)}
+.rang.bas{position:absolute;bottom:5vh;left:0;right:0;z-index:3}
+.coche-ok{width:120px;height:120px;border-radius:50%;background:var(--or);color:#1a1205;font:800 72px/120px Inter,sans-serif}
+#s-admin{justify-content:flex-start;overflow:auto;padding:4vh 5vw;align-items:stretch;text-align:left}
+#s-admin h2{text-align:center}
+.grille{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.gros-etat{position:static;font-size:16px;color:#cdd8e6;margin:6px 0}
+.rang.haut{margin-top:6px}
+#pin-in{width:min(360px,100%);text-align:center;letter-spacing:.4em;font-size:34px}
+@media (orientation:portrait){h1{font-size:clamp(40px,12vw,90px)}}
