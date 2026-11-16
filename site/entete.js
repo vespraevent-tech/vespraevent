@@ -671,3 +671,43 @@
     try { closeVM(); } catch (x) {}
   }, true);
 })();
+
+/* Maïs à éclater : une quantité (1 paquet ≈ 40 personnes) — pop-up produit et fiche pop-corn */
+(function () {
+  var BS = 'width:26px;height:26px;border:1px solid #cfd6e0;border-radius:7px;background:#fff;font-size:15px;line-height:1;cursor:pointer;padding:0;color:#0C0F14';
+  function stepper() {
+    var s = document.createElement('span'); s.className = 'oq'; s.style.cssText = 'display:none;align-items:center;gap:8px;margin-top:8px';
+    s.innerHTML = '<button type="button" class="om" aria-label="Un paquet de moins" style="' + BS + '">−</button><b style="min-width:16px;text-align:center;font-size:14px">1</b><button type="button" class="op" aria-label="Un paquet de plus" style="' + BS + '">+</button><small style="color:#646D7C;font-size:12px">paquet(s) · 40 personnes chacun</small>';
+    return s;
+  }
+  function monterPopup() {
+    var cb = document.getElementById('vmOpt_mais'); if (!cb || cb.closest('label').querySelector('.oq')) return;
+    var sp = cb.closest('label').querySelector('span > span'); var zone = sp || cb.closest('label');
+    var st = stepper(); zone.appendChild(st);
+    window._vmQte = window._vmQte || {}; window._vmQte.mais = 1;
+    function maj() { st.style.display = cb.checked ? 'flex' : 'none'; st.querySelector('b').textContent = window._vmQte.mais || 1;
+      var p = (window._vmQte.mais || 1) * 10, pr = cb.closest('label').querySelector('.vm-opt-price'); if (pr) pr.textContent = '+' + p + ' €'; }
+    cb.addEventListener('change', maj);
+    st.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); var b = e.target.closest('button'); if (!b) return;
+      var n = window._vmQte.mais || 1; n = b.classList.contains('op') ? Math.min(20, n + 1) : Math.max(1, n - 1); window._vmQte.mais = n; maj(); });
+    maj();
+  }
+  var o = document.getElementById('vmOptions');
+  function surveiller() {
+    var z = document.getElementById('vmOptions'); if (!z || z._oq) return; z._oq = true;
+    new MutationObserver(function () { monterPopup(); }).observe(z, { childList: true });
+    monterPopup();
+  }
+  new MutationObserver(surveiller).observe(document.documentElement, { childList: true, subtree: true });
+  surveiller();
+  /* fiche produit pop-corn */
+  document.addEventListener('DOMContentLoaded', function () {
+    var cb = document.getElementById('optionMais'); if (!cb || !window.updateInstallOption) return;
+    var st = stepper(); cb.closest('label').querySelector('span').appendChild(st); window._maisQte = 1;
+    var base = window.updateInstallOption;
+    function maj() { st.style.display = cb.checked ? 'flex' : 'none'; st.querySelector('b').textContent = window._maisQte; }
+    st.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); var b = e.target.closest('button'); if (!b) return;
+      window._maisQte = b.classList.contains('op') ? Math.min(20, window._maisQte + 1) : Math.max(1, window._maisQte - 1); maj(); base(); });
+    cb.addEventListener('change', maj); maj();
+  });
+})();

@@ -1261,7 +1261,7 @@ function updateInstallOption(){
   _maisOpt=!!(cb&&cb.checked);
   if(cb)updateOptionBorder(cb.closest('label'));
   const cp=document.getElementById('optionPots');_potsOpt=!!(cp&&cp.checked);if(cp)updateOptionBorder(cp.closest('label'));
-  document.getElementById('prodPriceDisplay').innerHTML=(_selectedVariant.price+(_maisOpt?(window.VESPRA_OPT?window.VESPRA_OPT('optionMais',10):10):0))+' € <small>/ événement</small>';
+  document.getElementById('prodPriceDisplay').innerHTML=(_selectedVariant.price+(_maisOpt?(window.VESPRA_OPT?window.VESPRA_OPT('optionMais',10):10)*(window._maisQte||1):0))+' € <small>/ événement</small>';
 }
 function selectVariant(btn,label,price){
   document.querySelectorAll('.prod-vbtn').forEach(b=>b.classList.remove('active'));
@@ -1273,8 +1273,8 @@ function addToCartProduct(){
   addToCart({
     id:'p11',
     name:'Machine à Pop-corn',
-    label:_selectedVariant.label+(_maisOpt?' + maïs ('+(window.VESPRA_OPT?window.VESPRA_OPT('optionMais',10):10)+' €)':'')+(_potsOpt?' + pots à popcorn (sur devis)':''),
-    price:_selectedVariant.price+(_maisOpt?(window.VESPRA_OPT?window.VESPRA_OPT('optionMais',10):10):0),
+    label:_selectedVariant.label+(_maisOpt?' + maïs'+((window._maisQte||1)>1?' ×'+window._maisQte:'')+' ('+((window.VESPRA_OPT?window.VESPRA_OPT('optionMais',10):10)*(window._maisQte||1))+' €)':'')+(_potsOpt?' + pots à popcorn (sur devis)':''),
+    price:_selectedVariant.price+(_maisOpt?(window.VESPRA_OPT?window.VESPRA_OPT('optionMais',10):10)*(window._maisQte||1):0),
     img:'popcorn.webp'
   });
 }
