@@ -32,6 +32,12 @@ const jeton = (id) => createHmac('sha256', process.env.VIDEOBOOTH_CLE || '').upd
 const store = () => getStore('videobooth');
 export const videoStore = store;
 
+/* trace du dernier contact de la tablette, visible dans le back-office */
+async function noter(quoi, detail) {
+  try { await store().setJSON('etat/' + quoi, { date: new Date().toISOString(), detail }); } catch (e) { console.error('Videobooth : trace impossible', e.message); }
+}
+export { noter };
+
 async function nettoyer(st) {
   try {
     const { blobs } = await st.list({ prefix: 'meta/' });
@@ -78,7 +84,8 @@ export default async (request) => {
   /* ── test de connexion depuis les réglages de la tablette ── */
   if (request.method === 'GET' && /\/api\/videobooth\/ping$/.test(url.pathname)) {
     if (!cle) return rep({ ok: false, erreur: "VIDEOBOOTH_CLE n'est pas définie dans Netlify (ou le site n'a pas été redéployé depuis)" });
-    if (request.headers.get('x-appareil') !== cle) return rep({ ok: false, erreur: 'La clé saisie sur la tablette ne correspond pas à celle de Netlify' });
+    if (request.headers.get('x-appareil') !== cle) { await noter('refus', 'clé de la tablette incorrecte (test)'); return rep({ ok: false, erreur: 'La clé saisie sur la tablette ne correspond pas à celle de Netlify' }); }
+    await noter('contact', 'test de connexion');
     return rep({ ok: true, resend: !!process.env.RESEND_API_KEY });
   }
 
@@ -98,7 +105,8 @@ export default async (request) => {
   /* ── réception d'un morceau ── */
   if (request.method === 'POST' && /\/api\/videobooth\/chunk$/.test(url.pathname)) {
     if (!cle) return rep({ ok: false, erreur: "VIDEOBOOTH_CLE n'est pas définie dans Netlify" }, 500);
-    if (request.headers.get('x-appareil') !== cle) return rep({ ok: false, erreur: 'Clé de la tablette refusée' }, 403);
+    if (request.headers.get('x-appareil') !== cle) { await noter('refus', 'clé de la tablette incorrecte (envoi)'); return rep({ ok: false, erreur: 'Clé de la tablette refusée' }, 403); }
+    await noter('contact', 'morceau ' + (Number(url.searchParams.get('i')) + 1) + '/' + url.searchParams.get('n'));
     const q = url.searchParams, id = q.get('id') || '';
     const i = Number(q.get('i')), n = Number(q.get('n'));
     if (!idOk(id) || !(n >= 1 && n <= 40) || !(i >= 0 && i < n)) return rep({ ok: false, erreur: 'Paramètres invalides' }, 400);

@@ -2353,7 +2353,9 @@ const gestionnaire = async (request) => {
         const liste = [];
         for (const b of blobs) { const m = await st.get(b.key, { type: 'json' }).catch(() => null); if (m) liste.push(m); }
         liste.sort((a, b) => String(b.cree).localeCompare(String(a.cree)));
-        return json({ videos: liste, cle: !!process.env.VIDEOBOOTH_CLE });
+        const etat = {};
+        for (const k of ['contact', 'refus']) etat[k] = await st.get('etat/' + k, { type: 'json' }).catch(() => null);
+        return json({ videos: liste, cle: !!process.env.VIDEOBOOTH_CLE, etat });
       }
       if (request.method === 'POST') {
         let body = {}; try { body = await request.json(); } catch {}

@@ -2607,7 +2607,14 @@ async function vbCharger(){
     const d=await api('/videobooth');
     VB=d.videos||[];
     const a=document.getElementById('vbAlerte');
-    a.style.display=d.cle?'none':'block'; a.textContent=d.cle?'':'La variable VIDEOBOOTH_CLE n’est pas encore définie dans Netlify : la tablette ne pourra pas envoyer ses vidéos.';
+    const fh=x=>x?new Date(x.date).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):null;
+    const et=d.etat||{}; let msg='';
+    if(!d.cle) msg='La variable VIDEOBOOTH_CLE n’est pas définie dans Netlify (ou le site n’a pas été redéployé depuis) : la tablette ne peut pas envoyer ses vidéos.';
+    else if(et.refus && (!et.contact || et.refus.date>et.contact.date)) msg='La tablette a essayé d’envoyer le '+fh(et.refus)+' mais sa clé ne correspond pas à celle de Netlify : recopiez la clé dans les réglages de la tablette.';
+    else if(!et.contact) msg='Aucun contact de la tablette pour l’instant. Vérifiez sur la tablette (cadenas, code 0104) : clé saisie, puis « Tester la connexion ».';
+    a.style.display=msg?'block':'none'; a.textContent=msg;
+    a.style.color=(msg&&d.cle&&et.contact&&!et.refus)?'#6b7280':'#b03a2a';
+    if(!msg&&et.contact){ a.style.display='block'; a.style.color='#6b7280'; a.textContent='Dernier contact de la tablette : '+fh(et.contact)+'.'; }
     vbRendre();
   }catch(e){ z.innerHTML='<div class="hint" style="color:#b03a2a">Chargement impossible : '+vbEsc(e.message)+'</div>'; }
 }
