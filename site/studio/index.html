@@ -1919,7 +1919,7 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
         <div class="actions-bar" style="margin-left:auto;padding-top:0;border:0">
           <button class="btn btn-ghost" id="vbRetour" onclick="vbOuvrir('')" hidden>‹ Tous les événements</button>
           <button class="btn btn-ghost" id="vbZip" onclick="vbToutTelecharger()" hidden>Tout télécharger (.zip)</button>
-          <button class="btn btn-ghost" id="vbLien" onclick="vbLienPartage()" hidden>Lien pour les mariés</button>
+          <button class="btn btn-ghost" id="vbLien" onclick="vbLienPartage()" hidden>Partager la galerie</button>
           <button class="btn btn-ghost" id="vbRelancer" onclick="vbRelancerEchecs()" hidden>Renvoyer les e-mails non partis</button>
           <button class="btn btn-ghost" onclick="vbCharger()">Actualiser</button>
         </div>
@@ -2716,8 +2716,13 @@ async function vbToutTelecharger(){
 async function vbLienPartage(){
   try{
     const r=await api('/videobooth/lien?e='+encodeURIComponent(VBEVT));
-    try{ await navigator.clipboard.writeText(r.url); showToast('Lien copié : à envoyer aux mariés'); }
-    catch(e){ prompt('Copiez ce lien et envoyez-le aux mariés :',r.url); }
+    const old=document.getElementById('vbPartage'); if(old) old.remove();
+    const msg='Bonjour ! Voici la galerie des messages vidéo de vos invités ('+VBEVT+') : '+r.url+' — à télécharger dans les 30 jours. Vespra Event';
+    const d=document.createElement('div'); d.id='vbPartage'; d.style.cssText='position:fixed;inset:0;background:rgba(15,34,55,.55);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px';
+    d.innerHTML='<div style="background:#fff;border-radius:14px;padding:22px;max-width:480px;width:100%"><div style="font:700 17px Poppins,Inter,sans-serif;color:#14304f">Partager la galerie</div><div style="font-size:13px;color:#6b7280;margin:4px 0 14px">Les mariés ouvrent ce lien et voient toutes les vidéos : ils peuvent les regarder, les télécharger une à une ou tout d’un coup (.zip). Valable 30 jours après chaque enregistrement.</div><input id="vbPartLien" readonly style="width:100%;padding:10px 12px;border:1px solid #d9dde5;border-radius:9px;font-size:13px;margin-bottom:12px"><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="vbPartCopie" type="button">Copier le lien</button><a class="btn btn-ghost" style="text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent(msg)+'">WhatsApp</a><a class="btn btn-ghost" style="text-decoration:none" href="mailto:?subject='+encodeURIComponent('Les vidéos de votre événement — '+VBEVT)+'&body='+encodeURIComponent(msg)+'">E-mail</a><a class="btn btn-ghost" style="text-decoration:none" target="_blank" rel="noopener" href="'+r.url.replace(/"/g,'&quot;')+'">Aperçu</a><button class="btn btn-ghost" id="vbPartX" type="button" style="margin-left:auto">Fermer</button></div></div>';
+    document.body.appendChild(d); const inp=d.querySelector('#vbPartLien'); inp.value=r.url;
+    d.querySelector('#vbPartX').onclick=()=>d.remove(); d.onclick=e=>{ if(e.target===d) d.remove(); };
+    d.querySelector('#vbPartCopie').onclick=async()=>{ try{ await navigator.clipboard.writeText(r.url); showToast('Lien copié'); }catch(e){ inp.select(); document.execCommand('copy'); showToast('Lien copié'); } };
   }catch(e){ showToast('Échec : '+e.message,true); }
 }
 async function vbSupprimer(id){
