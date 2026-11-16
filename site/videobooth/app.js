@@ -94,35 +94,6 @@
       setTimeout(function () { accueil(); }, 7000);
     });
   }
-  /* ───────── message vocal d'accueil + bip ───────── */
-  function sonSauver(id, blob) { return new Promise(function (ok) { try { var t = DB.transaction('sons', 'readwrite'); t.objectStore('sons').put({ id: id, blob: blob }); t.oncomplete = ok; t.onerror = ok; } catch (e) { ok(); } }); }
-  function sonLire(id) { return new Promise(function (ok) { try { var q = DB.transaction('sons', 'readonly').objectStore('sons').get(id); q.onsuccess = function () { ok(q.result && q.result.blob); }; q.onerror = function () { ok(null); }; } catch (e) { ok(null); } }); }
-  var audioCtx = null;
-  function bip(fin) {
-    try {
-      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-      var o = audioCtx.createOscillator(), g = audioCtx.createGain();
-      o.type = 'sine'; o.frequency.value = 880; g.gain.value = 0.35; o.connect(g); g.connect(audioCtx.destination); o.start();
-      setTimeout(function () { try { o.stop(); } catch (e) {} setTimeout(fin, 250); }, 380);
-    } catch (e) { fin(); }
-  }
-  var accueilVocalEnCours = null;
-  /* joue le message (fichier audio chargé, sinon voix de synthèse), puis appelle fin ; sécurité : jamais plus de 25 s */
-  function jouerAccueil(fin) {
-    var fini = false, stop = function () { if (fini) return; fini = true; clearTimeout(garde); accueilVocalEnCours = null; try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) {} fin(); };
-    var garde = setTimeout(stop, 25000); accueilVocalEnCours = stop;
-    var ev = (cfg.events || []).filter(function (x) { return x.id === cfg.actif; })[0] || {};
-    sonLire('accueil-' + cfg.actif).then(function (blob) {
-      if (fini) return;
-      if (blob) { var a = new Audio(URL.createObjectURL(blob)); a.onended = stop; a.onerror = stop; a.play().catch(stop); return; }
-      var texte = String(ev.msg || '').trim();
-      if (!texte || !window.speechSynthesis) return stop();
-      var u = new SpeechSynthesisUtterance(texte); u.lang = 'fr-FR'; u.rate = 0.95;
-      var vx = speechSynthesis.getVoices().filter(function (v) { return /^fr/i.test(v.lang); })[0]; if (vx) u.voice = vx;
-      u.onend = stop; u.onerror = stop; speechSynthesis.speak(u);
-    });
-  }
-  function accueilVocalActif() { var ev = (cfg.events || []).filter(function (x) { return x.id === cfg.actif; })[0]; return !!(ev && ev.msgOn); }
   /* ── test de la caméra : nom, résolution, zoom, guide de cadrage ── */
   var testCam = false;
   function infoCamera(s) {
@@ -155,16 +126,6 @@
   }
   $('b-go').onclick = function () {
     if (!flux) return; $('cadrage').hidden = true; $('b-go').hidden = true; $('compte').hidden = false; $('s-cam').classList.add('flou');
-    if (accueilVocalActif()) {
-      $('compte-n').textContent = '☎'; $('compte-msg').textContent = 'Écoutez le message… l’enregistrement commencera après le bip';
-      $('b-passer').hidden = false;
-      jouerAccueil(function () {
-        $('b-passer').hidden = true;
-        if (!$('s-cam').classList.contains('flou') || $('compte').hidden) return;   /* abandonné entre-temps (croix) */
-        bip(function () { $('compte').hidden = true; $('s-cam').classList.remove('flou'); demarrer(); });
-      });
-      return;
-    }
     $('compte-msg').textContent = 'Vous avez ' + (Number(cfg.max) || 30) + ' secondes maximum';
     var n = 3; $('compte-n').textContent = n; decompte = setInterval(function () { n--; if (n > 0) { $('compte-n').textContent = n; } else { clearInterval(decompte); decompte = null; $('compte').hidden = true; $('s-cam').classList.remove('flou'); demarrer(); } }, 1000);
   };
@@ -190,11 +151,8 @@
   function arreterRec() { if (rec && rec.state !== 'inactive') rec.stop(); }
 $('b-stop').onclick = arreterRec;
   /* croix : on abandonne la prise et on revient au formulaire, les champs restent remplis */
-  $('b-passer').onclick = function () { if (accueilVocalEnCours) accueilVocalEnCours(); };
   $('b-x').onclick = function () {
     if (testCam) { testCam = false; $('guide').hidden = true; $('cam-info').hidden = true; arreterCam(); ouvrirAdmin(); return; }
-    if (accueilVocalEnCours) { var f = accueilVocalEnCours; accueilVocalEnCours = null; try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) {} $('compte').hidden = true; }
-    $('b-passer').hidden = true;
     if (decompte) { clearInterval(decompte); decompte = null; }
     clearInterval(minuteur);
     if (rec && rec.state !== 'inactive') { rec.onstop = null; try { rec.stop(); } catch (e) {} }
@@ -333,7 +291,7 @@ $('b-stop').onclick = arreterRec;
   }
   function ouvrirEdition(id) {
     var e = evts().filter(function (x) { return x.id === id; })[0]; if (!e) return; edite = e;
-    $('e-nom').value = e.nom; $('e-noel').checked = !!e.noel; $('e-msgon').checked = !!e.msgOn; $('e-cadrage').value = e.cadrage == null ? '' : e.cadrage; $('e-msg').value = e.msg || ''; sonLire('accueil-' + e.id).then(function (b) { $('e-son-n').textContent = b ? '✓ fichier chargé' : ''; }); $('e-format').value = (e.fmtV === 2 && e.format) || 'auto'; $('e-date').value = e.date || ''; $('e-titre').value = e.titre || ''; $('e-sous').value = e.sous || ''; $('e-max').value = e.max || 30;
+    $('e-nom').value = e.nom; $('e-noel').checked = !!e.noel; $('e-cadrage').value = e.cadrage == null ? '' : e.cadrage; $('e-format').value = (e.fmtV === 2 && e.format) || 'auto'; $('e-date').value = e.date || ''; $('e-titre').value = e.titre || ''; $('e-sous').value = e.sous || ''; $('e-max').value = e.max || 30;
     var sel = $('e-cam'); sel.innerHTML = '<option value="">Caméra avant (par défaut)</option>';
     if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) navigator.mediaDevices.enumerateDevices().then(function (d) { d.filter(function (x) { return x.kind === 'videoinput'; }).forEach(function (x, i) { var o = document.createElement('option'); o.value = x.deviceId; o.textContent = x.label || ('Caméra ' + (i + 1)); if (x.deviceId === e.cam) o.selected = true; sel.appendChild(o); }); }).catch(function () {});
     var sm = $('e-mic'); sm.innerHTML = '<option value="">Micro de la tablette (par défaut)</option>';
@@ -342,20 +300,10 @@ $('b-stop').onclick = arreterRec;
     $('e-actif').textContent = e.id === cfg.actif ? 'Enregistrer et fermer' : 'Utiliser cet événement';
     $('adm-liste').hidden = true; $('adm-edit').hidden = false;
   }
-  $('e-son').onchange = function () {
-    var f = this.files && this.files[0]; if (!f || !edite) return;
-    sonSauver('accueil-' + edite.id, f).then(function () { $('e-son-n').textContent = '✓ ' + f.name; $('e-msgon').checked = true; });
-  };
-  $('e-son-del').onclick = function () { if (!edite) return; sonSauver('accueil-' + edite.id, null).then(function () { try { var t = DB.transaction('sons', 'readwrite'); t.objectStore('sons').delete('accueil-' + edite.id); } catch (e) {} $('e-son-n').textContent = ''; }); };
-  $('e-son-test').onclick = function () {
-    if (!edite) return; var id0 = cfg.actif; cfg.actif = edite.id;
-    var ev0 = (cfg.events || []).filter(function (x) { return x.id === edite.id; })[0]; var vieux = ev0 && ev0.msg; if (ev0) ev0.msg = $('e-msg').value.trim();
-    jouerAccueil(function () { if (ev0) ev0.msg = vieux; cfg.actif = id0; bip(function () {}); });
-  };
   function lireEdition() {
     if (!edite) return;
     edite.nom = $('e-nom').value.trim(); edite.date = $('e-date').value.trim(); edite.titre = $('e-titre').value.trim() || CFG0.titre; edite.sous = $('e-sous').value.trim();
-    edite.max = Math.min(120, Math.max(5, Number($('e-max').value) || 30)); edite.cam = $('e-cam').value; edite.noel = $('e-noel').checked; edite.msgOn = $('e-msgon').checked; edite.cadrage = $('e-cadrage').value.trim(); edite.msg = $('e-msg').value.trim(); edite.format = $('e-format').value; edite.fmtV = 2; edite.mic = $('e-mic').value;
+    edite.max = Math.min(120, Math.max(5, Number($('e-max').value) || 30)); edite.cam = $('e-cam').value; edite.noel = $('e-noel').checked; edite.cadrage = $('e-cadrage').value.trim(); edite.format = $('e-format').value; edite.fmtV = 2; edite.mic = $('e-mic').value;
   }
   function sauverConnexion() { cfg.serveur = $('a-serveur').value.trim(); cfg.cle = $('a-cle').value.trim() || cfg.cle; ecrireCfg(cfg); }
   $('a-serveur').onchange = $('a-cle').onchange = sauverConnexion;
