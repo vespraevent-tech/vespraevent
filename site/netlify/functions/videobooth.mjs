@@ -99,7 +99,7 @@ export default async (request) => {
     if (!m || Date.parse(m.cree) < Date.now() - GARDE_JOURS * 86400000) return new Response('Cette vidéo n’est plus disponible (conservée 30 jours).', { status: 410 });
     const buf = await st.get('video/' + id, { type: 'arrayBuffer' }).catch(() => null);
     if (!buf) return new Response('Vidéo introuvable', { status: 404 });
-    return new Response(buf, { headers: { 'Content-Type': m.type || 'video/mp4', 'Content-Disposition': `attachment; filename="${String(m.fichier).replace(/"/g, '')}"`, 'Cache-Control': 'private, no-store' } });
+    return new Response(buf, { headers: { 'Content-Type': m.type || 'video/mp4', 'Content-Disposition': `attachment; filename="${String(m.fichier).replace(/"/g, '')}"`, 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
   }
 
   /* ── réception d'un morceau ── */

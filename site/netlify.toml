@@ -120,3 +120,20 @@
   [headers.values]
     Content-Type = "text/plain; charset=utf-8"
     Cache-Control = "public, max-age=3600"
+
+# L'appli de la tablette Vidéobooth est privée : jamais référencée.
+[[headers]]
+  for = "/videobooth/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/videobooth"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+
+[[headers]]
+  for = "/api/videobooth/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"

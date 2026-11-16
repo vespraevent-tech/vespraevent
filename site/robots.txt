@@ -5,5 +5,8 @@ Allow: /
 Disallow: /*?demande=
 Disallow: /*?produit=
 Disallow: /studio/
+Disallow: /videobooth
+Disallow: /videobooth/
+Disallow: /api/videobooth/
 
 Sitemap: https://www.vespraevent.fr/sitemap.xml
