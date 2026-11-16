@@ -3435,6 +3435,7 @@ window.acompteSwitch=function(r){
     +'<span style="position:absolute;top:3px;'+(ok?'left:19px':'left:3px')+';width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .2s"></span></span>'
     +'<span>'+(ok?'Acompte re\u00e7u':'Acompte non re\u00e7u')+(montant>0?' \u2014 '+montant.toLocaleString('fr-FR')+' \u20ac':'')+'</span></button>'
     +(ok?' <button type="button" onclick="modifierMontantAcompte(\''+String(r.id).replace(/'/g,'')+'\')" style="margin-left:10px;background:none;border:0;padding:0;cursor:pointer;font:500 11.5px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;color:#7a808c;text-decoration:underline">modifier le montant</button>':'')
+    +(ok?' <button type="button" onclick="modifierDateAcompte(\''+String(r.id).replace(/'/g,'')+'\')" style="margin-left:10px;background:none;border:0;padding:0;cursor:pointer;font:500 11.5px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;color:#7a808c;text-decoration:underline">re\u00e7u le '+(r.acompteDate?String(r.acompteDate).split('-').reverse().join('/'):'\u2014')+' \u00b7 modifier</button>':'')
     +'</div>';
 };
 window.basculerAcompteRecu=function(id){
@@ -3452,6 +3453,23 @@ window.basculerAcompteRecu=function(id){
   if(dp)dp.outerHTML=detailPrixHTML(r);
 };
 
+/* date à laquelle l'acompte a réellement été reçu : le CA le compte dans ce mois-là */
+window.modifierDateAcompte=function(id){
+  var r=R.find(function(x){return String(x.id)===String(id);});
+  if(!r)return;
+  var cur=r.acompteDate?String(r.acompteDate).split('-').reverse().join('/'):'';
+  var v=prompt('Date de r\u00e9ception de l\u2019acompte (JJ/MM/AAAA) :',cur);
+  if(v===null)return;
+  var m=String(v).trim().match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/);
+  var iso=null;
+  if(m){ iso=m[3]+'-'+('0'+m[2]).slice(-2)+'-'+('0'+m[1]).slice(-2); var t=new Date(iso+'T12:00:00'); if(isNaN(t)||t.getMonth()+1!==Number(m[2])) iso=null; }
+  if(!iso){alert('Date invalide : saisissez par exemple 14/10/2026.');return;}
+  r.acompteDate=iso;
+  localStorage.setItem('vespraR',JSON.stringify(R));
+  if(typeof fbPutRes==='function')fbPutRes(r);
+  var b=document.getElementById('acZone');if(b)b.outerHTML=acompteSwitch(r);
+  var dp=document.getElementById('dpZone');if(dp)dp.outerHTML=detailPrixHTML(r);
+};
 /* corriger à la main le montant réellement reçu */
 window.modifierMontantAcompte=function(id){
   var r=R.find(function(x){return String(x.id)===String(id);});
