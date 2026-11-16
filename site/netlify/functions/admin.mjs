@@ -44,7 +44,7 @@ import { videoStore, envoyerMail as vbEnvoyerMail, jetonEvt as vbJetonEvt, galLi
 import * as secu from './_sauvegarde.mjs';
 /* Fabrication du PDF de facture : écrite à la main, sans dépendance,
    pour la même raison que la bibliothèque Blobs est jointe au dossier. */
-import { construireFacture, jourFr, periodeFr } from './_facture.mjs';
+import { construireFacture, conditionsReglement, jourFr, periodeFr } from './_facture.mjs';
 import { construireNoteFrais } from './_notefrais.mjs';
 import { construireEtatIK } from './_ik.mjs';
 import { contratWord } from './_contrat.mjs';
@@ -994,7 +994,7 @@ function envoiDevisDemande(d, lignes, fact) {
   let adr = String(d.devisAdresse || d.adresse || '').split(/\r?\n/).map((x) => x.trim()).filter(Boolean);
   const aF = fact && fact.adresse && fact.adresse.length ? fact : null;
   if (aF && !String(d.devisAdresse || '').trim()) adr = aF.adresse;      /* adresse de facturation du compte, sauf si Thomas en a saisi une */
-  return { ref: d.id, pro: d.devisPro === true || (!!aF && aF.pro && d.devisPro !== false), acompte: d.devisAvecAcompte ? Math.round(total * (Number(d.devisAcomptePct) || 30)) / 100 : 0, acomptePct: Number(d.devisAcomptePct) || 30, dateEvenement: d.date || '', dateFinEvenement: d.dateFin || d.datefin || '',
+  return { ref: d.id, pro: d.devisPro === true || (!!aF && aF.pro && d.devisPro !== false), acompte: d.devisAvecAcompte ? Math.round(total * (Number(d.devisAcomptePct) || 30)) / 100 : 0, acomptePct: Number(d.devisAcomptePct) || 30, cond: d.devisCond || null, dateEvenement: d.date || '', dateFinEvenement: d.dateFin || d.datefin || '',
     client: { nom: (d.clientType === 'Entreprise ou association' && String(d.societe || '').trim()) || d.nom || 'Client', adresse: adr, tel: d.telephone || '', email: d.email || '', siret: d.devisSiret || (aF && aF.siret) || '', tvaClient: d.devisTva || (aF && aF.tva) || '' }, lignes: l };
 }
 
@@ -2203,6 +2203,7 @@ const gestionnaire = async (request) => {
 
       /* Les prix du site sont TTC : la facture les décompose. */
       const ENT = await lireEntreprise();
+      const condReg = conditionsReglement(envoi ? envoi.cond : { mode: url.searchParams.get('cm'), jours: url.searchParams.get('cj'), note: url.searchParams.get('cn') });
       const pdf = construireFacture({
         emetteur: ENT.emetteur,
         client: {
@@ -2223,7 +2224,7 @@ const gestionnaire = async (request) => {
              dans les conditions de règlement au bas du document */
           echeance: type === 'devis'
             ? ENT.validite + ' jours'
-            : (pro ? '30 jours' : 'comptant'),
+            : ((condReg && condReg.court) || (pro ? '30 jours' : 'comptant')),
           /* l'acompte n'est pas toujours demandé : c'est le back-office
              qui dit s'il faut le déduire, et de combien */
           acompte: envoi
@@ -2232,11 +2233,12 @@ const gestionnaire = async (request) => {
                 ? Math.max(0, Number(url.searchParams.get('acompte')) || 0)
                 : 0),
           acomptePct: envoi ? Number(envoi.acomptePct) || 30 : (Number(url.searchParams.get('pct')) || 30),
+          reglementCourt: condReg ? condReg.court : '',
         },
         lignes,
         reglages: {
           tauxTVA: TAUX_TVA,
-          conditions: type === 'devis' ? ENT.priv.conditionsDevis : (pro ? ENT.priv.conditionsFacturePro : ENT.priv.conditionsFacturePart),
+          conditions: (condReg && condReg.long ? 'Conditions de règlement : ' + condReg.long + ' ' : '') + (type === 'devis' ? ENT.priv.conditionsDevis : (pro ? ENT.priv.conditionsFacturePro : ENT.priv.conditionsFacturePart)),
           penalites: (type !== 'devis' && pro) ? ENT.priv.penalites : '',
           escompte: type === 'devis' ? '' : 'Escompte pour paiement anticipé : néant.',
         },

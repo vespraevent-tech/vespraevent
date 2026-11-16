@@ -289,6 +289,34 @@ const NOIR = [0.047, 0.059, 0.078];
 const GRIS = [0.392, 0.427, 0.486];
 const GRIS_CLAIR = [0.94, 0.95, 0.96];
 
+/* Conditions de règlement choisies sur la fenêtre Devis / Facture : { mode, jours, note }.
+   Renvoie { court, long } ou null quand rien de particulier n'est demandé. */
+export function conditionsReglement(c) {
+  if (!c || typeof c !== 'object') return null;
+  const mode = String(c.mode || '');
+  const jours = Math.min(365, Math.max(0, Math.round(Number(c.jours) || 0)));
+  const note = String(c.note || '').replace(/[\u0000-\u001f]+/g, ' ').trim().slice(0, 300);
+  const j = (n) => n + ' jour' + (n > 1 ? 's' : '');
+  let court = '', long = '';
+  if (mode === 'commande') {
+    court = 'à la commande';
+    long = 'Règlement de la totalité du montant à la validation du devis, par virement bancaire, avant la livraison du matériel. La réservation est confirmée à réception du paiement.';
+  } else if (mode === 'avant' && jours > 0) {
+    court = j(jours) + ' avant l\u2019événement';
+    long = 'Règlement de la totalité du montant par virement bancaire, au plus tard ' + j(jours) + ' avant la date de l\u2019événement.';
+  } else if (mode === 'apres' && jours > 0) {
+    court = j(jours) + ' après l\u2019événement';
+    long = 'Règlement de la totalité du montant par virement bancaire, ' + j(jours) + ' après la date de l\u2019événement.';
+  } else if (mode === 'reception') {
+    court = 'à réception';
+    long = 'Règlement de la totalité du montant par virement bancaire, à réception de la facture.';
+  }
+  if (!court && !note) return null;
+  if (note) long = (long ? long + ' ' : '') + note;
+  if (long && !/[.!?]$/.test(long)) long += '.';
+  return { court, long };
+}
+
 export function construireFacture({ emetteur, client, facture, lignes, reglages }) {
   let p = new Page();
   const G = 48;                 /* marge gauche */
@@ -302,7 +330,8 @@ export function construireFacture({ emetteur, client, facture, lignes, reglages 
   p.texte(D, y + 2, estDevis ? 'DEVIS' : 'FACTURE', { taille: 26, gras: true, couleur: NAVY, align: 'droite' });
   p.texte(D, y - 16, 'N° ' + facture.numero, { taille: 10, gras: true, couleur: NOIR, align: 'droite' });
   p.texte(D, y - 29, 'Date : ' + facture.dateEmission, { taille: 9, couleur: GRIS, align: 'droite' });
-  p.texte(D, y - 41, (estDevis ? 'Validité : ' : 'Échéance : ') + facture.echeance, { taille: 9, couleur: GRIS, align: 'droite' });
+  p.texte(D, y - 41, (estDevis ? 'Validité : ' : 'Échéance : ') + facture.echeance
+    + (estDevis && facture.reglementCourt ? '  ·  Règlement : ' + facture.reglementCourt : ''), { taille: 9, couleur: GRIS, align: 'droite' });
   y -= 56;
   p.pave(G, y, D - G, 2.2, NAVY);
   y -= 28;

@@ -81,6 +81,7 @@
         r.devisSiret = v.siret || '';
         r.devisTva = v.tvaClient || '';
         r.devisAvecAcompte = !!v.avecAcompte;
+        r.devisCond = v.cond || null;
         if (v.acomptePct) r.devisAcomptePct = v.acomptePct;
         return Promise.resolve(enregistrerSuivi(r)).then(function () {
           /* une demande déjà au planning suit les mêmes montants */
@@ -96,7 +97,7 @@
           if (typeof showToast === 'function') showToast('Saisies non enregistrées : ' + e.message, true);
         });
       }
-      r.factureClient = { adresse: v.adresse || '', pro: !!v.pro, siret: v.siret || '', tvaClient: v.tvaClient || '', avecAcompte: !!v.avecAcompte, acomptePct: v.acomptePct || 30, societe: (r.factureClient && r.factureClient.societe) || r.societe || '' };
+      r.factureClient = { adresse: v.adresse || '', pro: !!v.pro, siret: v.siret || '', tvaClient: v.tvaClient || '', avecAcompte: !!v.avecAcompte, acomptePct: v.acomptePct || 30, cond: v.cond || null, societe: (r.factureClient && r.factureClient.societe) || r.societe || '' };
       if (typeof api === 'function') {
         return Promise.resolve(api('/data', { method: 'POST', body: JSON.stringify({ collection: 'reservations', item: { id: r.id, d: JSON.stringify(r) } }) }))
           .catch(function (e) { if (typeof showToast === 'function') showToast('Saisies non enregistrées : ' + e.message, true); });
@@ -270,11 +271,11 @@
              pro: cl ? cl.pro : r.devisPro === true,
              siret: cl ? cl.siret : (r.devisSiret || ''),
              tvaClient: cl ? cl.tvaClient : (r.devisTva || ''),
-             avecAcompte: r.devisAvecAcompte === true ? true : undefined, acomptePct: Number(r.devisAcomptePct) || undefined };
+             avecAcompte: r.devisAvecAcompte === true ? true : undefined, acomptePct: Number(r.devisAcomptePct) || undefined, cond: r.devisCond || null };
     } else {
       vu = r.factureClient || {};
       var cl2 = (r.factureClient === undefined) ? depuisClient(demandeLiee) : null;
-      if (cl2) vu = { pro: cl2.pro, siret: cl2.siret, tvaClient: cl2.tvaClient };
+      if (cl2) vu = { pro: cl2.pro, siret: cl2.siret, tvaClient: cl2.tvaClient, cond: (r.factureClient && r.factureClient.cond) || null };
     }
     /* fiche de la base clients : reprise de ce qui est déjà connu */
     clientsCharger();
@@ -356,11 +357,24 @@
         '<p class="fc-aide" id="fcAideAcompte"></p>' +
       '</div>' +
 
-      '<div class="fc-champ" id="fcBlocPro" hidden>' +
-        '<label class="fc-l" for="fcSiret">SIRET du client (facultatif)</label>' +
-        '<input class="fc-input" id="fcSiret" type="text" value="' + txt(vu.siret || '') + '" placeholder="123 456 789 00012">' +
-        '<label class="fc-l" for="fcTvaClient" style="margin-top:10px">N° de TVA du client (facultatif)</label>' +
-        '<input class="fc-input" id="fcTvaClient" type="text" value="' + txt(vu.tvaClient || '') + '" placeholder="FR00123456789">' +
+      /* SIRET et TVA viennent de la fiche client : ils restent transmis au document, sans champ à remplir ici */
+      '<div id="fcBlocPro" hidden>' +
+        '<input id="fcSiret" type="hidden" value="' + txt(vu.siret || '') + '">' +
+        '<input id="fcTvaClient" type="hidden" value="' + txt(vu.tvaClient || '') + '">' +
+      '</div>' +
+
+      '<div class="fc-champ" id="fcBlocCond">' +
+        '<label class="fc-l" for="fcCondMode">Conditions de règlement</label>' +
+        '<div class="fc-ligne">' +
+          '<select class="fc-input fc-input-court" id="fcCondMode" style="width:auto;margin-right:10px;max-width:100%">' +
+            [['', 'Conditions habituelles'], ['commande', 'Totalité à la commande, avant livraison'], ['avant', 'Totalité X jours avant l’événement'],
+             ['apres', 'Totalité X jours après l’événement'], ['reception', 'À réception de la facture']]
+              .map(function (o) { return '<option value="' + o[0] + '"' + (((vu.cond || {}).mode || '') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') +
+          '</select>' +
+          '<span id="fcCondJoursBloc" hidden><input class="fc-input fc-input-court" id="fcCondJours" type="number" min="1" max="365" step="1" value="' + (Number((vu.cond || {}).jours) || '') + '" placeholder="jours" style="width:80px"><span class="fc-unite">jours</span></span>' +
+        '</div>' +
+        '<input class="fc-input" id="fcCondNote" type="text" maxlength="300" style="margin-top:8px" value="' + txt((vu.cond || {}).note || '') + '" placeholder="Précision libre (facultatif) : ex. déplacement à Paris, virement avant le 10 juin">' +
+        '<p class="fc-aide" id="fcAideCond"></p>' +
       '</div>' +
 
       (prixPrestaManquant(r, lignes, depuisDemande)
@@ -405,7 +419,6 @@
 
     function majType() {
       var estPro = zone.querySelector('input[name="fcType"][value="pro"]').checked;
-      zone.querySelector('#fcBlocPro').hidden = !estPro;
       zone.querySelector('#fcAideType').textContent = devis
         ? (estPro ? 'Devis valable 30 jours, adressé à une structure.' : 'Devis valable 30 jours.')
         : (estPro
@@ -420,7 +433,33 @@
     zone.querySelectorAll('input[name="fcType"]').forEach(function (i) { i.addEventListener('change', majType); });
     zone.querySelector('#fcAvecAcompte').addEventListener('change', majAcompte);
     zone.querySelector('#fcPct').addEventListener('change', majAcompteMontant);
-    majType(); majAcompte();
+    function condSaisie() {
+      var q = function (x) { return zone.querySelector(x); };
+      var mode = (q('#fcCondMode') || {}).value || '';
+      var jours = Number((q('#fcCondJours') || {}).value) || 0;
+      var note = ((q('#fcCondNote') || {}).value || '').trim();
+      if (!mode && !note) return null;
+      return { mode: mode, jours: (mode === 'avant' || mode === 'apres') ? jours : 0, note: note };
+    }
+    function majCond() {
+      var mode = zone.querySelector('#fcCondMode').value;
+      zone.querySelector('#fcCondJoursBloc').hidden = !(mode === 'avant' || mode === 'apres');
+      var cb = zone.querySelector('#fcAvecAcompte');
+      var aide = zone.querySelector('#fcAideCond');
+      /* règlement de la totalité : un acompte n'a plus de sens, il est retiré */
+      if (devis && mode) { if (cb.checked) { cb.checked = false; majAcompte(); } cb.disabled = true; } else { cb.disabled = false; }
+      var j = Number((zone.querySelector('#fcCondJours') || {}).value) || 0;
+      var txtAide = {
+        '': 'Le document garde ses conditions habituelles.',
+        commande: devis ? 'Le client règle la totalité à la validation du devis ; l’acompte est désactivé.' : 'Totalité à régler à la validation, avant la livraison.',
+        avant: j ? 'Totalité à régler au plus tard ' + j + ' jour' + (j > 1 ? 's' : '') + ' avant l’événement.' : 'Indiquez le nombre de jours.',
+        apres: j ? 'Totalité à régler ' + j + ' jour' + (j > 1 ? 's' : '') + ' après l’événement.' : 'Indiquez le nombre de jours.',
+        reception: 'Totalité à régler à réception de la facture.'
+      };
+      if (aide) aide.textContent = txtAide[mode] || '';
+    }
+    ['#fcCondMode', '#fcCondJours'].forEach(function (sel) { zone.querySelector(sel).addEventListener('input', majCond); zone.querySelector(sel).addEventListener('change', majCond); });
+    majType(); majAcompte(); majCond();
 
     /* ce qui est saisi s'enregistre tout de suite : même sans télécharger, les autres appareils le voient */
     var _t = null;
@@ -431,6 +470,7 @@
         pro: !!(q('input[name="fcType"][value="pro"]') || {}).checked,
         siret: (q('#fcSiret') || {}).value || '', tvaClient: (q('#fcTvaClient') || {}).value || '',
         avecAcompte: !!(q('#fcAvecAcompte') || {}).checked, acomptePct: Number((q('#fcPct') || {}).value) || 30,
+        cond: condSaisie(),
         livraison: nombreOuNul(q('#fcLivraison')), montage: nombreOuNul(q('#fcMontage')),
         retour: !!(q('#fcRetour') || {}).checked,
       };
@@ -494,6 +534,13 @@
     var siret = (zone.querySelector('#fcSiret') || {}).value || '';
     var tvaClient = (zone.querySelector('#fcTvaClient') || {}).value || '';
     var avecAcompte = zone.querySelector('#fcAvecAcompte').checked;
+    var cond = (function () {
+      var mode = (zone.querySelector('#fcCondMode') || {}).value || '';
+      var jours = Number((zone.querySelector('#fcCondJours') || {}).value) || 0;
+      var note = ((zone.querySelector('#fcCondNote') || {}).value || '').trim();
+      if ((mode === 'avant' || mode === 'apres') && !jours) { mode = ''; }
+      return (mode || note) ? { mode: mode, jours: (mode === 'avant' || mode === 'apres') ? jours : 0, note: note } : null;
+    })();
     var totalDocument = (function(){
       var base = 0;
       if (source === 'demande') {
@@ -523,7 +570,7 @@
       return;
     }
     sauvegarderSaisies(id, source, r, { adresse: adresse, pro: pro, siret: siret, tvaClient: tvaClient,
-                  avecAcompte: avecAcompte, acomptePct: pctAc, livraison: livraison, montage: montage, retour: retour });
+                  avecAcompte: avecAcompte, acomptePct: pctAc, cond: cond, livraison: livraison, montage: montage, retour: retour });
 
     bouton.disabled = true;
     bouton.textContent = 'Génération…';
@@ -555,6 +602,7 @@
           pro: pro,
           acompte: acompte,
           acomptePct: pctAc,
+          cond: cond,
           dateEvenement: (r && r.date) || '',
           dateFinEvenement: (r && (r.dateFin || r.datefin)) || '',
           client: {
@@ -573,6 +621,7 @@
         + '&adresse=' + encodeURIComponent(lignesAdr.join('|'))
         + '&pro=' + (pro ? '1' : '0')
         + '&acompte=' + acompte + '&pct=' + pctAc
+        + (cond ? '&cm=' + encodeURIComponent(cond.mode) + '&cj=' + cond.jours + '&cn=' + encodeURIComponent(cond.note) : '')
         + (societeClient ? '&societe=' + encodeURIComponent(societeClient) : '')
         + (siret ? '&siret=' + encodeURIComponent(siret) : '')
         + (tvaClient ? '&tvaclient=' + encodeURIComponent(tvaClient) : ''),
