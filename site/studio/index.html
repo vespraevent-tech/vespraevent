@@ -3630,6 +3630,9 @@ async function loadDemandes(silencieux){
         statut: (r.statutSuivi === 'nouvelle' || r.statutSuivi === 'en-cours' || r.statutSuivi === 'validee') ? r.statutSuivi : 'validee',
         suiviResa: true,
         cadre: r.cadre || '',
+        /* « Appel/SMS » et « Mail » cochés : ils sont portés par la réservation */
+        appel: r.relanceAppel === true,
+        mail: r.relanceMail === true,
         /* les notes de la réservation sont la note de la fiche */
         note: noteDepuisResa(r, null),
         recue: r._created || '',
@@ -6753,7 +6756,15 @@ async function basculerRelance(id, quoi){
   const d = (cache.demandes||[]).find(x => x.id === id);
   if(!d) return;
   d[quoi] = !d[quoi];
-  try{ await enregistrerSuivi(d); }
+  try{
+    if(d.planning && d.resaId){
+      /* réservation saisie à la main : il n'y a pas de demande du site, le marqueur s'écrit sur la réservation */
+      const r = (cache.resas||[]).find(x => String(x.id) === String(d.resaId));
+      if(!r) throw new Error('Réservation introuvable');
+      r[quoi === 'appel' ? 'relanceAppel' : 'relanceMail'] = d[quoi];
+      await api('/data', {method:'POST', body: JSON.stringify({collection:'reservations', item:{id:String(r.id), d:JSON.stringify(r)}})});
+    } else await enregistrerSuivi(d);
+  }
   catch(e){ d[quoi] = !d[quoi]; alert('Impossible d\'enregistrer : ' + e.message); }
   renderDemandes();
   rafraichirFiche(d.id);
