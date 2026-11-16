@@ -455,6 +455,7 @@ export function construireFacture({ emetteur, client, facture, lignes, reglages 
   const totalHT = Math.round(brutHT * 100) / 100;
   const tva = Math.round((netTTC - netHT - tiersTTC) * 100) / 100;
   const acompte = Number(facture.acompte) || 0;
+  const pctAc = Math.min(100, Math.max(1, Math.round(Number(facture.acomptePct) || 30)));
   const aRem = remises.length > 0;
   const factAc = !estDevis && acompte > 0;
 
@@ -496,7 +497,7 @@ export function construireFacture({ emetteur, client, facture, lignes, reglages 
     trait();
     if (factAc) {
       total('Total TTC', euros(netTTC));
-      total('Acompte déjà versé (30 %)', '- ' + euros(acompte));
+      total('Acompte déjà versé (${pctAc} %)', '- ' + euros(acompte));
       trait();
     }
     total(factAc ? 'Solde restant à payer' : 'Net à payer', euros(factAc ? netTTC - acompte : netTTC), { fort: true, taille: 10, barre: true });
@@ -508,14 +509,14 @@ export function construireFacture({ emetteur, client, facture, lignes, reglages 
   if (aRem || factAc) {
     total('Total TTC', euros(brutTTC));
     for (const r of remises) total(r.lib, '- ' + euros(r.ttc));
-    if (factAc) total('Acompte déjà versé (30 %)', '- ' + euros(acompte));
+    if (factAc) total('Acompte déjà versé (${pctAc} %)', '- ' + euros(acompte));
     trait();
     total(factAc ? 'Solde restant à payer' : 'Net à payer', euros(factAc ? netTTC - acompte : netTTC), { fort: true, taille: 10, barre: true });
   } else {
     total('Net à payer', euros(netTTC), { fort: true, taille: acompte > 0 ? 10 : 11, barre: true });
   }
   }
-  if (estDevis && acompte > 0) total('Acompte à verser (30 %)', euros(acompte), { fort: true, taille: 10, gauche: true });
+  if (estDevis && acompte > 0) total(`Acompte à verser (${pctAc} %)`, euros(acompte), { fort: true, taille: 10, gauche: true });
 
   /* ── bon pour accord : sous les totaux, sur toute la largeur ───── */
   if (estDevis) {

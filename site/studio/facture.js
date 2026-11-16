@@ -81,6 +81,7 @@
         r.devisSiret = v.siret || '';
         r.devisTva = v.tvaClient || '';
         r.devisAvecAcompte = !!v.avecAcompte;
+        if (v.acomptePct) r.devisAcomptePct = v.acomptePct;
         return Promise.resolve(enregistrerSuivi(r)).then(function () {
           /* une demande déjà au planning suit les mêmes montants */
           if (r.resaId && typeof cache !== 'undefined') {
@@ -95,7 +96,7 @@
           if (typeof showToast === 'function') showToast('Saisies non enregistrées : ' + e.message, true);
         });
       }
-      r.factureClient = { adresse: v.adresse || '', pro: !!v.pro, siret: v.siret || '', tvaClient: v.tvaClient || '', avecAcompte: !!v.avecAcompte };
+      r.factureClient = { adresse: v.adresse || '', pro: !!v.pro, siret: v.siret || '', tvaClient: v.tvaClient || '', avecAcompte: !!v.avecAcompte, acomptePct: v.acomptePct || 30 };
       if (typeof api === 'function') {
         return Promise.resolve(api('/data', { method: 'POST', body: JSON.stringify({ collection: 'reservations', item: { id: r.id, d: JSON.stringify(r) } }) }))
           .catch(function (e) { if (typeof showToast === 'function') showToast('Saisies non enregistrées : ' + e.message, true); });
@@ -268,7 +269,7 @@
              pro: cl ? cl.pro : r.devisPro === true,
              siret: cl ? cl.siret : (r.devisSiret || ''),
              tvaClient: cl ? cl.tvaClient : (r.devisTva || ''),
-             avecAcompte: r.devisAvecAcompte === true ? true : undefined };
+             avecAcompte: r.devisAvecAcompte === true ? true : undefined, acomptePct: Number(r.devisAcomptePct) || undefined };
     } else {
       vu = r.factureClient || {};
       var cl2 = (r.factureClient === undefined) ? depuisClient(demandeLiee) : null;
@@ -292,7 +293,8 @@
        sur le total du document. */
     var acompteResa = !depuisDemande && r && r.acompte === true;
     var avecAcompte = vu.avecAcompte !== undefined ? vu.avecAcompte === true : acompteResa;
-    var montantAcompte = avecAcompte ? Math.round(totalDe(r) * 0.30 * 100) / 100 : 0;
+    var pct0 = Number(vu.acomptePct) >= 20 && Number(vu.acomptePct) <= 70 ? Number(vu.acomptePct) : 30;
+    var montantAcompte = avecAcompte ? Math.round(totalDe(r) * pct0) / 100 : 0;
     if (depuisDemande) montantAcompte = 0;
 
     var retourCoche = (r && r.livraisonRetour != null) ? r.livraisonRetour === true : false;
@@ -343,8 +345,11 @@
         '<label class="fc-case"><input type="checkbox" id="fcAvecAcompte"' + (avecAcompte ? ' checked' : '') + '> ' +
           '<span>' + (devis ? 'Prévoir un acompte' : 'Déduire un acompte déjà versé') + '</span></label>' +
         '<div class="fc-ligne" id="fcBlocAcompte" hidden>' +
+          '<select class="fc-input fc-input-court" id="fcPct" aria-label="Pourcentage d’acompte" style="width:auto;margin-right:10px">' +
+            [20,30,40,50,60,70].map(function (p) { return '<option value="' + p + '"' + (p === pct0 ? ' selected' : '') + '>' + p + ' %</option>'; }).join('') +
+          '</select>' +
           '<input class="fc-input fc-input-court" id="fcAcompte" type="number" min="0" step="0.01" ' +
-            'value="' + (montantAcompte ? montantAcompte : '') + '" placeholder="30 % du total" readonly>' +
+            'value="' + (montantAcompte ? montantAcompte : '') + '" placeholder="% du total" readonly>' +
             '<span class="fc-unite">€</span>' +
         '</div>' +
         '<p class="fc-aide" id="fcAideAcompte"></p>' +
@@ -374,11 +379,12 @@
       var cb = zone.querySelector('#fcAvecAcompte');
       var input = zone.querySelector('#fcAcompte');
       if (!cb || !input) return;
-      var montant = cb.checked ? Math.round(totalCourant() * 0.30 * 100) / 100 : 0;
+      var pct = Number((zone.querySelector('#fcPct') || {}).value) || 30;
+      var montant = cb.checked ? Math.round(totalCourant() * pct) / 100 : 0;
       input.value = montant ? montant.toFixed(2) : '';
       var aide = zone.querySelector('#fcAideAcompte');
       if (aide) aide.textContent = cb.checked
-        ? ((devis ? 'Acompte à verser : ' : 'Acompte déjà versé : ') + montant.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' € (30 % du total TTC).')
+        ? ((devis ? 'Acompte à verser : ' : 'Acompte déjà versé : ') + montant.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' € (' + pct + ' % du total TTC).')
         : 'Aucun acompte sur ce document.';
     }
     function majTotal() {
@@ -412,6 +418,7 @@
     }
     zone.querySelectorAll('input[name="fcType"]').forEach(function (i) { i.addEventListener('change', majType); });
     zone.querySelector('#fcAvecAcompte').addEventListener('change', majAcompte);
+    zone.querySelector('#fcPct').addEventListener('change', majAcompteMontant);
     majType(); majAcompte();
 
     /* ce qui est saisi s'enregistre tout de suite : même sans télécharger, les autres appareils le voient */
@@ -422,7 +429,7 @@
         adresse: ((q('#fcAdresse') || {}).value || '').trim(),
         pro: !!(q('input[name="fcType"][value="pro"]') || {}).checked,
         siret: (q('#fcSiret') || {}).value || '', tvaClient: (q('#fcTvaClient') || {}).value || '',
-        avecAcompte: !!(q('#fcAvecAcompte') || {}).checked,
+        avecAcompte: !!(q('#fcAvecAcompte') || {}).checked, acomptePct: Number((q('#fcPct') || {}).value) || 30,
         livraison: nombreOuNul(q('#fcLivraison')), montage: nombreOuNul(q('#fcMontage')),
         retour: !!(q('#fcRetour') || {}).checked,
       };
@@ -497,7 +504,8 @@
       }
       return base;
     })();
-    var acompte = avecAcompte ? Math.round(totalDocument * 0.30 * 100) / 100 : 0;
+    var pctAc = Number((zone.querySelector('#fcPct') || {}).value) || 30;
+    var acompte = avecAcompte ? Math.round(totalDocument * pctAc) / 100 : 0;
 
     var livraison = nombreOuNul(zone.querySelector('#fcLivraison'));
     var montage = nombreOuNul(zone.querySelector('#fcMontage'));
@@ -508,7 +516,7 @@
       return;
     }
     sauvegarderSaisies(id, source, r, { adresse: adresse, pro: pro, siret: siret, tvaClient: tvaClient,
-                  avecAcompte: avecAcompte, livraison: livraison, montage: montage, retour: retour });
+                  avecAcompte: avecAcompte, acomptePct: pctAc, livraison: livraison, montage: montage, retour: retour });
 
     bouton.disabled = true;
     bouton.textContent = 'Génération…';
@@ -539,6 +547,7 @@
           ref: id,
           pro: pro,
           acompte: acompte,
+          acomptePct: pctAc,
           dateEvenement: (r && r.date) || '',
           dateFinEvenement: (r && (r.dateFin || r.datefin)) || '',
           client: {
@@ -556,7 +565,7 @@
       appel = fetch(chemin + '?id=' + encodeURIComponent(id)
         + '&adresse=' + encodeURIComponent(lignesAdr.join('|'))
         + '&pro=' + (pro ? '1' : '0')
-        + '&acompte=' + acompte
+        + '&acompte=' + acompte + '&pct=' + pctAc
         + (societeClient ? '&societe=' + encodeURIComponent(societeClient) : '')
         + (siret ? '&siret=' + encodeURIComponent(siret) : '')
         + (tvaClient ? '&tvaclient=' + encodeURIComponent(tvaClient) : ''),

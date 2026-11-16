@@ -6155,6 +6155,7 @@ function _suiviPayload(d){
     devisSiret: d.devisSiret || '',
     devisTva: d.devisTva || '',
     devisAvecAcompte: d.devisAvecAcompte === true ? 'oui' : '',
+    devisAcomptePct: d.devisAcomptePct > 0 ? d.devisAcomptePct : '',
     /* note interne, écrite avant ou après validation */
     note: d.note || '',
     /* prix modifiés à la main avant validation : { « produit|formule » : prix } */

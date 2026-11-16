@@ -992,7 +992,7 @@ function envoiDevisDemande(d, lignes, fact) {
   let adr = String(d.devisAdresse || d.adresse || '').split(/\r?\n/).map((x) => x.trim()).filter(Boolean);
   const aF = fact && fact.adresse && fact.adresse.length ? fact : null;
   if (aF && !String(d.devisAdresse || '').trim()) adr = aF.adresse;      /* adresse de facturation du compte, sauf si Thomas en a saisi une */
-  return { ref: d.id, pro: d.devisPro === true || (!!aF && aF.pro && d.devisPro !== false), acompte: d.devisAvecAcompte ? Math.round(total * 30) / 100 : 0, dateEvenement: d.date || '', dateFinEvenement: d.dateFin || d.datefin || '',
+  return { ref: d.id, pro: d.devisPro === true || (!!aF && aF.pro && d.devisPro !== false), acompte: d.devisAvecAcompte ? Math.round(total * (Number(d.devisAcomptePct) || 30)) / 100 : 0, acomptePct: Number(d.devisAcomptePct) || 30, dateEvenement: d.date || '', dateFinEvenement: d.dateFin || d.datefin || '',
     client: { nom: (d.clientType === 'Entreprise ou association' && String(d.societe || '').trim()) || d.nom || 'Client', adresse: adr, tel: d.telephone || '', email: d.email || '', siret: d.devisSiret || (aF && aF.siret) || '', tvaClient: d.devisTva || (aF && aF.tva) || '' }, lignes: l };
 }
 
@@ -1722,7 +1722,7 @@ async function espaceAdmin(request, url, path) {
           parrainageStatut: x.parrainageStatut || '', offreMariage: x.offreMariage === true ? 'oui' : (x.offreMariage === false ? 'non' : ''),
           devisAcompte: x.devisAcompte || 0, acompteRecu: oui(x.acompteRecu),
           livraisonRetour: m.type === 'reprise' ? 'oui' : (x.livraisonRetour === true ? 'oui' : (x.livraisonRetour === false ? 'non' : '')),
-          devisAdresse: x.devisAdresse || '', devisPro: oui(x.devisPro), devisSiret: x.devisSiret || '', devisTva: x.devisTva || '', devisAvecAcompte: oui(x.devisAvecAcompte),
+          devisAdresse: x.devisAdresse || '', devisPro: oui(x.devisPro), devisSiret: x.devisSiret || '', devisTva: x.devisTva || '', devisAvecAcompte: oui(x.devisAvecAcompte), devisAcomptePct: Number(x.devisAcomptePct) || 0,
           corrections: m.type === 'livraison' ? { livraison: 'oui', adresse: m.adresse || x.adresse || '' } : {} };
         if (corps.montagePrix === null || corps.montagePrix === undefined) delete corps.montagePrix;
         const rp = await gestionnaire(new Request(new URL('/api/admin/demandes', request.url), { method: 'POST',
@@ -2212,6 +2212,7 @@ const gestionnaire = async (request) => {
             : (url.searchParams.has('acompte')
                 ? Math.max(0, Number(url.searchParams.get('acompte')) || 0)
                 : 0),
+          acomptePct: envoi ? Number(envoi.acomptePct) || 30 : (Number(url.searchParams.get('pct')) || 30),
         },
         lignes,
         reglages: {
@@ -2826,6 +2827,7 @@ const gestionnaire = async (request) => {
           devisSiret: String(suivi.devisSiret || ''),
           devisTva: String(suivi.devisTva || ''),
           devisAvecAcompte: suivi.devisAvecAcompte === 'oui',
+          devisAcomptePct: Number(suivi.devisAcomptePct) || 0,
           prixLignes: (() => { try { const o = JSON.parse(suivi.prixLignes || ''); return o && typeof o === 'object' && !Array.isArray(o) ? o : null; } catch { return null; } })(),
           /* « reprise du matériel comprise » : coché → true, décoché → false, jamais choisi → absent */
           livraisonRetour: suivi.livraisonRetour === 'oui' ? true : (suivi.livraisonRetour === 'non' ? false
@@ -2897,9 +2899,10 @@ const gestionnaire = async (request) => {
         devisSiret: body.devisSiret ? String(body.devisSiret).slice(0, 40) : '',
         devisTva: body.devisTva ? String(body.devisTva).slice(0, 40) : '',
         devisAvecAcompte: body.devisAvecAcompte === 'oui' || body.devisAvecAcompte === true ? 'oui' : '',
+        devisAcomptePct: Number(body.devisAcomptePct) >= 1 && Number(body.devisAcomptePct) <= 100 ? Number(body.devisAcomptePct) : '',
       };
       /* un champ absent de l'envoi (ancienne copie du back-office) reprend la valeur enregistrée */
-      const CHAMPS_DEVIS = ['devisAdresse', 'devisPro', 'devisSiret', 'devisTva', 'devisAvecAcompte'];
+      const CHAMPS_DEVIS = ['devisAdresse', 'devisPro', 'devisSiret', 'devisTva', 'devisAvecAcompte', 'devisAcomptePct'];
       /* corrections apportées depuis le back-office, préfixées c_ pour ne
          jamais se confondre avec les champs de suivi */
       const CORRIGEABLES = ['nom', 'telephone', 'email', 'date', 'convives',
