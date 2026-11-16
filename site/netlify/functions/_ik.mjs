@@ -93,7 +93,7 @@ export function construireEtatIK({ emetteur, beneficiaire, annee, vehicule, traj
   y = y0 - 82;
 
   /* attestation et signatures */
-  p.texte(G, y, 'Je certifie sur l’honneur l’exactitude de cet état : les trajets ci-dessus sont des déplacements professionnels effectués avec le véhicule indiqué.', { taille: 8.5, couleur: NOIR });
+  p.texte(G, y, 'Je certifie sur l’honneur l’exactitude de cet état : ces trajets sont professionnels et faits avec le véhicule indiqué.', { taille: 8.5, couleur: NOIR });
   y -= 30;
   p.texte(G, y, 'Le bénéficiaire (date et signature)', { taille: 8.5, gras: true, couleur: GRIS });
   p.texte(D, y, 'Pour la société — approuvé (date et signature)', { taille: 8.5, gras: true, couleur: GRIS, align: 'droite' });
