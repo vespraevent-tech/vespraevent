@@ -373,7 +373,7 @@
           '</select>' +
           '<span id="fcCondJoursBloc" hidden><input class="fc-input fc-input-court" id="fcCondJours" type="number" min="1" max="365" step="1" value="' + (Number((vu.cond || {}).jours) || '') + '" placeholder="jours" style="width:80px"><span class="fc-unite">jours</span></span>' +
         '</div>' +
-        '<input class="fc-input" id="fcCondNote" type="text" maxlength="300" style="margin-top:8px" value="' + txt((vu.cond || {}).note || '') + '" placeholder="Précision libre (facultatif) : ex. déplacement à Paris, virement avant le 10 juin">' +
+        '<input class="fc-input" id="fcCondNote" type="text" maxlength="300" style="margin-top:8px" value="' + txt((vu.cond || {}).note || '') + '" placeholder="Précision libre (facultatif) : ex. virement avant le 10 juin">' +
         '<p class="fc-aide" id="fcAideCond"></p>' +
       '</div>' +
 
