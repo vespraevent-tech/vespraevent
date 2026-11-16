@@ -57,7 +57,7 @@
 
   window.ikOuvrir = function () {
     var cv = el('ikCv'); if (!cv.options.length) cv.innerHTML = Object.keys(BAREME).map(function (k) { return '<option value="' + k + '">' + BAREME[k].nom + '</option>'; }).join('');
-    cv.value = loc('cv') || '5'; el('ikElec').checked = loc('elec') === '1';
+    cv.value = loc('cv') || '5'; el('ikElec').checked = loc('elec') === '1'; el('ikImmat').value = loc('immat') || '';
     var b = el('ikBenef'), cur = b.value; b.innerHTML = benefs().map(function (x) { return '<option>' + esc2(x) + '</option>'; }).join(''); if (cur) b.value = cur;
     if (!el('ikDate').value) el('ikDate').value = aujourdhui();
     ikAper();
@@ -68,7 +68,7 @@
       lignes = lignes.filter(function (x) { return x && /^\d{4}-\d{2}-\d{2}/.test(String(x.date || '')) && Number(x.km) > 0 && x.id; }); charge = true; } catch (e) { lignes = []; }
     ikRendre();
   }
-  window.ikReglages = function () { loc('cv', el('ikCv').value); loc('elec', el('ikElec').checked ? '1' : '0'); ikAper(); };
+  window.ikReglages = function () { loc('cv', el('ikCv').value); loc('elec', el('ikElec').checked ? '1' : '0'); loc('immat', el('ikImmat').value.trim()); ikAper(); };
 
   /* aperçu : indemnité du trajet saisi, compte tenu des kilomètres déjà faits cette année */
   window.ikAper = function () {
@@ -83,11 +83,11 @@
   window.ikAjouter = async function () {
     var km = parseFloat(String(el('ikKm').value).replace(',', '.')) || 0;
     if (km <= 0) { if (typeof showToast === 'function') showToast('Indiquez le nombre de kilomètres', true); return; }
-    var item = { id: 'ik' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), date: el('ikDate').value || aujourdhui(), motif: el('ikMotif').value.trim(), km: km,
+    var item = { id: 'ik' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), date: el('ikDate').value || aujourdhui(), motif: el('ikMotif').value.trim(), depart: el('ikDep').value.trim(), arrivee: el('ikArr').value.trim(), etapes: el('ikEtapes').value.trim(), client: el('ikClient').value.trim(), immat: el('ikImmat').value.trim(), km: km,
       benef: el('ikBenef').value, cv: el('ikCv').value, elec: el('ikElec').checked };
     try {
       await api('/data', { method: 'POST', body: JSON.stringify({ collection: 'indemnites-km', item: item }) });
-      lignes.push(item); el('ikKm').value = ''; el('ikMotif').value = ''; ikRendre(); ikAper();
+      lignes.push(item); el('ikKm').value = ''; el('ikMotif').value = ''; el('ikDep').value = ''; el('ikArr').value = ''; el('ikEtapes').value = ''; el('ikClient').value = ''; ikRendre(); ikAper();
       if (typeof showToast === 'function') showToast('Trajet enregistré');
     } catch (e) { if (typeof showToast === 'function') showToast('Enregistrement impossible : ' + e.message, true); }
   };
@@ -99,6 +99,7 @@
 
   function ikRendre() {
     var z = el('ikListe'); if (!z) return;
+    ikAnnees();
     var l = calculer(lignes);
     if (!l.length) { z.innerHTML = '<div class="hint" style="padding:18px 0">Aucun trajet enregistré.</div>'; return; }
     var annees = {}; l.forEach(function (x) { var a = String(x.date).slice(0, 4); (annees[a] = annees[a] || []).push(x); });
@@ -106,7 +107,7 @@
       var g = annees[a], km = g.reduce(function (t, x) { return t + (Number(x.km) || 0); }, 0), tot = g.reduce(function (t, x) { return t + x.indemnite; }, 0);
       return '<div class="ik-an"><div class="ik-anh"><b>' + a + '</b><span>' + fmt(km, 1) + ' km · <b>' + eur(tot) + '</b></span></div>' +
         g.slice().reverse().map(function (x) {
-          return '<div class="ik-l"><div><b>' + jour(x.date) + '</b> · ' + esc2(x.motif || 'Trajet') + '<div class="ik-s">' + esc2(x.benef) + ' · ' + esc2((BAREME[x.cv] || {}).nom || '') + (x.elec ? ' · électrique' : '') + ' · cumul ' + fmt(x.cumul, 0) + ' km</div></div>' +
+          return '<div class="ik-l"><div><b>' + jour(x.date) + '</b> · ' + esc2(x.motif || 'Trajet') + '<div class="ik-s">' + (x.depart || x.arrivee ? esc2((x.depart || '?') + ' → ' + (x.arrivee || '?')) + (x.etapes ? ' (via ' + esc2(x.etapes) + ')' : '') + '<br>' : '') + esc2(x.benef) + ' · ' + esc2((BAREME[x.cv] || {}).nom || '') + (x.elec ? ' · électrique' : '') + ' · cumul ' + fmt(x.cumul, 0) + ' km</div></div>' +
             '<div class="ik-r"><span>' + fmt(x.km, 1) + ' km</span><b>' + eur(x.indemnite) + '</b><button type="button" class="ik-x" onclick="ikSupprimer(\'' + x.id + '\')" aria-label="Supprimer">×</button></div></div>';
         }).join('') + '</div>';
     }).join('');
@@ -114,10 +115,30 @@
 
   window.ikExport = function () {
     var l = calculer(lignes); if (!l.length) return;
-    var csv = ['Date;Motif;Bénéficiaire;Puissance;Électrique;Kilomètres;Cumul annuel (km);Indemnité (€)'].concat(l.map(function (x) {
-      return [jour(x.date), x.motif || '', x.benef, (BAREME[x.cv] || {}).nom || '', x.elec ? 'oui' : 'non', fmt(x.km, 1), fmt(x.cumul, 0), fmt(x.indemnite, 2)].map(function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(';');
+    var csv = ['Date;Motif;Départ;Arrivée;Étapes;Client / événement;Bénéficiaire;Puissance;Électrique;Kilomètres;Cumul annuel (km);Indemnité (€)'].concat(l.map(function (x) {
+      return [jour(x.date), x.motif || '', x.depart || '', x.arrivee || '', x.etapes || '', x.client || '', x.benef, (BAREME[x.cv] || {}).nom || '', x.elec ? 'oui' : 'non', fmt(x.km, 1), fmt(x.cumul, 0), fmt(x.indemnite, 2)].map(function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(';');
     })).join('\r\n');
     var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' })); a.download = 'indemnites-kilometriques.csv'; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 3000);
   };
+  /* État justificatif : un PDF par bénéficiaire et par année, à signer et à conserver avec la carte grise */
+  window.ikEtatPdf = async function () {
+    var an = el('ikAnnee').value, benef = el('ikBenef').value;
+    var t = lignes.filter(function (x) { return String(x.date).slice(0, 4) === an && x.benef === benef; });
+    if (!t.length) { if (typeof showToast === 'function') showToast('Aucun trajet en ' + an + ' pour ' + benef, true); return; }
+    var manque = t.filter(function (x) { return !x.depart || !x.arrivee; }).length;
+    if (manque && !confirm(manque + ' trajet(s) sans adresse de départ ou d’arrivée : l’état sera moins solide en cas de contrôle. Continuer quand même ?')) return;
+    var v = { cv: el('ikCv').value, elec: el('ikElec').checked, immat: el('ikImmat').value.trim() };
+    if (!v.immat && !confirm('L’immatriculation du véhicule n’est pas renseignée. Continuer quand même ?')) return;
+    try {
+      var r = await fetch('/api/admin/ik-etat', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ beneficiaire: benef, annee: an, vehicule: v, trajets: t }) });
+      if (!r.ok) { var j = await r.json().catch(function () { return {}; }); throw new Error(j.error || ('Erreur ' + r.status)); }
+      var b = await r.blob(), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'etat-frais-km-' + an + '.pdf'; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+    } catch (e) { if (typeof showToast === 'function') showToast('PDF impossible : ' + e.message, true); }
+  };
+  function ikAnnees() {
+    var s = el('ikAnnee'), cur = s.value, an = new Date().getFullYear(), set = {}; set[an] = 1;
+    lignes.forEach(function (x) { set[String(x.date).slice(0, 4)] = 1; });
+    s.innerHTML = Object.keys(set).sort().reverse().map(function (a) { return '<option>' + a + '</option>'; }).join(''); if (cur && set[cur]) s.value = cur;
+  }
   window._ikCalc = { ik: ik, calculer: calculer, BAREME: BAREME };
 })();

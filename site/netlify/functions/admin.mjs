@@ -46,6 +46,7 @@ import * as secu from './_sauvegarde.mjs';
    pour la même raison que la bibliothèque Blobs est jointe au dossier. */
 import { construireFacture, jourFr, periodeFr } from './_facture.mjs';
 import { construireNoteFrais } from './_notefrais.mjs';
+import { construireEtatIK } from './_ik.mjs';
 import { contratWord } from './_contrat.mjs';
 import * as repAuto from './_reponse-auto.mjs';
 import { htmlRelance, htmlAvis, htmlAccuse, pageProduit } from './_mails-auto.mjs';
@@ -2033,6 +2034,23 @@ const gestionnaire = async (request) => {
      navigateur, pour qu'il survive aux déploiements et soit le même
      depuis le téléphone et l'ordinateur. */
   /* ---- note de frais : PDF d'une note ou récapitulatif d'un trimestre ---- */
+  if (path === '/ik-etat' && request.method === 'POST') {
+    let corps; try { corps = await request.json(); } catch { return json({ error: 'Requête invalide' }, 400); }
+    const trajets = (Array.isArray(corps && corps.trajets) ? corps.trajets : []).slice(0, 1500);
+    if (!trajets.length) return json({ error: 'aucun trajet pour cette année' }, 400);
+    try {
+      const ENT = await lireEntreprise();
+      const v = corps.vehicule || {};
+      const pdf = construireEtatIK({
+        emetteur: ENT.emetteur, beneficiaire: String(corps.beneficiaire || '').slice(0, 120), annee: String(corps.annee || '').slice(0, 4),
+        vehicule: { cv: String(v.cv || '5'), elec: v.elec === true, immat: String(v.immat || '').slice(0, 20) },
+        reference: String(corps.reference || '').slice(0, 60),
+        trajets: trajets.map((t) => ({ date: String(t.date || '').slice(0, 10), motif: String(t.motif || '').slice(0, 160), client: String(t.client || '').slice(0, 100), depart: String(t.depart || '').slice(0, 160), arrivee: String(t.arrivee || '').slice(0, 160), etapes: String(t.etapes || '').slice(0, 200), km: Number(t.km) || 0 })),
+      });
+      const nom = ('etat-km-' + String(corps.beneficiaire || '').replace(/[^A-Za-z0-9]+/g, '-') + '-' + String(corps.annee || '')).slice(0, 80) + '.pdf';
+      return new Response(pdf, { status: 200, headers: { 'content-type': 'application/pdf', 'cache-control': 'private, no-store', 'content-disposition': `attachment; filename="${nom}"` } });
+    } catch (e) { return json({ error: e.message }, 500); }
+  }
   if (path === '/note-frais' && request.method === 'POST') {
     let corps; try { corps = await request.json(); } catch { return json({ error: 'Requête invalide' }, 400); }
     const notes = (Array.isArray(corps && corps.notes) ? corps.notes : []).slice(0, 400);
