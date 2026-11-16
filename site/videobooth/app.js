@@ -180,17 +180,60 @@ $('b-stop').onclick = arreterRec;
     if (v === cfg.pin) ouvrirAdmin(); else $('pin-err').textContent = 'Code incorrect.';
   };
   $('pin-in').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('pin-ok').click(); });
-  function ouvrirAdmin() {
-    $('a-event').value = cfg.event; $('a-titre').value = cfg.titre; $('a-sous').value = cfg.sous; $('a-serveur').value = cfg.serveur; $('a-cle').value = cfg.cle; $('a-max').value = cfg.max;
-    var sel = $('a-cam'); sel.innerHTML = '<option value="">Caméra avant (par défaut)</option>';
-    if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) navigator.mediaDevices.enumerateDevices().then(function (d) { d.filter(function (x) { return x.kind === 'videoinput'; }).forEach(function (x, i) { var o = document.createElement('option'); o.value = x.deviceId; o.textContent = x.label || ('Caméra ' + (i + 1)); if (x.deviceId === cfg.cam) o.selected = true; sel.appendChild(o); }); }).catch(function () {});
-    majEtat(); montrer('s-admin');
+  /* ── événements : cartes, réglages de chacun, un seul « en cours » ── */
+  function nouvelId() { return 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
+  function evts() {
+    if (!Array.isArray(cfg.events)) cfg.events = [];
+    if (!cfg.events.length && cfg.event) { var id = nouvelId(); cfg.events.push({ id: id, nom: cfg.event, date: '', titre: cfg.titre, sous: cfg.sous, max: cfg.max, cam: cfg.cam }); cfg.actif = id; ecrireCfg(cfg); }
+    return cfg.events;
   }
-  $('a-close').onclick = function () { accueil(); };
-  $('a-save').onclick = function () {
-    cfg.event = $('a-event').value.trim(); cfg.titre = $('a-titre').value.trim() || CFG0.titre; cfg.sous = $('a-sous').value.trim(); cfg.serveur = $('a-serveur').value.trim(); cfg.cle = $('a-cle').value.trim() || CFG0.cle;
-    cfg.max = Math.min(120, Math.max(5, Number($('a-max').value) || 30)); cfg.cam = $('a-cam').value;
-    ecrireCfg(cfg); accueil(); synchro();
+  function appliquerActif() {
+    var e = evts().filter(function (x) { return x.id === cfg.actif; })[0];
+    cfg.event = e ? (e.nom + (e.date ? ' — ' + e.date : '')) : '';
+    cfg.titre = (e && e.titre) || CFG0.titre; cfg.sous = e ? (e.sous || '') : CFG0.sous; cfg.max = (e && Number(e.max)) || 30; cfg.cam = (e && e.cam) || '';
+    ecrireCfg(cfg);
+  }
+  var edite = null;
+  function rendreCartes() {
+    var h = '';
+    evts().forEach(function (e) {
+      h += '<button type="button" class="adm-carte' + (e.id === cfg.actif ? ' on' : '') + '" data-id="' + e.id + '">' + (e.id === cfg.actif ? '<i class="badge">En cours</i>' : '') +
+        '<b></b><span></span></button>';
+    });
+    h += '<button type="button" class="adm-carte nouveau" id="adm-new">+ Nouvel événement</button>';
+    $('adm-cartes').innerHTML = h;
+    var cs = $('adm-cartes').querySelectorAll('.adm-carte[data-id]');
+    evts().forEach(function (e, i) { cs[i].querySelector('b').textContent = e.nom || 'Sans nom'; cs[i].querySelector('span').textContent = e.date || ''; cs[i].onclick = function () { ouvrirEdition(e.id); }; });
+    $('adm-new').onclick = function () { var e = { id: nouvelId(), nom: '', date: '', titre: CFG0.titre, sous: CFG0.sous, max: 30, cam: '' }; cfg.events.push(e); if (!cfg.actif) cfg.actif = e.id; ecrireCfg(cfg); ouvrirEdition(e.id); };
+  }
+  function ouvrirAdmin() {
+    $('a-serveur').value = cfg.serveur; $('a-cle').value = cfg.cle;
+    $('adm-edit').hidden = true; $('adm-liste').hidden = false; rendreCartes(); majEtat(); montrer('s-admin');
+  }
+  function ouvrirEdition(id) {
+    var e = evts().filter(function (x) { return x.id === id; })[0]; if (!e) return; edite = e;
+    $('e-nom').value = e.nom; $('e-date').value = e.date || ''; $('e-titre').value = e.titre || ''; $('e-sous').value = e.sous || ''; $('e-max').value = e.max || 30;
+    var sel = $('e-cam'); sel.innerHTML = '<option value="">Caméra avant (par défaut)</option>';
+    if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) navigator.mediaDevices.enumerateDevices().then(function (d) { d.filter(function (x) { return x.kind === 'videoinput'; }).forEach(function (x, i) { var o = document.createElement('option'); o.value = x.deviceId; o.textContent = x.label || ('Caméra ' + (i + 1)); if (x.deviceId === e.cam) o.selected = true; sel.appendChild(o); }); }).catch(function () {});
+    $('e-titre-h').textContent = e.nom || 'Nouvel événement';
+    $('e-actif').textContent = e.id === cfg.actif ? 'Enregistrer et fermer' : 'Utiliser cet événement';
+    $('adm-liste').hidden = true; $('adm-edit').hidden = false;
+  }
+  function lireEdition() {
+    if (!edite) return;
+    edite.nom = $('e-nom').value.trim(); edite.date = $('e-date').value.trim(); edite.titre = $('e-titre').value.trim() || CFG0.titre; edite.sous = $('e-sous').value.trim();
+    edite.max = Math.min(120, Math.max(5, Number($('e-max').value) || 30)); edite.cam = $('e-cam').value;
+  }
+  function sauverConnexion() { cfg.serveur = $('a-serveur').value.trim(); cfg.cle = $('a-cle').value.trim() || cfg.cle; ecrireCfg(cfg); }
+  $('a-serveur').onchange = $('a-cle').onchange = sauverConnexion;
+  $('a-close').onclick = function () { sauverConnexion(); appliquerActif(); accueil(); synchro(); };
+  $('e-retour').onclick = function () { lireEdition(); appliquerActif(); ouvrirAdmin(); };
+  $('e-ok').onclick = function () { lireEdition(); appliquerActif(); ouvrirAdmin(); };
+  $('e-actif').onclick = function () { lireEdition(); cfg.actif = edite.id; appliquerActif(); sauverConnexion(); accueil(); synchro(); };
+  $('e-sup').onclick = function () {
+    if (!edite || !confirm('Supprimer cet événement des réglages ? (les vidéos déjà enregistrées ne sont pas supprimées)')) return;
+    cfg.events = cfg.events.filter(function (x) { return x.id !== edite.id; }); if (cfg.actif === edite.id) cfg.actif = cfg.events[0] ? cfg.events[0].id : '';
+    edite = null; appliquerActif(); ouvrirAdmin();
   };
   $('a-sync').onclick = function () {
     if (!cfg.cle) { noterMsg('la clé de l’appareil n’est pas renseignée (champ ci-dessus, puis Enregistrer)'); return majEtat(); }
@@ -222,5 +265,6 @@ $('b-stop').onclick = arreterRec;
   document.addEventListener('pointerdown', function () { garderEveille(); if (document.fullscreenElement == null && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {}); }, { once: true });
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/videobooth/sw.js', { scope: '/videobooth/' }).catch(function () {});
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
+  appliquerActif();
   ouvrirDb().then(function () { accueil(); synchro(); }).catch(function () { accueil(); $('etat').hidden = false; $('etat').textContent = 'Stockage de la tablette indisponible'; $('etat').classList.add('alerte'); });
 })();

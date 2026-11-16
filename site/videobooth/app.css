@@ -109,3 +109,19 @@ html,body,#app{height:100dvh}
 .adm-m{font-size:13px;color:#9fb0c6;line-height:1.4}
 .adm-f{display:flex;justify-content:flex-end}
 .adm-ok{background:var(--or);color:#1a1205;border:0;border-radius:10px;padding:12px 26px;font:700 16px Inter,sans-serif;width:100%}
+
+.adm[hidden]{display:none}
+.adm-cartes{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.adm-carte{position:relative;text-align:left;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:16px 16px 14px;color:#fff;min-height:96px;display:flex;flex-direction:column;gap:4px}
+.adm-carte b{font:600 17px Inter,sans-serif;line-height:1.25}
+.adm-carte span{font-size:13px;color:#9fb0c6}
+.adm-carte.on{border-color:var(--or);background:rgba(245,158,11,.12)}
+.adm-carte .badge{position:absolute;top:10px;right:10px;background:var(--or);color:#1a1205;border-radius:999px;font:700 10px Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px}
+.adm-carte.nouveau{align-items:center;justify-content:center;border-style:dashed;color:var(--or);font:600 15px Inter,sans-serif;text-align:center}
+.adm-f2{display:flex;gap:10px;flex-wrap:wrap}
+.adm-f2 .adm-ok{flex:1;width:auto;min-width:180px}
+.adm-danger{color:#ffb4a8}
+.adm-h .adm-b{white-space:nowrap}
+.adm-h{gap:12px;justify-content:flex-start}
+#adm-liste .adm-h{justify-content:space-between}
+.adm-carte .badge{position:static;align-self:flex-start;font-style:normal;margin-bottom:4px}

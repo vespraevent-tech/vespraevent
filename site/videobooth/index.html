@@ -10,7 +10,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="/favicon.png">
 <link rel="stylesheet" href="/polices.css?v=1">
-<link rel="stylesheet" href="app.css?v=8">
+<link rel="stylesheet" href="app.css?v=10">
 </head>
 <body>
 <main id="app">
@@ -60,22 +60,10 @@
   </section>
 
   <section id="s-admin" class="ecran">
-    <div class="adm">
-      <header class="adm-h"><h2>Réglages</h2><button id="a-close" class="adm-x" type="button" aria-label="Fermer sans enregistrer">✕</button></header>
-
-      <div class="adm-c">
-        <h3>Événement</h3>
-        <label>Nom de l’événement<input id="a-event" type="text" placeholder="Mariage Durand — 20 juin"></label>
-        <div class="adm-2">
-          <label>Titre d’accueil<input id="a-titre" type="text"></label>
-          <label>Sous-titre<input id="a-sous" type="text"></label>
-        </div>
-        <div class="adm-2">
-          <label>Durée maximale (secondes)<input id="a-max" type="number" min="5" max="120"></label>
-          <label>Caméra<select id="a-cam"></select></label>
-        </div>
-      </div>
-
+    <div class="adm" id="adm-liste">
+      <header class="adm-h"><h2>Événements</h2><button id="a-close" class="adm-x" type="button" aria-label="Fermer">✕</button></header>
+      <p class="adm-m">Touchez un événement pour le régler. Celui marqué « En cours » est affiché aux invités.</p>
+      <div id="adm-cartes" class="adm-cartes"></div>
       <div class="adm-c">
         <h3>Envoi des vidéos</h3>
         <div class="adm-2">
@@ -86,8 +74,23 @@
         <div id="a-file" class="adm-m"></div>
         <div class="adm-l"><button id="a-sync" class="adm-b" type="button">Envoyer maintenant</button><button id="a-export" class="adm-b" type="button">Exporter les vidéos</button></div>
       </div>
+    </div>
 
-      <div class="adm-f"><button id="a-save" class="adm-ok" type="button">Enregistrer et fermer</button></div>
+    <div class="adm" id="adm-edit" hidden>
+      <header class="adm-h"><button id="e-retour" class="adm-b" type="button">‹ Événements</button><h2 id="e-titre-h">Événement</h2></header>
+      <div class="adm-c">
+        <label>Nom de l’événement<input id="e-nom" type="text" placeholder="Mariage Cathy"></label>
+        <label>Date<input id="e-date" type="text" placeholder="21 novembre"></label>
+        <div class="adm-2">
+          <label>Titre d’accueil<input id="e-titre" type="text"></label>
+          <label>Sous-titre<input id="e-sous" type="text"></label>
+        </div>
+        <div class="adm-2">
+          <label>Durée maximale (secondes)<input id="e-max" type="number" min="5" max="120"></label>
+          <label>Caméra<select id="e-cam"></select></label>
+        </div>
+      </div>
+      <div class="adm-f2"><button id="e-sup" class="adm-b adm-danger" type="button">Supprimer</button><button id="e-ok" class="adm-b" type="button">Enregistrer</button><button id="e-actif" class="adm-ok" type="button">Utiliser cet événement</button></div>
     </div>
   </section>
 
@@ -98,6 +101,6 @@
     <div class="rang"><button id="pin-x" class="sec" type="button">Annuler</button><button id="pin-ok" class="gros" type="button">Valider</button></div>
   </section>
 </main>
-<script src="app.js?v=9"></script>
+<script src="app.js?v=10"></script>
 </body>
 </html>
