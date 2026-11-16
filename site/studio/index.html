@@ -3536,7 +3536,9 @@ async function loadDemandes(silencieux){
       api('/data?collection=reservations'),
       api('/parrainage').catch(() => null)
     ]);
-    const demandes = (demandesToutes || []).filter(x => x.formulaire !== 'rendez-vous');
+    /* marqueurs Appel/SMS et Mail cochés avant leur enregistrement sur la réservation */
+    const anciensMarqueurs = new Map((demandesToutes || []).filter(x => x && x.planningSuivi).map(x => [String(x.id), x]));
+    const demandes = (demandesToutes || []).filter(x => x && !x.planningSuivi && x.formulaire !== 'rendez-vous');
     majPastilleRdv((demandesToutes || []).filter(x => x.formulaire === 'rendez-vous'));
     /* relecture automatique : si rien n'a changé, on ne touche à rien */
     const sig = JSON.stringify([demandes, (brutResas || []).map(x => { if(!x) return x; const t = String(x.d || ''); let h = 0; for(let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0; return x.id + ':' + t.length + ':' + h; })]);
@@ -3631,8 +3633,8 @@ async function loadDemandes(silencieux){
         suiviResa: true,
         cadre: r.cadre || '',
         /* « Appel/SMS » et « Mail » cochés : ils sont portés par la réservation */
-        appel: r.relanceAppel === true,
-        mail: r.relanceMail === true,
+        appel: r.relanceAppel !== undefined ? r.relanceAppel === true : !!(anciensMarqueurs.get('__planning__' + String(r.id)) || {}).appel,
+        mail: r.relanceMail !== undefined ? r.relanceMail === true : !!(anciensMarqueurs.get('__planning__' + String(r.id)) || {}).mail,
         /* les notes de la réservation sont la note de la fiche */
         note: noteDepuisResa(r, null),
         recue: r._created || '',

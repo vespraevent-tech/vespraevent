@@ -2948,7 +2948,12 @@ const gestionnaire = async (request) => {
           if (t && r <= t + 1000 && t - r < 30 * 60 * 1000) x.accuseEnvoye = new Date(t).toISOString();
         });
       } catch {}
-      return json(items);
+      /* « Appel/SMS » / « Mail » cochés avant que ces marqueurs soient portés par la réservation elle-même :
+         ils étaient enregistrés sous l'identifiant « __planning__<réservation> » ; on les renvoie pour ne rien perdre */
+      const anciensMarqueurs = suivis
+        .filter((x) => String(x.id || '').startsWith('__planning__') && (x.appel === 'oui' || x.mail === 'oui'))
+        .map((x) => ({ id: String(x.id), planningSuivi: true, appel: x.appel === 'oui', mail: x.mail === 'oui' }));
+      return json(items.concat(anciensMarqueurs));
     } catch (e) { return json({ error: e.message }, 500); }
   }
 
