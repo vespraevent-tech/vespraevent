@@ -4,8 +4,8 @@
    Fonction « background » de Netlify (le nom finit par -background) :
    elle répond tout de suite 202 puis peut tourner jusqu'à 15 minutes.
    Elle est lancée par vespra-notification.mjs à chaque demande de devis /
-   réservation ; elle attend le délai réglé (30 s par défaut) puis envoie au client un message
-   avec le lien vers son espace client. Aucun montant n'est promis.
+   réservation ; elle attend le délai réglé (30 s par défaut) puis envoie au client un simple accusé
+   de réception (sans devis joint). Aucun montant n'est promis.
 
    Sécurité : l'appel doit porter une signature HMAC de l'e-mail
    (ADMIN_SECRET), sinon n'importe qui pourrait déclencher des envois.
@@ -58,12 +58,8 @@ export default async (request) => {
   if (!cleApi) { console.error('RESEND_API_KEY absente — accusé non envoyé'); return new Response('sans clé', { status: 202 }); }
   const site = (process.env.URL || 'https://www.vespraevent.fr').replace(/\/$/, '');
   const prenom = String(b.prenom || '').trim().slice(0, 40);
-  /* demande sans livraison ni montage, tout chiffré : le devis part tout de suite, en pièce jointe */
-  let devis = null;
-  try {
-    const rd = await fetch(site + '/api/espace/accuse-devis', { method: 'POST', headers: { 'content-type': 'application/json', 'x-accuse': attendue }, body: JSON.stringify({ email }) });
-    if (rd.ok) { const j = await rd.json(); if (j && j.ok && j.b64) devis = { filename: String(j.nom || 'Devis-Vespra-Event.pdf'), content: j.b64 }; }
-  } catch (e) { console.error('Devis automatique indisponible :', e.message); }
+  /* aucun devis n'est joint : l'équipe envoie elle-même un devis avec un message personnalisé */
+  const devis = null;
   const txt = devis ? reglage.devis : reglage.sans;
   /* récapitulatif transmis par la notification : on ne garde que du texte court et des nombres */
   const t = (x, n) => String(x == null ? '' : x).slice(0, n);

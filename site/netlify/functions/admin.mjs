@@ -1187,6 +1187,9 @@ async function espace(request, url, secret, gestionnaire) {
 
   /* devis automatique joint à l'accusé de réception (appel signé de accuse-background, jamais public) */
   if (path === '/accuse-devis' && request.method === 'POST') {
+    return json({ ok: false });   /* désactivé : plus aucun devis automatique (il aurait pris un numéro) */
+  }
+  if (path === '/accuse-devis-ancien' && request.method === 'POST') {
     let b; try { b = await request.json(); } catch { return json({ ok: false }, 400); }
     const email = emailCle(b.email);
     const sig = request.headers.get('x-accuse') || '';
@@ -1241,7 +1244,7 @@ async function espace(request, url, secret, gestionnaire) {
         let pj = null;
         try {
           const dd = dossierDemande(brut, false);
-          if (devisAutoPossible(brut, dd.lignes)) {
+          if (false && devisAutoPossible(brut, dd.lignes)) {   /* plus de devis joint aux relances */
             const rep = await gestionnaire(new Request(new URL('/api/admin/devis', request.url), { method: 'POST',
               headers: { cookie: cookieA, 'content-type': 'application/json' }, body: JSON.stringify(envoiDevisDemande(brut, dd.lignes, adresseFacture(await lireCompte(email)))) }));
             if (rep.ok) {
@@ -1250,7 +1253,7 @@ async function espace(request, url, secret, gestionnaire) {
             }
           }
         } catch (e) { console.error('Relance : devis indisponible', e.message); }
-        const txt = pj ? reglage.relance.avec : reglage.relance.sans;
+        const txt = reglage.relance.sans;
         const html = htmlRelance({ txt, site, emetteur: EMETTEUR });
         try {
           const r = await fetch('https://api.resend.com/emails', { method: 'POST',

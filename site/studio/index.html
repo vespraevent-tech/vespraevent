@@ -1752,10 +1752,10 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
         <button type="button" class="stab" data-ra="avisauto" onclick="raOnglet('avisauto')">Demande d'avis</button>
       </div>
     <div class="ra-sec" id="ra-repauto">
-      <div class="hint" style="margin-bottom:8px">Mail envoyé au client après sa demande, avec le devis en pièce jointe quand il est chiffrable.</div>
+      <div class="hint" style="margin-bottom:8px">Mail envoyé au client après sa demande : un simple accusé de réception, sans devis joint (vous envoyez vous-même le devis avec votre message).</div>
       <div class="ra-ligne"><label class="ra-sw" aria-label="Envoyer la réponse automatique"><input type="checkbox" id="raActif" onchange="raBascule()"><span class="ra-sl"></span></label><span class="ra-sw-t" data-pour="raActif"></span></div>
       <label class="ra-l" style="flex-direction:row;align-items:center;gap:8px;margin-top:12px">Envoyé <input type="number" id="raDelai" min="1" max="900" step="1" style="width:64px"> <select id="raDelaiU" onchange="raDelaiUnite()" style="width:auto"><option value="s">secondes</option><option value="m">minutes</option></select> après la demande</label>
-      <div class="ra-bloc">
+      <div class="ra-bloc" style="display:none">
         <div class="ra-t">Avec devis joint</div>
         <label class="ra-l">Objet<input type="text" id="raDevisObjet" maxlength="150"></label>
         <label class="ra-l">Titre du mail<input type="text" id="raDevisTitre" maxlength="150"></label>
@@ -1765,7 +1765,7 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
         <button class="ra-r" type="button" onclick="raEssai('accuse-devis')">M'envoyer un essai</button>
       </div>
       <div class="ra-bloc">
-        <div class="ra-t">Sans devis joint</div>
+        <div class="ra-t">Message de réponse automatique</div>
         <label class="ra-l">Objet<input type="text" id="raSansObjet" maxlength="150"></label>
         <label class="ra-l">Titre du mail<input type="text" id="raSansTitre" maxlength="150"></label>
         <label class="ra-l">Message<textarea id="raSansMessage" rows="6" maxlength="4000"></textarea></label>
@@ -1785,7 +1785,7 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
       <div class="hint" style="margin-bottom:8px">Mail envoyé une seule fois aux demandes restées sans suite, vers 9 h–10 h. Les demandes déjà validées ne sont jamais relancées.</div>
       <div class="ra-ligne"><label class="ra-sw" aria-label="Relancer les demandes restées sans suite"><input type="checkbox" id="raRelActif" onchange="raBascule()"><span class="ra-sl"></span></label><span class="ra-sw-t" data-pour="raRelActif"></span></div>
       <label class="ra-l" style="flex-direction:row;align-items:center;gap:8px;margin-top:12px">Au bout de <input type="number" id="raRelJours" min="1" max="30" step="1" style="width:64px"> jours</label>
-      <div class="ra-bloc">
+      <div class="ra-bloc" style="display:none">
         <div class="ra-t">Avec devis joint (quand il est chiffré)</div>
         <label class="ra-l">Objet<input type="text" id="raRelAvecObjet" maxlength="150"></label>
         <label class="ra-l">Titre du mail<input type="text" id="raRelAvecTitre" maxlength="150"></label>
@@ -1794,7 +1794,7 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
         <button class="ra-r" type="button" onclick="raEssai('relance-avec')">M'envoyer un essai</button>
       </div>
       <div class="ra-bloc">
-        <div class="ra-t">Sans devis (livraison ou montage pas encore chiffrés)</div>
+        <div class="ra-t">Message de relance</div>
         <label class="ra-l">Objet<input type="text" id="raRelSansObjet" maxlength="150"></label>
         <label class="ra-l">Titre du mail<input type="text" id="raRelSansTitre" maxlength="150"></label>
         <label class="ra-l">Message<textarea id="raRelSansMessage" rows="7" maxlength="4000"></textarea></label>

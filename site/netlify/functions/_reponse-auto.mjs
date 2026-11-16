@@ -17,7 +17,7 @@ export const DEFAUTS = {
   sans: {
     objet: 'Nous avons bien reçu votre demande — Vespra Event',
     titre: 'Nous avons bien reçu votre demande',
-    message: 'Merci de nous avoir contactés ! Nous étudions votre demande et revenons vers vous très vite avec votre devis personnalisé.\n\n' + T_RES,
+    message: 'Merci pour votre demande ! Notre équipe prépare votre devis et revient vers vous très vite.\n\n' + T_RES,
     dispo: DISPO,
   },
 };
