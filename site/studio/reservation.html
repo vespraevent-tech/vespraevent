@@ -1495,8 +1495,9 @@ function reparerOptionsOrphelines(r){
 }
 function getProductPrice(p){
   // p = reservation product object {name, cat, price, variant}
-  /* 0 € est un vrai prix pour une option (offerte) ou une ligne marquée « prix saisi » */
-  if(p.price!=null && !(Number(p.price)===0 && !p.prixManuel && p.estOption!==true)) return p.price;
+  /* 0 € n'est un vrai prix que sur une ligne marquée « prix saisi » (option offerte depuis « Modifier ») ;
+     les anciennes réservations gardent leur calcul d'origine */
+  if(p.price!=null && !(Number(p.price)===0 && !p.prixManuel)) return p.price;
   if(p.price!=null || true){ var _pc=prixDepuisLibelleCompose(p); if(_pc!=null) return _pc; }
   if(p.price!=null) return p.price;
   // Chercher dans le catalogue
