@@ -1352,6 +1352,8 @@ async function espace(request, url, secret, gestionnaire) {
     let c = await lireCompte(email);
     if (c && c.actif === false) return reponse;
     if (!c) {
+      /* compte supprimé depuis le back-office : il ne se recrée pas tout seul (seule une création manuelle le rétablit) */
+      try { const brut = await (await blobStore(AUTH_STORE)).get(cleCompte(email), { type: 'json', consistency: 'strong' }); if (brut && brut.supprime) { await new Promise((r) => setTimeout(r, 400)); return reponse; } } catch {}
       const nom = await trouverIdentite(email, b.telephone, request, secret, gestionnaire);
       if (nom === null) { await new Promise((r) => setTimeout(r, 400)); return reponse; }
       c = { email, nom: texte(nom, 80), passwordRecord: null, actif: true, v: 1, cree: new Date().toISOString() };
