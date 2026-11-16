@@ -1754,7 +1754,7 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
     <div class="ra-sec" id="ra-repauto">
       <div class="hint" style="margin-bottom:8px">Mail envoyé au client après sa demande : un simple accusé de réception, sans devis joint (vous envoyez vous-même le devis avec votre message).</div>
       <div class="ra-ligne"><label class="ra-sw" aria-label="Envoyer la réponse automatique"><input type="checkbox" id="raActif" onchange="raBascule()"><span class="ra-sl"></span></label><span class="ra-sw-t" data-pour="raActif"></span></div>
-      <label class="ra-l" style="flex-direction:row;align-items:center;gap:8px;margin-top:12px">Envoyé <input type="number" id="raDelai" min="1" max="900" step="1" style="width:64px"> <select id="raDelaiU" onchange="raDelaiUnite()" style="width:auto"><option value="s">secondes</option><option value="m">minutes</option></select> après la demande</label>
+      <label class="ra-l" style="flex-direction:row;align-items:center;gap:8px;margin-top:12px">Envoyé <input type="number" id="raDelai" min="1" max="900" step="1" style="width:64px"> <select id="raDelaiU" hidden style="display:none" onchange="raDelaiUnite()"><option value="s">secondes</option><option value="m">minutes</option></select><span id="raSeg" style="display:inline-flex;border:1px solid #d5d9e0;border-radius:9px;overflow:hidden;background:#fff"><button type="button" data-u="s" onclick="raUnite('s')" style="border:0;background:none;padding:7px 14px;font:600 12.5px Inter,system-ui,sans-serif;color:#646D7C;cursor:pointer">secondes</button><button type="button" data-u="m" onclick="raUnite('m')" style="border:0;border-left:1px solid #d5d9e0;background:none;padding:7px 14px;font:600 12.5px Inter,system-ui,sans-serif;color:#646D7C;cursor:pointer">minutes</button></span> après la demande</label>
       <div class="ra-bloc" style="display:none">
         <div class="ra-t">Avec devis joint</div>
         <label class="ra-l">Objet<input type="text" id="raDevisObjet" maxlength="150"></label>
@@ -2888,9 +2888,11 @@ function raMajEtats(){
 }
 function raBascule(){ raMajEtats(); if(_raPret) raEnregistrer(); }
 /* délai de l'accusé : enregistré en secondes, affiché en secondes ou en minutes */
-function raDelaiPoser(sec){ sec = Number(sec) || 30; const u = document.getElementById('raDelaiU'), n = document.getElementById('raDelai'); if(sec >= 120 && sec % 60 === 0){ u.value = 'm'; n.value = sec/60; } else { u.value = 's'; n.value = sec; } }
+function raDelaiPoser(sec){ sec = Number(sec) || 30; const u = document.getElementById('raDelaiU'), n = document.getElementById('raDelai'); if(sec >= 120 && sec % 60 === 0){ u.value = 'm'; n.value = sec/60; } else { u.value = 's'; n.value = sec; } ; raSegMaj(); }
 function raDelaiLire(){ const v = Number(document.getElementById('raDelai').value) || 30; return Math.min(900, Math.max(10, Math.round(v * (document.getElementById('raDelaiU').value === 'm' ? 60 : 1)))); }
-function raDelaiUnite(){ raDelaiPoser(raDelaiLire()); }
+function raSegMaj(){ const u = document.getElementById('raDelaiU'); if(!u) return; document.querySelectorAll('#raSeg button').forEach(b => { const on = b.dataset.u === u.value; b.style.background = on ? '#2B4A6B' : 'none'; b.style.color = on ? '#fff' : '#646D7C'; }); }
+function raUnite(x){ const u = document.getElementById('raDelaiU'); u.value = x; raDelaiUnite(); raSegMaj(); }
+function raDelaiUnite(){ raDelaiPoser(raDelaiLire()); raSegMaj(); }
 async function raCharger(){
   raMsg('Chargement…');
   try{
