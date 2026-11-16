@@ -26,10 +26,11 @@
   window.montantOrgaDefaut = function(id){ var m = lire()[id]; return m && Number(m.orga) > 0 ? Number(m.orga) : 0; };
 
   /* ── fonds de tiers : lignes à reverser ── */
-  function lignesTiers(){
+  function lignesTiers(periode){
     var out = [];
     (window.R || []).forEach(function(r){
       if (r._deleted) return;
+      if (periode && !periode(r.dateStart)) return;   /* uniquement la période affichée (mois, trimestre…) */
       (r.supplements || []).forEach(function(x, i){
         if (!x || !x.tiers) return;
         out.push({ r: r, i: i, id: x.prestataire || '', montant: Number(x.prix) || 0, reverse: x.reverse === true, date: x.reverseDate || '' });
@@ -57,14 +58,14 @@
   };
 
   window.fondsTiersHTML = function(){
-    var l = lignesTiers(), par = {};
+    var l = lignesTiers(typeof window._caInPeriod === 'function' ? window._caInPeriod : null), par = {};
     l.forEach(function(t){ var p = par[t.id] = par[t.id] || { aRev: 0, rev: 0, n: 0 }; if (t.reverse) p.rev += t.montant; else p.aRev += t.montant; p.n++; });
     var ids = Object.keys(par);
     var h = '<div id="fonds-tiers" style="background:#fff;border:1px solid #eee8dc;border-radius:14px;padding:18px 20px;margin-bottom:14px">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">'
       + '<div style="font:700 11px Inter,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8a8f98">Fonds de tiers à reverser</div>'
       + '<div style="display:flex;gap:8px"><button class="dp-b sup" onclick="ouvrirMandats()">Mandats</button><button class="dp-b sup" onclick="exporterFondsTiers()">Export CSV</button></div></div>';
-    if (!ids.length) return h + '<div style="font:13px Inter,system-ui,sans-serif;color:#8a8f98">Aucune prestation de prestataire partenaire.</div></div>';
+    if (!ids.length) return h + '<div style="font:13px Inter,system-ui,sans-serif;color:#8a8f98">Aucune prestation de prestataire partenaire sur cette période.</div></div>';
     ids.forEach(function(id){
       var p = par[id];
       h += '<div style="padding:10px 0;border-top:1px solid #f1ede3">'
