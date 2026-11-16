@@ -140,3 +140,7 @@ html,body,#app{height:100dvh}
 .noel-on #s-merci,.noel-on #s-accueil{padding-bottom:calc(min(15vh,150px) + 3vh)}
 .adm-chk{flex-direction:row!important;align-items:center;gap:10px!important;font-size:13px!important;color:#cdd8e6!important;font-weight:500!important}
 .adm-chk input{width:20px;height:20px;padding:0;flex:none;accent-color:var(--or)}
+
+/* format story 9:16 : l'image remplit l'écran ; en 3:4 elle reste entière */
+#v-live,#v-revoir{object-fit:cover}
+.fmt34 #v-live,.fmt34 #v-revoir{object-fit:contain}
