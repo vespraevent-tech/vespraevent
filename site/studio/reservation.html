@@ -1197,10 +1197,10 @@ var P=[
   ['Ventilateur événementiel','barnum',10,['Standard'],'Ventilateur'],
   ['Chauffage','barnum',null,['Sur devis'],'Chauffage'],
   ['Mange-debout housse blanche','barnum',10,['Standard'],'Mange-debout'],
-  ['Mini bounce crocodile','animation',80,['Standard'],'Mini bounce'],
-  ['Bouncedome gonflable avec toboggan Amazone Safari','animation',100,['Standard'],'Bouncedome'],
-  ['Multiplay château gonflable Dinoworld','animation',150,['Standard'],'Dinoworld'],
-  ['Château gonflable Multiplay Summer Party','animation',150,['Standard'],'Summer Party'],
+  ['Mini château gonflable crocodile','animation',80,['Standard'],'Mini château'],
+  ['Château gonflable Safari','animation',100,['Standard'],'Château safari'],
+  ['Château gonflable Dino World','animation',150,['Standard'],'Château dino'],
+  ['Château gonflable Summer Party','animation',150,['Standard'],'Château summer'],
   ['Vidéoprojecteur','sono',20,['Vidéoprojecteur seul (sans écran)','Vidéoprojecteur + écran de projection'],'Vidéoprojecteur',
     {'Vidéoprojecteur seul (sans écran)':20,'Vidéoprojecteur + écran de projection':30}],
   ['Écran de projection','sono',10,['Standard'],'Écran'],
@@ -5495,7 +5495,7 @@ function pkCatsSite(p){
   if(/^Boîte de nuit/.test(n)) return ['Animation','Barnums'];
   if(n==='Baby-foot'||n==='Jeux en bois'||n==='Pack karaoké') return ['Animation'];
   if(/^Mange-debout/.test(n)) return ['Barnums','Restauration'];
-  if(/^(Mini bounce|Bouncedome|Multiplay|Château)/.test(n)) return ['Chateaux','Animation'];
+  if(/^(Mini château|Mini bounce|Bouncedome|Multiplay|Château)/.test(n)) return ['Chateaux','Animation'];
   if(n==='Chauffage') return ['Confort'];
   if(/^(Barnum|Tente|Buvette)/.test(n)) return ['Barnums'];
   if(/^(Pack Vespra|Sono|Caisson|Micro|Vidéoprojecteur|Écran de projection)/.test(n)) return ['Son'];

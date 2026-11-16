@@ -345,6 +345,8 @@
       .replace(/\b\d+\s*[x\u00d7]\s*\d+\s*m?\b/gi, '').replace(/\u00d8\s*\d+\s*m\b/gi, '')
       .replace(/\b\d+\s*(?:personnes?|pers\.?|tirages?|photos?|canons?|spots?|machines?|m)\b/gi, '')
       .replace(/\s{2,}/g, ' ').replace(/[\s.,;:\u00b7-]+$/, '').trim();
+    var ch = /^(mini )?ch[\u00e2a]teau gonflable\s+(.*)$/i.exec(n);
+    if (ch) return (ch[1] ? 'Mini ch\u00e2teau' : 'Ch\u00e2teau') + (ch[2] && !ch[1] ? ' ' + ch[2] : '');
     if (/^Sono(risation)?\b/i.test(n)) return 'Sono';
     return n || 'Produit';
   }

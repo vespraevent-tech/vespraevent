@@ -587,7 +587,7 @@ window.VESPRA_PRIX_REGISTRE = [
   },
   {
     "i": "chateau-gonflable-1",
-    "n": "Mini bounce crocodile",
+    "n": "Mini château gonflable crocodile",
     "v": "",
     "p": 80,
     "pg": "produit-mini-bounce-crocodile.html",
@@ -597,7 +597,7 @@ window.VESPRA_PRIX_REGISTRE = [
   },
   {
     "i": "chateau-gonflable-2",
-    "n": "Bouncedome gonflable avec toboggan Amazone Safari",
+    "n": "Château gonflable Safari",
     "v": "",
     "p": 100,
     "pg": "produit-bouncedome-amazone-safari.html",
@@ -607,7 +607,7 @@ window.VESPRA_PRIX_REGISTRE = [
   },
   {
     "i": "chateau-gonflable-3",
-    "n": "Multiplay château gonflable Dinoworld",
+    "n": "Château gonflable Dino World",
     "v": "",
     "p": 150,
     "pg": "produit-chateau-dinoworld.html",
@@ -617,7 +617,7 @@ window.VESPRA_PRIX_REGISTRE = [
   },
   {
     "i": "chateau-gonflable-4",
-    "n": "Château gonflable Multiplay Summer Party",
+    "n": "Château gonflable Summer Party",
     "v": "",
     "p": 150,
     "pg": "produit-chateau-summer-party.html",
@@ -1539,7 +1539,7 @@ window.VESPRA_PRODUITS = [
   {
     "id": "p54",
     "ref": "p54",
-    "nom": "Mini bounce crocodile",
+    "nom": "Mini château gonflable crocodile",
     "cat": "Châteaux gonflables",
     "cats": [
       "Châteaux gonflables",
@@ -1558,13 +1558,13 @@ window.VESPRA_PRODUITS = [
   {
     "id": "p55",
     "ref": "p55",
-    "nom": "Bouncedome gonflable avec toboggan Amazone Safari",
+    "nom": "Château gonflable Safari",
     "cat": "Châteaux gonflables",
     "cats": [
       "Châteaux gonflables",
       "Animations"
     ],
-    "desc": "Bouncedome gonflable sur le thème de la jungle, avec toboggan : un dôme couvert, des animaux et un explorateur, pour un anniversaire d'enfants qui sort de l'ordinaire.",
+    "desc": "Château gonflable sur le thème de la jungle, avec toboggan : un dôme couvert, des animaux et un explorateur, pour un anniversaire d'enfants qui sort de l'ordinaire.",
     "img": "chateau-bouncedome-amazone-safari.webp",
     "imgCat": "chateau-bouncedome-amazone-safari.webp",
     "page": "produit-bouncedome-amazone-safari.html",
@@ -1577,7 +1577,7 @@ window.VESPRA_PRODUITS = [
   {
     "id": "p56",
     "ref": "p56",
-    "nom": "Multiplay château gonflable Dinoworld",
+    "nom": "Château gonflable Dino World",
     "cat": "Châteaux gonflables",
     "cats": [
       "Châteaux gonflables",
@@ -1596,7 +1596,7 @@ window.VESPRA_PRODUITS = [
   {
     "id": "p57",
     "ref": "p57",
-    "nom": "Château gonflable Multiplay Summer Party",
+    "nom": "Château gonflable Summer Party",
     "cat": "Châteaux gonflables",
     "cats": [
       "Châteaux gonflables",
@@ -4242,23 +4242,23 @@ window.VESPRA_MEDIAS = {
     "photos": [
       {
         "s": "chateau-mini-bounce-crocodile.webp",
-        "a": "Mini bounce crocodile"
+        "a": "Mini château gonflable crocodile"
       },
       {
         "s": "chateau-mini-bounce-crocodile-2.webp",
-        "a": "Mini bounce crocodile — gros plan sur la gueule et le toboggan"
+        "a": "Mini château gonflable crocodile — gros plan sur la gueule et le toboggan"
       },
       {
         "s": "chateau-mini-bounce-crocodile-3.webp",
-        "a": "Mini bounce crocodile — vue de face"
+        "a": "Mini château gonflable crocodile — vue de face"
       },
       {
         "s": "chateau-mini-bounce-crocodile-4.webp",
-        "a": "Mini bounce crocodile — l'aire de saut vue du dessus"
+        "a": "Mini château gonflable crocodile — l'aire de saut vue du dessus"
       },
       {
         "s": "chateau-mini-bounce-crocodile-5.webp",
-        "a": "Mini bounce crocodile — l'intérieur : parois et filets"
+        "a": "Mini château gonflable crocodile — l'intérieur : parois et filets"
       }
     ],
     "options": {},
@@ -4268,35 +4268,35 @@ window.VESPRA_MEDIAS = {
     "photos": [
       {
         "s": "chateau-bouncedome-amazone-safari.webp",
-        "a": "Bouncedome gonflable avec toboggan Amazone Safari"
+        "a": "Château gonflable Safari"
       },
       {
         "s": "chateau-bouncedome-amazone-safari-2.webp",
-        "a": "Bouncedome gonflable avec toboggan Amazone Safari — vue de face"
+        "a": "Château gonflable Safari — vue de face"
       },
       {
         "s": "chateau-bouncedome-amazone-safari-3.webp",
-        "a": "Bouncedome gonflable avec toboggan Amazone Safari — vue de l'autre côté"
+        "a": "Château gonflable Safari — vue de l'autre côté"
       },
       {
         "s": "chateau-bouncedome-amazone-safari-4.webp",
-        "a": "Bouncedome gonflable avec toboggan Amazone Safari — le décor : l'explorateur"
+        "a": "Château gonflable Safari — le décor : l'explorateur"
       },
       {
         "s": "chateau-bouncedome-amazone-safari-5.webp",
-        "a": "Bouncedome gonflable avec toboggan Amazone Safari — l'enseigne Amazone Safari"
+        "a": "Château gonflable Safari — l'enseigne Amazone Safari"
       },
       {
         "s": "chateau-bouncedome-amazone-safari-6.webp",
-        "a": "Bouncedome gonflable avec toboggan Amazone Safari — l'intérieur du dôme"
+        "a": "Château gonflable Safari — l'intérieur du dôme"
       },
       {
         "s": "chateau-bouncedome-amazone-safari-7.webp",
-        "a": "Bouncedome gonflable avec toboggan Amazone Safari — le décor intérieur : la jeep"
+        "a": "Château gonflable Safari — le décor intérieur : la jeep"
       },
       {
         "s": "chateau-bouncedome-amazone-safari-8.webp",
-        "a": "Bouncedome gonflable avec toboggan Amazone Safari — le toboggan"
+        "a": "Château gonflable Safari — le toboggan"
       }
     ],
     "options": {},
@@ -4306,43 +4306,43 @@ window.VESPRA_MEDIAS = {
     "photos": [
       {
         "s": "chateau-dinoworld.webp",
-        "a": "Multiplay château gonflable Dinoworld"
+        "a": "Château gonflable Dino World"
       },
       {
         "s": "chateau-dinoworld-2.webp",
-        "a": "Multiplay château gonflable Dinoworld — installé en extérieur"
+        "a": "Château gonflable Dino World — installé en extérieur"
       },
       {
         "s": "chateau-dinoworld-3.webp",
-        "a": "Multiplay château gonflable Dinoworld — vue de face en extérieur"
+        "a": "Château gonflable Dino World — vue de face en extérieur"
       },
       {
         "s": "chateau-dinoworld-4.webp",
-        "a": "Multiplay château gonflable Dinoworld — le dinosaure en façade"
+        "a": "Château gonflable Dino World — le dinosaure en façade"
       },
       {
         "s": "chateau-dinoworld-5.webp",
-        "a": "Multiplay château gonflable Dinoworld — le décor : dinosaure"
+        "a": "Château gonflable Dino World — le décor : dinosaure"
       },
       {
         "s": "chateau-dinoworld-6.webp",
-        "a": "Multiplay château gonflable Dinoworld — l'intérieur : décor de jungle"
+        "a": "Château gonflable Dino World — l'intérieur : décor de jungle"
       },
       {
         "s": "chateau-dinoworld-7.webp",
-        "a": "Multiplay château gonflable Dinoworld — l'entrée intérieure"
+        "a": "Château gonflable Dino World — l'entrée intérieure"
       },
       {
         "s": "chateau-dinoworld-8.webp",
-        "a": "Multiplay château gonflable Dinoworld — les obstacles"
+        "a": "Château gonflable Dino World — les obstacles"
       },
       {
         "s": "chateau-dinoworld-9.webp",
-        "a": "Multiplay château gonflable Dinoworld — les obstacles gonflables"
+        "a": "Château gonflable Dino World — les obstacles gonflables"
       },
       {
         "s": "chateau-dinoworld-10.webp",
-        "a": "Multiplay château gonflable Dinoworld — le toboggan vu de dessus"
+        "a": "Château gonflable Dino World — le toboggan vu de dessus"
       }
     ],
     "options": {},
@@ -4352,31 +4352,31 @@ window.VESPRA_MEDIAS = {
     "photos": [
       {
         "s": "chateau-summer-party.webp",
-        "a": "Château gonflable Multiplay Summer Party"
+        "a": "Château gonflable Summer Party"
       },
       {
         "s": "chateau-summer-party-2.webp",
-        "a": "Château gonflable Multiplay Summer Party — vue de face"
+        "a": "Château gonflable Summer Party — vue de face"
       },
       {
         "s": "chateau-summer-party-3.webp",
-        "a": "Château gonflable Multiplay Summer Party — vue de côté"
+        "a": "Château gonflable Summer Party — vue de côté"
       },
       {
         "s": "chateau-summer-party-4.webp",
-        "a": "Château gonflable Multiplay Summer Party — les personnages du toit"
+        "a": "Château gonflable Summer Party — les personnages du toit"
       },
       {
         "s": "chateau-summer-party-5.webp",
-        "a": "Château gonflable Multiplay Summer Party — l'aire de jeu vue du dessus"
+        "a": "Château gonflable Summer Party — l'aire de jeu vue du dessus"
       },
       {
         "s": "chateau-summer-party-6.webp",
-        "a": "Château gonflable Multiplay Summer Party — les obstacles colorés"
+        "a": "Château gonflable Summer Party — les obstacles colorés"
       },
       {
         "s": "chateau-summer-party-7.webp",
-        "a": "Château gonflable Multiplay Summer Party — le toboggan"
+        "a": "Château gonflable Summer Party — le toboggan"
       }
     ],
     "options": {},
