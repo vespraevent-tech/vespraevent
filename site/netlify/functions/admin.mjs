@@ -40,6 +40,7 @@ import { createHmac, timingSafeEqual, createHash, randomUUID, randomBytes, rando
    introuvable au moment de l'exécution et TOUTE modification depuis le
    back-office échouerait. */
 import { getStore, stockageActif, stats as stockStats } from './_stockage.mjs';
+import { videoStore, envoyerMail as vbEnvoyerMail } from './videobooth.mjs';
 import * as secu from './_sauvegarde.mjs';
 /* Fabrication du PDF de facture : écrite à la main, sans dépendance,
    pour la même raison que la bibliothèque Blobs est jointe au dossier. */
@@ -2336,6 +2337,45 @@ const gestionnaire = async (request) => {
   }
 
   /* ── Sauvegardes et récupération ──────────────────────────────── */
+  /* ── Vidéobooth : vidéos reçues de la tablette ── */
+  if (path === '/videobooth' || path === '/videobooth/video') {
+    try {
+      const st = videoStore();
+      if (path === '/videobooth/video' && request.method === 'GET') {
+        const id = String(url.searchParams.get('id') || '').replace(/[^A-Za-z0-9_-]/g, '');
+        const m = await st.get('meta/' + id, { type: 'json' }).catch(() => null);
+        const buf = m && await st.get('video/' + id, { type: 'arrayBuffer' }).catch(() => null);
+        if (!buf) return json({ error: 'Vidéo introuvable ou expirée' }, 404);
+        return new Response(buf, { headers: { 'Content-Type': m.type || 'video/mp4', 'Content-Disposition': `attachment; filename="${String(m.fichier).replace(/"/g, '')}"`, 'Cache-Control': 'private, no-store' } });
+      }
+      if (request.method === 'GET') {
+        const { blobs } = await st.list({ prefix: 'meta/' });
+        const liste = [];
+        for (const b of blobs) { const m = await st.get(b.key, { type: 'json' }).catch(() => null); if (m) liste.push(m); }
+        liste.sort((a, b) => String(b.cree).localeCompare(String(a.cree)));
+        return json({ videos: liste, cle: !!process.env.VIDEOBOOTH_CLE });
+      }
+      if (request.method === 'POST') {
+        let body = {}; try { body = await request.json(); } catch {}
+        const id = String(body.id || '').replace(/[^A-Za-z0-9_-]/g, '');
+        const m = await st.get('meta/' + id, { type: 'json' }).catch(() => null);
+        if (!m) return json({ error: 'Vidéo introuvable' }, 404);
+        if (body.email && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(body.email))) m.email = String(body.email).trim();
+        const buf = await st.get('video/' + id, { type: 'arrayBuffer' }).catch(() => null);
+        if (!buf) return json({ error: 'Fichier vidéo expiré' }, 410);
+        const site = (process.env.URL || 'https://www.vespraevent.fr').replace(/\/$/, '');
+        const r = await vbEnvoyerMail(m, buf, site);
+        m.mail = r.ok ? 'envoye' : 'erreur'; m.mailErreur = r.erreur || ''; m.pj = !!r.pj; m.renvoye = new Date().toISOString();
+        await st.setJSON('meta/' + id, m);
+        return json({ ok: r.ok, erreur: r.erreur || '', video: m });
+      }
+      if (request.method === 'DELETE') {
+        const id = String(url.searchParams.get('id') || '').replace(/[^A-Za-z0-9_-]/g, '');
+        await st.delete('video/' + id).catch(() => {}); await st.delete('meta/' + id).catch(() => {});
+        return json({ ok: true });
+      }
+    } catch (e) { return json({ error: e.message }, 500); }
+  }
   if (path === '/sauvegardes' && request.method === 'GET') {
     try {
       const [sauvegardes, corbeille] = await Promise.all([secu.listerSauvegardes(), secu.listerCorbeille()]);

@@ -30,6 +30,7 @@ const PJ_MAX = 18 * 1024 * 1024;
 const idOk = (s) => /^[A-Za-z0-9_-]{6,60}$/.test(s || '');
 const jeton = (id) => createHmac('sha256', process.env.VIDEOBOOTH_CLE || '').update('vb:' + id).digest('hex').slice(0, 32);
 const store = () => getStore('videobooth');
+export const videoStore = store;
 
 async function nettoyer(st) {
   try {
@@ -66,6 +67,8 @@ async function envoyerMail(m, octets, site) {
   if (!r.ok) { const t = await r.text(); console.error('Videobooth : Resend a refusé', r.status, t); return { ok: false, erreur: 'Service e-mail : ' + r.status }; }
   return { ok: true, pj };
 }
+
+export { envoyerMail, jeton, GARDE_JOURS };
 
 export default async (request) => {
   if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
