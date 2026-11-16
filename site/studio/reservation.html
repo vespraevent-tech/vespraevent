@@ -1604,9 +1604,29 @@ function pctAcompte(r){
   }catch(e){}
   return p>=1&&p<=100?p:30;
 }
-function fraisLMAcompte(r){ return r&&r.acompte===true ? Math.round(fraisLMRes(r)*pctAcompte(r))/100 : 0; }
+/* Montant d'acompte : une fois reçu, il est FIGÉ (r.acompteMontant) et ne suit plus les ajouts/retraits faits ensuite.
+   Avant réception, ou sans montant figé, il se calcule : total × pourcentage. */
+function acompteCalcule(r){ return Math.round(calcResTotal(r)*pctAcompte(r))/100; }
+function acompteAttendu(r){
+  if(!r) return 0;
+  var f=Number(r.acompteMontant);
+  if(r.acompte===true && f>0) return f;
+  if(r.acompte===true && Number(r.devisAcompte)>0) return Number(r.devisAcompte);
+  return acompteCalcule(r);
+}
+/* fige le montant reçu au niveau actuel (appelé AVANT une modification de la réservation) */
+function figerAcompte(r){
+  if(r && r.acompte===true && !(Number(r.acompteMontant)>0)){ r.acompteMontant=acompteAttendu(r); }
+}
+/* pourcentage réel du montant figé (pour répartir frais de livraison / tiers) */
+function pctEffAcompte(r){
+  var t=calcResTotal(r);
+  if(r && r.acompte===true && Number(r.acompteMontant)>0 && t>0) return Math.min(100,Number(r.acompteMontant)/t*100);
+  return pctAcompte(r);
+}
+function fraisLMAcompte(r){ return r&&r.acompte===true ? Math.round(fraisLMRes(r)*pctEffAcompte(r))/100 : 0; }
 /* part « fonds de tiers » (prestataires partenaires) : encaissée mais jamais du CA ni de la TVA */
-function tiersAcompte(r){ return r&&r.acompte===true ? Math.round(caTiers(r)*pctAcompte(r))/100 : 0; }
+function tiersAcompte(r){ return r&&r.acompte===true ? Math.round(caTiers(r)*pctEffAcompte(r))/100 : 0; }
 function tiersSolde(r){ return Math.round((caTiers(r)-tiersAcompte(r))*100)/100; }
 function fraisLMSolde(r){ return Math.round((fraisLMRes(r)-fraisLMAcompte(r))*100)/100; }
 function calcResTotal(r){
@@ -1680,7 +1700,7 @@ function chargeTvaCents(f,period){
 }
 function chargesTvaPeriode(list,period){var t=0;list.forEach(function(f){t+=chargeTvaCents(f,period);});return t/100;}
 function acompteDateRes(r){ return (r && (r.acompteDate || r.dateStart)) || ''; }
-function acompteRes(r){ return r && r.acompte===true ? Math.round(calcResTotal(r)*pctAcompte(r))/100 : 0; }
+function acompteRes(r){ return r && r.acompte===true ? acompteAttendu(r) : 0; }
 function resteRes(r){ return Math.round((calcResTotal(r)-acompteRes(r))*100)/100; }
 /* Libellés des fiches : « PB1 300 photos », « Pack Vespra 180 personnes ».
    La formule (300 photos, 180 personnes…) fait partie du nom du produit :
@@ -3399,20 +3419,23 @@ window.basculerVirement=function(id){
 /* Interrupteur « acompte reçu » : vert, bouton à gauche = reçu ; rouge, bouton à droite = pas encore reçu */
 window.acompteSwitch=function(r){
   var ok=r.acompte===true;
-  var montant=Math.round(calcResTotal(r)*pctAcompte(r))/100;
+  var montant=acompteAttendu(r);
   var note=(Number(r.devisAcompte)>0)
     ? '<div style="font:400 11px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;color:#9aa0ab;margin:0 0 6px">(devis g\u00e9n\u00e9r\u00e9 avec une demande d\u2019acompte)</div>' : '';
   return '<div id="acZone">'+note+'<button type="button" id="acSwitch" role="switch" aria-checked="'+ok+'" aria-label="Acompte re\u00e7u" onclick="basculerAcompteRecu(\''+String(r.id).replace(/'/g,'')+'\')" '
     +'style="cursor:pointer;display:inline-flex;align-items:center;gap:9px;background:none;border:0;padding:0;font:600 12.5px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;color:'+(ok?'#2f7a3a':'#b5392c')+'">'
     +'<span style="position:relative;width:38px;height:22px;border-radius:11px;flex-shrink:0;transition:background .2s;background:'+(ok?'#3fa653':'#d9493b')+'">'
     +'<span style="position:absolute;top:3px;'+(ok?'left:19px':'left:3px')+';width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .2s"></span></span>'
-    +'<span>'+(ok?'Acompte re\u00e7u':'Acompte non re\u00e7u')+(montant>0?' \u2014 '+montant.toLocaleString('fr-FR')+' \u20ac':'')+'</span></button></div>';
+    +'<span>'+(ok?'Acompte re\u00e7u':'Acompte non re\u00e7u')+(montant>0?' \u2014 '+montant.toLocaleString('fr-FR')+' \u20ac':'')+'</span></button>'
+    +(ok?' <button type="button" onclick="modifierMontantAcompte(\''+String(r.id).replace(/'/g,'')+'\')" style="margin-left:10px;background:none;border:0;padding:0;cursor:pointer;font:500 11.5px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;color:#7a808c;text-decoration:underline">modifier le montant</button>':'')
+    +'</div>';
 };
 window.basculerAcompteRecu=function(id){
   var r=R.find(function(x){return String(x.id)===String(id);});
   if(!r)return;
   r.acompte=!(r.acompte===true);
-  if(r.acompte===true) r.acompteDate=new Date().toISOString().slice(0,10); else delete r.acompteDate;
+  if(r.acompte===true){ r.acompteDate=new Date().toISOString().slice(0,10); delete r.acompteMontant; r.acompteMontant=acompteAttendu(r); }
+  else { delete r.acompteDate; delete r.acompteMontant; }
   localStorage.setItem('vespraR',JSON.stringify(R));
   if(typeof fbPutRes==='function')fbPutRes(r);
   var b=document.getElementById('acZone');
@@ -3420,6 +3443,21 @@ window.basculerAcompteRecu=function(id){
   /* le total du dessous (acompte vers\u00e9, reste \u00e0 payer) suit */
   var dp=document.getElementById('dpZone');
   if(dp)dp.outerHTML=detailPrixHTML(r);
+};
+
+/* corriger à la main le montant réellement reçu */
+window.modifierMontantAcompte=function(id){
+  var r=R.find(function(x){return String(x.id)===String(id);});
+  if(!r)return;
+  var v=prompt('Montant de l\u2019acompte r\u00e9ellement re\u00e7u (en \u20ac) :',String(acompteAttendu(r)).replace('.',','));
+  if(v===null)return;
+  var n=parseFloat(String(v).replace(/\s/g,'').replace(',','.'));
+  if(!(n>0)){alert('Montant invalide.');return;}
+  r.acompteMontant=Math.round(n*100)/100;
+  localStorage.setItem('vespraR',JSON.stringify(R));
+  if(typeof fbPutRes==='function')fbPutRes(r);
+  var b=document.getElementById('acZone');if(b)b.outerHTML=acompteSwitch(r);
+  var dp=document.getElementById('dpZone');if(dp)dp.outerHTML=detailPrixHTML(r);
 };
 
 /* Liste de tous les acomptes reçus : qui, pour quel événement, quand, combien */
@@ -4229,7 +4267,7 @@ function buildAcomptesHtml(){
     allAcomptes.forEach(function(r){
       var y=r.dateStart?r.dateStart.slice(0,4):'?';
       if(!byYear[y])byYear[y]={count:0,total:0,acompte:0};
-      var montant=calcResTotal(r);var a30=Math.round(montant*pctAcompte(r))/100;
+      var montant=calcResTotal(r);var a30=acompteAttendu(r);
       byYear[y].count++;byYear[y].total+=montant;byYear[y].acompte+=a30;
       totalAcomptes+=a30;
     });
@@ -4256,7 +4294,7 @@ function buildAcomptesHtml(){
     allAcomptes.forEach(function(r){
       var m=r.dateStart?r.dateStart.slice(0,7):'?';
       if(!byMonth[m])byMonth[m]={count:0,total:0,acompte:0};
-      var montant=calcResTotal(r);var a30=Math.round(montant*pctAcompte(r))/100;
+      var montant=calcResTotal(r);var a30=acompteAttendu(r);
       byMonth[m].count++;byMonth[m].total+=montant;byMonth[m].acompte+=a30;
       totalAcomptes+=a30;
     });
@@ -4283,7 +4321,7 @@ function buildAcomptesHtml(){
     // Vue détail : toutes les réservations
     var acompteRes=allAcomptes;
     rows=acompteRes.map(function(r){
-      var montant=calcResTotal(r);var acompte30=Math.round(montant*pctAcompte(r))/100;
+      var montant=calcResTotal(r);var acompte30=acompteAttendu(r);
       totalAcomptes+=acompte30;
       var d1=r.dateStart?new Date(r.dateStart).toLocaleDateString('fr-FR'):'';
       var d2=r.dateEnd&&r.dateEnd!==r.dateStart?new Date(r.dateEnd).toLocaleDateString('fr-FR'):'';
@@ -6083,6 +6121,7 @@ document.getElementById('saveM').onclick=function(){
     var idx=R.findIndex(function(x){return String(x.id)===String(currentDetailId);});
     if(idx>-1){
       var _vb=(document.getElementById('validated-by')||{value:'Thomas'}).value||'Thomas';
+      try{ figerAcompte(R[idx]); }catch(e){}
       var _avantR=JSON.parse(JSON.stringify(R[idx]));
       R[idx]=Object.assign(R[idx],{
         client:client,phone:document.getElementById('phone').value.trim(),email:document.getElementById('email').value.trim(),
@@ -6468,7 +6507,7 @@ function detailPrixHTML(r){
   try{ if(typeof recapPrestaHTML==='function') lignes+=recapPrestaHTML(r); if(typeof mandatLienHTML==='function') lignes+=mandatLienHTML(r); }catch(e){}
   lignes+='<div class="dp-l" style="justify-content:flex-start"><button class="dp-b sup" style="font-weight:600" onclick="ajouterSupplement(\''+r.id+'\')">+ Ajouter une prestation</button></div>';
   var total = loc+liv+mon+sup;
-  var acc = (r.acompte===true) ? Math.round(total*pctAcompte(r))/100 : 0;
+  var acc = (r.acompte===true) ? acompteAttendu(r) : 0;
   var bas = '<div class="dp-l dp-t"><span class="dp-n">Total</span>'
     +'<span class="dp-v">'+euroFr(total)+'</span></div>';
   if(acc>0){
@@ -6743,7 +6782,7 @@ function openDetail(id) {
     if(row.val==='ACOMPTE_SWITCH'){
       val=acompteSwitch(r);
     } else if(row.val==='ACOMPTE_BADGE'){
-      var acompteMontant=Math.round(calcResTotal(r)*pctAcompte(r))/100;
+      var acompteMontant=acompteAttendu(r);
       val=r.acompte?'<span style="display:inline-flex;align-items:center;gap:6px;background:#f0f7ee;border:1px solid #b8d8b4;border-radius:8px;padding:6px 12px;font:600 13px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;color:#3d6e36">✅ Versé — '+acompteMontant.toLocaleString('fr-FR')+' €</span>':'<span style="display:inline-flex;align-items:center;gap:6px;background:#fdf4f3;border:1px solid #f0c8c0;border-radius:8px;padding:6px 12px;font:600 13px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;color:#b5533c">❌ Non versé</span>';
     } else if(row.val==='TOTAL_BADGE'){
       val='<span style="font:700 18px Poppins,system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--navy)">'+resTotal.toLocaleString('fr-FR')+' €</span>';

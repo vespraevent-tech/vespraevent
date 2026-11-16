@@ -4325,7 +4325,11 @@ function acompteBlocHTML(d, r, modeForce){
   }
   cartes.forEach(c => { total += c.total; });
   autres.forEach(x => { total += x.prix; });
-  const montant = total > 0 ? Math.round(total*(Number(d.devisAcomptePct)>=1&&Number(d.devisAcomptePct)<=100?Number(d.devisAcomptePct):30))/100 : (demande > 0 ? demande : 0);
+  let montant = total > 0 ? Math.round(total*(Number(d.devisAcomptePct)>=1&&Number(d.devisAcomptePct)<=100?Number(d.devisAcomptePct):30))/100 : (demande > 0 ? demande : 0);
+  /* acompte déjà reçu : le montant est figé, il ne suit plus les ajouts faits ensuite */
+  const _fige = r && r.acompte === true ? Number(r.acompteMontant) : 0;
+  window._acMontantFiche = {id: String((r && r.id) || (d && d.id) || ''), montant: montant};
+  if(_fige > 0) montant = _fige;
 
   const interrupteur =
     '<button type="button" role="switch" aria-checked="' + recu + '" aria-label="Acompte reçu" ' +
@@ -4574,7 +4578,14 @@ async function basculerAcompte(id, mode, val){
   const redessiner = () => { if(mode === 'resa') ficheResa(id); else if(d) ficheDemande(d.id); };
   /* le total se met à jour tout de suite ; l'enregistrement suit derrière */
   if(d) d.acompteRecu = val;
-  if(r){ r.acompte = val; if(val) r.acompteDate = new Date().toISOString().slice(0,10); else delete r.acompteDate; }
+  if(r){
+    r.acompte = val;
+    if(val){
+      r.acompteDate = new Date().toISOString().slice(0,10);
+      const f = window._acMontantFiche;
+      if(f && f.montant > 0 && (f.id === String(r.id) || (d && f.id === String(d.id)))) r.acompteMontant = f.montant;
+    }else{ delete r.acompteDate; delete r.acompteMontant; }
+  }
   redessiner();
   try{
     if(r) await api('/data', {method:'POST', body: JSON.stringify({collection:'reservations', item:{id:String(r.id), d:JSON.stringify(r)}})});
