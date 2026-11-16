@@ -5094,9 +5094,10 @@ function prixUnitaire(l, ancien){
     (l.options||[]).forEach(nom => {
       const q = qteOption(nom);
       const o = (p.options||[]).find(o => memeOption(o.nom, q.base));
-      if(o && !o.devis){
+      if(o){
         const ov = l.optPrix && l.optPrix[o.nom] != null ? Number(l.optPrix[o.nom]) : NaN;
-        base += (isFinite(ov) ? ov : (Number(o.prix)||0)) * q.n;
+        /* option « sur devis » : 0 tant que le prix n'est pas saisi à la main */
+        base += (isFinite(ov) ? ov : (o.devis ? 0 : (Number(o.prix)||0))) * q.n;
       }
     });
   } else {
@@ -5200,8 +5201,8 @@ function mdRendre(){
           return '<label class="md-o' + (on ? ' on' : '') + '">' +
             '<input type="checkbox"' + (on ? ' checked' : '') +
             ' onchange="mdOption(' + i + ', \'' + escAttr(o.nom) + '\', this.checked)">' +
-            esc(o.nom) + (o.devis ? '<b>sur devis</b>'
-              : (on ? '<span class="md-opp">+ <input type="text" inputmode="decimal" class="md-opin' + (l.optPrix && l.optPrix[o.nom] != null ? ' forc' : '') + '" value="' + escVal(String(l.optPrix && l.optPrix[o.nom] != null ? l.optPrix[o.nom] : (Number(o.prix)||0)).replace('.', ',')) + '" aria-label="Prix de l\'option" onclick="event.stopPropagation()" onchange="mdPrixOpt(' + i + ', \'' + escAttr(o.nom) + '\', this.value)"> €</span>'
+            esc(o.nom) + (o.devis && !on ? '<b>sur devis</b>'
+              : (on ? '<span class="md-opp">+ <input type="text" inputmode="decimal" class="md-opin' + (l.optPrix && l.optPrix[o.nom] != null ? ' forc' : '') + '" value="' + escVal(String(l.optPrix && l.optPrix[o.nom] != null ? l.optPrix[o.nom] : (o.devis ? 0 : (Number(o.prix)||0))).replace('.', ',')) + '" aria-label="Prix de l\'option" onclick="event.stopPropagation()" onchange="mdPrixOpt(' + i + ', \'' + escAttr(o.nom) + '\', this.value)"> €</span>'
                     : '<b>+ ' + (Number(o.prix)||0) + ' €</b>')) +
           '</label>';
         }).join('') + '</div>' + (options.length > 1 ? '</details>' : '')
