@@ -59,3 +59,6 @@ select option{color:#000}
 .compte span{font:600 clamp(20px,3.2vw,34px) Inter,sans-serif;text-shadow:0 2px 16px rgba(0,0,0,.8);background:rgba(0,0,0,.35);padding:10px 22px;border-radius:12px}
 .compte[hidden]{display:none}
 [hidden]{display:none!important}
+#s-form{justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:12vh}
+#s-form form{margin:auto 0}
+@media (max-height:700px){#s-form{gap:10px}#s-form input[type=text],#s-form input[type=email]{padding:12px 14px;font-size:20px}}

@@ -35,7 +35,7 @@
   function fmt(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
 
   /* ───────── formulaire ───────── */
-  $('b-commencer').onclick = function () { montrer('s-form'); setTimeout(function () { $('f-prenom').focus(); }, 80); };
+  $('b-commencer').onclick = function () { montrer('s-form'); setTimeout(function () { $('f-nom').focus(); }, 80); };
   $('f-retour').onclick = function () { accueil(); };
   $('form').onsubmit = function (e) {
     e.preventDefault();
