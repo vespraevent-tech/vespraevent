@@ -686,7 +686,8 @@
     var st = stepper(); zone.appendChild(st);
     window._vmQte = window._vmQte || {}; window._vmQte.mais = 1;
     function maj() { st.style.display = cb.checked ? 'flex' : 'none'; st.querySelector('b').textContent = window._vmQte.mais || 1;
-      var p = (window._vmQte.mais || 1) * 10, pr = cb.closest('label').querySelector('.vm-opt-price'); if (pr) pr.textContent = '+' + p + ' €'; }
+      var p = (window._vmQte.mais || 1) * 10, pr = cb.closest('label').querySelector('.vm-opt-price'); if (pr) pr.textContent = '+' + p + ' €';
+      try { var vp = document.getElementById('vmPrice'); if (vp && _vmp) vp.textContent = (_vmp.price + (cb.checked ? p : 0)) + ' €'; } catch (x) {} }
     cb.addEventListener('change', maj);
     st.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); var b = e.target.closest('button'); if (!b) return;
       var n = window._vmQte.mais || 1; n = b.classList.contains('op') ? Math.min(20, n + 1) : Math.max(1, n - 1); window._vmQte.mais = n; maj(); });
