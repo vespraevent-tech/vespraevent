@@ -4883,6 +4883,7 @@ function modifierDemande(id){
     ? (Number(resa.montage) > 0 ? Number(resa.montage) : (d.montagePrix === null || d.montagePrix === undefined || d.montagePrix === '' ? null : 0))
     : ((d.montagePrix === null || d.montagePrix === undefined || d.montagePrix === '') ? null : (Number(d.montagePrix) || 0));
   const iniRetour = resa ? (resa.livraisonRetour !== false) : (d.livraisonRetour !== false);
+  const iniPro = /entreprise|association|mairie|collectivit/i.test(String(d.clientType || ''));
   let sources = ['Instagram','Facebook','Google','Site web','Bouche-à-oreille','Autre'];
   try{ const l = JSON.parse(localStorage.getItem('vespraSrc') || 'null'); if(Array.isArray(l) && l.length) sources = l; }catch(e){}
   const iniSource = (resa && resa.source) ? (resa.source === 'Site internet' ? 'Site web' : resa.source) : (d.source || 'Site web');
@@ -4911,6 +4912,12 @@ function modifierDemande(id){
       saisie('nom', 'Prénom & Nom du client', d.nom, 'Ex : Jean Dupuis', 'text', true) +
       saisie('telephone', 'Téléphone', d.telephone, '06 00 00 00 00', 'tel') +
       saisie('email', 'Email', d.email, 'client@email.com', 'email') +
+      champ('clienttype', 'Type de client', '<select id="m-clienttype" onchange="mdPro()"><option value="Particulier"' + (iniPro ? '' : ' selected') + '>Particulier</option><option value="Entreprise ou association"' + (iniPro ? ' selected' : '') + '>Entreprise, association, mairie…</option></select>', true) +
+      '<div class="pm-cond" id="m-proWrap"' + (iniPro ? '' : ' style="display:none"') + '>' +
+        saisie('societe', 'Nom de l\u2019entreprise ou de l\u2019association', d.societe, 'Ex : Comité des fêtes de Vitré', 'text', true) +
+        saisie('siret', 'SIRET', d.siret, '123 456 789 00012') +
+        saisie('tva', 'N° de TVA (facultatif)', d.tva, 'FR00123456789') +
+      '</div>' +
       saisie('date', 'Date de début', iniDebut, '', 'date') +
       saisie('datefin', 'Date de fin', iniFin, '', 'date') +
       champ('livraison', 'Livraison',
@@ -4950,6 +4957,10 @@ function modifierDemande(id){
     '</div>';
 
   mdCharger(d);
+}
+function mdPro(){
+  const s = document.getElementById('m-clienttype'), w = document.getElementById('m-proWrap');
+  if(w && s) w.style.display = /entreprise|association/i.test(s.value) ? '' : 'none';
 }
 function mdPlus(){
   const w = document.getElementById('m-plus'), b = document.getElementById('m-plusB'); if(!w) return;
@@ -5517,6 +5528,10 @@ async function enregistrerDemande(id, bouton){
     livraison: lire('livraison'), adresse: lire('adresse'),
     message: lire('message'),
     source: lire('source'), validepar: lire('validepar'),
+    clienttype: lire('clienttype') || 'Particulier',
+    societe: /entreprise|association/i.test(lire('clienttype')) ? lire('societe') : '',
+    siret: /entreprise|association/i.test(lire('clienttype')) ? lire('siret') : '',
+    tva: /entreprise|association/i.test(lire('clienttype')) ? lire('tva') : '',
     /* le matériel n'est plus du texte libre : on enregistre le panier
        corrigé, et on efface l'ancienne correction en texte */
     materiel: '', panier: mdPanier(),
@@ -5565,10 +5580,16 @@ async function enregistrerDemande(id, bouton){
     if(chg.livPrix) d.livraisonPrix = livPrix;
     if(chg.montPrix) d.montagePrix = montPrix;
     if(chg.retour && corrections.livraison === 'oui') d.livraisonRetour = retourCoche;
+    /* le devis et la facture reprennent ces informations : type de client, SIRET, TVA */
+    const proNouveau = /entreprise|association/i.test(corrections.clienttype);
+    const proAvant = /entreprise|association|mairie|collectivit/i.test(String(d.clientType || ''));
+    if(proNouveau !== proAvant || (corrections.siret || '') !== String(d.siret || '') || (corrections.tva || '') !== String(d.tva || '')){
+      d.devisPro = proNouveau; d.devisSiret = corrections.siret; d.devisTva = corrections.tva;
+    }
     try{ await enregistrerSuivi(d, { corrections }); }
     catch(err){ d.optsRetirees = retiresAvant; Object.assign(d, avantSuivi); throw err; }
     const avantD = Object.assign({}, d, { optsRetirees: retiresAvant }, avantSuivi);
-    Object.assign(d, corrections, {dateFin: corrections.datefin, validePar: corrections.validepar});
+    Object.assign(d, corrections, {dateFin: corrections.datefin, validePar: corrections.validepar, clientType: corrections.clienttype === 'Particulier' ? '' : corrections.clienttype});
 
     /* si la réservation est déjà au planning, elle suit UNIQUEMENT ce que
        vous venez de changer ici : le reste de la réservation n'est pas touché */

@@ -2868,7 +2868,7 @@ const gestionnaire = async (request) => {
           materiel: suivi.c_materiel || '',
           categories: d.catsData || '',
           origine: d.origine || d.connu || '',
-          clientType: d.client_type || '', societe: d.societe || '', siret: d.siret || '', tva: d.tva || '',
+          clientType: corrige(suivi, 'clienttype', d.client_type || ''), societe: corrige(suivi, 'societe', d.societe || ''), siret: corrige(suivi, 'siret', d.siret || ''), tva: corrige(suivi, 'tva', d.tva || ''),
           /* les catégories cochées sur le formulaire court de l'accueil :
              sans panier, c'est la seule indication de matériel */
           interets: d.interets || d.materiel || '',
@@ -2973,13 +2973,13 @@ const gestionnaire = async (request) => {
          jamais se confondre avec les champs de suivi */
       const CORRIGEABLES = ['nom', 'telephone', 'email', 'date', 'convives',
                             'type', 'livraison', 'adresse', 'message', 'materiel',
-                            'datefin', 'source', 'validepar'];
+                            'datefin', 'source', 'validepar', 'clienttype', 'societe', 'siret', 'tva'];
       if (body.corrections && typeof body.corrections === 'object') {
         for (const champ of CORRIGEABLES) {
           const v = body.corrections[champ];
           if (v !== undefined && v !== null) {
             /* un champ vidé est marqué : un envoi vide pourrait être perdu en route et l'ancienne valeur reviendrait */
-            champs['c_' + champ] = (String(v) === '' && ['telephone', 'email', 'message', 'adresse', 'convives', 'type', 'datefin'].includes(champ))
+            champs['c_' + champ] = (String(v) === '' && ['telephone', 'email', 'message', 'adresse', 'convives', 'type', 'datefin', 'societe', 'siret', 'tva'].includes(champ))
               ? '__vide__' : String(v).slice(0, 1200);
           }
         }
@@ -3016,7 +3016,7 @@ const gestionnaire = async (request) => {
           }
           for (const [k, v] of Object.entries(precedent)) {
             if (!k.startsWith('c_') || champs[k] !== undefined || v === undefined || v === null) continue;
-            if (v === '' && !['c_telephone', 'c_email', 'c_message', 'c_adresse', 'c_convives', 'c_type', 'c_datefin'].includes(k)) continue;
+            if (v === '' && !['c_telephone', 'c_email', 'c_message', 'c_adresse', 'c_convives', 'c_type', 'c_datefin', 'c_societe', 'c_siret', 'c_tva'].includes(k)) continue;
             champs[k] = v;
           }
         }
