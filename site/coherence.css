@@ -390,3 +390,17 @@ html body .vm>.btn-p,html body .vm>.btn-submit,html body .vm>button[onclick*="co
 
 /* « Meilleures locations » : plus de pastilles sous le carrousel (trop nombreuses) */
 html body .bests-dots{display:none!important}
+
+/* ===== En-tête des articles de blog : dégradé bleu nuit, halo orange et photo de l'article ===== */
+html body .article-hero{position:relative;isolation:isolate;
+  background:radial-gradient(520px 260px at 88% 8%,rgba(245,158,11,.20),transparent 70%),linear-gradient(120deg,#0d1f33 0%,#17385a 62%,#1f4a74 100%)}
+html body .article-hero>*{position:relative;z-index:2}
+html body .article-hero[style*="--hero-img"]::after{content:"";position:absolute;z-index:1;right:6%;top:50%;transform:translateY(-50%) rotate(1.6deg);
+  width:min(34%,420px);aspect-ratio:4/3;border-radius:20px;background:var(--hero-img) center/cover no-repeat,#e9edf2;
+  box-shadow:0 30px 60px -24px rgba(0,0,0,.65),0 0 0 6px rgba(255,255,255,.10)}
+html body .article-hero[style*="--hero-img"]>*{max-width:min(58%,720px)}
+html body .article-hero .art-tag,html body .article-hero [class*="tag"]{box-shadow:0 6px 16px -8px rgba(245,158,11,.7)}
+@media(max-width:900px){
+  html body .article-hero[style*="--hero-img"]::after{right:-8%;top:auto;bottom:-14%;transform:rotate(-3deg);width:58%;opacity:.30;box-shadow:none}
+  html body .article-hero[style*="--hero-img"]>*{max-width:none}
+}
