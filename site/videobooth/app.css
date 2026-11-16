@@ -144,3 +144,8 @@ html,body,#app{height:100dvh}
 /* format story 9:16 : l'image remplit l'écran ; en 3:4 elle reste entière */
 #v-live,#v-revoir{object-fit:cover}
 .fmt34 #v-live,.fmt34 #v-revoir{object-fit:contain}
+
+.passer{position:absolute;bottom:4vh;left:50%;transform:translateX(-50%);z-index:7;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:10px 22px;font:600 14px Inter,sans-serif}
+.passer[hidden]{display:none}
+.adm-vocal{display:flex;flex-direction:column;gap:10px;border-top:1px solid rgba(255,255,255,.1);padding-top:10px}
+.adm textarea{width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,.28);border-radius:9px;background:rgba(0,0,0,.25);color:#fff;font:500 15px Inter,sans-serif;resize:vertical}

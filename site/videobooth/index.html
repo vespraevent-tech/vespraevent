@@ -10,7 +10,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="/favicon.png">
 <link rel="stylesheet" href="/polices.css?v=1">
-<link rel="stylesheet" href="app.css?v=13">
+<link rel="stylesheet" href="app.css?v=15">
 </head>
 <body>
 <main id="app">
@@ -45,6 +45,7 @@
     <div id="rec" class="rec" hidden><span class="pt"></span><b id="rec-t">0:00</b><i id="rec-max">/ 0:30</i></div>
     <div id="barre" class="barre" hidden><div id="barre-i"></div></div>
     <button id="b-go" class="gros go" type="button">Je suis prêt(e)</button>
+    <button id="b-passer" class="passer" type="button" hidden>Passer le message</button>
     <button id="b-stop" class="stop" type="button" hidden>Terminer l’enregistrement</button>
     <div id="cam-err" class="err grand" role="alert" hidden></div>
   </section>
@@ -88,6 +89,9 @@
           <label>Titre d’accueil<input id="e-titre" type="text"></label>
           <label>Sous-titre<input id="e-sous" type="text"></label>
         </div>
+        <div class="adm-vocal"><label class="adm-chk"><input id="e-msgon" type="checkbox"><span>Message vocal d’accueil avant l’enregistrement (puis un bip)</span></label>
+          <label>Texte lu à voix haute<textarea id="e-msg" rows="3" placeholder="Bonjour et bienvenue ! Préparez-vous. Après le bip, l’enregistrement commence : laissez-nous un message vidéo."></textarea></label>
+          <div class="adm-l"><label class="adm-b" style="cursor:pointer">Ou charger un fichier audio<input id="e-son" type="file" accept="audio/*" hidden></label><span id="e-son-n" class="adm-m"></span><button id="e-son-test" class="adm-b" type="button">Écouter</button><button id="e-son-del" class="adm-b" type="button">Retirer le fichier</button></div></div>
         <label class="adm-chk"><input id="e-noel" type="checkbox"><span>Thème Noël : sapins et guirlandes sur l’écran d’accueil et de remerciement</span></label>
         <div class="adm-2">
           <label>Durée maximale (secondes)<input id="e-max" type="number" min="5" max="120"></label>
@@ -107,6 +111,6 @@
     <div class="rang"><button id="pin-x" class="sec" type="button">Annuler</button><button id="pin-ok" class="gros" type="button">Valider</button></div>
   </section>
 </main>
-<script src="app.js?v=14"></script>
+<script src="app.js?v=15"></script>
 </body>
 </html>
