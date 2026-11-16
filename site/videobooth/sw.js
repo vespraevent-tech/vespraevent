@@ -1,6 +1,6 @@
 /* Vidéobooth : l'appli s'ouvre même sans réseau (les vidéos, elles, vivent dans la tablette jusqu'à leur envoi). */
-const V = 'vb-16';
-const FICHIERS = ['/videobooth/', '/videobooth/index.html', '/videobooth/app.js?v=17', '/videobooth/app.css?v=17', '/polices.css?v=1', '/favicon.png'];
+const V = 'vb-17';
+const FICHIERS = ['/videobooth/', '/videobooth/index.html', '/videobooth/app.js?v=18', '/videobooth/app.css?v=18', '/polices.css?v=1', '/favicon.png'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(V).then((c) => Promise.all(FICHIERS.map((u) => c.add(u).catch(() => {})))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((k) => Promise.all(k.filter((x) => x !== V).map((x) => caches.delete(x)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', (e) => {

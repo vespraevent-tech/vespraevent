@@ -88,6 +88,7 @@
     navigator.mediaDevices.getUserMedia(contraintes).then(function (s) {
       flux = s; $('b-go').hidden = false; $('cadrage').textContent = cfg.cadrage || ''; $('cadrage').hidden = !cfg.cadrage; $('v-src').srcObject = s; $('v-src').play().catch(function () {}); boucle = requestAnimationFrame(dessiner);
       grandAngle(s);
+      if (testCam) infoCamera(s);
     }).catch(function (e) {
       $('cam-err').textContent = 'Impossible d’accéder à la caméra ou au micro. Autorisez-les dans les réglages de la tablette, puis réessayez.'; $('cam-err').hidden = false; $('b-go').hidden = true;
       setTimeout(function () { accueil(); }, 7000);
@@ -122,6 +123,21 @@
     });
   }
   function accueilVocalActif() { var ev = (cfg.events || []).filter(function (x) { return x.id === cfg.actif; })[0]; return !!(ev && ev.msgOn); }
+  /* ── test de la caméra : nom, résolution, zoom, guide de cadrage ── */
+  var testCam = false;
+  function infoCamera(s) {
+    var tr = s.getVideoTracks()[0], st = tr.getSettings ? tr.getSettings() : {}, caps = tr.getCapabilities ? tr.getCapabilities() : {}, au = s.getAudioTracks()[0];
+    var l = ['Caméra : ' + (tr.label || '(nom inconnu)'), 'Image reçue : ' + st.width + ' × ' + st.height + ' à ' + Math.round(st.frameRate || 0) + ' i/s',
+      'Zoom : ' + (caps.zoom ? ('min ' + caps.zoom.min + ' · max ' + caps.zoom.max + ' · actuel ' + (st.zoom || '?')) : 'non réglable par le navigateur'),
+      'Format enregistré : ' + (cfg.format === 'auto' || !cfg.format ? 'auto (' + (window.innerWidth > window.innerHeight ? '16:9' : '9:16') + ')' : cfg.format),
+      'Micro : ' + (au ? (au.label || '(nom inconnu)') : 'aucun')];
+    navigator.mediaDevices.enumerateDevices().then(function (d) {
+      l.push('Caméras disponibles : ' + d.filter(function (x) { return x.kind === 'videoinput'; }).map(function (x) { return x.label || '?'; }).join(' | '));
+      $('cam-info').textContent = l.join('\n'); $('cam-info').hidden = false;
+    });
+    $('guide').hidden = false; $('b-go').hidden = true; $('cadrage').hidden = true;
+  }
+  $('a-camtest').onclick = function () { testCam = true; ouvrirCam(); };
   /* GRAND ANGLE : zoom au minimum, et caméra « ultra grand-angle » si la tablette en a une */
   var angleEssaye = false;
   function grandAngle(s) {
@@ -176,6 +192,7 @@ $('b-stop').onclick = arreterRec;
   /* croix : on abandonne la prise et on revient au formulaire, les champs restent remplis */
   $('b-passer').onclick = function () { if (accueilVocalEnCours) accueilVocalEnCours(); };
   $('b-x').onclick = function () {
+    if (testCam) { testCam = false; $('guide').hidden = true; $('cam-info').hidden = true; arreterCam(); ouvrirAdmin(); return; }
     if (accueilVocalEnCours) { var f = accueilVocalEnCours; accueilVocalEnCours = null; try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) {} $('compte').hidden = true; }
     $('b-passer').hidden = true;
     if (decompte) { clearInterval(decompte); decompte = null; }
