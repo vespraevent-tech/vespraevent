@@ -1200,7 +1200,10 @@ var P=[
   ['Guirlande lumineuse','lumieres',null,['10 m','20 m','40 m'],'Guirlande',{'10 m':9,'20 m':18,'40 m':36,'30 m':25}],
   ['Ventilateur événementiel','barnum',10,['Standard'],'Ventilateur'],
   ['Chauffage','barnum',null,['Sur devis'],'Chauffage'],
-  ['Mange-debout housse blanche','barnum',10,['Standard'],'Mange-debout'],
+  ['Mange-debout','barnum',null,['Sans housse','Housse blanche','Housse noire','Housse marron','Housse dorée','Housse bleu foncé','Housse bordeaux','Housse verte','Housse terracotta'],'Mange-debout',
+    {'Sans housse':10,'Housse blanche':13,'Housse noire':13,'Housse marron':15,'Housse dorée':15,'Housse bleu foncé':15,'Housse bordeaux':15,'Housse verte':15,'Housse terracotta':15}],
+  ['Housses de mange-debout (seules)','barnum',null,['Blanche','Noire','Marron','Dorée','Bleu foncé','Bordeaux','Verte','Terracotta'],'Housses',
+    {'Blanche':3,'Noire':3,'Marron':5,'Dorée':5,'Bleu foncé':5,'Bordeaux':5,'Verte':5,'Terracotta':5}],
   ['Mini château gonflable crocodile','animation',80,['Standard'],'Mini château'],
   ['Château gonflable Safari','animation',100,['Standard'],'Château safari'],
   ['Château gonflable Dino World','animation',150,['Standard'],'Château dino'],
@@ -3500,7 +3503,7 @@ function saveEquipGroups(arr){
 }
 function isNoStockProduct(name){
   var keywords=['Installation','Sac de lestage','Cadre photo','Lestage','Déguisement',
-    'Feux d\'artifice','Canon ','Maïs','Éclairage','Guirlande','Cabine','Néon'];
+    'Feux d\'artifice','Canon ','Maïs','Éclairage','Guirlande','Cabine','Néon','Housses de mange-debout'];
   return keywords.some(function(k){return name.indexOf(k)>=0;});
 }
 function isCatVariant(catId){
@@ -6540,7 +6543,7 @@ window.qteNom=qteNom;
 function qteMaxRes(base,n){
   var st=1; try{ st=stockProduit(base)||1; }catch(e){}
   var b=String(base||'').toLowerCase();
-  var def=/mange.?debout/.test(b)?10:/spot led/.test(b)?12:/^barnum/.test(b)?2:/guirlande/.test(b)?10:/fontaine/.test(b)?4:1;
+  var def=/mange.?debout|housses?\b/.test(b)?40:/spot led/.test(b)?12:/^barnum/.test(b)?2:/guirlande/.test(b)?10:/fontaine/.test(b)?4:1;
   return Math.max(st,def,n||1);
 }
 function caseQteRes(base,n,attrs){

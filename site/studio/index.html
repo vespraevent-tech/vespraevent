@@ -5075,7 +5075,21 @@ function mdLivraison(oui){
    ═══════════════════════════════════════════════════════════════ */
 let mdLignes = [];
 
-function catalogue(){ return window.VESPRA_PRODUITS || []; }
+/* Mange-debout : housse au choix (10 € sans housse, 13 € blanche ou noire, 15 € autre couleur), et housses seules
+   (changement de couleur en cours d'événement). Surcharge propre au back-office, cohérente avec la fiche du site. */
+const MD_COULEURS = [['blanche',3],['noire',3],['marron',5],['dorée',5],['bleu foncé',5],['bordeaux',5],['verte',5],['terracotta',5]];
+let _catBO = null, _catSrc = null;
+function catalogue(){
+  const src = window.VESPRA_PRODUITS || [];
+  if(_catBO && _catSrc === src) return _catBO;
+  const cats = ['Mobilier, réception et barnums','Restauration'];
+  const vMD = [{label:'Sans housse', prix:10}].concat(MD_COULEURS.map(c => ({label:'Housse ' + c[0], prix: 10 + c[1]})));
+  const md = { id:'p45', ref:'p45', nom:'Mange-debout', anciens:['Mange-debout housse blanche','Mange-debout Ø 80 cm'], cat:cats[0], cats:cats, prix:10, variantes:vMD, vpropre:0, options:[], notices:[] };
+  const hs = { id:'p45h', ref:'p45h', nom:'Housses de mange-debout (seules)', anciens:[], cat:cats[0], cats:[cats[0]], prix:3, variantes:MD_COULEURS.map(c => ({label:c[0][0].toUpperCase()+c[0].slice(1), prix:c[1]})), vpropre:0, options:[], notices:[] };
+  const base = src.filter(p => !/^mange-debout/i.test(String(p.nom||'')));
+  _catSrc = src; _catBO = base.concat([md, hs]);
+  return _catBO;
+}
 
 /* Prestations de service : pas de prix au catalogue, il se saisit sur la ligne, avec une description. */
 const PRESTATIONS = ['Serveuse privée — Candice', 'Chef pâtissier — Emmanuel'];
@@ -5310,6 +5324,8 @@ function mdCharger(d){
       if(m.length === 1){ l.formule = m[0].label; break; }
     }
   });
+  /* ancien intitulé « Mange-debout housse blanche » : c'est le Mange-debout, formule « Housse blanche » */
+  mdLignes.forEach(l => { if(/^mange-debout( ø ?80 ?cm| housse blanche)$/i.test(String(l.produit||'').trim())){ if(!l.formule && /housse blanche/i.test(l.produit)) l.formule = 'Housse blanche'; l.produit = 'Mange-debout'; } });
   mdLignes.forEach(l => { if(estFeux(l)) feuxLireCouleurs(l); });
   /* ligne enregistrée à l'ancien tarif : l'éditeur ne la passe pas au nouveau prix tout seul */
   mdLignes.forEach(l => {
@@ -5454,7 +5470,7 @@ function qteMaxProduit(nom){
   }catch(e){}
   if(/photobooth/.test(n)) return 4;
   if(/^barnum/.test(n)) return 2;
-  if(/mange.?debout/.test(n)) return 10;
+  if(/mange.?debout|housses?\b/.test(n)) return 40;
   if(/spot led/.test(n)) return 12;
   if(/guirlande/.test(n)) return 10;
   if(/fontaine/.test(n)) return 4;
