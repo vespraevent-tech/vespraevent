@@ -97,7 +97,7 @@
           <label>Durée maximale (secondes)<input id="e-max" type="number" min="5" max="120"></label>
           <label>Caméra<select id="e-cam"></select></label>
           <label>Micro<select id="e-mic"></select></label>
-          <label>Format de la vidéo<select id="e-format"><option value="9:16">Story 9:16 (plein écran vertical)</option><option value="3:4">3:4 (image plus large)</option></select></label>
+          <label>Format de la vidéo<select id="e-format"><option value="auto">Automatique (suit la position de la tablette)</option><option value="16:9">Paysage 16:9 (tablette à l’horizontale)</option><option value="4:3">Paysage 4:3 (image plus haute)</option><option value="9:16">Story 9:16 (vertical, plein écran)</option><option value="3:4">Portrait 3:4 (vertical, plus large)</option></select></label>
         </div>
       </div>
       <div class="adm-f2"><button id="e-sup" class="adm-b adm-danger" type="button">Supprimer</button><button id="e-ok" class="adm-b" type="button">Enregistrer</button><button id="e-actif" class="adm-ok" type="button">Utiliser cet événement</button></div>
@@ -111,6 +111,6 @@
     <div class="rang"><button id="pin-x" class="sec" type="button">Annuler</button><button id="pin-ok" class="gros" type="button">Valider</button></div>
   </section>
 </main>
-<script src="app.js?v=15"></script>
+<script src="app.js?v=16"></script>
 </body>
 </html>

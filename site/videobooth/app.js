@@ -62,11 +62,17 @@
   }
   var cv = $('v-live'), cx = cv.getContext('2d'), boucle = 0;
   /* Rendu toujours VERTICAL (3:4) : l'image de la caméra est recadrée sur un canvas, et c'est ce canvas qui est filmé. */
+  /* format de la vidéo : automatique = suit l'orientation de la tablette (vertical 9:16, horizontal 16:9) */
+  function ratioFormat() {
+    var f = cfg.format || 'auto';
+    if (f === 'auto') f = window.innerWidth > window.innerHeight ? '16:9' : '9:16';
+    return { '9:16': 0.5625, '3:4': 0.75, '4:3': 1.3333, '16:9': 1.7778 }[f] || 0.5625;
+  }
   function dessiner() {
     var v = $('v-src');
     if (v.videoWidth) {
-      var vw = v.videoWidth, vh = v.videoHeight, W, H, R = cfg.format === '3:4' ? 0.75 : 0.5625;
-      if (vw / vh > R) { H = Math.min(vh, 1920); W = Math.round(H * R / 2) * 2; } else { W = Math.min(vw, 1080); H = Math.round(W / R / 2) * 2; }
+      var vw = v.videoWidth, vh = v.videoHeight, W, H, R = ratioFormat();
+      if (vw / vh > R) { H = Math.min(vh, 1920); W = Math.round(H * R / 2) * 2; } else { W = Math.min(vw, 1920); H = Math.round(W / R / 2) * 2; }
       if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
       var sc = Math.max(W / vw, H / vh), sw = W / sc, sh = H / sc;
       cx.drawImage(v, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, W, H);
@@ -288,7 +294,7 @@ $('b-stop').onclick = arreterRec;
   function appliquerActif() {
     var e = evts().filter(function (x) { return x.id === cfg.actif; })[0];
     cfg.event = e ? (e.nom + (e.date ? ' — ' + e.date : '')) : '';
-    cfg.titre = (e && e.titre) || CFG0.titre; cfg.sous = e ? (e.sous || '') : CFG0.sous; cfg.max = (e && Number(e.max)) || 30; cfg.cam = (e && e.cam) || ''; cfg.noel = !!(e && e.noel); cfg.format = (e && e.format) || '9:16'; cfg.mic = (e && e.mic) || ''; document.body.classList.toggle('fmt34', cfg.format === '3:4'); document.body.classList.toggle('noel-on', cfg.noel);
+    cfg.titre = (e && e.titre) || CFG0.titre; cfg.sous = e ? (e.sous || '') : CFG0.sous; cfg.max = (e && Number(e.max)) || 30; cfg.cam = (e && e.cam) || ''; cfg.noel = !!(e && e.noel); cfg.format = (e && e.fmtV === 2 && e.format) || 'auto'; cfg.mic = (e && e.mic) || ''; document.body.classList.toggle('fmt34', cfg.format === '3:4' || cfg.format === '4:3'); document.body.classList.toggle('noel-on', cfg.noel);
     ecrireCfg(cfg);
   }
   var edite = null;
@@ -310,7 +316,7 @@ $('b-stop').onclick = arreterRec;
   }
   function ouvrirEdition(id) {
     var e = evts().filter(function (x) { return x.id === id; })[0]; if (!e) return; edite = e;
-    $('e-nom').value = e.nom; $('e-noel').checked = !!e.noel; $('e-msgon').checked = !!e.msgOn; $('e-msg').value = e.msg || ''; sonLire('accueil-' + e.id).then(function (b) { $('e-son-n').textContent = b ? '✓ fichier chargé' : ''; }); $('e-format').value = e.format || '9:16'; $('e-date').value = e.date || ''; $('e-titre').value = e.titre || ''; $('e-sous').value = e.sous || ''; $('e-max').value = e.max || 30;
+    $('e-nom').value = e.nom; $('e-noel').checked = !!e.noel; $('e-msgon').checked = !!e.msgOn; $('e-msg').value = e.msg || ''; sonLire('accueil-' + e.id).then(function (b) { $('e-son-n').textContent = b ? '✓ fichier chargé' : ''; }); $('e-format').value = (e.fmtV === 2 && e.format) || 'auto'; $('e-date').value = e.date || ''; $('e-titre').value = e.titre || ''; $('e-sous').value = e.sous || ''; $('e-max').value = e.max || 30;
     var sel = $('e-cam'); sel.innerHTML = '<option value="">Caméra avant (par défaut)</option>';
     if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) navigator.mediaDevices.enumerateDevices().then(function (d) { d.filter(function (x) { return x.kind === 'videoinput'; }).forEach(function (x, i) { var o = document.createElement('option'); o.value = x.deviceId; o.textContent = x.label || ('Caméra ' + (i + 1)); if (x.deviceId === e.cam) o.selected = true; sel.appendChild(o); }); }).catch(function () {});
     var sm = $('e-mic'); sm.innerHTML = '<option value="">Micro de la tablette (par défaut)</option>';
@@ -332,7 +338,7 @@ $('b-stop').onclick = arreterRec;
   function lireEdition() {
     if (!edite) return;
     edite.nom = $('e-nom').value.trim(); edite.date = $('e-date').value.trim(); edite.titre = $('e-titre').value.trim() || CFG0.titre; edite.sous = $('e-sous').value.trim();
-    edite.max = Math.min(120, Math.max(5, Number($('e-max').value) || 30)); edite.cam = $('e-cam').value; edite.noel = $('e-noel').checked; edite.msgOn = $('e-msgon').checked; edite.msg = $('e-msg').value.trim(); edite.format = $('e-format').value; edite.mic = $('e-mic').value;
+    edite.max = Math.min(120, Math.max(5, Number($('e-max').value) || 30)); edite.cam = $('e-cam').value; edite.noel = $('e-noel').checked; edite.msgOn = $('e-msgon').checked; edite.msg = $('e-msg').value.trim(); edite.format = $('e-format').value; edite.fmtV = 2; edite.mic = $('e-mic').value;
   }
   function sauverConnexion() { cfg.serveur = $('a-serveur').value.trim(); cfg.cle = $('a-cle').value.trim() || cfg.cle; ecrireCfg(cfg); }
   $('a-serveur').onchange = $('a-cle').onchange = sauverConnexion;
