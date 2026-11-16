@@ -95,7 +95,7 @@ export default async (request) => {
     for (const b of blobs) { const m = await st.get(b.key, { type: 'json' }).catch(() => null); if (m && m.event === label && Date.parse(m.cree) >= Date.now() - GARDE_JOURS * 86400000) liste.push(m); }
     liste.sort((a, b) => String(a.cree).localeCompare(String(b.cree)));
     const lignes = liste.map((m) => ({ nom: `${m.prenom} ${m.nom}`.trim(), fichier: m.fichier, date: m.cree, mo: Math.round((m.octets || 0) / 104857.6) / 10, href: `/api/videobooth/v/${m.id}?t=${jeton(m.id)}` }));
-    const rows = lignes.map((l, i) => `<div class="c"><button class="pl" type="button" data-i="${i}" aria-label="Voir la vidéo de ${esc(l.nom)}"><svg viewBox="0 0 24 24" width="30" height="30" fill="#fff"><path d="M8 5v14l11-7z"/></svg></button><div class="n"><b>${esc(l.nom)}</b><span>${esc(new Date(l.date).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }))}</span></div><a href="${esc(l.href)}" download>Télécharger</a></div>`).join('');
+    const rows = lignes.map((l, i) => `<div class="c"><button class="pl" type="button" data-i="${i}" aria-label="Voir la vidéo de ${esc(l.nom)}"><svg viewBox="0 0 24 24" width="30" height="30" fill="#fff"><path d="M8 5v14l11-7z"/></svg></button><div class="n"><b>${esc(l.nom)}</b><span>${esc(new Date(l.date).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }))}</span></div><a href="${esc(l.href)}&amp;dl=1" download>Télécharger</a></div>`).join('');
     const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Souvenirs — ${esc(label)}</title>
 <style>*{box-sizing:border-box}body{margin:0;background:#0f2237;font-family:Inter,Arial,sans-serif;color:#fff}header{padding:34px 18px 18px;text-align:center;background:radial-gradient(700px 300px at 85% 0,rgba(245,158,11,.2),transparent 70%)}header small{letter-spacing:.3em;font-size:11px;color:#9fb0c6}h1{font-size:26px;margin:8px 0 4px}header p{margin:0;color:#9fb0c6;font-size:14px}main{max-width:760px;margin:0 auto;padding:6px 14px 60px}.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:14px}.c{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}.pl{height:92px;border:0;border-radius:10px;background:linear-gradient(135deg,#2B4A6B,#16365a);display:flex;align-items:center;justify-content:center;cursor:pointer}.n b{display:block;font-size:15px}.n span{font-size:12px;color:#9fb0c6}.c a{background:#F59E0B;color:#1a1205;border-radius:8px;padding:9px;text-align:center;text-decoration:none;font:700 13px Arial,sans-serif}#zip{display:block;width:100%;margin-top:6px;background:#F59E0B;color:#1a1205;border:0;border-radius:10px;padding:14px;font:700 15px Arial,sans-serif;cursor:pointer}#st{font-size:13px;color:#9fb0c6;text-align:center;margin-top:8px;min-height:16px}#m{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;z-index:5;padding:14px}#m.on{display:flex}#m video{max-width:100%;max-height:78vh;border-radius:12px;background:#000}#m button{background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:9px;padding:10px 22px;font:600 14px Arial,sans-serif}.note{text-align:center;color:#9fb0c6;font-size:12.5px;margin-top:22px}.vide{text-align:center;color:#9fb0c6;padding:40px 0}</style></head><body>
 <header><small>VESPRA EVENT</small><h1>${esc(label)}</h1><p>${lignes.length} message${lignes.length > 1 ? 's' : ''} vidéo de vos invités</p></header>
@@ -109,7 +109,7 @@ Array.prototype.forEach.call(document.querySelectorAll('.pl'),function(b){b.oncl
 document.getElementById('mx').onclick=function(){mv.pause();mv.removeAttribute('src');mv.load();m.classList.remove('on');};
 var b=document.getElementById('zip');if(b)b.onclick=function(){b.disabled=true;var st=document.getElementById('st'),f=[],i=0;
 function next(){if(i>=L.length)return vbZip(f).then(function(z){var a=document.createElement('a');a.href=URL.createObjectURL(z);a.download=${JSON.stringify(label.replace(/[\\/:*?"<>|]+/g, ' ').trim() || 'videos')}+'.zip';document.body.appendChild(a);a.click();st.textContent='Terminé.';b.disabled=false;});
-st.textContent='Préparation… '+(i+1)+' / '+L.length;return fetch(L[i].href).then(function(r){return r.blob()}).then(function(x){f.push({nom:L[i].fichier,blob:x});i++;return next()});}
+st.textContent='Préparation… '+(i+1)+' / '+L.length;return fetch(L[i].href+'&dl=1').then(function(r){return r.blob()}).then(function(x){f.push({nom:L[i].fichier,blob:x});i++;return next()});}
 next().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez les vidéos une par une.';b.disabled=false;});};
 </script></body></html>`;
     return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
@@ -125,8 +125,28 @@ next().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez l
     if (!m || Date.parse(m.cree) < Date.now() - GARDE_JOURS * 86400000) return new Response('Cette vidéo n’est plus disponible (conservée 30 jours).', { status: 410 });
     const buf = await st.get('video/' + id, { type: 'arrayBuffer' }).catch(() => null);
     if (!buf) return new Response('Vidéo introuvable', { status: 404 });
-    const lecture = url.searchParams.get('lecture') === '1';
-    return new Response(buf, { headers: { 'Content-Type': m.type || 'video/mp4', 'Content-Disposition': `${lecture ? 'inline' : 'attachment'}; filename="${String(m.fichier).replace(/"/g, '')}"`, 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
+    const lecture = url.searchParams.get('lecture') === '1', dl = url.searchParams.get('dl') === '1';
+    /* lien de l'e-mail sans option : une page avec le lecteur et le bouton de téléchargement */
+    if (!lecture && !dl) {
+      const q = `?t=${encodeURIComponent(url.searchParams.get('t'))}`;
+      const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Votre vidéo — ${esc(m.event || 'Vespra Event')}</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#0f2237;font-family:Inter,Arial,sans-serif;color:#fff;text-align:center}main{max-width:480px;margin:0 auto;padding:30px 16px 50px}small{letter-spacing:.3em;font-size:11px;color:#9fb0c6}h1{font-size:22px;margin:10px 0 4px}p{color:#9fb0c6;font-size:14px;margin:0 0 16px}video{width:100%;max-height:70vh;border-radius:14px;background:#000}a{display:block;margin-top:16px;background:#F59E0B;color:#1a1205;border-radius:10px;padding:14px;text-decoration:none;font:700 15px Arial,sans-serif}.n{margin-top:20px;font-size:12.5px;color:#9fb0c6}</style></head><body><main>
+<small>VESPRA EVENT</small><h1>${esc(m.prenom)}, voici votre message vidéo</h1><p>${esc(m.event || '')}</p>
+<video controls playsinline preload="metadata" src="/api/videobooth/v/${esc(id)}${q}&amp;lecture=1"></video>
+<a href="/api/videobooth/v/${esc(id)}${q}&amp;dl=1" download>Télécharger ma vidéo</a>
+<div class="n">Disponible ${GARDE_JOURS} jours après l’enregistrement.<br>Vespra Event — spécialiste de la location événementielle dans le Grand Ouest.</div></main></body></html>`;
+      return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
+    }
+    /* lecture par morceaux (Range) : indispensable pour que la vidéo se lance sur téléphone */
+    const total = buf.byteLength, rg = /^bytes=(\d*)-(\d*)$/.exec(request.headers.get('range') || '');
+    const hd = { 'Content-Type': m.type || 'video/mp4', 'Content-Disposition': `${dl ? 'attachment' : 'inline'}; filename="${String(m.fichier).replace(/"/g, '')}"`, 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', 'Accept-Ranges': 'bytes' };
+    if (rg && (rg[1] !== '' || rg[2] !== '')) {
+      let d1 = rg[1] === '' ? Math.max(0, total - Number(rg[2])) : Number(rg[1]);
+      let f1 = rg[1] === '' || rg[2] === '' ? total - 1 : Math.min(Number(rg[2]), total - 1);
+      if (d1 > f1 || d1 >= total) return new Response(null, { status: 416, headers: { 'Content-Range': `bytes */${total}` } });
+      return new Response(buf.slice(d1, f1 + 1), { status: 206, headers: { ...hd, 'Content-Range': `bytes ${d1}-${f1}/${total}`, 'Content-Length': String(f1 - d1 + 1) } });
+    }
+    return new Response(buf, { headers: { ...hd, 'Content-Length': String(total) } });
   }
 
   /* ── réception d'un morceau ── */
