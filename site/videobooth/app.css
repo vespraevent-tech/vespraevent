@@ -47,3 +47,15 @@ select option{color:#000}
 .rang.haut{margin-top:6px}
 #pin-in{width:min(360px,100%);text-align:center;letter-spacing:.4em;font-size:34px}
 @media (orientation:portrait){h1{font-size:clamp(40px,12vw,90px)}}
+
+.cadenas{position:absolute;top:0;right:0;width:96px;height:96px;background:transparent;border:0;z-index:5;opacity:0}
+.marque{position:absolute;bottom:5vh;left:0;right:0;font:400 clamp(16px,2vw,22px) 'Bebas Neue',Impact,sans-serif;letter-spacing:.3em;color:rgba(255,255,255,.4)}
+.etat{bottom:1.6vh}
+.petit{font-size:clamp(14px,1.9vw,19px);color:#9fb0c6}
+.croix{position:absolute;top:2.5vh;right:3vw;z-index:6;width:64px;height:64px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font:600 28px/64px Inter,sans-serif}
+#s-cam.flou #v-live{filter:blur(22px) brightness(.8);transform:scaleX(-1) scale(1.15)}
+.compte{flex-direction:column;gap:2vh;background:transparent}
+.compte b{font:400 clamp(200px,42vh,440px)/1 'Bebas Neue',Impact,sans-serif;text-shadow:0 8px 60px rgba(0,0,0,.6)}
+.compte span{font:600 clamp(20px,3.2vw,34px) Inter,sans-serif;text-shadow:0 2px 16px rgba(0,0,0,.8);background:rgba(0,0,0,.35);padding:10px 22px;border-radius:12px}
+.compte[hidden]{display:none}
+[hidden]{display:none!important}

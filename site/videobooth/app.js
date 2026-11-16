@@ -3,10 +3,10 @@
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
-  var CFG0 = { event: '', titre: 'Laissez un message vidéo', sous: '30 secondes pour dire quelques mots aux mariés', serveur: '', cle: '', max: 30, cam: '', pin: '' };
+  var CFG0 = { event: '', titre: 'Enregistrer un souvenir', sous: 'Laissez un petit message vidéo de 30 secondes', serveur: '', cle: '', max: 30, cam: '', pin: '0104' };
   function lireCfg() { try { return Object.assign({}, CFG0, JSON.parse(localStorage.getItem('vb-cfg') || '{}')); } catch (e) { return Object.assign({}, CFG0); } }
   function ecrireCfg(c) { try { localStorage.setItem('vb-cfg', JSON.stringify(c)); } catch (e) {} }
-  var cfg = lireCfg();
+  var cfg = lireCfg(); if (!cfg.pin) cfg.pin = '0104';
 
   /* ───────── base locale ───────── */
   var DB = null;
@@ -26,17 +26,17 @@
   /* ───────── écrans ───────── */
   function montrer(id) { document.querySelectorAll('.ecran').forEach(function (e) { e.classList.toggle('on', e.id === id); }); }
   var inactif = null;
-  function veille() { clearTimeout(inactif); inactif = setTimeout(function () { if (!$('s-accueil').classList.contains('on') && !$('s-admin').classList.contains('on') && !$('s-pin').classList.contains('on') && !enregistrement) { arreterCam(); accueil(); } }, 90000); }
+  function veille() { clearTimeout(inactif); inactif = setTimeout(function () { if (!$('s-accueil').classList.contains('on') && !$('s-admin').classList.contains('on') && !$('s-pin').classList.contains('on') && !enregistrement) { arreterCam(); accueil(); } }, 120000); }
   ['pointerdown', 'keydown'].forEach(function (t) { document.addEventListener(t, veille, { passive: true }); });
-  function accueil() {
+  function accueil(garder) {
     $('t-accueil').textContent = cfg.titre || CFG0.titre; $('p-accueil').textContent = cfg.sous || '';
-    $('form').reset(); $('f-err').textContent = ''; montrer('s-accueil'); majEtat();
+    if (!garder) $('form').reset(); $('f-err').textContent = ''; montrer('s-accueil'); majEtat();
   }
   function fmt(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
 
   /* ───────── formulaire ───────── */
   $('b-commencer').onclick = function () { montrer('s-form'); setTimeout(function () { $('f-prenom').focus(); }, 80); };
-  $('f-retour').onclick = accueil;
+  $('f-retour').onclick = function () { accueil(); };
   $('form').onsubmit = function (e) {
     e.preventDefault();
     var p = $('f-prenom').value.trim(), n = $('f-nom').value.trim(), m = $('f-email').value.trim();
@@ -48,7 +48,7 @@
   var invite = null;
 
   /* ───────── caméra ───────── */
-  var flux = null, rec = null, morceaux = [], blobFinal = null, mime = '', enregistrement = false, minuteur = null, t0 = 0;
+  var decompte = null, flux = null, rec = null, morceaux = [], blobFinal = null, mime = '', enregistrement = false, minuteur = null, t0 = 0;
   function meilleurMime() {
     var l = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
     for (var i = 0; i < l.length; i++) { try { if (window.MediaRecorder && MediaRecorder.isTypeSupported(l[i])) return l[i]; } catch (e) {} }
@@ -56,25 +56,25 @@
   }
   function arreterCam() { if (flux) { flux.getTracks().forEach(function (t) { t.stop(); }); flux = null; } $('v-live').srcObject = null; }
   function ouvrirCam() {
-    montrer('s-cam'); $('cam-err').hidden = true; $('compte').hidden = true; $('rec').hidden = true; $('barre').hidden = true;
-    $('b-go').hidden = false; $('b-stop').hidden = true; enregistrement = false;
-    var contraintes = { audio: { echoCancellation: true, noiseSuppression: true }, video: cfg.cam ? { deviceId: { exact: cfg.cam }, width: { ideal: 1920 }, height: { ideal: 1080 } } : { facingMode: 'user', width: { ideal: 1920 }, height: { ideal: 1080 } } };
+    montrer('s-cam'); $('s-cam').classList.remove('flou'); $('cam-err').hidden = true; $('compte').hidden = true; $('rec').hidden = true; $('barre').hidden = true;
+    $('b-go').hidden = true; $('b-stop').hidden = true; enregistrement = false;
+    var contraintes = { audio: { echoCancellation: true, noiseSuppression: true }, video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, window.innerHeight > window.innerWidth ? { width: { ideal: 1080 }, height: { ideal: 1920 } } : { width: { ideal: 1920 }, height: { ideal: 1080 } }) };
     arreterCam();
     navigator.mediaDevices.getUserMedia(contraintes).then(function (s) {
-      flux = s; $('v-live').srcObject = s; $('v-live').play().catch(function () {});
+      flux = s; $('b-go').hidden = false; $('v-live').srcObject = s; $('v-live').play().catch(function () {});
     }).catch(function (e) {
       $('cam-err').textContent = 'Impossible d’accéder à la caméra ou au micro. Autorisez-les dans les réglages de la tablette, puis réessayez.'; $('cam-err').hidden = false; $('b-go').hidden = true;
-      setTimeout(accueil, 7000);
+      setTimeout(function () { accueil(); }, 7000);
     });
   }
   $('b-go').onclick = function () {
-    if (!flux) return; $('b-go').hidden = true; $('compte').hidden = false;
-    var n = 3; $('compte').textContent = n;
-    var h = setInterval(function () { n--; if (n > 0) { $('compte').textContent = n; } else { clearInterval(h); $('compte').hidden = true; demarrer(); } }, 1000);
+    if (!flux) return; $('b-go').hidden = true; $('compte').hidden = false; $('s-cam').classList.add('flou');
+    $('compte-msg').textContent = 'Vous avez ' + (Number(cfg.max) || 30) + ' secondes maximum';
+    var n = 3; $('compte-n').textContent = n; decompte = setInterval(function () { n--; if (n > 0) { $('compte-n').textContent = n; } else { clearInterval(decompte); decompte = null; $('compte').hidden = true; $('s-cam').classList.remove('flou'); demarrer(); } }, 1000);
   };
   function demarrer() {
     morceaux = []; blobFinal = null; mime = meilleurMime();
-    try { rec = mime ? new MediaRecorder(flux, { mimeType: mime, videoBitsPerSecond: 6000000 }) : new MediaRecorder(flux); } catch (e) { rec = new MediaRecorder(flux); }
+    try { rec = mime ? new MediaRecorder(flux, { mimeType: mime, videoBitsPerSecond: 3000000 }) : new MediaRecorder(flux); } catch (e) { rec = new MediaRecorder(flux); }
     mime = rec.mimeType || mime || 'video/webm';
     rec.ondataavailable = function (e) { if (e.data && e.data.size) morceaux.push(e.data); };
     rec.onstop = function () {
@@ -91,7 +91,15 @@
     }, 200);
   }
   function arreterRec() { if (rec && rec.state !== 'inactive') rec.stop(); }
-  $('b-stop').onclick = arreterRec;
+$('b-stop').onclick = arreterRec;
+  /* croix : on abandonne la prise et on revient au formulaire, les champs restent remplis */
+  $('b-x').onclick = function () {
+    if (decompte) { clearInterval(decompte); decompte = null; }
+    clearInterval(minuteur);
+    if (rec && rec.state !== 'inactive') { rec.onstop = null; try { rec.stop(); } catch (e) {} }
+    enregistrement = false; arreterCam(); morceaux = []; blobFinal = null; $('s-cam').classList.remove('flou');
+    montrer('s-form');
+  };
 
   /* ───────── revoir / terminer ───────── */
   $('b-refaire').onclick = function () { try { URL.revokeObjectURL($('v-revoir').src); } catch (e) {} blobFinal = null; ouvrirCam(); };
@@ -107,7 +115,7 @@
       fichier: nomFichier(), type: blobFinal.type, duree: Math.round((Date.now() - t0) / 1000), cree: new Date().toISOString(), essais: 0, blob: blobFinal };
     ajouter(v).then(function () {
       try { URL.revokeObjectURL($('v-revoir').src); } catch (e) {} blobFinal = null; invite = null; $('b-fin').disabled = false;
-      montrer('s-merci'); synchro(); setTimeout(accueil, 4500);
+      montrer('s-merci'); synchro(); setTimeout(function () { accueil(); }, 7000);
     }).catch(function () { $('b-fin').disabled = false; alert('La vidéo n’a pas pu être enregistrée : la tablette est peut-être pleine. Prévenez l’équipe.'); });
   };
 
@@ -115,31 +123,36 @@
   var envoiEnCours = false, dernierMsg = '';
   function majEtat() {
     toutes().then(function (l) {
-      var n = l.length, txt = n ? (n + ' vidéo' + (n > 1 ? 's' : '') + ' en attente d’envoi') : 'Toutes les vidéos sont envoyées';
-      if (!cfg.serveur) txt = n ? (n + ' vidéo' + (n > 1 ? 's' : '') + ' gardée' + (n > 1 ? 's' : '') + ' sur la tablette') : '';
-      var el = $('etat'); el.textContent = [cfg.event, txt].filter(Boolean).join(' · '); el.classList.toggle('alerte', n > 20);
-      $('a-file').textContent = (n ? n + ' vidéo(s) en attente' : 'Aucune vidéo en attente') + (dernierMsg ? ' — ' + dernierMsg : '');
+      var att = l.filter(function (v) { return !v.envoye; }).length, tot = l.length;
+      var txt = att ? (att + ' vidéo' + (att > 1 ? 's' : '') + ' en attente d’envoi') : (tot ? 'Toutes les vidéos sont envoyées' : '');
+      var el = $('etat'); el.textContent = [cfg.event, txt].filter(Boolean).join(' · '); el.classList.toggle('alerte', att > 20);
+      $('a-file').textContent = tot + ' vidéo(s) gardée(s) sur la tablette, dont ' + (tot - att) + ' envoyée(s)' + (att ? ' — ' + att + ' en attente' : '') + (dernierMsg ? ' — ' + dernierMsg : '');
     }).catch(function () {});
   }
+  var TAILLE = 3 * 1024 * 1024;
   function envoyer(v) {
-    var fd = new FormData();
-    fd.append('video', v.blob, v.fichier);
-    ['id', 'event', 'nom', 'prenom', 'email', 'fichier', 'type', 'duree', 'cree'].forEach(function (k) { fd.append(k, v[k] == null ? '' : v[k]); });
-    fd.append('consent', '1');
-    return fetch(cfg.serveur.replace(/\/+$/, '') + '/api/videobooth/upload', { method: 'POST', headers: { 'x-appareil': cfg.cle }, body: fd }).then(function (r) {
-      if (!r.ok) throw new Error('Serveur : ' + r.status);
-      return r.json().catch(function () { return {}; });
-    });
+    var base = (cfg.serveur || location.origin).replace(/\/+$/, '');
+    var n = Math.max(1, Math.ceil(v.blob.size / TAILLE)), i = 0, dernier = {};
+    function suite() {
+      var q = new URLSearchParams({ id: v.id, i: i, n: n, fichier: v.fichier, type: v.type || '', nom: v.nom, prenom: v.prenom, email: v.email, event: v.event || '', duree: v.duree || 0 });
+      return fetch(base + '/api/videobooth/chunk?' + q.toString(), { method: 'POST', headers: { 'x-appareil': cfg.cle, 'content-type': 'application/octet-stream' }, body: v.blob.slice(i * TAILLE, (i + 1) * TAILLE) }).then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (j) {
+          if (!r.ok || j.ok === false) throw new Error(j.erreur || ('Serveur : ' + r.status));
+          dernier = j; i++; return i < n ? suite() : dernier;
+        });
+      });
+    }
+    return suite();
   }
   function synchro() {
-    if (envoiEnCours || !cfg.serveur || !navigator.onLine) { majEtat(); return Promise.resolve(); }
+    if (envoiEnCours || !cfg.cle || !navigator.onLine) { majEtat(); return Promise.resolve(); }
     envoiEnCours = true;
     return toutes().then(function (l) {
-      l.sort(function (a, b) { return a.cree < b.cree ? -1 : 1; });
+      l = l.filter(function (v) { return !v.envoye; }).sort(function (a, b) { return a.cree < b.cree ? -1 : 1; });
       var suite = Promise.resolve();
       l.forEach(function (v) {
         suite = suite.then(function () {
-          return envoyer(v).then(function () { dernierMsg = ''; return retirer(v.id); }).catch(function (e) { dernierMsg = 'envoi impossible (' + (e.message || 'réseau') + '), nouvel essai automatique'; v.essais = (v.essais || 0) + 1; return ajouter(v); });
+          return envoyer(v).then(function (rep) { dernierMsg = (rep && rep.mail === false) ? 'vidéo envoyée au site, mais e-mail non parti : ' + (rep.mailErreur || '') : ''; v.envoye = true; v.envoyeLe = new Date().toISOString(); v.mail = !(rep && rep.mail === false); return ajouter(v); }).catch(function (e) { dernierMsg = 'envoi impossible (' + (e.message || 'réseau') + '), nouvel essai automatique'; v.essais = (v.essais || 0) + 1; return ajouter(v); });
         });
       });
       return suite;
@@ -149,9 +162,9 @@
 
   /* ───────── réglages (code d'accès) ───────── */
   var pressions = 0, tPress = 0, modePin = 'verifier';
-  $('logo').onclick = function () { var n = Date.now(); pressions = (n - tPress < 1500) ? pressions + 1 : 1; tPress = n; if (pressions >= 5) { pressions = 0; demanderPin(); } };
+  $('cadenas').onclick = demanderPin;
   function demanderPin() {
-    modePin = cfg.pin ? 'verifier' : 'creer'; $('pin-t').textContent = cfg.pin ? 'Code d’accès' : 'Créez un code d’accès'; $('pin-in').value = ''; $('pin-err').textContent = ''; montrer('s-pin'); setTimeout(function () { $('pin-in').focus(); }, 80);
+    modePin = 'verifier'; $('pin-t').textContent = 'Code d’accès'; $('pin-in').value = ''; $('pin-err').textContent = ''; montrer('s-pin'); setTimeout(function () { $('pin-in').focus(); }, 80);
   }
   $('pin-x').onclick = accueil;
   $('pin-ok').onclick = function () {
@@ -161,14 +174,14 @@
   };
   $('pin-in').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('pin-ok').click(); });
   function ouvrirAdmin() {
-    $('a-event').value = cfg.event; $('a-titre').value = cfg.titre; $('a-sous').value = cfg.sous; $('a-serveur').value = cfg.serveur; $('a-cle').value = cfg.cle; $('a-max').value = cfg.max; $('a-pin').value = '';
+    $('a-event').value = cfg.event; $('a-titre').value = cfg.titre; $('a-sous').value = cfg.sous; $('a-serveur').value = cfg.serveur; $('a-cle').value = cfg.cle; $('a-max').value = cfg.max;
     var sel = $('a-cam'); sel.innerHTML = '<option value="">Caméra avant (par défaut)</option>';
     if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) navigator.mediaDevices.enumerateDevices().then(function (d) { d.filter(function (x) { return x.kind === 'videoinput'; }).forEach(function (x, i) { var o = document.createElement('option'); o.value = x.deviceId; o.textContent = x.label || ('Caméra ' + (i + 1)); if (x.deviceId === cfg.cam) o.selected = true; sel.appendChild(o); }); }).catch(function () {});
     majEtat(); montrer('s-admin');
   }
   $('a-save').onclick = function () {
     cfg.event = $('a-event').value.trim(); cfg.titre = $('a-titre').value.trim() || CFG0.titre; cfg.sous = $('a-sous').value.trim(); cfg.serveur = $('a-serveur').value.trim(); cfg.cle = $('a-cle').value.trim();
-    cfg.max = Math.min(120, Math.max(5, Number($('a-max').value) || 30)); cfg.cam = $('a-cam').value; if ($('a-pin').value.trim().length >= 4) cfg.pin = $('a-pin').value.trim();
+    cfg.max = Math.min(120, Math.max(5, Number($('a-max').value) || 30)); cfg.cam = $('a-cam').value;
     ecrireCfg(cfg); accueil(); synchro();
   };
   $('a-sync').onclick = function () { dernierMsg = 'envoi en cours…'; majEtat(); synchro().then(majEtat); };
