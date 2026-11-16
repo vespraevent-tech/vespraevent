@@ -10,7 +10,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="/favicon.png">
 <link rel="stylesheet" href="/polices.css?v=1">
-<link rel="stylesheet" href="app.css?v=6">
+<link rel="stylesheet" href="app.css?v=8">
 </head>
 <body>
 <main id="app">
@@ -60,23 +60,34 @@
   </section>
 
   <section id="s-admin" class="ecran">
-    <h2>Réglages</h2>
-    <div class="grille">
-      <label>Événement<input id="a-event" type="text" placeholder="Mariage Durand — 20 juin"></label>
-      <label>Titre d’accueil<input id="a-titre" type="text"></label>
-      <label>Sous-titre<input id="a-sous" type="text"></label>
-      <label>Adresse du site (laisser vide = ce site)<input id="a-serveur" type="url" placeholder="https://www.vespraevent.fr"></label>
-      <label>Clé de l’appareil<input id="a-cle" type="text" autocomplete="off"></label>
-      <label>Durée maximale (secondes)<input id="a-max" type="number" min="5" max="120"></label>
-      <label>Caméra<select id="a-cam"></select></label>
-      
-    </div>
-    <div class="rang haut" style="justify-content:flex-start"><button id="a-test" class="sec" type="button">Tester la connexion</button><span id="a-test-r" class="etat gros-etat"></span></div>
-    <div id="a-file" class="etat gros-etat"></div>
-    <div class="rang haut">
-      <button id="a-sync" class="sec" type="button">Envoyer maintenant</button>
-      <button id="a-export" class="sec" type="button">Exporter les vidéos en attente</button>
-      <button id="a-save" class="gros" type="button">Enregistrer et fermer</button>
+    <div class="adm">
+      <header class="adm-h"><h2>Réglages</h2><button id="a-close" class="adm-x" type="button" aria-label="Fermer sans enregistrer">✕</button></header>
+
+      <div class="adm-c">
+        <h3>Événement</h3>
+        <label>Nom de l’événement<input id="a-event" type="text" placeholder="Mariage Durand — 20 juin"></label>
+        <div class="adm-2">
+          <label>Titre d’accueil<input id="a-titre" type="text"></label>
+          <label>Sous-titre<input id="a-sous" type="text"></label>
+        </div>
+        <div class="adm-2">
+          <label>Durée maximale (secondes)<input id="a-max" type="number" min="5" max="120"></label>
+          <label>Caméra<select id="a-cam"></select></label>
+        </div>
+      </div>
+
+      <div class="adm-c">
+        <h3>Envoi des vidéos</h3>
+        <div class="adm-2">
+          <label>Adresse du site<input id="a-serveur" type="url" placeholder="vide = ce site"></label>
+          <label>Clé de l’appareil<input id="a-cle" type="text" autocomplete="off"></label>
+        </div>
+        <div class="adm-l"><button id="a-test" class="adm-b" type="button">Tester la connexion</button><span id="a-test-r" class="adm-m"></span></div>
+        <div id="a-file" class="adm-m"></div>
+        <div class="adm-l"><button id="a-sync" class="adm-b" type="button">Envoyer maintenant</button><button id="a-export" class="adm-b" type="button">Exporter les vidéos</button></div>
+      </div>
+
+      <div class="adm-f"><button id="a-save" class="adm-ok" type="button">Enregistrer et fermer</button></div>
     </div>
   </section>
 
@@ -87,6 +98,6 @@
     <div class="rang"><button id="pin-x" class="sec" type="button">Annuler</button><button id="pin-ok" class="gros" type="button">Valider</button></div>
   </section>
 </main>
-<script src="app.js?v=7"></script>
+<script src="app.js?v=8"></script>
 </body>
 </html>

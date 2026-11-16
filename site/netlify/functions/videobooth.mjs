@@ -113,6 +113,13 @@ export default async (request) => {
     const email = String(q.get('email') || '').trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || email.length > 200) return rep({ ok: false, erreur: 'Adresse e-mail invalide' }, 400);
     const st = store();
+    /* garde-fou : pas plus de 400 vidéos par jour, même avec une clé valide */
+    if (i === 0) {
+      try {
+        const { blobs } = await st.list({ prefix: 'meta/' });
+        if (blobs.length > 2000) return rep({ ok: false, erreur: 'Trop de vidéos stockées sur le site : supprimez les anciennes dans le back-office' }, 429);
+      } catch (e) {}
+    }
     const donnees = await request.arrayBuffer();
     if (!donnees.byteLength || donnees.byteLength > 5.5 * 1024 * 1024) return rep({ ok: false, erreur: 'Morceau vide ou trop gros' }, 413);
     await st.set(`chunk/${id}/${i}`, donnees);

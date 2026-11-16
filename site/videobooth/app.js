@@ -3,10 +3,10 @@
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
-  var CFG0 = { event: '', titre: 'Enregistrer un souvenir', sous: 'Laissez un petit message vidéo de 30 secondes', serveur: '', cle: '', max: 30, cam: '', pin: '0104' };
+  var CFG0 = { event: '', titre: 'Enregistrer un souvenir', sous: 'Laissez un petit message vidéo de 30 secondes', serveur: '', cle: '234b81789b23d9224e60b3ae', max: 30, cam: '', pin: '0104' };
   function lireCfg() { try { return Object.assign({}, CFG0, JSON.parse(localStorage.getItem('vb-cfg') || '{}')); } catch (e) { return Object.assign({}, CFG0); } }
   function ecrireCfg(c) { try { localStorage.setItem('vb-cfg', JSON.stringify(c)); } catch (e) {} }
-  var cfg = lireCfg(); if (!cfg.pin) cfg.pin = '0104';
+  var cfg = lireCfg(); if (!cfg.pin) cfg.pin = '0104'; if (!cfg.cle) cfg.cle = CFG0.cle;
   /* appairage rapide : ouvrir /videobooth/#cle=VOTRE_CLE une seule fois enregistre la clé sur la tablette */
   try {
     var mh = /[#&?]cle=([^&]+)/.exec(location.hash || '');
@@ -186,8 +186,9 @@ $('b-stop').onclick = arreterRec;
     if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) navigator.mediaDevices.enumerateDevices().then(function (d) { d.filter(function (x) { return x.kind === 'videoinput'; }).forEach(function (x, i) { var o = document.createElement('option'); o.value = x.deviceId; o.textContent = x.label || ('Caméra ' + (i + 1)); if (x.deviceId === cfg.cam) o.selected = true; sel.appendChild(o); }); }).catch(function () {});
     majEtat(); montrer('s-admin');
   }
+  $('a-close').onclick = function () { accueil(); };
   $('a-save').onclick = function () {
-    cfg.event = $('a-event').value.trim(); cfg.titre = $('a-titre').value.trim() || CFG0.titre; cfg.sous = $('a-sous').value.trim(); cfg.serveur = $('a-serveur').value.trim(); cfg.cle = $('a-cle').value.trim();
+    cfg.event = $('a-event').value.trim(); cfg.titre = $('a-titre').value.trim() || CFG0.titre; cfg.sous = $('a-sous').value.trim(); cfg.serveur = $('a-serveur').value.trim(); cfg.cle = $('a-cle').value.trim() || CFG0.cle;
     cfg.max = Math.min(120, Math.max(5, Number($('a-max').value) || 30)); cfg.cam = $('a-cam').value;
     ecrireCfg(cfg); accueil(); synchro();
   };
