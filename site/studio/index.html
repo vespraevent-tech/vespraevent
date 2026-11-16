@@ -538,6 +538,10 @@ select.dpc-q::-ms-expand{display:none}
 .fd-sous{display:block;font:400 11px Inter,system-ui,sans-serif;color:#9aa0ab;margin-top:2px}
 .fd-statut{padding:10px 28px 4px}.fd-statut .dm-champ{display:inline-flex;align-items:center;gap:10px}.fd-statut .dm-champ label{margin:0}
 .dpc-txt{font-weight:600}.dpc-qt{font-size:12px;color:#6b7280;margin-left:6px}
+/* « Ajouter une réservation » depuis la liste : la fenêtre s'ouvre par-dessus la liste, sans afficher le planning derrière */
+body.resa-depuis-liste{overflow:hidden}
+body.resa-depuis-liste #panel-resa.resa-overlay{display:block!important;position:fixed;inset:0;z-index:2000;padding:0;margin:0;background:transparent;pointer-events:none}
+body.resa-depuis-liste #panel-resa.resa-overlay #resaFrame{position:fixed;inset:0;width:100%!important;height:100%!important;max-width:none;border:none;border-radius:0;background:transparent;pointer-events:auto}
 body.bo-cadre-plein{overflow:hidden}
 body.bo-cadre-plein #resaFrame{position:fixed;inset:0;width:100%!important;height:100%!important;
   max-width:none;border:none;border-radius:0;z-index:2000}
@@ -2546,18 +2550,47 @@ async function saveAdminSettings(){
   }catch(e){st.textContent=e.message;}
 }
 
+/* ferme la fenêtre ouverte depuis la liste : la liste n'a jamais bougé, on la rafraîchit */
+function resaListeFin(){
+  if(!window._resaDepuisListe) return;
+  window._resaDepuisListe = false;
+  document.body.classList.remove('resa-depuis-liste');
+  const pan = document.getElementById('panel-resa'); if(pan) pan.classList.remove('resa-overlay');
+  try{ const cadre = document.getElementById('resaFrame'); const d = cadre && cadre.contentDocument; if(d) d.documentElement.classList.remove('modale-seule'); }catch(e){}
+  try{ if(typeof loadDemandes === 'function') loadDemandes(true); }catch(e){}
+  try{ if(typeof chargerResasCache === 'function') chargerResasCache(); }catch(e){}
+}
 async function ajouterReservationDepuisListe(){
-  switchTab('resa-planning');
+  window._resaDepuisListe = true;
+  window._resaOuverte = false;
+  document.body.classList.add('resa-depuis-liste');
+  const pan = document.getElementById('panel-resa'); if(pan) pan.classList.add('resa-overlay');
+  ouvrirResa(PAGES_RESA['resa-planning'] || 'planning');
+  let essais = 0;
   const ouvrir = () => {
     const cadre = document.getElementById('resaFrame');
-    if(cadre && cadre.contentWindow && typeof cadre.contentWindow.openModal === 'function'){
+    if(cadre && cadre.contentWindow && typeof cadre.contentWindow.openModal === 'function' && cadre.contentDocument && cadre.contentDocument.getElementById('mb')){
+      try{
+        const d = cadre.contentDocument;
+        if(!d.getElementById('vp-modale-seule')){
+          const st = d.createElement('style'); st.id = 'vp-modale-seule';
+          st.textContent = 'html.modale-seule,html.modale-seule body{background:transparent!important}html.modale-seule body>*:not(.modalbg):not(script):not(style){visibility:hidden!important}';
+          d.head.appendChild(st);
+        }
+        d.documentElement.classList.add('modale-seule');
+      }catch(e){}
       cadre.contentWindow.openModal();
       return true;
     }
     return false;
   };
   if(ouvrir()) return;
-  const attente = () => { if(!ouvrir()) setTimeout(attente, 100); };
+  const attente = () => {
+    if(!window._resaDepuisListe) return;
+    if(ouvrir()) return;
+    if(++essais > 150){ resaListeFin(); return; }   /* 15 s : on abandonne proprement */
+    setTimeout(attente, 100);
+  };
   setTimeout(attente, 100);
 }
 
@@ -2934,6 +2967,11 @@ window.addEventListener('message', e => {
   /* une fiche s'ouvre à l'intérieur du cadre : on lui donne tout l'écran,
      sans quoi son haut ou son bas dépasse de la zone visible dès que la
      page est un peu défilée (voir reservation-plus.js) */
+  if(e.data && e.data.type === 'vespra-fenetre' && window._resaDepuisListe){
+    if(e.data.ouverte) window._resaOuverte = true;
+    else if(window._resaOuverte) resaListeFin();
+    return;
+  }
   if(e.data && e.data.type === 'vespra-fenetre'){
     /* sur ordinateur, le cadre garde sa taille : la fiche s'ouvre par-dessus
        le planning, qui ne bouge pas. Le plein écran ne sert qu'au téléphone. */
