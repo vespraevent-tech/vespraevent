@@ -751,6 +751,8 @@ html body input, html body select, html body textarea { max-width: 100%; }
       <div class="field ac-wrap"><label>Prénom &amp; Nom du client</label><input id="client" placeholder="Ex : Jean Dupuis" autocomplete="off" oninput="acSearch(this.value)"><div class="ac-list" id="ac-list"></div></div>
       <div class="field"><label>Téléphone</label><input id="phone" type="tel" placeholder="06 00 00 00 00"></div>
       <div class="field"><label>Email</label><input id="email" type="email" placeholder="client@email.com"></div>
+      <div class="field"><label>Type de client</label><select id="clientType" onchange="majTypeClient()"><option value="">Particulier</option><option value="pro">Entreprise, association, mairie…</option></select></div>
+      <div class="field" id="proWrap" style="display:none;grid-column:1/-1"><label>Nom de l’entreprise ou de l’association</label><input id="societe" placeholder="Ex : Comité des fêtes de Vitré" autocomplete="off"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><div><label>SIRET</label><input id="siret" placeholder="123 456 789 00012" autocomplete="off"></div><div><label>N° de TVA (facultatif)</label><input id="tvaClient" placeholder="FR00123456789" autocomplete="off"></div></div></div>
       <div class="field"><label>Date de début</label><input id="dateStart" type="date"></div>
       <div class="field"><label>Date de fin</label><input id="dateEnd" type="date"></div>
       <div class="field"><label>Nombre de convives</label><select id="convives"></select></div>
@@ -815,6 +817,8 @@ html body input, html body select, html body textarea { max-width: 100%; }
       <h3>Produits à prévoir</h3>
       <!-- Récapitulatif produits sélectionnés -->
       <div id="prod-selected-tags" class="prod-selected-tags" style="display:none"></div>
+      <div class="pk-libre" style="margin:8px 0 0"><button type="button" class="btn btn-ghost" onclick="pkLibreOuvrir()" style="font-size:12.5px;padding:7px 12px">+ Ligne personnalisée (titre et prix libres)</button>
+        <div id="pkLibreForm" style="display:none;gap:8px;margin-top:8px;flex-wrap:wrap"><input id="pkLibreTitre" placeholder="Ex : Location de camion" autocomplete="off" style="flex:1 1 180px"><input id="pkLibrePrix" inputmode="decimal" placeholder="Prix TTC €" autocomplete="off" style="flex:0 0 120px"><button type="button" class="btn" onclick="pkAjouterLibre()">Ajouter</button></div></div>
       <!-- Liste déroulante : catégories du site → produits → options -->
       <details id="prod-details" class="pk-det">
         <summary id="prod-summary">Ajouter un produit</summary>
@@ -5844,6 +5848,17 @@ function renderProdTags(){
   // Mise à jour acompte
   if(typeof toggleAcompte==='function'&&acompte){window.toggleAcompte(true);}
 }
+window.pkLibreOuvrir=function(){var f=document.getElementById('pkLibreForm');if(!f)return;f.style.display=f.style.display==='none'?'flex':'none';if(f.style.display!=='none')document.getElementById('pkLibreTitre').focus();};
+window.pkAjouterLibre=function(){
+  var t=String(document.getElementById('pkLibreTitre').value||'').trim();
+  var n=Number(String(document.getElementById('pkLibrePrix').value||'').replace(/\s/g,'').replace(',','.').replace(/\u20ac/g,''));
+  if(!t){document.getElementById('pkLibreTitre').focus();return;}
+  var prix=(isFinite(n)&&n>=0)?Math.round(n*100)/100:0;
+  var max=0;modalSel.forEach(function(x){if(x.uid>max)max=x.uid;});
+  modalSel.push({uid:max+1,name:t.slice(0,80),short:t.slice(0,80),cat:'divers',price:prix,prixManuel:true,libre:true,variant:'Standard'});
+  document.getElementById('pkLibreTitre').value='';document.getElementById('pkLibrePrix').value='';document.getElementById('pkLibreForm').style.display='none';
+  renderProdTags();
+};
 function pkAjouterOption(par,d){
   var max=0; modalSel.forEach(function(x){if(x.uid>max)max=x.uid;});
   modalSel.push({uid:max+1,parent:par.uid,name:d.nom,short:d.label,cat:d.cat||par.cat,price:d.devis?0:d.prix,variant:'Standard',estOption:true});
@@ -5977,6 +5992,23 @@ function populateValidatedBy(selectedName){
   }
 }
 
+window.majTypeClient=function(){var s=document.getElementById('clientType'),w=document.getElementById('proWrap');if(w&&s)w.style.display=s.value==='pro'?'':'none';};
+function remplirTypeClient(r){
+  var fc=(r&&r.factureClient)||{};
+  var pro=!!(r&&(/entreprise|association|mairie|collectivit/i.test(String(r.clientType||''))||fc.pro===true));
+  var set=function(id,v){var e=document.getElementById(id);if(e)e.value=v||'';};
+  set('clientType',pro?'pro':'');set('societe',(r&&r.societe)||fc.societe||'');set('siret',(r&&r.siret)||fc.siret||'');set('tvaClient',(r&&r.tva)||fc.tvaClient||'');
+  majTypeClient();
+}
+/* type de client, société, SIRET et TVA : repris par le devis et la facture */
+function appliquerTypeClient(o){
+  if(!o)return;
+  var pro=document.getElementById('clientType').value==='pro';
+  var v=function(id){return (document.getElementById(id).value||'').trim();};
+  o.clientType=pro?'Entreprise ou association':'';
+  o.societe=pro?v('societe'):'';o.siret=pro?v('siret'):'';o.tva=pro?v('tvaClient'):'';
+  o.factureClient=Object.assign({},o.factureClient||{},{pro:pro,siret:o.siret,tvaClient:o.tva,societe:o.societe});
+}
 function openModal(){
   editMode=false;currentDetailId=null;
   livraison=true;acompte=false;if(window.toggleVirement)window.toggleVirement(false);
@@ -6005,6 +6037,7 @@ function openModal(){
   document.getElementById('client').value='';
   document.getElementById('phone').value='';
   document.getElementById('email').value='';
+  remplirTypeClient(null);
   document.getElementById('place').value='';
   document.getElementById('notes').value='';
   document.getElementById('mb').classList.add('open');
@@ -6056,6 +6089,7 @@ document.getElementById('saveM').onclick=function(){
         products:sel,validatedBy:_vb
       });
       pkSuppSave(R[idx]);
+      appliquerTypeClient(R[idx]);
       if(window.vespraClientsSuivre)window.vespraClientsSuivre([_avantR],R);
     }
   } else {
@@ -6078,6 +6112,7 @@ document.getElementById('saveM').onclick=function(){
       statutSuivi:'en-cours'
     });
     pkSuppSave(R[R.length-1]);
+    appliquerTypeClient(R[R.length-1]);
   }
   localStorage.setItem('vespraR',JSON.stringify(R));
   var _sv=editMode?R.find(function(x){return String(x.id)===String(currentDetailId);}):R[R.length-1];
@@ -6838,6 +6873,7 @@ function openModalEdit(id) {
   document.getElementById('client').value = r.client||'';
   populateValidatedBy(typeof r.validatedBy==='string'?r.validatedBy:(r.validatedBy?r.validatedBy.firstName:null));
   document.getElementById('phone').value = r.phone||'';
+  try{ var _dl=(window.parent&&window.parent.cache&&window.parent.cache.demandes||[]).find(function(x){return x&&x.resaId&&String(x.resaId)===String(r.id);}); remplirTypeClient(Object.assign({},_dl&&{clientType:_dl.clientType,societe:_dl.societe,siret:_dl.siret,tva:_dl.tva},r.clientType||r.societe||r.siret||r.tva||r.factureClient?r:{})); }catch(e){ remplirTypeClient(r); }
   document.getElementById('email').value = r.email||'';
   document.getElementById('dateStart').value = r.dateStart||'';
   document.getElementById('dateEnd').value = r.dateEnd||r.dateStart||'';

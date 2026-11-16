@@ -1037,6 +1037,7 @@ body.bo-masque .bo-oeil-bar .o-ferme{display:block}
 .fd-modifs input{width:100%;border:1px solid #dcd5c8;border-radius:8px;padding:6px 10px;margin:6px 0;font:12px Inter,sans-serif}
 #panel-videobooth{min-width:0;max-width:100%;overflow-x:hidden}#panel-videobooth .toolbar{flex-wrap:wrap;gap:10px}#panel-videobooth .actions-bar{margin-left:0!important;flex-wrap:wrap;gap:8px}
 .ik-legs .ik-lg{display:grid;grid-template-columns:1fr 1fr 90px 32px;gap:8px;margin-bottom:8px}.ik-legs .ik-lg input{width:100%}.ik-legb{display:flex;gap:8px;flex-wrap:wrap}@media(max-width:620px){.ik-legs .ik-lg{grid-template-columns:1fr 1fr 70px 28px}}.ik-w{flex:1 1 280px}.ik-elec{flex:0 0 120px}.ik-elec input{width:20px;height:20px;padding:0}.ik-an{margin-top:14px;background:#fff;border:1px solid var(--g3);border-radius:12px;overflow:hidden}.ik-anh{display:flex;justify-content:space-between;gap:10px;padding:12px 16px;background:#f7f5f0;font-size:14px}.ik-l{display:flex;justify-content:space-between;gap:12px;padding:11px 16px;border-top:1px solid #eee8dc;font-size:13.5px;align-items:center}.ik-s{font-size:12px;color:#8a8f98;margin-top:2px}.ik-r{display:flex;align-items:center;gap:12px;white-space:nowrap}.ik-r span{color:#6b7280}.ik-x{background:none;border:0;color:#b03a2a;font-size:20px;cursor:pointer}#ikApercu b{font-size:17px;color:var(--navy)}#ikApercu span{color:#8a8f98;font-size:12.5px}@media(max-width:560px){.ik-l{flex-direction:column;align-items:flex-start}}
+.md-libre{margin:8px 0}.md-libre-f{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}.md-libre-f input{flex:1 1 180px;padding:8px 10px;border:1px solid #d9dde5;border-radius:8px;font:inherit}.md-libre-f input:last-of-type{flex:0 0 120px}.md-titre-libre{border:1px solid #d9dde5;border-radius:8px;padding:6px 8px;font:inherit;font-weight:600;min-width:0;flex:1}
 </style>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=7">
   <link rel="manifest" href="/studio/manifest.webmanifest">
@@ -4985,6 +4986,8 @@ function modifierDemande(id){
       (d.interets && !materielListe(d).length
         ? '<div class="md-interets">Le client s\'intéresse à : <b>' + esc(String(d.interets)) + '</b>. Ajoutez les produits ci-dessous.</div>' : '') +
       '<div id="mdListe"></div>' +
+      '<div class="md-libre"><button type="button" class="btn btn-ghost" onclick="mdLibreOuvrir()">+ Ligne personnalisée (titre et prix libres)</button>' +
+        '<div id="mdLibreForm" class="md-libre-f" style="display:none"><input type="text" id="mdLibreTitre" placeholder="Ex : Location de camion" autocomplete="off"><input type="text" inputmode="decimal" id="mdLibrePrix" placeholder="Prix TTC €" autocomplete="off"><button type="button" class="btn" onclick="mdAjouterLibre()">Ajouter</button></div></div>' +
       '<div class="md-ajout">' +
         '<select id="mdNouveau"><option value="">Ajouter un produit…</option>' + catalogueOptionsHTML() + '</select>' +
         '<button type="button" class="btn btn-ghost" onclick="mdAjouter()">Ajouter</button>' +
@@ -5235,7 +5238,7 @@ function mdCharger(d){
     prix: (x.prix || 0) / (x.qte > 1 ? x.qte : 1),
     prixForce: x.prixManuel ? (Number(x.prix) || 0) : null,
     perso: x.perso || null, optPrix: x.optPrix || null, ancien: !!x.ancien,
-    presta: !!x.presta, desc: x.desc || '', orga: x.orga || '',
+    presta: !!x.presta, desc: x.desc || '', orga: x.orga || '', libre: !!x.libre,
   }));
   /* Une formule absente ou inconnue ne doit jamais retomber sur la première
      du menu (« Digital ») : on la retrouve d'après le prix enregistré, et à
@@ -5365,7 +5368,7 @@ function mdRendre(){
     }
     const hors = '';
     return '<div class="md-l">' +
-      '<div class="md-h"><span class="md-n">' + esc(l.produit) + hors + '</span>' +
+      '<div class="md-h">' + (l.libre ? '<input type="text" class="md-n md-titre-libre" value="' + escVal(l.produit) + '" onchange="mdTitreLibre(' + i + ', this.value)" aria-label="Titre de la ligne" placeholder="Titre">' : '<span class="md-n">' + esc(l.produit) + hors + '</span>') +
         ((qteMaxProduit(l.produit) > 1 || (l.qte||1) > 1) ? '<span class="md-q" title="Quantité"><button type="button" aria-label="Moins" onclick="mdQte(' + i + ', -1)">−</button><b>' + (l.qte||1) + '</b><button type="button" aria-label="Plus" onclick="mdQte(' + i + ', 1)"' + ((l.qte||1) >= Math.max(qteMaxProduit(l.produit), l.qte||1) ? ' disabled' : '') + '>+</button></span>' : '<span style="margin-left:auto"></span>') +
         '<span class="md-p"><input type="text" inputmode="decimal" class="md-pin' + (l.prixForce != null ? ' forc' : '') + '" value="' + escVal(l.presta && !prixLigne(l) ? '' : String(Math.round(prixLigne(l)*100)/100).replace('.', ',')) + '"' + (l.presta ? ' placeholder="Prestation"' : '') + ' aria-label="Prix de la ligne" onchange="mdPrix(' + i + ', this.value)"> €' +
           (l.prixForce != null && !l.presta ? '<button type="button" class="md-rst" title="Revenir au prix du catalogue" onclick="mdPrix(' + i + ', \'\')">↺</button>' : '') + '</span>' +
@@ -5503,6 +5506,22 @@ function mdOption(i, nom, on){
 
 function mdRetirer(i){ mdLignes.splice(i, 1); mdRendre(); }
 
+function mdLibreOuvrir(){
+  const f = document.getElementById('mdLibreForm'); if(!f) return;
+  f.style.display = f.style.display === 'none' ? 'flex' : 'none';
+  if(f.style.display !== 'none') document.getElementById('mdLibreTitre').focus();
+}
+function mdAjouterLibre(){
+  const t = String((document.getElementById('mdLibreTitre')||{}).value || '').trim();
+  const n = Number(String((document.getElementById('mdLibrePrix')||{}).value || '').replace(/\s/g,'').replace(',', '.').replace(/€/g,''));
+  if(!t){ document.getElementById('mdLibreTitre').focus(); return; }
+  const prix = (isFinite(n) && n >= 0) ? Math.round(n * 100) / 100 : 0;
+  mdLignes.push({ produit: t.slice(0, 80), formule: '', options: [], prix: prix, qte: 1, prixForce: prix, libre: true });
+  document.getElementById('mdLibreTitre').value = ''; document.getElementById('mdLibrePrix').value = '';
+  document.getElementById('mdLibreForm').style.display = 'none';
+  mdRendre();
+}
+function mdTitreLibre(i, v){ if(mdLignes[i]) mdLignes[i].produit = String(v||'').slice(0, 80); }
 function mdAjouter(){
   const sel = document.getElementById('mdNouveau');
   if(!sel || !sel.value) return;
@@ -5536,6 +5555,7 @@ function mdPanier(){
     if(l.presta){ o.prestation = true; o.description = String(l.desc||'').trim(); o.prixManuel = true; o.organisationTtc = Number(l.orga) > 0 ? Number(l.orga) : 0; o.prestataire = prestaIdLocal(l.produit); }
     if(l.qte > 1) o.quantite = l.qte;
     if(l.prixForce != null) o.prixManuel = true;
+    if(l.libre){ o.libre = true; o.prixManuel = true; o.prix = prixLigne(l); }
     if(l.perso) o.formulePerso = { n: l.perso.n, prix: l.perso.prix };
     if(l.optPrix) o.prixOptions = l.optPrix;
     return o;
@@ -6126,6 +6146,7 @@ function materielListe(d){
       /* « Spot LED sur batterie ×8 » : une seule ligne, avec sa quantité */
       { const qn = Number(a.quantite != null ? a.quantite : a.qty); ligne.qte = qn > 1 ? Math.floor(qn) : 1; ligne.srcIdx = (brut === d.panier) ? ai : -1; }
       ligne.prixManuel = !!a.prixManuel; if(a.prixManuel) ligne.manuel = true;
+      if(a.libre) ligne.libre = true;
       if(a.formulePerso && typeof a.formulePerso === 'object') ligne.perso = { n: Number(a.formulePerso.n)||0, prix: Number(a.formulePerso.prix)||0 };
       if(a.prixOptions && typeof a.prixOptions === 'object') ligne.optPrix = a.prixOptions;
       /* Une demande encore en cours (non validée) n'a pas de prix figé : on

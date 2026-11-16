@@ -96,7 +96,7 @@
           if (typeof showToast === 'function') showToast('Saisies non enregistrées : ' + e.message, true);
         });
       }
-      r.factureClient = { adresse: v.adresse || '', pro: !!v.pro, siret: v.siret || '', tvaClient: v.tvaClient || '', avecAcompte: !!v.avecAcompte, acomptePct: v.acomptePct || 30 };
+      r.factureClient = { adresse: v.adresse || '', pro: !!v.pro, siret: v.siret || '', tvaClient: v.tvaClient || '', avecAcompte: !!v.avecAcompte, acomptePct: v.acomptePct || 30, societe: (r.factureClient && r.factureClient.societe) || r.societe || '' };
       if (typeof api === 'function') {
         return Promise.resolve(api('/data', { method: 'POST', body: JSON.stringify({ collection: 'reservations', item: { id: r.id, d: JSON.stringify(r) } }) }))
           .catch(function (e) { if (typeof showToast === 'function') showToast('Saisies non enregistrées : ' + e.message, true); });
@@ -232,7 +232,8 @@
   /* Le nom de la société, quand le client en a indiqué une : il remplace le nom de la personne sur le document. */
   function societeDe(r, source) {
     var d = demandeLieeDe(r, source);
-    if (!d) return '';
+    /* réservation créée à la main : le nom de la structure est saisi sur la réservation elle-même */
+    if (!d) { var fc0 = (r && r.factureClient) || {}; var nomS = String((r && r.societe) || fc0.societe || '').trim(); return (fc0.pro === true || /entreprise|association|mairie|collectivit/i.test(String((r && r.clientType) || ''))) ? nomS : ''; }
     var estPro = /entreprise|association|mairie|collectivit/i.test(String(d.clientType || ''));
     return estPro ? String(d.societe || '').trim() : '';
   }
