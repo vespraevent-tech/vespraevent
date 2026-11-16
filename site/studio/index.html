@@ -1850,6 +1850,16 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
       <div class="toolbar"><div><h2>Espace client</h2><div class="hint">Comptes des clients, codes de connexion et demandes de modification.</div></div>
         <div class="actions-bar" style="margin-left:auto;padding-top:0;border:0"><input class="dm-tri" id="espQ" placeholder="Rechercher…" oninput="espRendre()" style="width:150px;min-width:0;flex:none;padding:5px 9px;font:400 12px Inter,system-ui,sans-serif;color:#646D7C"></div></div>
       <div style="font:11px Inter,system-ui,sans-serif;color:#8a8f9b;margin:-4px 0 10px"><button type="button" onclick="espTestMail()" style="border:0;background:none;padding:0;color:#8a8f9b;text-decoration:underline;cursor:pointer;font:inherit">Tester l’envoi d’e-mails</button> <span id="espTest"></span></div>
+      <div id="espNouveau" style="background:#fff;border:1px solid #e3e6eb;border-radius:12px;padding:14px;margin:0 0 14px;font:13px Inter,system-ui,sans-serif">
+        <b style="display:block;margin-bottom:8px">Créer un compte espace client</b>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input id="espNE" type="email" placeholder="Adresse e-mail" autocomplete="off" style="flex:1 1 220px;min-width:0;padding:8px 10px;border:1px solid #d5d9e0;border-radius:8px;font:inherit">
+          <input id="espNN" type="text" placeholder="Nom (facultatif)" autocomplete="off" style="flex:1 1 150px;min-width:0;padding:8px 10px;border:1px solid #d5d9e0;border-radius:8px;font:inherit">
+          <input id="espNP" type="text" placeholder="Mot de passe (10 caractères min.)" autocomplete="off" style="flex:1 1 210px;min-width:0;padding:8px 10px;border:1px solid #d5d9e0;border-radius:8px;font:inherit">
+          <button class="btn primary" type="button" onclick="espCreer()">Créer le compte</button>
+        </div>
+        <div id="espNM" style="min-height:18px;margin-top:8px;font-size:12px"></div>
+      </div>
       <div id="espModifs"></div>
       <div id="espListe" style="overflow-x:auto"></div>
     </div>
@@ -9809,6 +9819,19 @@ function espRendre(){
     return '<tr><td style="padding:8px 6px;border-top:1px solid #eee8dc"><b>' + esc(c.nom || '—') + '</b><br><small style="color:#8a8577">' + esc(c.tel||'') + '</small></td><td style="padding:8px 6px;border-top:1px solid #eee8dc;word-break:break-all">' + esc(c.email) + '</td><td style="padding:8px 6px;border-top:1px solid #eee8dc">' + etat + '</td><td style="padding:8px 6px;border-top:1px solid #eee8dc;text-align:right"><button class="btn" onclick="espOuvrir(\'' + escAttr(c.email) + '\',\'' + escAttr(c.nom||'') + '\')">Gérer</button></td></tr>';
   }).join('') + '</tbody></table>' : '<div class="rech-vide">Aucun compte créé pour le moment.</div>';
 }
+async function espCreer(){
+  const m = document.getElementById('espNM'), v = id => document.getElementById(id).value.trim();
+  const email = v('espNE').toLowerCase(), nom = v('espNN'), mdp = document.getElementById('espNP').value;
+  const err = t => { m.style.color = '#9e2a2a'; m.textContent = t; };
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return err('Adresse e-mail invalide.');
+  if(mdp.length < 10) return err('Le mot de passe doit faire au moins 10 caractères.');
+  m.style.color = '#8a8f9b'; m.textContent = 'Création…';
+  try{
+    await api('/espace-comptes', {method:'POST', body: JSON.stringify({email:email, nom:nom, password:mdp})});
+    m.style.color = '#3d6e36'; m.textContent = 'Compte créé : ' + email + '. Connexion sur la page « espace client » du site, onglet « Connexion ».';
+    document.getElementById('espNP').value = ''; await espCharger();
+  }catch(e){ err(e.message || 'Erreur'); }
+}
 async function espTestMail(){
   const z = document.getElementById('espTest'); z.style.color = '#8a8f9b'; z.textContent = 'Envoi…';
   try{
@@ -9835,7 +9858,7 @@ function espOuvrir(email, nom){
   q('espB1').onclick = () => post({email:email, nom:nom, genererCode:true}).then(d => { q('espRes').innerHTML = 'Code à envoyer au client : <b style="font-size:18px;letter-spacing:.2em">' + d.code + '</b><br><small style="color:#646D7C">Notez-le : il ne sera plus affichable.</small>'; espCharger(); }).catch(e => { q('espRes').textContent = e.message; });
   if(a){
     q('espB2').onclick = () => post({email:email, actif:!a.actif}).then(() => { ov.remove(); espCharger(); });
-    q('espB3').onclick = () => { if(!confirm('Supprimer cet espace client ? Ses réservations ne sont pas touchées.')) return; api('/espace-comptes?email=' + encodeURIComponent(email), {method:'DELETE'}).then(() => { ov.remove(); espCharger(); }); };
+    q('espB3').onclick = () => { if(!confirm('Supprimer cet espace client ? Ses réservations ne sont pas touchées.')) return; api('/espace-comptes?email=' + encodeURIComponent(email), {method:'DELETE'}).then(() => { delete cache.espComptes[String(email).toLowerCase()]; ov.remove(); espRendre(); espCharger(); }).catch(e => alert('Suppression impossible : ' + (e.message || e))); };
   }
 }
 /* le nom du client, sur une fiche, mène à son espace client */

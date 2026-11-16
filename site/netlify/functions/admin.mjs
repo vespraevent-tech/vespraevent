@@ -786,7 +786,7 @@ const emailValide = (e) => /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/.test(Strin
 const cleCompte = (e) => 'espace/compte/' + encodeURIComponent(emailCle(e));
 
 async function lireCompte(email) {
-  try { return await (await blobStore(AUTH_STORE)).get(cleCompte(email), { type: 'json', consistency: 'strong' }); }
+  try { const c = await (await blobStore(AUTH_STORE)).get(cleCompte(email), { type: 'json', consistency: 'strong' }); return c && !c.supprime ? c : null; }
   catch { return null; }
 }
 async function ecrireCompte(c) {
@@ -1631,7 +1631,7 @@ async function espaceAdmin(request, url, path) {
     const res = [];
     for (const b of blobs) {
       const c = await store.get(b.key, { type: 'json', consistency: 'strong' }).catch(() => null);
-      if (c) res.push({ email: c.email, nom: c.nom || '', actif: c.actif !== false, cree: c.cree || '', dernierAcces: c.dernierAcces || '', mailEtat: c.mailEtat || null, nomSource: c.nomSource || '' });
+      if (c && !c.supprime) res.push({ email: c.email, nom: c.nom || '', actif: c.actif !== false, cree: c.cree || '', dernierAcces: c.dernierAcces || '', mailEtat: c.mailEtat || null, nomSource: c.nomSource || '' });
     }
     return json(res.sort((a, b) => a.nom.localeCompare(b.nom)));
   }
@@ -1682,7 +1682,10 @@ async function espaceAdmin(request, url, path) {
   if (path === '/espace-comptes' && request.method === 'DELETE') {
     const email = emailCle(url.searchParams.get('email'));
     if (!email) return json({ error: 'e-mail manquant' }, 400);
-    await store.delete(cleCompte(email));
+    /* on écrit d'abord une pierre tombale (lecture immédiatement cohérente), puis on supprime la clé :
+       la liste des clés peut rester en retard quelques secondes, le compte, lui, n'apparaît plus */
+    try { await store.setJSON(cleCompte(email), { email, supprime: true, actif: false, v: Date.now(), supprimeLe: new Date().toISOString() }); } catch {}
+    try { await store.delete(cleCompte(email)); } catch {}
     return json({ ok: true });
   }
   if (path === '/espace-modifs' && request.method === 'GET') return json(await demandesModif(''));
