@@ -5381,7 +5381,7 @@ function mdCharger(d){
       });
       const pris = {};
       mdLignes.forEach(l => {
-        if(l.perso || l.presta || l.prixForce != null || estFeux(l)) return;
+        if(l.perso || l.presta || estFeux(l)) return;
         const cle = net(l.produit);
         const gi = groupes.findIndex((g, k) => !pris[k] && g.ok && cle && (g.nom.indexOf(cle) === 0 || cle.indexOf(g.nom.split(' ').slice(0,2).join(' ')) === 0));
         if(gi < 0) return;
@@ -5395,6 +5395,7 @@ function mdCharger(d){
           const reel = Number(ro.price) || 0;
           if(Math.abs(reel - cat * q.n) > 0.01){ l.optPrix = l.optPrix || {}; const fo = ficheProduit(l.produit, l.formule); const oc = fo && (fo.options||[]).find(o => memeOption(o.nom, q.base)); if(oc) l.optPrix[oc.nom] = q.n > 1 ? reel / q.n : reel; }
         });
+        if(l.prixForce != null) return;      /* prix de la ligne déjà saisi : seuls les prix d'options ont été relus */
         const t = Math.round(groupes[gi].total * 100) / 100;
         if(t > 0 && Math.abs(t - prixLigne(l)) > 0.01) l.prixForce = t;
       });
