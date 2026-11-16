@@ -446,7 +446,7 @@
       zone.querySelector('#fcCondJoursBloc').style.display = (mode === 'avant' || mode === 'apres') ? 'flex' : 'none';
       var aide = zone.querySelector('#fcAideCond');
       var j = Number((zone.querySelector('#fcCondJours') || {}).value) || 0;
-      var reste = zone.querySelector('#fcAvecAcompte').checked ? 'Le solde est à régler' : 'La totalité est à régler';
+      var reste = 'La facture est à régler';
       var txtAide = {
         '': 'Le document garde ses conditions habituelles.',
         jour: reste + ' le jour de l’événement.',

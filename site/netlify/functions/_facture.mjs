@@ -299,8 +299,8 @@ export function conditionsReglement(c, avecAcompte = false) {
   const jours = Math.min(365, Math.max(0, Math.round(Number(c.jours) || 0)));
   const note = String(c.note || '').replace(/[\u0000-\u001f]+/g, ' ').trim().slice(0, 300);
   const j = (n) => n + ' jour' + (n > 1 ? 's' : '');
-  /* l'acompte, s'il y en a un, se règle à la validation du devis : ces conditions portent sur le reste (ou la totalité) */
-  const debut = avecAcompte ? 'Règlement du solde' : 'Règlement de la totalité du montant';
+  /* phrase volontairement neutre : acompte versé ou non, le client comprend qu'il s'agit du reste à payer */
+  const debut = 'Règlement de la facture';
   let court = '', long = '';
   if (mode === 'jour') {
     court = 'le jour de l\u2019événement';
@@ -318,7 +318,7 @@ export function conditionsReglement(c, avecAcompte = false) {
   if (!court && !note) return null;
   if (note) long = (long ? long + ' ' : '') + note;
   if (long && !/[.!?]$/.test(long)) long += '.';
-  return { court, long, lib: avecAcompte ? 'Règlement du solde' : 'Règlement' };
+  return { court, long, lib: 'Règlement de la facture' };
 }
 
 export function construireFacture({ emetteur, client, facture, lignes, reglages }) {
