@@ -63,3 +63,14 @@ html body .art-sidebar .sidebar-product{position:sticky;top:96px;border:0;border
   html body .art-assoc-row i{display:none}
 }
 html body .art-card .art-fig img{max-height:520px;width:auto;max-width:100%;margin:0 auto;display:block}
+/* images : bords bien arrondis, sans cadre, légère ombre */
+html body .art-card .art-fig{margin:18px 0 6px;padding:0;border:0;background:none;box-shadow:none}
+html body .art-card .art-fig img{border-radius:24px;box-shadow:0 18px 40px -22px rgba(15,34,55,.55)}
+/* pastilles de couleurs (article mange-debout) */
+html body .art-coul-liste{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0 18px}
+html body .art-coul{display:inline-flex;align-items:center;gap:9px;padding:9px 14px;background:#f5f8fb;border-radius:999px;font:600 14px Inter,system-ui,sans-serif;color:#0f2237}
+html body .art-coul i{width:18px;height:18px;border-radius:50%;border:1.5px solid #b9c0cb;flex:none}
+html body .art-coul small{font:600 12px Inter,system-ui,sans-serif;color:#7b8798}
+html body .art-card figure.art-fig{border:0!important;background:none!important;overflow:visible!important;border-radius:0}
+html body .art-card figure.art-fig img{padding:0!important;height:auto!important;max-height:520px;background:none!important;object-fit:cover;border-radius:24px}
+html body .art-card figure.art-fig figcaption{border-top:0;padding:10px 0 0}
