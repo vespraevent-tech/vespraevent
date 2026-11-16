@@ -10,7 +10,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="/favicon.png">
 <link rel="stylesheet" href="/polices.css?v=1">
-<link rel="stylesheet" href="app.css?v=5">
+<link rel="stylesheet" href="app.css?v=6">
 </head>
 <body>
 <main id="app">
@@ -20,7 +20,7 @@
     <p id="p-accueil">Laissez un petit message vidéo de 30 secondes</p>
     <button id="b-commencer" class="gros" type="button">Commencer</button>
     <div class="marque">VESPRA EVENT</div>
-    <div id="etat" class="etat" aria-live="polite"></div>
+    <div id="etat" class="etat" aria-live="polite" hidden></div>
   </section>
 
   <section id="s-form" class="ecran">
@@ -71,6 +71,7 @@
       <label>Caméra<select id="a-cam"></select></label>
       
     </div>
+    <div class="rang haut" style="justify-content:flex-start"><button id="a-test" class="sec" type="button">Tester la connexion</button><span id="a-test-r" class="etat gros-etat"></span></div>
     <div id="a-file" class="etat gros-etat"></div>
     <div class="rang haut">
       <button id="a-sync" class="sec" type="button">Envoyer maintenant</button>
@@ -86,6 +87,6 @@
     <div class="rang"><button id="pin-x" class="sec" type="button">Annuler</button><button id="pin-ok" class="gros" type="button">Valider</button></div>
   </section>
 </main>
-<script src="app.js?v=5"></script>
+<script src="app.js?v=6"></script>
 </body>
 </html>

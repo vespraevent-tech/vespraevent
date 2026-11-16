@@ -24,7 +24,8 @@
   function retirer(id) { return tx('readwrite', function (s) { return s.delete(id); }); }
 
   /* ───────── écrans ───────── */
-  function montrer(id) { document.querySelectorAll('.ecran').forEach(function (e) { e.classList.toggle('on', e.id === id); }); }
+  function montrer(id) {
+    if (id !== 's-revoir') { var vr = $('v-revoir'); try { vr.pause(); vr.removeAttribute('src'); vr.load(); } catch (e) {} } document.querySelectorAll('.ecran').forEach(function (e) { e.classList.toggle('on', e.id === id); }); }
   var inactif = null;
   function veille() { clearTimeout(inactif); inactif = setTimeout(function () { if (!$('s-accueil').classList.contains('on') && !$('s-admin').classList.contains('on') && !$('s-pin').classList.contains('on') && !enregistrement) { arreterCam(); accueil(); } }, 120000); }
   ['pointerdown', 'keydown'].forEach(function (t) { document.addEventListener(t, veille, { passive: true }); });
@@ -120,12 +121,13 @@ $('b-stop').onclick = arreterRec;
   };
 
   /* ───────── envoi au serveur ───────── */
-  var envoiEnCours = false, dernierMsg = '';
+  var envoiEnCours = false, dernierMsg = ''; try { dernierMsg = localStorage.getItem('vb-err') || ''; } catch (e) {}
+  function noterMsg(m) { dernierMsg = m; try { localStorage.setItem('vb-err', m); } catch (e) {} }
   function majEtat() {
     toutes().then(function (l) {
       var att = l.filter(function (v) { return !v.envoye; }).length, tot = l.length;
       var txt = att ? (att + ' vidéo' + (att > 1 ? 's' : '') + ' en attente d’envoi') : (tot ? 'Toutes les vidéos sont envoyées' : '');
-      var el = $('etat'); el.textContent = [cfg.event, txt].filter(Boolean).join(' · '); el.classList.toggle('alerte', att > 20);
+      
       $('a-file').textContent = tot + ' vidéo(s) gardée(s) sur la tablette, dont ' + (tot - att) + ' envoyée(s)' + (att ? ' — ' + att + ' en attente' : '') + (dernierMsg ? ' — ' + dernierMsg : '');
     }).catch(function () {});
   }
@@ -152,7 +154,7 @@ $('b-stop').onclick = arreterRec;
       var suite = Promise.resolve();
       l.forEach(function (v) {
         suite = suite.then(function () {
-          return envoyer(v).then(function (rep) { dernierMsg = (rep && rep.mail === false) ? 'vidéo envoyée au site, mais e-mail non parti : ' + (rep.mailErreur || '') : ''; v.envoye = true; v.envoyeLe = new Date().toISOString(); v.mail = !(rep && rep.mail === false); return ajouter(v); }).catch(function (e) { dernierMsg = 'envoi impossible (' + (e.message || 'réseau') + '), nouvel essai automatique'; v.essais = (v.essais || 0) + 1; return ajouter(v); });
+          return envoyer(v).then(function (rep) { noterMsg((rep && rep.mail === false) ? 'vidéo reçue par le site, mais e-mail non parti : ' + (rep.mailErreur || '') : ''); v.envoye = true; v.envoyeLe = new Date().toISOString(); v.mail = !(rep && rep.mail === false); return ajouter(v); }).catch(function (e) { noterMsg('envoi impossible (' + (e.message || 'réseau') + '), nouvel essai automatique'); v.essais = (v.essais || 0) + 1; return ajouter(v); });
         });
       });
       return suite;
@@ -184,7 +186,17 @@ $('b-stop').onclick = arreterRec;
     cfg.max = Math.min(120, Math.max(5, Number($('a-max').value) || 30)); cfg.cam = $('a-cam').value;
     ecrireCfg(cfg); accueil(); synchro();
   };
-  $('a-sync').onclick = function () { dernierMsg = 'envoi en cours…'; majEtat(); synchro().then(majEtat); };
+  $('a-sync').onclick = function () {
+    if (!cfg.cle) { noterMsg('la clé de l’appareil n’est pas renseignée (champ ci-dessus, puis Enregistrer)'); return majEtat(); }
+    noterMsg('envoi en cours…'); majEtat(); synchro().then(function () { if (dernierMsg === 'envoi en cours…') noterMsg(''); majEtat(); });
+  };
+  $('a-test').onclick = function () {
+    var base = ($('a-serveur').value.trim() || location.origin).replace(/\/+$/, ''), cle = $('a-cle').value.trim();
+    $('a-test-r').textContent = 'Test en cours…';
+    fetch(base + '/api/videobooth/ping', { headers: { 'x-appareil': cle } }).then(function (r) { return r.json().catch(function () { return { ok: false, erreur: 'Réponse inattendue (' + r.status + ')' }; }); }).then(function (j) {
+      $('a-test-r').textContent = j.ok ? ('✓ Connexion OK' + (j.resend ? '' : ' — mais l’envoi d’e-mail n’est pas configuré (RESEND_API_KEY manquante)')) : ('✗ ' + (j.erreur || 'échec'));
+    }).catch(function (e) { $('a-test-r').textContent = '✗ Serveur injoignable : ' + (e.message || 'réseau'); });
+  };
   $('a-export').onclick = function () {
     toutes().then(function (l) {
       if (!l.length) return alert('Aucune vidéo en attente.');
@@ -204,5 +216,5 @@ $('b-stop').onclick = arreterRec;
   document.addEventListener('pointerdown', function () { garderEveille(); if (document.fullscreenElement == null && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {}); }, { once: true });
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/videobooth/sw.js', { scope: '/videobooth/' }).catch(function () {});
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
-  ouvrirDb().then(function () { accueil(); synchro(); }).catch(function () { accueil(); $('etat').textContent = 'Stockage de la tablette indisponible'; $('etat').classList.add('alerte'); });
+  ouvrirDb().then(function () { accueil(); synchro(); }).catch(function () { accueil(); $('etat').hidden = false; $('etat').textContent = 'Stockage de la tablette indisponible'; $('etat').classList.add('alerte'); });
 })();

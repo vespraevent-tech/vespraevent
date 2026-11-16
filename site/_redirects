@@ -32,6 +32,7 @@ http://www.vespraevent.com/*   https://www.vespraevent.fr/:splat   301!
 /api/textes          /.netlify/functions/admin          200
 /api/google          /.netlify/functions/admin          200
 /api/notices         /.netlify/functions/admin          200
+/api/videobooth/*   /.netlify/functions/videobooth   200
 /api/admin/*         /.netlify/functions/admin          200
 /api/espace/*        /.netlify/functions/admin          200
 /espace-client       /espace-client.html                200

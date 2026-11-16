@@ -75,6 +75,13 @@ export default async (request) => {
   const url = new URL(request.url);
   const cle = process.env.VIDEOBOOTH_CLE;
 
+  /* ── test de connexion depuis les réglages de la tablette ── */
+  if (request.method === 'GET' && /\/api\/videobooth\/ping$/.test(url.pathname)) {
+    if (!cle) return rep({ ok: false, erreur: "VIDEOBOOTH_CLE n'est pas définie dans Netlify (ou le site n'a pas été redéployé depuis)" });
+    if (request.headers.get('x-appareil') !== cle) return rep({ ok: false, erreur: 'La clé saisie sur la tablette ne correspond pas à celle de Netlify' });
+    return rep({ ok: true, resend: !!process.env.RESEND_API_KEY });
+  }
+
   /* ── téléchargement par lien ── */
   const mv = /\/api\/videobooth\/v\/([A-Za-z0-9_-]+)$/.exec(url.pathname);
   if (request.method === 'GET' && mv) {
