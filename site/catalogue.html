@@ -694,8 +694,33 @@ transform:none!important;stroke-dashoffset:0!important}}
 })();
 </script>
 
+<style id="cc-search-css">
+.cc-search{position:relative;display:flex;align-items:center;gap:10px;max-width:640px;margin:0 0 26px}
+.cc-search-ico{position:absolute;left:16px;font-size:19px;color:var(--g2,#646D7C);pointer-events:none;line-height:1}
+.cc-search-in{flex:1;min-width:0;padding:13px 16px 13px 42px;border:1px solid var(--g3,#C8CDD8);border-radius:999px;background:#fff;font-family:inherit;font-size:15px;color:var(--black,#0c0f14);outline:none;transition:border-color .15s,box-shadow .15s}
+.cc-search-in::placeholder{color:var(--g2,#646D7C)}
+.cc-search-in:focus{border-color:var(--navy,#2b4a6b);box-shadow:0 0 0 3px rgba(43,74,107,.12)}
+.cc-search-in::-webkit-search-cancel-button{display:none}
+.cc-search-go{border:0;border-radius:999px;background:var(--navy,#2b4a6b);color:#fff;font:600 14px Inter,system-ui,sans-serif;padding:13px 22px;cursor:pointer;white-space:nowrap}
+.cc-search-go:hover{filter:brightness(1.1)}
+.cc-suggest{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;background:#fff;border:1px solid var(--g3,#C8CDD8);border-radius:14px;box-shadow:0 14px 34px rgba(20,48,79,.14);overflow:hidden}
+.cc-suggest[hidden]{display:none}
+.cc-suggest a,.cc-suggest button{display:flex;align-items:center;gap:12px;width:100%;padding:9px 14px;border:0;background:none;text-align:left;text-decoration:none;color:inherit;font:inherit;cursor:pointer}
+.cc-suggest a:hover,.cc-suggest button:hover{background:#f3f6fa}
+.cc-suggest img{width:42px;height:42px;object-fit:cover;border-radius:8px;flex:none;background:#eef0f3}
+.cc-suggest b{font-size:14px;color:#173858;font-weight:600}.cc-suggest small{display:block;font-size:12.5px;color:var(--g2,#646D7C)}
+.cc-suggest .cc-sg-tous{justify-content:center;border-top:1px solid #eceef2;color:var(--navy,#2b4a6b);font-weight:600;font-size:14px}
+@media(max-width:640px){.cc-search{margin-bottom:20px}.cc-search-go{padding:13px 16px}}
+</style>
+
 <section class="cc" id="catChooser" aria-label="Choisir une catégorie">
   <div class="cc-intro"><h2>Notre catalogue</h2><p>Découvrez notre sélection de matériel pour tous vos événements. Parcourez nos catégories et trouvez les équipements qui vous correspondent.</p></div>
+  <form class="cc-search" id="ccSearch" role="search" autocomplete="off">
+    <span class="cc-search-ico" aria-hidden="true">⌕</span>
+    <input type="search" id="ccSearchIn" class="cc-search-in" placeholder="Rechercher un produit : photobooth, enceinte, barnum…" aria-label="Rechercher un produit dans le catalogue" aria-controls="ccSuggest" autocomplete="off">
+    <button type="submit" class="cc-search-go">Rechercher</button>
+    <div class="cc-suggest" id="ccSuggest" role="listbox" hidden></div>
+  </form>
   <div class="cc-in">
     <ul class="cc-list" id="ccList"></ul>
     <div class="cc-side" id="ccSide">
@@ -1236,12 +1261,43 @@ if(urlCat){
     if(armedIndex===i){choisir(P[i][0],'push');return;}
     selectedIndex=i;armedIndex=i;show(i);
   });
+  /* ── recherche au-dessus du choix des catégories : suggestions en direct, et page de résultats sur tout le catalogue ── */
+  (function(){
+    const f=document.getElementById('ccSearch'),inp=document.getElementById('ccSearchIn'),box=document.getElementById('ccSuggest');
+    if(!f||!inp||!box)return;
+    const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const trouver=q=>{const terms=NORM(q).trim().split(/\s+/).filter(Boolean);if(!terms.length)return[];
+      return PRODUCTS.filter(p=>{const hay=NORM([p.name,p.desc,...(p.cats||[p.cat]).map(normCat),...(p.variants||[]).map(v=>v.label),...(p.options||[]).map(o=>o.label)].join(' '));return terms.every(t=>hay.includes(t));});};
+    function fermer(){box.hidden=true;box.innerHTML='';}
+    function resultats(q){
+      q=String(q||'').trim();if(!q)return;
+      fermer();
+      const si=document.getElementById('searchInput'),fs=document.getElementById('filterSelect'),ps=document.getElementById('priceSelect');
+      if(si)si.value=q;if(fs)fs.value='Tous';if(ps)ps.value='tous';
+      document.body.classList.remove('cat-choose');updateCrumb('');applyFilters();
+      try{history.pushState(null,'','catalogue.html?q='+encodeURIComponent(q));}catch(e){}
+      allerPremierProduit();
+    }
+    inp.addEventListener('input',function(){
+      const q=inp.value.trim();if(NORM(q).length<2){fermer();return;}
+      const L=trouver(q);
+      if(!L.length){box.innerHTML='<div style="padding:12px 16px;color:#646D7C;font-size:14px">Aucun produit ne correspond. Essayez un autre mot, ou contactez-nous.</div>';box.hidden=false;return;}
+      box.innerHTML=L.slice(0,6).map(p=>'<a href="'+esc(p.page||'catalogue.html')+'" role="option">'+(p.img?'<img src="'+esc(p.img)+'" alt="" loading="lazy" decoding="async" width="42" height="42">':'')+'<span><b>'+esc(p.name)+'</b><small>'+(p.variants&&p.variants.length?'dès ':'')+esc(p.price)+' €</small></span></a>').join('')
+        +(L.length>6?'<button type="button" class="cc-sg-tous">Voir les '+L.length+' résultats →</button>':'');
+      box.hidden=false;
+      const t=box.querySelector('.cc-sg-tous');if(t)t.onclick=function(){resultats(q);};
+    });
+    f.addEventListener('submit',function(e){e.preventDefault();resultats(inp.value);});
+    document.addEventListener('click',function(e){if(!f.contains(e.target))fermer();});
+    inp.addEventListener('keydown',function(e){if(e.key==='Escape')fermer();});
+  })();
   const lv=document.createElement('li');lv.className='cc-voir';lv.innerHTML='<button type="button">Voir tout<small>→</small></button>';ul.appendChild(lv);
   lv.firstChild.addEventListener('click',function(){choisir('Tous','push');});
   window.vespraChoixCategories=function(mode){try{if(mode!=='none'){if(location.search)history.pushState(null,'','catalogue.html');else history.replaceState(null,'','catalogue.html');}}catch(e){}selectedIndex=0;armedIndex=0;ul.querySelectorAll('button[data-i]').forEach(b=>b.classList.remove('on'));document.body.classList.add('cat-choose');show(0);updateCrumb('');window.scrollTo({top:0,behavior:'auto'});};
   /* bouton « retour » : on suit l'adresse (catégorie ouverte, ou choix des catégories) */
   window.addEventListener('popstate',function(){
     const q=new URLSearchParams(location.search),c=q.get('cat');
+    if(!c&&q.get('q')){const si=document.getElementById('searchInput');if(si){si.value=q.get('q');}document.getElementById('filterSelect').value='Tous';document.body.classList.remove('cat-choose');applyFilters();return;}
     if(c){const v=c==='tout'?'Tous':c;const fs=document.getElementById('filterSelect');if(fs&&[].some.call(fs.options,o=>o.value===v)){armedIndex=-1;choisir(v,'none');}}
     else if(!q.get('q')&&!q.get('evt')){window.vespraChoixCategories('none');}
   });
