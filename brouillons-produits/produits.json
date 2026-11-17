@@ -4,10 +4,21 @@
     {
       "id_provisoire": "chiffres-lettres-bois",
       "nom": "Chiffres et lettres géants en bois",
-      "categories_visees": ["Décoration"],
+      "categories_visees": [
+        "Décoration"
+      ],
       "idee_description": "Chiffres et lettres géants en bois, à poser ou à accrocher : un âge pour un anniversaire, un prénom, LOVE ou un mot pour un mariage. Une décoration qui se voit sur toutes les photos.",
-      "usages": ["anniversaire (chiffre de l'âge)", "mariage (prénoms, LOVE)", "baby shower / naissance", "fond de photobooth"],
-      "options_possibles": ["couleur / finition (bois naturel, blanc…)", "taille", "avec ou sans éclairage"],
+      "usages": [
+        "anniversaire (chiffre de l'âge)",
+        "mariage (prénoms, LOVE)",
+        "baby shower / naissance",
+        "fond de photobooth"
+      ],
+      "options_possibles": [
+        "couleur / finition (bois naturel, blanc…)",
+        "taille",
+        "avec ou sans éclairage"
+      ],
       "questions": [
         "Quelles hauteurs (ex. 60 cm, 90 cm, 1,20 m) et quelle épaisseur ?",
         "Quels caractères : tous les chiffres 0-9 ? l'alphabet complet ? un mot déjà fait (LOVE, MR & MRS) ?",
@@ -23,10 +34,20 @@
     {
       "id_provisoire": "arche-ballons",
       "nom": "Arche de ballons",
-      "categories_visees": ["Décoration"],
+      "categories_visees": [
+        "Décoration"
+      ],
       "idee_description": "Arche de ballons pour l'entrée, le fond de la photo ou la table des gâteaux : couleurs au choix, livrée prête à installer.",
-      "usages": ["entrée de salle", "fond de photobooth", "anniversaire / baby shower / mariage"],
-      "options_possibles": ["couleurs (palette de 2 à 3 teintes)", "taille de l'arche", "ballons de fête supplémentaires"],
+      "usages": [
+        "entrée de salle",
+        "fond de photobooth",
+        "anniversaire / baby shower / mariage"
+      ],
+      "options_possibles": [
+        "couleurs (palette de 2 à 3 teintes)",
+        "taille de l'arche",
+        "ballons de fête supplémentaires"
+      ],
       "questions": [
         "Arche gonflée en atelier et livrée, ou kit à monter sur place ? Montage compris ?",
         "Quelles tailles (largeur, hauteur) ?",
@@ -42,10 +63,22 @@
     {
       "id_provisoire": "fonds-photobooth-themes",
       "nom": "Fonds de photobooth (fleurs, squelettes, thèmes)",
-      "categories_visees": ["Photobooth et Vidéobooth", "Décoration"],
+      "categories_visees": [
+        "Photobooth et Vidéobooth",
+        "Décoration"
+      ],
       "idee_description": "Fonds décoratifs carrés pour vos photos : mur de fleurs, squelettes et autres thèmes, à choisir selon votre événement. Ils se posent derrière le photobooth ou le coin photo.",
-      "usages": ["fond de photobooth", "coin photo", "mariage (fleurs)", "Halloween / thème (squelettes)"],
-      "options_possibles": ["thème au choix (fleurs, squelettes, autres)", "taille du fond", "avec support / pied"],
+      "usages": [
+        "fond de photobooth",
+        "coin photo",
+        "mariage (fleurs)",
+        "Halloween / thème (squelettes)"
+      ],
+      "options_possibles": [
+        "thème au choix (fleurs, squelettes, autres)",
+        "taille du fond",
+        "avec support / pied"
+      ],
       "questions": [
         "Quels thèmes exacts as-tu ou veux-tu ? (fleurs : quelles couleurs ? squelettes : style ? autres ?)",
         "Dimensions d'un fond (largeur × hauteur) et système de fixation (cadre, pied, panneaux à assembler) ?",
@@ -53,6 +86,63 @@
         "Prix : identique pour tous les thèmes ? Caution ?",
         "Compatible avec quels photobooths (le tien, d'autres) ?",
         "Photos à fournir (une par thème) ?"
+      ],
+      "prix": null,
+      "photos": null,
+      "statut": "brouillon"
+    },
+    {
+      "id_provisoire": "effets-speciaux",
+      "nom": "Effets spéciaux : lance-flammes, machines à confettis, machines à CO2",
+      "categories_visees": [
+        "Effets spéciaux (nouvelle catégorie à créer)"
+      ],
+      "idee_description": "Machines à effets pour les grands moments : jets de flammes, canons à confettis, jets de CO2 pour la soirée, le gâteau ou l'entrée des mariés.",
+      "usages": [
+        "entrée des mariés",
+        "ouverture de piste",
+        "gâteau / anniversaire",
+        "soirée à thème"
+      ],
+      "options_possibles": [
+        "nombre de machines",
+        "recharges (confettis, CO2)",
+        "technicien / mise en place sur place"
+      ],
+      "questions": [
+        "Lance-flammes : quel matériel exact, et quelles règles de sécurité (distance, lieu, assurance, autorisation de la salle) ? Opérateur obligatoire ?",
+        "CO2 : bouteilles incluses ? Recharge facturée à l'usage ?",
+        "Confettis : papier, biodégradable ? Nettoyage à la charge du client ?",
+        "Une fiche par machine ou une fiche « Effets spéciaux » avec choix ?",
+        "Prix, caution, photos / vidéos de démonstration ?"
+      ],
+      "prix": null,
+      "photos": null,
+      "statut": "brouillon"
+    },
+    {
+      "id_provisoire": "evenements-themes",
+      "nom": "Soirées et événements à thème clé en main",
+      "categories_visees": [
+        "Page / section de mise en avant (pas un produit seul)"
+      ],
+      "idee_description": "Mise en avant sur le site : on peut organiser entièrement des événements et soirées à thème (décor, fonds, lettres, ballons, effets, photobooth). Idée : section sur l'accueil + page dédiée + lien depuis chaque catégorie.",
+      "usages": [
+        "soirée Halloween",
+        "soirée casino",
+        "anniversaire à thème",
+        "mariage à thème"
+      ],
+      "options_possibles": [
+        "forfait thème complet",
+        "devis sur mesure"
+      ],
+      "questions": [
+        "Quels thèmes proposes-tu aujourd'hui (liste) ?",
+        "Qu'est-ce qui est inclus : décor, installation, animation, repas… ?",
+        "Prix « à partir de » ou uniquement sur devis ?",
+        "Zone d'intervention (Vitré et alentours ?) ?",
+        "Photos d'événements déjà faits ?"
       ],
       "prix": null,
       "photos": null,
