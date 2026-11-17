@@ -179,3 +179,4 @@ html,body,#app{height:100dvh}
 .mic i{display:block;height:100%;width:0;background:#4ade80;transition:width .12s}
 .son-alerte{position:absolute;left:50%;bottom:calc(14vh + 70px);transform:translateX(-50%);z-index:6;max-width:88vw;background:#b03a2a;color:#fff;border-radius:12px;padding:12px 18px;text-align:center;font:600 clamp(14px,2vw,18px) Inter,sans-serif}
 .son-alerte[hidden]{display:none}
+.mic em{font:600 clamp(12px,1.6vw,14px) Inter,sans-serif;color:#fff;font-style:normal;opacity:.9}

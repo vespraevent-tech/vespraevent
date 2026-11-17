@@ -2727,7 +2727,7 @@ function vbSessSauver(){
 function vbSessSuppr(i){ const l=(VBCFG.sessions||[]).slice(); if(!confirm('Supprimer la session « '+l[i].nom+' » ? Les vidéos déjà reçues ne sont pas supprimées.')) return; l.splice(i,1); vbConfigPoster({sessions:l},'Session supprimée'); if(VBEVT) vbOuvrir(''); }
 
 /* ── Vidéobooth ── */
-let VB=[], VBEVT='', VBALERTE=20;
+let VB=[], VBEVT='', VBALERTE=20, VBETAT=null;
 function vbEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 const vbNomEvt=v=>v.event||'(sans nom d’événement)';
 async function vbCharger(){
@@ -2745,24 +2745,26 @@ async function vbCharger(){
     a.style.display=msg?'block':'none'; a.textContent=msg;
     a.style.color=(msg&&d.cle&&et.contact&&!et.refus)?'#6b7280':'#b03a2a';
     if(!msg&&et.contact){ a.style.display='block'; a.style.color='#6b7280'; a.textContent='Dernier contact de la tablette : '+fh(et.contact)+'.'; }
-    /* état envoyé par la tablette toutes les 2 minutes */
-    if(!msg&&et.tablette&&et.tablette.detail){
-      const t=et.tablette.detail, age=Math.round((Date.now()-new Date(et.tablette.date))/60000), pb=[];
-      if(age>30) pb.push('plus de nouvelles depuis '+(age>=120?Math.round(age/60)+' h':age+' min'));
-      if(t.batt!=null&&t.batt<20&&!t.charge) pb.push('batterie faible, tablette pas en charge');
-      if(t.cam==='perdue'||t.cam==='absent') pb.push('caméra non détectée');
-      if(t.mic==='perdu'||t.mic==='absent') pb.push('micro non détecté');
-      if(t.quota&&t.usage/t.quota>0.85) pb.push('tablette presque pleine');
-      if(t.att>5) pb.push(t.att+' vidéos en attente d’envoi');
-      const infos=['en ligne il y a '+(age<1?'moins d’une minute':age+' min')];
-      if(t.batt!=null) infos.push('batterie '+t.batt+' %'+(t.charge?' (en charge)':''));
-      if(t.att!=null) infos.push(t.att+' vidéo'+(t.att>1?'s':'')+' en attente');
-      a.style.display='block'; a.style.color=pb.length?'#b03a2a':'#3d6e36';
-      a.textContent=(pb.length?'⚠ Tablette : '+pb.join(' · ')+' — ':'Tablette : ')+infos.join(' · ')+'.';
-    }
+    VBETAT=et.tablette||null;
     try{ const al=await api('/videobooth/alerte'); VBALERTE=al.go||20; }catch(e){}
     vbRendre(); vbConfigCharger();
   }catch(e){ z.innerHTML='<div class="hint" style="color:#b03a2a">Chargement impossible : '+vbEsc(e.message)+'</div>'; }
+}
+/* état de la tablette (envoyé toutes les 2 minutes) : visible seulement ici, jamais sur la tablette */
+function vbCarteTablette(){
+  if(!VBETAT||!VBETAT.detail) return '';
+  const t=VBETAT.detail, age=Math.max(0,Math.round((Date.now()-new Date(VBETAT.date))/60000));
+  const pastille=(txt,ok,warn)=>'<span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;border-radius:20px;padding:4px 11px;color:'+(ok?'#2f6b2a':(warn?'#8a5a00':'#b03a2a'))+';background:'+(ok?'#e4f2df':(warn?'#fdf0d5':'#fbeae7'))+'">'+txt+'</span>';
+  const p=[]; let grave=false;
+  const enLigne=age<=30; if(!enLigne) grave=true;
+  p.push(pastille((enLigne?'● En ligne':'● Hors ligne')+' · il y a '+(age<1?'moins d’une minute':(age>=120?Math.round(age/60)+' h':age+' min')),enLigne,false));
+  if(t.batt!=null){ const bas=t.batt<20&&!t.charge; if(bas) grave=true; p.push(pastille('🔋 '+t.batt+' %'+(t.charge?' ⚡ en charge':''),!bas&&(t.charge||t.batt>=40),!bas)); }
+  const att=t.att||0; p.push(pastille(att+' vidéo'+(att>1?'s':'')+' en attente d’envoi',att===0,att<=5)); if(att>5) grave=true;
+  const camOk=t.cam==='ok'||t.cam==='inconnu'; if(!camOk) grave=true; p.push(pastille('Caméra : '+({ok:'OK',inconnu:'OK',perdue:'a décroché',absent:'absente',refusee:'non autorisée',erreur:'erreur'}[t.cam]||t.cam),camOk,false));
+  const micOk=t.mic==='ok'||t.mic==='inconnu'; if(!micOk) grave=true; p.push(pastille('Micro : '+({ok:'OK',inconnu:'OK',perdu:'a décroché',absent:'absent'}[t.mic]||t.mic),micOk,false));
+  if(t.quota){ const pc=Math.round(t.usage/t.quota*100); if(pc>85) grave=true; p.push(pastille('Mémoire tablette : '+pc+' %',pc<70,pc<=85)); }
+  const notes=[]; if(t.reco) notes.push('la caméra a été relancée '+t.reco+' fois depuis le dernier démarrage de la page'); if(t.mut) notes.push(t.mut+' vidéo'+(t.mut>1?'s':'')+' enregistrée'+(t.mut>1?'s':'')+' avec un son très faible');
+  return '<div style="background:'+(grave?'#fff6f4':'#fff')+';border:1px solid '+(grave?'#e9b4ab':'#e6e1d6')+';border-radius:12px;padding:12px 16px;margin:0 0 14px"><div style="font:700 14px Poppins,Inter,sans-serif;color:#14304f;margin-bottom:8px">Tablette'+(t.enreg?' <span style="font-weight:500;color:#6b7280;font-size:12.5px">· un invité est en train de filmer</span>':'')+'</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+p.join('')+'</div>'+(notes.length?'<div style="font-size:12.5px;color:#6b7280;margin-top:8px">'+notes.join(' · ')+'.</div>':'')+'</div>';
 }
 /* jauge de stockage : visible seulement dans le back-office, jamais sur la tablette */
 function vbJauge(detail){
@@ -2798,8 +2800,8 @@ function vbRendre(){
     cartes.sort((a,b)=>{ const ta=a.s&&!vbSessTerminee(a.s)?1:0, tb=b.s&&!vbSessTerminee(b.s)?1:0; if(ta!==tb) return tb-ta; const la=(ev[a.nom]||[]).map(v=>String(v.cree)).sort().pop()||'', lb=(ev[b.nom]||[]).map(v=>String(v.cree)).sort().pop()||''; return lb.localeCompare(la); });
     const total=VB.reduce((t,v)=>t+(v.octets||0),0);
     const tete='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px"><div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f">Événements <span style="font-weight:500;color:#6b7280;font-size:13px">· '+VB.length+' vidéo'+(VB.length>1?'s':'')+' sur le site ('+mo(total)+')</span></div><button class="btn" onclick="vbSessEdit(-1)">+ Nouvelle session</button></div>';
-    if(!cartes.length){ z.innerHTML=vbJauge(true)+tete+'<div class="hint" style="padding:24px 0">Aucune session pour l’instant. Créez-en une : elle apparaîtra sur la tablette.</div>'; return; }
-    z.innerHTML=vbJauge(true)+tete+'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">'+cartes.map(c=>{
+    if(!cartes.length){ z.innerHTML=vbCarteTablette()+vbJauge(true)+tete+'<div class="hint" style="padding:24px 0">Aucune session pour l’instant. Créez-en une : elle apparaîtra sur la tablette.</div>'; return; }
+    z.innerHTML=vbCarteTablette()+vbJauge(true)+tete+'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">'+cartes.map(c=>{
       const l=ev[c.nom]||[], ds=l.map(v=>+new Date(v.cree)), ko=l.filter(v=>v.mail!=='envoye').length, poids=l.reduce((t,v)=>t+(v.octets||0),0);
       const quand=ds.length?(fd(Math.min(...ds))===fd(Math.max(...ds))?fd(Math.min(...ds)):fd(Math.min(...ds))+' → '+fd(Math.max(...ds))):'';
       const pastille=(txt,coul,fond)=>'<span style="font-size:11.5px;font-weight:700;color:'+coul+';background:'+fond+';border-radius:20px;padding:2px 9px">'+txt+'</span>';

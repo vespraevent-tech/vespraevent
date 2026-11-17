@@ -114,15 +114,21 @@
   }
   function suivreNiveau() {
     var n = lireNiveau(); niveau = n; if (enregistrement && n > niveauMax) niveauMax = n;
-    var b = $('mic-i'); if (b) b.style.width = Math.min(100, Math.round(n * 220)) + '%';
+    var b = $('mic-i'); if (b) { b.style.width = Math.min(100, Math.round(n * 220)) + '%'; b.style.background = n > 0.85 ? '#ef4444' : (n > 0.6 ? '#f59e0b' : '#4ade80'); }
   }
+  /* Reconnexion automatique, sans boucle : 1re tentative après 2 s, puis 4, 8, 16… jusqu'à 60 s ; au bout de 6 échecs on revient
+     à l'écran d'accueil (la prochaine personne retentera). Le compteur repart à zéro quand la caméra tient 30 s.
+     Les invités ne voient jamais de message technique : seulement « Un instant… ». Le détail va dans l'état de la tablette (back-office). */
+  var essaisCam = 0, minuteurReco = null, minuteurStable = null, nbReco = 0, nbSilence = 0;
   function perteCapteur(quoi) {
     if (quoi === 'cam') camEtat = 'perdue'; else micEtat = 'perdu';
+    clearTimeout(minuteurStable);
     if (enregistrement) { arreterRec(); return; }
-    if ($('s-cam').classList.contains('on')) {
-      $('cam-err').textContent = quoi === 'cam' ? 'La caméra ne répond plus : nouvelle tentative…' : 'Le micro ne répond plus : nouvelle tentative…'; $('cam-err').hidden = false;
-      setTimeout(function () { if ($('s-cam').classList.contains('on') && !enregistrement) ouvrirCam(); }, 1500);
-    }
+    if (!$('s-cam').classList.contains('on') || minuteurReco) return;
+    if (essaisCam >= 6) { essaisCam = 0; arreterCam(); accueil(); return; }
+    var delai = Math.min(60000, 2000 * Math.pow(2, essaisCam)); essaisCam++; nbReco++;
+    $('cam-err').textContent = 'Un instant…'; $('cam-err').hidden = false;
+    minuteurReco = setTimeout(function () { minuteurReco = null; if ($('s-cam').classList.contains('on') && !enregistrement) ouvrirCam(); }, delai);
   }
   function arreterCam() {
     analyseur = null; $('mic').hidden = true; if (boucle) { cancelAnimationFrame(boucle); boucle = 0; } if (flux) { flux.getTracks().forEach(function (t) { t.stop(); }); flux = null; } $('v-src').srcObject = null; }
@@ -135,12 +141,13 @@
       flux = s; $('b-go').hidden = false; $('fmt').hidden = !(cfg.choixFormat !== false) || testCam; majFormat(); $('cadrage').textContent = cfg.cadrage || ''; $('cadrage').hidden = !cfg.cadrage; $('v-src').srcObject = s; $('v-src').play().catch(function () {}); boucle = requestAnimationFrame(dessiner);
       grandAngle(s);
       camEtat = 'ok'; tFige = Date.now(); brancherMicro(s); $('mic').hidden = false;
+      clearTimeout(minuteurStable); minuteurStable = setTimeout(function () { essaisCam = 0; }, 30000);
       s.getVideoTracks().forEach(function (t) { t.onended = function () { perteCapteur('cam'); }; });
       s.getAudioTracks().forEach(function (t) { t.onended = function () { perteCapteur('mic'); }; });
-      if (!s.getAudioTracks().length) { $('cam-err').textContent = 'Aucun micro détecté sur cette tablette : le son ne sera pas enregistré.'; $('cam-err').hidden = false; }
       if (testCam) infoCamera(s);
     }).catch(function (e) {
-      $('cam-err').textContent = 'Impossible d’accéder à la caméra ou au micro. Autorisez-les dans les réglages de la tablette, puis réessayez.'; $('cam-err').hidden = false; $('b-go').hidden = true;
+      camEtat = (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) ? 'refusee' : 'erreur';
+      $('cam-err').textContent = testCam ? 'Impossible d’accéder à la caméra ou au micro. Autorisez-les dans les réglages de la tablette, puis réessayez.' : 'La caméra n’est pas disponible pour le moment.'; $('cam-err').hidden = false; $('b-go').hidden = true;
       setTimeout(function () { accueil(); }, 7000);
     });
   }
@@ -191,7 +198,7 @@
       enregistrement = false; clearInterval(minuteur);
       blobFinal = new Blob(morceaux, { type: mime.split(';')[0] });
       sonNiveau = Math.round(niveauMax * 100); var faible = sonNiveau < 3;
-      $('son-alerte').hidden = !faible; $('son-alerte').textContent = faible ? 'Le micro n’a presque rien capté. Parlez plus près de la tablette, ou recommencez.' : '';
+      $('son-alerte').hidden = !faible; $('son-alerte').textContent = faible ? 'On ne vous entend pas bien. Parlez un peu plus fort, plus près de la tablette, puis recommencez.' : ''; if (faible) nbSilence++;
       arreterCam(); $('v-revoir').src = URL.createObjectURL(blobFinal); montrer('s-revoir'); $('v-revoir').play().catch(function () {});
     };
     rec.start(1000); enregistrement = true; t0 = Date.now();
@@ -294,7 +301,7 @@ $('b-stop').onclick = arreterRec;
   /* ── état de la tablette, envoyé toutes les 2 minutes au back-office (batterie, vidéos en attente, caméra, micro, place) ── */
   function battement() {
     if (!(cfg.jeton || cfg.cle)) return;
-    var etat = { cam: camEtat, mic: micEtat, ver: 23, enreg: !!enregistrement };
+    var etat = { cam: camEtat, mic: micEtat, ver: 24, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
     var fin = function () {
       toutes().then(function (l) { etat.att = l.filter(function (v) { return !v.envoye; }).length; etat.tot = l.length; }).catch(function () {}).then(function () {
         return (navigator.storage && navigator.storage.estimate) ? navigator.storage.estimate().then(function (e) { etat.usage = e.usage || 0; etat.quota = e.quota || 0; }).catch(function () {}) : null;
