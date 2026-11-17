@@ -101,7 +101,7 @@ export function htmlVideo({ prenom, evenement, lien, pj, jours, site }) {
 <p style="margin:0 0 12px">Merci d'avoir laissé un message vidéo${evenement ? ` pour <strong>${esc(evenement)}</strong>` : ''} : un joli souvenir à garder.</p>
 <p style="margin:0 0 16px">${pj ? 'Votre vidéo est <strong>jointe à ce message</strong>. Vous pouvez aussi la télécharger avec le bouton ci-dessous.' : 'Votre vidéo est un peu lourde pour être jointe : téléchargez-la avec le bouton ci-dessous.'}</p>
 <p style="margin:0 0 18px"><a href="${esc(lien)}" style="display:inline-block;padding:11px 20px;background:#F59E0B;color:#1a1205;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700">Télécharger ma vidéo</a></p>
-<p style="margin:0 0 14px;color:#8a8f98;font-size:12.5px">Le lien reste valable ${jours} jours. Votre message a aussi été remis aux organisateurs de l'événement.</p>
+<p style="margin:0 0 14px;color:#8a8f98;font-size:12.5px">${jours > 0 ? `Le lien reste valable ${jours} jours.` : 'Le lien reste disponible quelque temps : pensez à télécharger votre vidéo pour la garder.'}${pj ? ' La vidéo jointe à ce message reste dans votre boîte mail.' : ''} Votre message a aussi été remis aux organisateurs de l'événement.</p>
 <p style="margin:0 0 4px">Cordialement,</p>
 <p style="margin:0 0 2px;font-weight:600;color:#2b4a6b">L'équipe Vespra Event</p>
 <p style="margin:0 0 6px;color:#6b7280;font-size:13px">Spécialiste de la location événementielle dans le Grand Ouest.</p>

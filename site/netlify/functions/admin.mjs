@@ -2387,6 +2387,17 @@ const gestionnaire = async (request) => {
     const a = await vbAccesLire(st);
     return json({ ok: true, acces: a ? (a.mdp || '') : '', accesLibre: !!(a && a.libre), sessions: sessions || await vbSessionsLire(st) });
   }
+  /* seuil d'alerte de stockage (en Go) : l'alerte ne s'affiche que dans le back-office */
+  if (path === '/videobooth/alerte' && request.method === 'GET') {
+    const v = await videoStore().get('config/alerte', { type: 'json' }).catch(() => null);
+    return json({ go: v && Number(v.go) > 0 ? Number(v.go) : 20 });
+  }
+  if (path === '/videobooth/alerte' && request.method === 'POST') {
+    let body = {}; try { body = await request.json(); } catch {}
+    const go = Math.min(100000, Math.max(0.5, Number(String(body.go || '').replace(',', '.')) || 20));
+    await videoStore().setJSON('config/alerte', { go, maj: new Date().toISOString() });
+    return json({ ok: true, go });
+  }
   if (path === '/videobooth/galerie' && request.method === 'POST') {
     let body = {}; try { body = await request.json(); } catch {}
     const e = String(body.e || ''); const m = String(body.mdp || '').trim();
@@ -2430,7 +2441,10 @@ const gestionnaire = async (request) => {
         /* vider toutes les vidéos d'un événement (après les avoir téléchargées) */
         const ev = String(url.searchParams.get('event') || '');
         const SANS = '(sans nom d’événement)';
-        const cibles = await vbLireMetas(st, (m) => (m.event || SANS) === ev);
+        /* « jusqu'au » (AAAA-MM-JJ, inclus, heure de Paris) : on ne supprime que les vidéos enregistrées jusqu'à ce jour */
+        const jusque = /^\d{4}-\d{2}-\d{2}$/.test(String(url.searchParams.get('jusqua') || '')) ? String(url.searchParams.get('jusqua')) : '';
+        const jourParis = (iso) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date(iso));
+        const cibles = await vbLireMetas(st, (m) => (m.event || SANS) === ev && (!jusque || jourParis(m.cree) <= jusque));
         for (const m of cibles) { await st.delete('video/' + m.id).catch(() => {}); await st.delete('meta/' + m.id).catch(() => {}); }
         return json({ ok: true, supprimees: cibles.length });
       }

@@ -37,7 +37,7 @@
   function accueil(garder) {
     $('t-accueil').textContent = cfg.titre || CFG0.titre; $('p-accueil').textContent = cfg.sous || '';
     $('t-qui').textContent = cfg.qui || 'Qui êtes-vous ?'; $('p-qui').textContent = cfg.quiSous == null ? 'Pour vous envoyer votre vidéo par e-mail' : cfg.quiSous;
-    if (!garder) $('form').reset(); $('f-err').textContent = ''; montrer('s-accueil'); majEtat();
+    if (!garder) { $('form').reset(); formatInvite = null; majFormat(); } $('f-err').textContent = ''; montrer('s-accueil'); majEtat();
   }
   function fmt(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
 
@@ -64,8 +64,18 @@
   var cv = $('v-live'), cx = cv.getContext('2d'), boucle = 0;
   /* Rendu toujours VERTICAL (3:4) : l'image de la caméra est recadrée sur un canvas, et c'est ce canvas qui est filmé. */
   /* format de la vidéo : automatique = suit l'orientation de la tablette (vertical 9:16, horizontal 16:9) */
+  var formatInvite = null;   /* format choisi par l'invité (vertical / horizontal), remis à zéro pour chaque nouvel invité */
+  function formatEffectif() { var f = formatInvite || cfg.format || 'auto'; if (f === 'auto') f = window.innerWidth > window.innerHeight ? '16:9' : '9:16'; return f; }
+  function majFormat() {
+    var f = formatEffectif(), vertical = f === '9:16' || f === '3:4';
+    /* image entière (bandes noires) quand le format filmé n'a pas la forme de l'écran : on voit exactement ce qui sera filmé */
+    document.body.classList.toggle('fmt34', f === '3:4' || f === '4:3' || vertical !== (window.innerHeight > window.innerWidth));
+    Array.prototype.forEach.call(document.querySelectorAll('#fmt button'), function (b) { b.classList.toggle('on', (b.dataset.f === 'v') === vertical); });
+  }
+  window.addEventListener('resize', majFormat);
+  Array.prototype.forEach.call(document.querySelectorAll('#fmt button'), function (b) { b.onclick = function () { formatInvite = b.dataset.f === 'v' ? '9:16' : '16:9'; majFormat(); }; });
   function ratioFormat() {
-    var f = cfg.format || 'auto';
+    var f = formatInvite || cfg.format || 'auto';
     if (f === 'auto') f = window.innerWidth > window.innerHeight ? '16:9' : '9:16';
     return { '9:16': 0.5625, '3:4': 0.75, '4:3': 1.3333, '16:9': 1.7778 }[f] || 0.5625;
   }
@@ -83,11 +93,11 @@
   function arreterCam() { if (boucle) { cancelAnimationFrame(boucle); boucle = 0; } if (flux) { flux.getTracks().forEach(function (t) { t.stop(); }); flux = null; } $('v-src').srcObject = null; }
   function ouvrirCam() {
     montrer('s-cam'); $('s-cam').classList.remove('flou'); $('cam-err').hidden = true; $('compte').hidden = true; $('rec').hidden = true; $('barre').hidden = true;
-    $('b-go').hidden = true; $('b-stop').hidden = true; enregistrement = false;
+    $('b-go').hidden = true; $('b-stop').hidden = true; $('fmt').hidden = true; enregistrement = false;
     var contraintes = { audio: Object.assign({ echoCancellation: true, noiseSuppression: true }, cfg.mic ? { deviceId: { exact: cfg.mic } } : {}), video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, { width: { ideal: 1920 }, height: { ideal: 1080 } }) };
     arreterCam();
     navigator.mediaDevices.getUserMedia(contraintes).then(function (s) {
-      flux = s; $('b-go').hidden = false; $('cadrage').textContent = cfg.cadrage || ''; $('cadrage').hidden = !cfg.cadrage; $('v-src').srcObject = s; $('v-src').play().catch(function () {}); boucle = requestAnimationFrame(dessiner);
+      flux = s; $('b-go').hidden = false; $('fmt').hidden = !(cfg.choixFormat !== false) || testCam; majFormat(); $('cadrage').textContent = cfg.cadrage || ''; $('cadrage').hidden = !cfg.cadrage; $('v-src').srcObject = s; $('v-src').play().catch(function () {}); boucle = requestAnimationFrame(dessiner);
       grandAngle(s);
       if (testCam) infoCamera(s);
     }).catch(function (e) {
@@ -107,7 +117,7 @@
       l.push('Caméras disponibles : ' + d.filter(function (x) { return x.kind === 'videoinput'; }).map(function (x) { return x.label || '?'; }).join(' | '));
       $('cam-info').textContent = l.join('\n'); $('cam-info').hidden = false;
     });
-    $('guide').hidden = false; $('b-go').hidden = true; $('cadrage').hidden = true;
+    $('guide').hidden = false; $('b-go').hidden = true; $('cadrage').hidden = true; $('fmt').hidden = true;
   }
   $('a-camtest').onclick = function () { testCam = true; ouvrirCam(); };
   /* GRAND ANGLE : zoom au minimum, et caméra « ultra grand-angle » si la tablette en a une */
@@ -126,12 +136,12 @@
     }).catch(function () {});
   }
   $('b-go').onclick = function () {
-    if (!flux) return; $('cadrage').hidden = true; $('b-go').hidden = true; $('compte').hidden = false; $('s-cam').classList.add('flou');
+    if (!flux) return; $('fmt').hidden = true; $('cadrage').hidden = true; $('b-go').hidden = true; $('compte').hidden = false; $('s-cam').classList.add('flou');
     $('compte-msg').textContent = 'Vous avez ' + (Number(cfg.max) || 30) + ' secondes maximum';
     var n = 3; $('compte-n').textContent = n; decompte = setInterval(function () { n--; if (n > 0) { $('compte-n').textContent = n; } else { clearInterval(decompte); decompte = null; $('compte').hidden = true; $('s-cam').classList.remove('flou'); demarrer(); } }, 1000);
   };
   /* qualité choisie sur la session : haute 3,5 Mbit/s, standard 2,5, économique 1,8 (vidéos plus légères, moins de stockage et de données mobiles) */
-  function debitVideo() { return { eco: 1800000, standard: 2500000 }[cfg.qualite] || 3500000; }
+  function debitVideo() { return { eco: 1800000, haute: 3500000 }[cfg.qualite] || 2500000; }
   function demarrer() {
     morceaux = []; blobFinal = null; mime = meilleurMime();
     var flot = new MediaStream(cv.captureStream(30).getVideoTracks().concat(flux.getAudioTracks()));
@@ -306,9 +316,9 @@ $('b-stop').onclick = arreterRec;
     cfg.event = s ? (s.label || s.nom || '') : '';
     cfg.titre = (s && s.titre) || CFG0.titre; cfg.sous = s ? (s.sous || '') : CFG0.sous; cfg.max = (s && Number(s.max)) || 30;
     cfg.noel = !!(s && s.noel); cfg.format = (s && s.format) || 'auto';
-    cfg.qui = (s && s.qui) || ''; cfg.quiSous = s ? (s.quiSous == null || s.quiSous === '' ? null : s.quiSous) : null; cfg.qualite = (s && s.qualite) || 'haute'; cfg.garde = (s && Number(s.garde)) || 14;
+    cfg.qui = (s && s.qui) || ''; cfg.quiSous = s ? (s.quiSous == null || s.quiSous === '' ? null : s.quiSous) : null; cfg.qualite = (s && s.qualite) || 'standard'; cfg.garde = (s && Number(s.garde)) || 14; cfg.choixFormat = !s || s.choixFormat !== false;
     cfg.cadrage = (s && s.cadrage != null && s.cadrage !== '') ? s.cadrage : (s ? '' : 'Vous pouvez incliner doucement la tablette pour vous cadrer');
-    document.body.classList.toggle('noel-on', cfg.noel); document.body.classList.toggle('fmt34', cfg.format === '3:4' || cfg.format === '4:3');
+    document.body.classList.toggle('noel-on', cfg.noel); majFormat();
     ecrireCfg(cfg);
   }
   var edite = null;

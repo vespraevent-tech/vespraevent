@@ -42,8 +42,9 @@ async function noter(quoi, detail) {
 export { noter };
 
 /* durée de conservation propre à chaque vidéo (réglée sur la session au moment de l'enregistrement) */
-const gardeJours = (m) => Math.min(365, Math.max(7, Number(m && m.garde) || GARDE_JOURS));
-const perimee = (m) => Date.parse(m.cree) < Date.now() - gardeJours(m) * 86400000;
+/* durée de conservation : 0 = pas de suppression automatique (c'est vous qui supprimez depuis le back-office) */
+const gardeJours = (m) => { const n = Math.round(Number(m && m.garde) || 0); return n > 0 ? Math.min(730, Math.max(7, n)) : 0; };
+const perimee = (m) => gardeJours(m) > 0 && Date.parse(m.cree) < Date.now() - gardeJours(m) * 86400000;
 /* lecture des fiches en parallèle, par paquets : des milliers de vidéos restent lisibles en quelques secondes */
 export async function lireMetas(st, filtre) {
   const { blobs } = await st.list({ prefix: 'meta/' });
@@ -118,8 +119,9 @@ async function sessionsEcrire(st, liste) {
     format: ['auto', '16:9', '4:3', '9:16', '3:4'].includes(e.format) ? e.format : 'auto', noel: !!e.noel, cadrage: String(e.cadrage == null ? '' : e.cadrage).slice(0, 160),
     qui: String(e.qui || '').slice(0, 80), quiSous: String(e.quiSous == null ? '' : e.quiSous).slice(0, 160),
     actif: e.actif !== false, fin: /^\d{4}-\d{2}-\d{2}$/.test(String(e.fin || '')) ? String(e.fin) : '',
-    conserv: Math.min(365, Math.max(7, Math.round(Number(e.conserv)) || GARDE_JOURS)), garde: Math.min(365, Math.max(1, Math.round(Number(e.garde)) || 14)),
-    qualite: ['haute', 'standard', 'eco'].includes(e.qualite) ? e.qualite : 'haute',
+    conserv: (Number(e.conserv) > 0) ? Math.min(730, Math.max(7, Math.round(Number(e.conserv)))) : 0, garde: Math.min(365, Math.max(1, Math.round(Number(e.garde)) || 14)),
+    qualite: ['haute', 'standard', 'eco'].includes(e.qualite) ? e.qualite : 'standard',
+    choixFormat: e.choixFormat !== false,
   })).filter((e) => e.nom);
   await st.setJSON('config/sessions', propre); return propre;
 }
@@ -160,7 +162,7 @@ export default async (request) => {
     await noter('contact', 'session ouverte : ' + ses.nom);
     /* une tablette installée pour un événement de plusieurs semaines garde sa session 60 jours */
     const exp = Date.now() + 60 * 86400e3;
-    return rep({ ok: true, jeton: signer({ t: 'session', id: ses.id, exp }), exp, session: { id: ses.id, nom: ses.nom, date: ses.date, label: labelSession(ses), titre: ses.titre, sous: ses.sous, max: ses.max, format: ses.format, noel: ses.noel, cadrage: ses.cadrage, qui: ses.qui, quiSous: ses.quiSous, qualite: ses.qualite, garde: ses.garde } });
+    return rep({ ok: true, jeton: signer({ t: 'session', id: ses.id, exp }), exp, session: { id: ses.id, nom: ses.nom, date: ses.date, label: labelSession(ses), titre: ses.titre, sous: ses.sous, max: ses.max, format: ses.format, noel: ses.noel, cadrage: ses.cadrage, qui: ses.qui, quiSous: ses.quiSous, qualite: ses.qualite, garde: ses.garde, choixFormat: ses.choixFormat !== false } });
   }
 
   /* ── test de connexion depuis les réglages de la tablette ── */
@@ -242,7 +244,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
 <small>VESPRA EVENT</small><h1>${esc(m.prenom)}, voici votre message vidéo</h1><p>${esc(m.event || '')}</p>
 <video controls playsinline preload="metadata" src="/api/videobooth/v/${esc(id)}${q}&amp;lecture=1"></video>
 <a href="/api/videobooth/v/${esc(id)}${q}&amp;dl=1" download>Télécharger ma vidéo</a>
-<div class="n">Disponible ${gardeJours(m)} jours après l’enregistrement.<br>Vespra Event — spécialiste de la location événementielle dans le Grand Ouest.</div></main></body></html>`;
+<div class="n">${gardeJours(m) ? 'Disponible ' + gardeJours(m) + ' jours après l’enregistrement.' : 'Pensez à télécharger votre vidéo pour la garder.'}<br>Vespra Event — spécialiste de la location événementielle dans le Grand Ouest.</div></main></body></html>`;
       return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
     }
     /* lecture par morceaux (Range) : indispensable pour que la vidéo se lance sur téléphone */
@@ -298,7 +300,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
       type: String(q.get('type') || 'video/mp4').slice(0, 40), duree: Number(q.get('duree')) || 0, octets: total, cree: new Date().toISOString(),
     };
     /* durée de conservation propre à la session de cette vidéo */
-    try { const ses = (await sessionsLire(st)).find((e) => labelSession(e) === m.event); if (ses) m.garde = ses.conserv || GARDE_JOURS; } catch {}
+    try { const ses = (await sessionsLire(st)).find((e) => labelSession(e) === m.event); if (ses) m.garde = ses.conserv || 0; } catch {}
     await st.set('video/' + id, tout.buffer);
     for (let k = 0; k < n; k++) await st.delete(`chunk/${id}/${k}`).catch(() => {});
     /* la fiche est écrite AVANT l'e-mail : si l'envoi est interrompu, la vidéo reste visible dans le back-office */

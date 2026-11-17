@@ -1919,7 +1919,7 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
       <div class="toolbar">
         <div>
           <h2 id="vbTitre">Vidéobooth</h2>
-          <div class="hint" id="vbSous">Les vidéos enregistrées sur la tablette arrivent ici et partent par e-mail à l’invité. Elles restent sur le site pendant la durée réglée sur chaque session (30 jours par défaut).</div>
+          <div class="hint" id="vbSous">Les vidéos enregistrées sur la tablette arrivent ici et partent par e-mail à l’invité. Elles restent sur le site jusqu’à ce que vous les supprimiez (ou après le délai que vous réglez sur une session).</div>
         </div>
         <div class="actions-bar" style="margin-left:auto;padding-top:0;border:0">
           <button class="btn btn-ghost" id="vbRetour" onclick="vbOuvrir('')" hidden>‹ Tous les événements</button>
@@ -2670,7 +2670,7 @@ const VB_CARTE='background:#fff;border:1px solid #e6e1d6;border-radius:12px;padd
 const VB_INPUT='padding:8px 10px;border:1px solid #d9dde5;border-radius:8px;font:inherit;font-size:13.5px;color:#111';
 function vbFormSession(){
   const ses=VBCFG.sessions||[];
-  const e=VBEDIT.i>=0?ses[VBEDIT.i]:{nom:'',date:'',mdp:'',titre:'Enregistrer un souvenir',sous:'Laissez un petit message vidéo de 30 secondes',max:30,format:'auto',noel:false,cadrage:'Vous pouvez incliner doucement la tablette pour vous cadrer',qui:'',quiSous:'',actif:true,fin:'',conserv:30,garde:14,qualite:'standard'};
+  const e=VBEDIT.i>=0?ses[VBEDIT.i]:{nom:'',date:'',mdp:'',titre:'Enregistrer un souvenir',sous:'Laissez un petit message vidéo de 30 secondes',max:30,format:'auto',noel:false,cadrage:'Vous pouvez incliner doucement la tablette pour vous cadrer',qui:'',quiSous:'',actif:true,fin:'',conserv:0,garde:14,qualite:'standard',choixFormat:true};
   const lab='font-size:12px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px';
   const f=(id,l,v,ph,type)=>'<label style="'+lab+'">'+l+'<input id="vs-'+id+'" type="'+(type||'text')+'" value="'+vbEsc(v==null?'':v)+'" placeholder="'+vbEsc(ph||'')+'" style="'+VB_INPUT+'"></label>';
   const sel=(id,l,opts,cur)=>'<label style="'+lab+'">'+l+'<select id="vs-'+id+'" style="'+VB_INPUT+'">'+opts.map(o=>'<option value="'+o[0]+'"'+(String(cur)===String(o[0])?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></label>';
@@ -2686,8 +2686,9 @@ function vbFormSession(){
     f('qui','Titre du formulaire',e.qui,'Qui êtes-vous ?')+f('quiSous','Phrase sous ce titre',e.quiSous,'Pour vous envoyer votre vidéo par e-mail')+
     f('max','Durée maximale (secondes)',e.max,'30','number')+f('cadrage','Message de cadrage',e.cadrage,'')+
     sel('format','Format de la vidéo',[['auto','Automatique'],['16:9','Paysage 16:9'],['4:3','Paysage 4:3'],['9:16','Story 9:16'],['3:4','Portrait 3:4']],e.format)+
-    sel('qualite','Qualité de la vidéo',[['haute','Haute (≈ 26 Mo/min)'],['standard','Standard (≈ 19 Mo/min)'],['eco','Économique (≈ 13 Mo/min)']],e.qualite||'haute')+
-    f('conserv','Conservée sur le site (jours)',e.conserv||30,'30','number')+f('garde','Gardée sur la tablette après envoi (jours)',e.garde||14,'14','number')+
+    sel('qualite','Qualité de la vidéo',[['haute','Haute (≈ 26 Mo/min)'],['standard','Standard (≈ 19 Mo/min)'],['eco','Économique (≈ 13 Mo/min)']],e.qualite||'standard')+
+    f('conserv','Suppression automatique sur le site après (jours) — 0 = jamais',e.conserv||0,'0','number')+f('garde','Gardée sur la tablette après envoi (jours)',e.garde||14,'14','number')+
+    '<label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" id="vs-choixformat"'+(e.choixFormat!==false?' checked':'')+'> Laisser l’invité choisir : vertical (story) ou horizontal</label>'+
     '<label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" id="vs-noel"'+(e.noel?' checked':'')+'> Thème Noël</label>'+
     '</div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" onclick="vbSessSauver()">Enregistrer la session</button><button class="btn btn-ghost" onclick="vbSessEdit(null)">Annuler</button></div></div>';
 }
@@ -2714,7 +2715,7 @@ function vbAccesSauver(){
 function vbSessSauver(){
   const v=id=>(document.getElementById('vs-'+id)||{}).value||'';
   const prot=document.getElementById('vs-prot').checked;
-  const s={nom:v('nom').trim(),date:v('date').trim(),fin:v('fin'),actif:document.getElementById('vs-actif').checked,mdp:prot?v('mdp').trim():'',titre:v('titre').trim(),sous:v('sous').trim(),qui:v('qui').trim(),quiSous:v('quiSous').trim(),max:Number(v('max'))||30,cadrage:v('cadrage').trim(),format:v('format'),qualite:v('qualite'),conserv:Number(v('conserv'))||30,garde:Number(v('garde'))||14,noel:!!document.getElementById('vs-noel').checked};
+  const s={nom:v('nom').trim(),date:v('date').trim(),fin:v('fin'),actif:document.getElementById('vs-actif').checked,mdp:prot?v('mdp').trim():'',titre:v('titre').trim(),sous:v('sous').trim(),qui:v('qui').trim(),quiSous:v('quiSous').trim(),max:Number(v('max'))||30,cadrage:v('cadrage').trim(),format:v('format'),qualite:v('qualite'),conserv:Number(v('conserv'))||0,garde:Number(v('garde'))||14,choixFormat:!!document.getElementById('vs-choixformat').checked,noel:!!document.getElementById('vs-noel').checked};
   if(!s.nom){ showToast('Indiquez le nom de la session',true); return; }
   if(prot&&!s.mdp){ showToast('Saisissez le mot de passe, ou décochez la protection',true); return; }
   const l=(VBCFG.sessions||[]).slice(); const ancien=VBEDIT.i>=0?l[VBEDIT.i]:null;
@@ -2726,7 +2727,7 @@ function vbSessSauver(){
 function vbSessSuppr(i){ const l=(VBCFG.sessions||[]).slice(); if(!confirm('Supprimer la session « '+l[i].nom+' » ? Les vidéos déjà reçues ne sont pas supprimées.')) return; l.splice(i,1); vbConfigPoster({sessions:l},'Session supprimée'); if(VBEVT) vbOuvrir(''); }
 
 /* ── Vidéobooth ── */
-let VB=[], VBEVT='';
+let VB=[], VBEVT='', VBALERTE=20;
 function vbEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 const vbNomEvt=v=>v.event||'(sans nom d’événement)';
 async function vbCharger(){
@@ -2744,9 +2745,23 @@ async function vbCharger(){
     a.style.display=msg?'block':'none'; a.textContent=msg;
     a.style.color=(msg&&d.cle&&et.contact&&!et.refus)?'#6b7280':'#b03a2a';
     if(!msg&&et.contact){ a.style.display='block'; a.style.color='#6b7280'; a.textContent='Dernier contact de la tablette : '+fh(et.contact)+'.'; }
+    try{ const al=await api('/videobooth/alerte'); VBALERTE=al.go||20; }catch(e){}
     vbRendre(); vbConfigCharger();
   }catch(e){ z.innerHTML='<div class="hint" style="color:#b03a2a">Chargement impossible : '+vbEsc(e.message)+'</div>'; }
 }
+/* jauge de stockage : visible seulement dans le back-office, jamais sur la tablette */
+function vbJauge(detail){
+  const total=VB.reduce((t,v)=>t+(v.octets||0),0), seuil=VBALERTE*1073741824, pct=Math.round(total/seuil*100);
+  const coul=pct>=100?'#b03a2a':(pct>=70?'#c27a00':'#3d6e36'), fond=pct>=100?'#fbeae7':(pct>=70?'#fff4dc':'#eef6ec');
+  const msg=pct>=100?'Seuil dépassé : téléchargez les vidéos puis videz-les dès que possible.':(pct>=70?'Le stockage se remplit : pensez à télécharger puis à vider les vidéos.':'');
+  if(!detail&&pct<70) return '';
+  const barre='<div style="height:8px;background:#e8e4da;border-radius:6px;overflow:hidden;margin:8px 0 6px"><div style="height:100%;width:'+Math.min(100,pct)+'%;background:'+coul+'"></div></div>';
+  return '<div style="background:'+(msg?fond:'#fff')+';border:1px solid '+(msg?coul:'#e6e1d6')+';border-radius:12px;padding:12px 16px;margin:0 0 14px">'+
+    '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><b style="color:'+coul+'">'+(msg?'⚠ ':'')+'Stockage des vidéos : '+vbMo(total)+' sur '+String(VBALERTE).replace('.',',')+' Go d’alerte ('+pct+' %)</b>'+
+    (detail?'<span style="font-size:12.5px;color:#6b7280">Alerte à partir de <input id="vbSeuil" value="'+String(VBALERTE).replace('.',',')+'" style="width:60px;padding:4px 6px;border:1px solid #d9dde5;border-radius:6px;text-align:center"> Go <button class="btn btn-ghost" style="padding:4px 10px;font-size:12.5px" onclick="vbSeuilSauver()">Enregistrer</button></span>':'')+'</div>'+barre+
+    (msg?'<div style="font-size:13px;color:'+coul+';font-weight:600">'+msg+'</div>':'')+(detail?'<div style="font-size:12px;color:#8a8f98;margin-top:4px">Ce seuil est le vôtre : Netlify ne publie pas de limite de taille. Il vous prévient ici, et nulle part ailleurs (jamais sur la tablette).</div>':'')+'</div>';
+}
+async function vbSeuilSauver(){ const v=document.getElementById('vbSeuil').value; try{ const r=await api('/videobooth/alerte',{method:'POST',body:JSON.stringify({go:v})}); VBALERTE=r.go; showToast('Seuil enregistré'); vbRendre(); }catch(e){ showToast('Échec : '+e.message,true); } }
 function vbOuvrir(nom){ VBEVT=nom; VBEDIT=null; vbRendre(); vbConfigRendre(); window.scrollTo({top:0}); }
 const vbMo=n=>n>=1073741824?(n/1073741824).toFixed(2).replace('.',',')+' Go':(n/1048576).toFixed(1).replace('.',',')+' Mo';
 function vbRendre(){
@@ -2768,8 +2783,8 @@ function vbRendre(){
     cartes.sort((a,b)=>{ const ta=a.s&&!vbSessTerminee(a.s)?1:0, tb=b.s&&!vbSessTerminee(b.s)?1:0; if(ta!==tb) return tb-ta; const la=(ev[a.nom]||[]).map(v=>String(v.cree)).sort().pop()||'', lb=(ev[b.nom]||[]).map(v=>String(v.cree)).sort().pop()||''; return lb.localeCompare(la); });
     const total=VB.reduce((t,v)=>t+(v.octets||0),0);
     const tete='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px"><div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f">Événements <span style="font-weight:500;color:#6b7280;font-size:13px">· '+VB.length+' vidéo'+(VB.length>1?'s':'')+' sur le site ('+mo(total)+')</span></div><button class="btn" onclick="vbSessEdit(-1)">+ Nouvelle session</button></div>';
-    if(!cartes.length){ z.innerHTML=tete+'<div class="hint" style="padding:24px 0">Aucune session pour l’instant. Créez-en une : elle apparaîtra sur la tablette.</div>'; return; }
-    z.innerHTML=tete+'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">'+cartes.map(c=>{
+    if(!cartes.length){ z.innerHTML=vbJauge(true)+tete+'<div class="hint" style="padding:24px 0">Aucune session pour l’instant. Créez-en une : elle apparaîtra sur la tablette.</div>'; return; }
+    z.innerHTML=vbJauge(true)+tete+'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">'+cartes.map(c=>{
       const l=ev[c.nom]||[], ds=l.map(v=>+new Date(v.cree)), ko=l.filter(v=>v.mail!=='envoye').length, poids=l.reduce((t,v)=>t+(v.octets||0),0);
       const quand=ds.length?(fd(Math.min(...ds))===fd(Math.max(...ds))?fd(Math.min(...ds)):fd(Math.min(...ds))+' → '+fd(Math.max(...ds))):'';
       const pastille=(txt,coul,fond)=>'<span style="font-size:11.5px;font-weight:700;color:'+coul+';background:'+fond+';border-radius:20px;padding:2px 9px">'+txt+'</span>';
@@ -2787,23 +2802,30 @@ function vbRendre(){
   document.getElementById('vbTitre').textContent=VBEVT;
   document.getElementById('vbRelancer').hidden=!l.some(v=>v.mail!=='envoye');
   const poids=l.reduce((t,v)=>t+(v.octets||0),0);
-  z.innerHTML='<div class="hint" style="margin-bottom:10px">'+l.length+' vidéo'+(l.length>1?'s':'')+' · '+mo(poids)+'</div>'+(l.length?'':'<div class="hint" style="padding:18px 0">Aucune vidéo pour cet événement pour l’instant. Elles apparaîtront ici dès que la tablette les enverra.</div>')+'<div style="display:flex;flex-direction:column;gap:10px">'+
-  l.map(v=>{const d=new Date(v.cree);const ok=v.mail==='envoye';const j=Math.max(0,(Number(v.garde)||30)-Math.floor((Date.now()-d)/86400000));
+  z.innerHTML=vbJauge(false)+'<div class="hint" style="margin-bottom:10px">'+l.length+' vidéo'+(l.length>1?'s':'')+' · '+mo(poids)+'</div>'+(l.length?'':'<div class="hint" style="padding:18px 0">Aucune vidéo pour cet événement pour l’instant. Elles apparaîtront ici dès que la tablette les enverra.</div>')+'<div style="display:flex;flex-direction:column;gap:10px">'+
+  l.map(v=>{const d=new Date(v.cree);const ok=v.mail==='envoye';const j=Math.max(0,(Number(v.garde)||0)-Math.floor((Date.now()-d)/86400000));
     const btn='class="btn btn-ghost" style="text-decoration:none;padding:7px 12px;font-size:13px"';
     return '<div style="background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:14px 16px">'+
       '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><b style="font-size:15px">'+vbEsc(v.prenom)+' '+vbEsc(v.nom)+'</b>'+
       '<span style="color:'+(ok?'#3d6e36':'#b03a2a')+';font-weight:600;font-size:13px">'+(ok?'E-mail envoyé'+(v.pj?' (vidéo jointe)':' (lien)'):(v.mail==='attente'?'E-mail en cours d’envoi':'E-mail non parti'+(v.mailErreur?' — '+vbEsc(v.mailErreur):'')))+'</span></div>'+
       '<div style="color:#4a5565;font-size:13.5px;margin-top:2px;word-break:break-all">'+vbEsc(v.email)+'</div>'+
-      '<div style="color:#8a8f98;font-size:12.5px;margin-top:2px">'+d.toLocaleDateString('fr-FR')+' à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+' · '+mo(v.octets||0)+' · supprimée du site dans '+j+' j</div>'+
+      '<div style="color:#8a8f98;font-size:12.5px;margin-top:2px">'+d.toLocaleDateString('fr-FR')+' à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+' · '+mo(v.octets||0)+' · '+(Number(v.garde)>0?'supprimée du site dans '+j+' j':'conservée jusqu’à votre suppression')+'</div>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><a '+btn+' href="/api/admin/videobooth/video?id='+encodeURIComponent(v.id)+'" download>Télécharger</a><button '+btn+' onclick="vbRenvoyer(\''+v.id+'\')">Renvoyer l’e-mail</button><button '+btn+' onclick="vbSupprimer(\''+v.id+'\')">Supprimer</button></div></div>';}).join('')+'</div>';
 }
 function vbReglagesOuvrir(){ const i=(VBCFG.sessions||[]).findIndex(e=>vbLabel(e)===VBEVT); if(i>=0) vbSessEdit(i); }
 async function vbViderEvenement(){
-  const l=VB.filter(v=>vbNomEvt(v)===VBEVT); if(!l.length){ showToast('Aucune vidéo à supprimer',true); return; }
-  const poids=l.reduce((t,v)=>t+(v.octets||0),0);
-  if(!confirm('Supprimer les '+l.length+' vidéo'+(l.length>1?'s':'')+' de « '+VBEVT+' » du site ('+vbMo(poids)+') ?\n\nIl n’y a pas de retour en arrière. Téléchargez-les d’abord (« Tout télécharger »). Les e-mails déjà envoyés aux invités ne sont pas concernés, mais leurs liens ne fonctionneront plus.')) return;
-  if(!confirm('Dernière confirmation : supprimer définitivement ces '+l.length+' vidéos du site ?')) return;
-  try{ const r=await api('/videobooth?event='+encodeURIComponent(VBEVT),{method:'DELETE'}); showToast(r.supprimees+' vidéo'+(r.supprimees>1?'s supprimées':' supprimée')); await vbCharger(); }catch(e){ showToast('Échec : '+e.message,true); }
+  const tout=VB.filter(v=>vbNomEvt(v)===VBEVT); if(!tout.length){ showToast('Aucune vidéo à supprimer',true); return; }
+  const jourParis=iso=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris'}).format(new Date(iso));
+  const dern=tout.map(v=>jourParis(v.cree)).sort().pop();
+  const rep=prompt('Supprimer les vidéos de « '+VBEVT+' » enregistrées jusqu’au (inclus) :\n\nFormat AAAA-MM-JJ. Pour tout supprimer, gardez la date proposée (dernière vidéo reçue).\nPour garder les vidéos de la semaine en cours, saisissez la veille du début de semaine.',dern);
+  if(rep===null) return;
+  const jusqua=String(rep).trim();
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(jusqua)){ showToast('Date invalide (exemple : 2026-12-06)',true); return; }
+  const l=tout.filter(v=>jourParis(v.cree)<=jusqua);
+  if(!l.length){ showToast('Aucune vidéo jusqu’à cette date',true); return; }
+  const poids=l.reduce((t,v)=>t+(v.octets||0),0), reste=tout.length-l.length;
+  if(!confirm('Supprimer '+l.length+' vidéo'+(l.length>1?'s':'')+' du site ('+vbMo(poids)+') ?'+(reste?'\n'+reste+' plus récente'+(reste>1?'s resteront':' restera')+'.':'')+'\n\nIl n’y a pas de retour en arrière : téléchargez-les d’abord (« Tout télécharger »). Les e-mails déjà envoyés aux invités ne sont pas touchés (vidéo jointe conservée dans leur boîte mail), mais les liens de téléchargement et la galerie ne les montreront plus.')) return;
+  try{ const r=await api('/videobooth?event='+encodeURIComponent(VBEVT)+'&jusqua='+jusqua,{method:'DELETE'}); showToast(r.supprimees+' vidéo'+(r.supprimees>1?'s supprimées':' supprimée')); await vbCharger(); }catch(e){ showToast('Échec : '+e.message,true); }
 }
 async function vbRenvoyer(id){
   const v=VB.find(x=>x.id===id); if(!v) return;
