@@ -10156,7 +10156,8 @@ function accueilRender(){
   }
 }
 function accueilRender2(){
-  const dem=(Array.isArray(cache.demandes)?cache.demandes:[]).filter(d=>d&&!d.planning);
+  /* mêmes lignes que la liste des réservations : les réservations saisies à la main (planning) comptent aussi, sinon le tableau de bord affiche moins que la liste */
+  const dem=(Array.isArray(cache.demandes)?cache.demandes:[]).filter(d=>d);
   const nouv=dem.filter(d=>d.statut==='nouvelle');
   const attente=dem.filter(d=>d.statut==='en-cours').length;
   let rdv=0; try{ rdv=(Array.isArray(rdvListe)?rdvListe:[]).filter(x=>x&&x.statut!=='validee'&&!x.suspect).length; }catch(e){}
