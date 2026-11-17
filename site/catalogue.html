@@ -733,14 +733,16 @@ transform:none!important;stroke-dashoffset:0!important}}
 
 
 <style id="cat-crumb-css">
-/* dans une catégorie : seulement le fil d'Ariane (ni recherche, ni filtres) ; recherche et filtres restent sur « Voir tout » et sur une recherche */
-.cat-crumb{display:none;align-items:center;gap:9px;padding:18px 40px 16px;font-size:14px;color:#596575;border-bottom:1px solid var(--g4,#F0F2F5);background:#fff}
-body.cat-in .cat-crumb{display:flex}
+/* dans une catégorie : seulement le fil d'Ariane, comme sur les fiches produit (une seule ligne) ; recherche et filtres restent sur « Voir tout » et sur une recherche */
+.cat-crumb{display:none;margin:0;padding:22px 64px 12px;font-size:12px;color:var(--g2,#646D7C);background:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;box-sizing:border-box;border-bottom:1px solid var(--g4,#F0F2F5)}
+body.cat-in .cat-crumb{display:block}
 html body.cat-in #filtersBar.filters,html body.cat-choose #catCrumb{display:none!important}
-.cat-crumb a{color:var(--navy,#2b4a6b);font-weight:600;text-decoration:none}.cat-crumb a:hover{text-decoration:underline}
-.cat-crumb .crumb-cat-sep{color:#9aa3b0}.cat-crumb #crumbCurrent{color:#0c0f14;font-weight:600}
-.cat-crumb-n{margin-left:auto;font-size:12.5px;color:var(--g2,#646D7C);white-space:nowrap}
-@media(max-width:760px){.cat-crumb{padding:14px 16px 12px;font-size:13.5px;flex-wrap:wrap}}
+.cat-crumb a{color:var(--g2,#646D7C);text-decoration:none}.cat-crumb a:hover{color:var(--navy,#2b4a6b);text-decoration:underline}
+.cat-crumb #crumbCurrent{color:#0c0f14;font-weight:600}
+@media(max-width:1024px){.cat-crumb{padding:20px 40px 12px}}
+@media(max-width:760px){.cat-crumb{padding:20px 20px 12px;font-size:min(12px,3.05vw)}}
+.prod-grid.vc-fondu{animation:vcFondu .26s ease}
+@keyframes vcFondu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 /* « Voir tout » et recherche : barre de filtres plus nette */
 .cc-back-s{border:0!important;background:none!important;box-shadow:none!important;height:auto!important;padding:2px 0!important;border-radius:0!important;color:var(--navy,#2b4a6b)!important;font:600 14px 'Inter',sans-serif!important}
 .filter-search-in{border-radius:8px}
@@ -762,12 +764,10 @@ html body.cat-in #filtersBar.filters,html body.cat-choose #catCrumb{display:none
   .filter-select:focus{border-color:var(--navy,#2b4a6b)!important;box-shadow:0 0 0 3px rgba(43,74,107,.12)!important}
 }
 </style>
-<nav class="cat-crumb" id="catCrumb" aria-label="Fil d'Ariane">
-  <a href="catalogue.html" id="crumbCatalogue">Catalogue</a><span class="crumb-cat-sep" aria-hidden="true" hidden>›</span><span id="crumbCurrent" aria-current="page" hidden></span><span class="cat-crumb-n" id="crumbCount"></span>
-</nav>
+<nav class="cat-crumb" id="catCrumb" aria-label="Fil d'Ariane"><a href="index.html">Accueil</a> <span class="crumb-cat-sep0" aria-hidden="true">›</span> <a href="catalogue.html" id="crumbCatalogue">Catalogue</a> <span class="crumb-cat-sep" aria-hidden="true" hidden>›</span> <span id="crumbCurrent" aria-current="page" hidden></span><span class="cat-crumb-n" id="crumbCount" hidden></span></nav>
 
 <div class="filters" id="filtersBar">
-  <div class="cc-back-row"><button type="button" class="cc-back-s" onclick="vespraChoixCategories()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 2L3.5 6l4 4"/></svg>Catégories</button></div>
+  <div class="cc-back-row"><button type="button" class="cc-back-s" onclick="vespraChoixCategories();window.vespraRestaurerChoix&&window.vespraRestaurerChoix()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 2L3.5 6l4 4"/></svg>Catégories</button></div>
   <div class="filter-search">
     <span class="filter-search-ico" aria-hidden="true">⌕</span>
     <input type="search" id="searchInput" class="filter-search-in" placeholder="Rechercher un produit…" aria-label="Rechercher un produit" oninput="applyFilters()" autocomplete="off">
@@ -1233,7 +1233,7 @@ if(urlCat){
   if(!ul||!ph)return;
   const crumbSep=document.querySelector('.crumb-cat-sep'),crumbCurrent=document.getElementById('crumbCurrent'),crumbCatalogue=document.getElementById('crumbCatalogue');
   function updateCrumb(name){const active=!!name&&name!=='Tous';if(crumbSep)crumbSep.hidden=!active;if(crumbCurrent){crumbCurrent.hidden=!active;crumbCurrent.textContent=active?lib(name):'';}if(crumbCatalogue)crumbCatalogue.setAttribute('aria-current',active?'false':'page');}
-  if(crumbCatalogue)crumbCatalogue.addEventListener('click',function(e){e.preventDefault();window.vespraChoixCategories();});
+  if(crumbCatalogue)crumbCatalogue.addEventListener('click',function(e){e.preventDefault();window.vespraChoixCategories();restaurerChoix();});
   const CO=p=>(p.cats||[p.cat]).map(normCat);
   const DESC={'Photobooth et Vidéobooth':"Photobooth, cabines téléphoniques, livre d'or audio, panneau de bienvenue et néon : des souvenirs que vos invités garderont.",'Voitures de collection':"Une Citroën Traction ou une Ford Mustang pour vos photos, votre arrivée ou une belle mise en scène.",'Animations':"Karaoké, jeux, photobooth, pop-corn et châteaux gonflables : de quoi animer toute la soirée, des enfants aux plus grands.",'Son, lumière et vidéo':"Sonorisation, micros, jeux de lumières, boule à facettes et vidéoprojecteur pour une ambiance à la hauteur.",'Effets spéciaux et artifices':"Feux d'artifice de jour, fumée lourde, étincelles froides et machines à bulles pour les grands moments.",'Châteaux gonflables':"Du mini château aux grands châteaux avec toboggan, sans oublier la boîte de nuit gonflable : livrés et installés chez vous.",'Mobilier, réception et barnums':"Barnums, tentes étoile, buvette et mange-debout pour recevoir à l'abri, à l'extérieur comme à l'intérieur.",'Restauration':"Brasero, pop-corn, fontaine à cocktail, machine à glaçons et mange-debout pour régaler vos invités.",'Chauffage et ventilation':"Chauffage pour l'hiver, ventilateur pour l'été : tout le monde est bien, quelle que soit la météo.",'Décoration':"Panneau de bienvenue, panneau de direction, néon lumineux, guirlandes et spots LED : accueillez vos invités et soignez l'ambiance de votre événement.",'Jeux en bois':"Baby-foot, cornhole, palet breton, puissance 4 géant et passe-trappe pour occuper petits et grands."};
   const imgs={},cnt=[],rows=[];
@@ -1274,15 +1274,31 @@ if(urlCat){
   /* arrivée dans une catégorie (clic, retour depuis une fiche produit) : le premier produit est en haut à gauche, sous l'en-tête */
   function allerPremierProduit(){
     if(document.body.classList.contains('cat-choose'))return;
-    const c=document.querySelector('#prodGrid .prod-card')||document.getElementById('prodGrid');if(!c)return;
+    /* on arrive sur le fil d'Ariane (juste sous l'en-tête) : on comprend qu'on est en haut de la catégorie, et le premier produit suit */
+    const c=document.getElementById('catCrumb');const ref=(c&&c.offsetParent!==null)?c:(document.querySelector('#prodGrid .prod-card')||document.getElementById('prodGrid'));if(!ref)return;
     const n=document.querySelector('.nav');const h=n?Math.round(n.getBoundingClientRect().height):64;
-    window.scrollTo({top:Math.max(0,c.getBoundingClientRect().top+scrollY-h-14),behavior:'instant'});
+    window.scrollTo({top:Math.max(0,ref.getBoundingClientRect().top+scrollY-h-6),behavior:'smooth'});
+  }
+  /* au retour sur le choix des catégories, on retrouve l'endroit où l'on avait cliqué (pas le haut de la page) */
+  function memoriserChoix(){try{sessionStorage.setItem('vespra_cat_y',String(Math.round(window.scrollY)));}catch(e){}}
+  function restaurerChoix(){
+    let y=NaN;try{y=Number(sessionStorage.getItem('vespra_cat_y'));}catch(e){}
+    if(!isFinite(y)||y<0)return;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'instant'})));
+  }
+  /* un clic sur une catégorie un peu trop basse : la page remonte doucement pour la montrer, sans sauter */
+  function ajusterVue(el){
+    if(!el)return;
+    const n=document.querySelector('.nav'),h=n?Math.round(n.getBoundingClientRect().height):64;
+    const r=el.getBoundingClientRect(),vh=window.innerHeight||800;
+    if(r.bottom>vh*0.82||r.top<h+8){window.scrollTo({top:Math.max(0,window.scrollY+r.top-Math.round(vh*0.30)),behavior:'smooth'});}
   }
   try{history.scrollRestoration='manual';}catch(e){}
   /* arrivée sur la page (lien depuis une autre page, retour arrière) : aucun défilement forcé, on reste où le navigateur nous met */
 
   let selectedIndex=-1,armedIndex=-1;
   function choisir(v,mode){
+    if(mode==='push'&&document.body.classList.contains('cat-choose'))memoriserChoix();
     document.getElementById('filterSelect').value=v;
     document.body.classList.remove('cat-choose');
     updateCrumb(v==='Tous'?'':v);
@@ -1291,14 +1307,14 @@ if(urlCat){
     /* entrée dans une catégorie depuis le choix : nouvelle étape d'historique, pour que « retour » revienne au choix des catégories */
     try{const u='catalogue.html?cat='+(v==='Tous'?'tout':encodeURIComponent(v));if(mode==='push')history.pushState(null,'',u);else if(mode!=='none')history.replaceState(null,'',u);}catch(e){}
     /* entrer dans une catégorie : on arrive en haut de la page (l'aperçu au premier clic, lui, ne fait jamais défiler) */
-    if(mode==='push')allerPremierProduit();
+    if(mode==='push'){const g=document.getElementById('prodGrid');if(g){g.classList.remove('vc-fondu');void g.offsetWidth;g.classList.add('vc-fondu');}allerPremierProduit();}
   }
   ul.addEventListener('click',function(e){
     const b=e.target.closest('button[data-i]');if(!b)return;
     const i=+b.dataset.i;
     /* 1er clic = aperçu de la photo, 2e clic sur la même catégorie = entrer (souris comme tactile) */
     if(armedIndex===i){choisir(P[i][0],'push');return;}
-    selectedIndex=i;armedIndex=i;show(i);
+    selectedIndex=i;armedIndex=i;show(i);setTimeout(()=>ajusterVue(rows[i]),70);
   });
   /* ── recherche au-dessus du choix des catégories : suggestions en direct, et page de résultats sur tout le catalogue ── */
   (function(){
@@ -1338,12 +1354,23 @@ if(urlCat){
     const q=new URLSearchParams(location.search),c=q.get('cat');
     if(!c&&q.get('q')){const si=document.getElementById('searchInput');if(si){si.value=q.get('q');}document.getElementById('filterSelect').value='Tous';document.body.classList.remove('cat-choose');applyFilters();return;}
     if(c){const v=c==='tout'?'Tous':c;const fs=document.getElementById('filterSelect');if(fs&&[].some.call(fs.options,o=>o.value===v)){armedIndex=-1;choisir(v,'none');}}
-    else if(!q.get('q')&&!q.get('evt')){window.vespraChoixCategories('none');}
+    else if(!q.get('q')&&!q.get('evt')){window.vespraChoixCategories('none');restaurerChoix();}
   });
   const q=new URLSearchParams(location.search);
   if(!(q.get('cat')||q.get('q')||q.get('evt'))){document.body.classList.add('cat-choose');selectedIndex=0;armedIndex=0;show(0);updateCrumb('');}
   else{const v=document.getElementById('filterSelect').value;if(v!=='Tous')choisir(v);else{updateCrumb('');}}
   document.documentElement.classList.remove('cc-wait','cc-pre');
+  window.vespraRestaurerChoix=restaurerChoix;
+  /* retour depuis une fiche produit (ou autre page) : on retrouve la position où l'on était */
+  try{
+    const clef='vespra_scroll_'+location.pathname+location.search;
+    window.addEventListener('pagehide',function(){try{sessionStorage.setItem(clef,String(Math.round(window.scrollY)));}catch(e){}});
+    const nav=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{};
+    if(nav.type==='back_forward'){
+      const y=Number(sessionStorage.getItem(clef));
+      if(y>0)[120,500,1100].forEach(t=>setTimeout(()=>{if(Math.abs(window.scrollY-y)>8)window.scrollTo({top:y,behavior:'instant'});},t));
+    }
+  }catch(e){}
   try{
     const sig=x=>JSON.stringify([x&&x.categoriesCatalogue||[],x&&x.categoriesSupprimees||[]]);
     if(typeof window.VESPRA_DONNEES==='function')window.VESPRA_DONNEES().then(function(fd){
