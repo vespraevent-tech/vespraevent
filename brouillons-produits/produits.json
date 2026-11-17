@@ -125,27 +125,31 @@
     },
     {
       "id_provisoire": "evenements-themes",
-      "nom": "Soirées et événements à thème clé en main",
+      "nom": "Organisation d'événements clé en main (pros, mariages, soirées à thème)",
       "categories_visees": [
         "Page / section de mise en avant (pas un produit seul)"
       ],
-      "idee_description": "Mise en avant sur le site : on peut organiser entièrement des événements et soirées à thème (décor, fonds, lettres, ballons, effets, photobooth). Idée : section sur l'accueil + page dédiée + lien depuis chaque catégorie.",
+      "idee_description": "Mise en avant : nous accompagnons et guidons l'organisation clé en main de n'importe quel type d'événement (particuliers, mariages, professionnels), avec notre réseau de prestataires : vidéo, photo, traiteur, pâtisserie, etc. Le matériel (décor, effets, photobooth) vient en complément. Idée : section sur l'accueil, page dédiée, lien depuis chaque catégorie et depuis le devis.",
       "usages": [
-        "soirée Halloween",
-        "soirée casino",
-        "anniversaire à thème",
-        "mariage à thème"
+        "mariage",
+        "soirée d'entreprise / événement pro",
+        "anniversaire",
+        "soirée à thème"
       ],
       "options_possibles": [
-        "forfait thème complet",
+        "accompagnement et conseil",
+        "mise en relation avec des prestataires partenaires",
+        "forfait clé en main",
         "devis sur mesure"
       ],
       "questions": [
-        "Quels thèmes proposes-tu aujourd'hui (liste) ?",
-        "Qu'est-ce qui est inclus : décor, installation, animation, repas… ?",
-        "Prix « à partir de » ou uniquement sur devis ?",
-        "Zone d'intervention (Vitré et alentours ?) ?",
-        "Photos d'événements déjà faits ?"
+        "Quels prestataires partenaires peut-on citer : vidéaste, photographe, traiteur, pâtissier, autres (DJ, fleuriste…) ? Noms visibles ou non ?",
+        "Tu coordonnes tout (un seul interlocuteur, une seule facture) ou tu mets en relation ?",
+        "Comment tu es rémunéré : commission, forfait de coordination, inclus dans le devis ?",
+        "Types d'événements pros visés (séminaire, soirée d'entreprise, lancement…) ?",
+        "Zone d'intervention ?",
+        "Photos ou exemples d'événements déjà organisés ?",
+        "Page dédiée avec formulaire « Parlez-nous de votre projet » ?"
       ],
       "prix": null,
       "photos": null,
