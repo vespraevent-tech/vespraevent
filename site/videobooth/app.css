@@ -23,7 +23,12 @@ input[type=text],input[type=email],input[type=url],input[type=number],input[type
 input:focus,select:focus{outline:none;border-color:var(--or)}
 select option{color:#000}
 .coche{flex-direction:row;align-items:flex-start;gap:12px;font-weight:400;font-size:14px;letter-spacing:0;line-height:1.4}
-.coche input{width:26px;height:26px;margin-top:2px;flex:none;accent-color:var(--or)}
+.coche input{appearance:none;-webkit-appearance:none;width:28px;height:28px;margin:1px 0 0;flex:none;border:2px solid rgba(255,255,255,.55);border-radius:8px;background:rgba(255,255,255,.08);display:grid;place-content:center;cursor:pointer;transition:background .15s,border-color .15s,transform .1s}
+.coche input::after{content:"";width:14px;height:8px;border-left:3.5px solid #1a1205;border-bottom:3.5px solid #1a1205;transform:rotate(-45deg) translate(1px,-1px) scale(0);transition:transform .12s}
+.coche input:checked{background:var(--or);border-color:var(--or)}
+.coche input:checked::after{transform:rotate(-45deg) translate(1px,-1px) scale(1)}
+.coche input:active{transform:scale(.94)}
+.coche input:focus-visible{outline:3px solid rgba(245,158,11,.5);outline-offset:2px}
 .err{min-height:22px;color:#ffb4a8;font-size:16px;font-weight:600}
 .err.grand{position:absolute;left:6vw;right:6vw;top:40%;font-size:22px;text-align:center;background:rgba(0,0,0,.6);padding:24px;border-radius:16px}
 #s-cam{padding:0;background:#000;justify-content:flex-end;gap:0}
@@ -137,7 +142,7 @@ html,body,#app{height:100dvh}
 .amp{animation:vbLum 2s ease-in-out infinite}
 @keyframes vbLum{0%,100%{opacity:1}50%{opacity:.42}}
 @media (prefers-reduced-motion:reduce){.amp{animation:none}}
-.noel-haut{top:0;height:min(11vh,90px)}
+.noel-haut{top:0;height:clamp(60px,7vw,110px)}
 .noel-bas{bottom:0;height:min(15vh,150px)}
 .noel-on #s-accueil .marque,.noel-on #s-merci .marque{bottom:calc(min(15vh,150px) + 1.5vh)}
 .noel-on #s-merci,.noel-on #s-accueil{padding-bottom:calc(min(15vh,150px) + 3vh)}

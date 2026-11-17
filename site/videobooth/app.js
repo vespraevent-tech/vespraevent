@@ -333,9 +333,9 @@ $('b-stop').onclick = arreterRec;
     var cols = ['#F59E0B', '#ffffff', '#e8564a', '#7cc4f2'];
     /* guirlande : un fil en arcs, des douilles accrochées au fil, des ampoules allumées qui scintillent doucement */
     var guirlande = (function () {
-      var H0 = 6, CY = 40, fil = 'M-10,' + H0, amp = '', k = 0;
+      var H0 = 6, CY = 40, fil = 'M-10,' + H0, amp = '', k = 0;   /* motif sur 1600 de large, 54 de haut : tout reste visible, quelle que soit la largeur de l'écran */
       var pt = function (x0, t) { var u = 1 - t; return [x0 + 90 * t, u * u * H0 + 2 * u * t * CY + t * t * H0]; };
-      for (var x = -10; x < 820; x += 90) {
+      for (var x = -10; x < 1620; x += 90) {
         fil += ' Q' + (x + 45) + ',' + CY + ' ' + (x + 90) + ',' + H0;
         [0.2, 0.5, 0.8].forEach(function (t) {
           var q = pt(x, t), c = cols[k % 4], d = ((k * 0.37) % 2.4).toFixed(2), du = (1.7 + (k % 3) * 0.45).toFixed(2);
@@ -347,7 +347,7 @@ $('b-stop').onclick = arreterRec;
           k++;
         });
       }
-      return '<svg viewBox="0 0 800 62" preserveAspectRatio="xMidYMin slice" width="100%" height="100%"><path d="' + fil + '" fill="none" stroke="#3f9a6c" stroke-width="2.4" stroke-linecap="round"/>' + amp + '</svg>';
+      return '<svg viewBox="0 0 1600 54" preserveAspectRatio="xMidYMin slice" width="100%" height="100%"><path d="' + fil + '" fill="none" stroke="#3f9a6c" stroke-width="2.4" stroke-linecap="round"/>' + amp + '</svg>';
     })();
     function sapin(x, h, id) {
       var w = h * 0.62, y0 = 118, lum = '';
