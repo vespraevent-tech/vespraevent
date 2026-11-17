@@ -129,7 +129,7 @@
       "categories_visees": [
         "Page / section de mise en avant (pas un produit seul)"
       ],
-      "idee_description": "Mise en avant : nous accompagnons et guidons l'organisation clé en main de n'importe quel type d'événement (particuliers, mariages, professionnels), avec notre réseau de prestataires : vidéo, photo, traiteur, pâtisserie, etc. Le matériel (décor, effets, photobooth) vient en complément. Idée : section sur l'accueil, page dédiée, lien depuis chaque catégorie et depuis le devis.",
+      "idee_description": "Mise en avant : Vespra Event coordonne tout, avec une seule facture, pour n'importe quel type d'événement (particuliers, mariages, professionnels). Accompagnement et conseil, avec les prestataires déjà présents sur le site (traiteur Passion Réception, bar 3B Bar, serveuse privée Candice, pâtisserie Emmanuel, location de vaisselle Passion Réception) et bientôt un photographe et un vidéaste. Seuls les produits loués affichent un prix ; tout le reste est sur devis, via une demande envoyée par le client. Aucune mention de rémunération, commission ou mode de facturation sur le site.",
       "usages": [
         "mariage",
         "soirée d'entreprise / événement pro",
@@ -137,23 +137,24 @@
         "soirée à thème"
       ],
       "options_possibles": [
-        "accompagnement et conseil",
-        "mise en relation avec des prestataires partenaires",
-        "forfait clé en main",
-        "devis sur mesure"
+        "sur devis uniquement"
       ],
       "questions": [
-        "Quels prestataires partenaires peut-on citer : vidéaste, photographe, traiteur, pâtissier, autres (DJ, fleuriste…) ? Noms visibles ou non ?",
-        "Tu coordonnes tout (un seul interlocuteur, une seule facture) ou tu mets en relation ?",
-        "Comment tu es rémunéré : commission, forfait de coordination, inclus dans le devis ?",
-        "Types d'événements pros visés (séminaire, soirée d'entreprise, lancement…) ?",
-        "Zone d'intervention ?",
-        "Photos ou exemples d'événements déjà organisés ?",
-        "Page dédiée avec formulaire « Parlez-nous de votre projet » ?"
+        "Page dédiée ou section de la page nos-prestataires existante ?",
+        "Formulaire : quels champs (type d'événement, date, lieu, nombre d'invités, prestataires souhaités, budget) ?",
+        "Quand le photographe et le vidéaste arrivent : noms, photos, métiers à afficher ?",
+        "Photos ou exemples d'événements déjà organisés ?"
       ],
       "prix": null,
       "photos": null,
-      "statut": "brouillon"
+      "statut": "brouillon",
+      "regles": [
+        "Prix affichés uniquement pour les produits en location",
+        "Prestations et organisation : sur devis, formulaire de demande",
+        "Ne pas parler de rémunération, commission ou facturation",
+        "Une seule facture, coordination par Vespra Event (message : un seul interlocuteur)",
+        "Prestataires cités : ceux de la page nos-prestataires ; photographe et vidéaste à ajouter bientôt"
+      ]
     },
     {
       "id_provisoire": "chiffres-lettres-lumineux",
