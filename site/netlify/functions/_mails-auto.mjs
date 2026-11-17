@@ -100,11 +100,12 @@ export function pageProduit(nom, pages) {
 export function htmlVideo({ prenom, expediteur, destinataire, pour, evenement, lien, pj, jours, site }) {
   const sem = (jours || 7) === 7 ? '1 semaine' : `${jours} jours`;
   const autre = pour === 'autre';
+  /* le nom de l'événement n'apparaît plus dans le message : « Salle de… » ne dirait rien au destinataire */
   const intro = autre
     ? `<p style="margin:0 0 12px">Bonjour ${esc(destinataire || '')},</p>
-<p style="margin:0 0 12px"><strong>${esc(expediteur || prenom)}</strong> a laissé un message vidéo pour vous${evenement ? ` lors de <strong>${esc(evenement)}</strong>` : ''} : un joli souvenir à garder.</p>`
+<p style="margin:0 0 12px"><strong>${esc(expediteur || prenom)}</strong> a laissé un message vidéo pour vous. Un joli souvenir à garder.</p>`
     : `<p style="margin:0 0 12px">Bonjour ${esc(prenom)},</p>
-<p style="margin:0 0 12px">Merci d'avoir laissé un message vidéo${evenement ? ` pour <strong>${esc(evenement)}</strong>` : ''} : un joli souvenir à garder.</p>`;
+<p style="margin:0 0 12px">Voici le message vidéo que vous avez laissé. Un joli souvenir à garder.</p>`;
   const corps = `${intro}
 <p style="margin:0 0 16px">${pj ? (autre ? 'La vidéo est <strong>jointe à ce message</strong> : vous pouvez l’enregistrer directement depuis cet e-mail. Vous pouvez aussi la télécharger avec le bouton ci-dessous.' : 'Votre vidéo est <strong>jointe à ce message</strong> : vous pouvez l’enregistrer directement depuis cet e-mail. Vous pouvez aussi la télécharger avec le bouton ci-dessous.') : (autre ? 'La vidéo est un peu lourde pour être jointe : téléchargez-la avec le bouton ci-dessous.' : 'Votre vidéo est un peu lourde pour être jointe : téléchargez-la avec le bouton ci-dessous.')}</p>
 <p style="margin:0 0 18px"><a href="${esc(lien)}" style="display:inline-block;padding:11px 20px;background:#F59E0B;color:#1a1205;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700">Télécharger la vidéo</a></p>

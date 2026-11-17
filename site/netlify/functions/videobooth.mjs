@@ -78,7 +78,7 @@ async function envoyerMail(m, octets, site) {
   const body = {
     from: process.env.NOTIFY_FROM || 'Vespra Event <onboarding@resend.dev>',
     to: [m.email],
-    subject: m.pour === 'autre' ? `Un message vidéo de ${m.prenom}${m.event ? ' — ' + m.event : ''}` : (m.event ? `Votre message vidéo — ${m.event}` : 'Votre message vidéo'),
+    subject: m.pour === 'autre' ? `Un message vidéo de ${m.prenom} ${m.nom}`.trim() : 'Votre message vidéo',
     html,
     headers: { 'X-Entity-Ref-ID': 'videobooth-' + m.id },
   };
