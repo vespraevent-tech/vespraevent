@@ -49,30 +49,130 @@
     return l.length ? l : ['Thomas DEL\'HOMMEAU', 'Damien MARION'];
   }
 
+  /* ── adresse du local : point de départ de tous les trajets ── */
+  var localDefaut = '';
+  function adresseLocal() { return (loc('local') || '').trim() || localDefaut; }
+  async function ikChargerLocal() {
+    try { var e = await api('/entreprise'), p = (e && e.pub) || {}; localDefaut = [p.adresse, p.cpville].filter(Boolean).join(', '); } catch (x) {}
+    var c = el('ikLocal'); if (c && !c.value) c.value = adresseLocal();
+    if (legs.length && !legs[0].de) { legs[0].de = adresseLocal(); ikLegsRendre(); }
+  }
+  window.ikLocalSauver = function () { loc('local', el('ikLocal').value.trim()); };
+
+  /* ── suggestions d'adresses (Base Adresse Nationale), sur une seule ligne ── */
+  var ENDPOINT = 'https://api-adresse.data.gouv.fr/search/';
+  function suggere(inp, choisir) {
+    if (!inp || inp._sug) return; inp._sug = 1;
+    var liste = document.createElement('div'); liste.className = 'ik-ad'; liste.hidden = true; inp.parentNode.appendChild(liste);
+    var t = 0, jeton = 0;
+    function fermer() { clearTimeout(t); jeton++; liste.hidden = true; liste.innerHTML = ''; }
+    inp.addEventListener('input', function () {
+      clearTimeout(t); var q = inp.value.replace(/\s+/g, ' ').trim(); if (q.length < 3) { fermer(); return; }
+      var mon = ++jeton;
+      t = setTimeout(function () {
+        fetch(ENDPOINT + '?q=' + encodeURIComponent(q) + '&limit=5&autocomplete=1').then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (d) {
+          if (mon !== jeton) return;
+          var f = (d && d.features) || []; if (!f.length) { fermer(); return; }
+          liste.innerHTML = f.map(function (x, i) { var p = x.properties || {}; return '<button type="button" data-i="' + i + '"><b>' + esc2(p.name || p.label) + '</b><small>' + esc2([p.postcode, p.city].filter(Boolean).join(' ')) + '</small></button>'; }).join('');
+          liste.hidden = false;
+          Array.prototype.forEach.call(liste.querySelectorAll('button'), function (b) {
+            b.onmousedown = function (e) { e.preventDefault(); };
+            b.onclick = function () { var p = f[+b.dataset.i].properties || {}; fermer(); inp.value = p.label || p.name || ''; choisir(inp.value); };
+          });
+        }).catch(function () {});
+      }, 260);
+    });
+    inp.addEventListener('blur', function () { setTimeout(fermer, 150); });
+    inp.addEventListener('keydown', function (e) { if (e.key === 'Escape') fermer(); });
+  }
+
   /* ── itinéraire par tronçons ── */
   var legs = [{ de: '', vers: '', km: '' }];
   function num(v) { return parseFloat(String(v).replace(',', '.')) || 0; }
   function totalLegs() { return legs.reduce(function (t, l) { return t + num(l.km); }, 0); }
+  function chainer(i) {
+    if (legs[i + 1] && !legs[i + 1].de) { legs[i + 1].de = legs[i].vers; var n = el('ikLegs').querySelector('input[data-i="' + (i + 1) + '"][data-k="de"]'); if (n) n.value = legs[i].vers; }
+  }
   window.ikLegsRendre = function () {
     el('ikLegs').innerHTML = legs.map(function (l, i) {
-      return '<div class="ik-lg"><input type="text" data-i="' + i + '" data-k="de" value="' + esc2(l.de) + '" placeholder="' + (i ? 'Départ du tronçon' : 'Départ (ex. Vitré)') + '" autocomplete="off">' +
-        '<input type="text" data-i="' + i + '" data-k="vers" value="' + esc2(l.vers) + '" placeholder="Arrivée (ex. Vezin-le-Coquet)" autocomplete="off">' +
+      return '<div class="ik-lg" data-row="' + i + '"><button type="button" class="ik-gr" data-i="' + i + '" aria-label="Déplacer ce tronçon (glisser, ou flèches haut et bas)" title="Glisser pour déplacer"></button>' +
+        '<span class="ik-aw"><input type="text" data-i="' + i + '" data-k="de" value="' + esc2(l.de) + '" placeholder="' + (i ? 'Départ du tronçon' : 'Départ (adresse du local)') + '" autocomplete="off"></span>' +
+        '<span class="ik-aw"><input type="text" data-i="' + i + '" data-k="vers" value="' + esc2(l.vers) + '" placeholder="Arrivée (adresse du client)" autocomplete="off"></span>' +
         '<input type="text" inputmode="decimal" data-i="' + i + '" data-k="km" value="' + esc2(l.km) + '" placeholder="km" autocomplete="off">' +
         '<button type="button" class="ik-x" onclick="ikLegDel(' + i + ')" aria-label="Retirer ce tronçon">×</button></div>';
     }).join('');
     Array.prototype.forEach.call(el('ikLegs').querySelectorAll('input'), function (inp) {
-      inp.oninput = function () {
-        var i = +inp.dataset.i, k = inp.dataset.k; legs[i][k] = inp.value;
-        if (k === 'vers' && legs[i + 1] && !legs[i + 1].de) { legs[i + 1].de = inp.value; var n = el('ikLegs').querySelector('input[data-i="' + (i + 1) + '"][data-k="de"]'); if (n) n.value = inp.value; }
-        ikTotal();
-      };
+      var i = +inp.dataset.i, k = inp.dataset.k;
+      inp.oninput = function () { legs[i][k] = inp.value; if (k === 'vers') chainer(i); ikTotal(); };
+      if (k === 'de' || k === 'vers') suggere(inp, function (v) { legs[i][k] = v; if (k === 'vers') chainer(i); ikTotal(); });
     });
+    Array.prototype.forEach.call(el('ikLegs').querySelectorAll('.ik-gr'), ikPoignee);
     ikTotal();
   };
+  /* déplacer un tronçon : glisser la poignée (souris ou doigt), ou flèches haut / bas au clavier */
+  function deplacer(de, vers) { if (vers < 0 || vers >= legs.length || vers === de) return; var x = legs.splice(de, 1)[0]; legs.splice(vers, 0, x); ikLegsRendre(); }
+  function ikPoignee(h) {
+    h.onkeydown = function (e) { var i = +h.dataset.i; if (e.key === 'ArrowUp') { e.preventDefault(); deplacer(i, i - 1); var n = el('ikLegs').querySelector('.ik-gr[data-i="' + Math.max(0, i - 1) + '"]'); if (n) n.focus(); } if (e.key === 'ArrowDown') { e.preventDefault(); deplacer(i, i + 1); var m = el('ikLegs').querySelector('.ik-gr[data-i="' + Math.min(legs.length - 1, i + 1) + '"]'); if (m) m.focus(); } };
+    h.onpointerdown = function (e) {
+      e.preventDefault(); var de = +h.dataset.i, rows = Array.prototype.slice.call(el('ikLegs').querySelectorAll('.ik-lg')), cible = de;
+      var ligne = rows[de]; ligne.classList.add('ik-drag'); try { h.setPointerCapture(e.pointerId); } catch (x) {}
+      function ou(y) { var r = rows.map(function (n) { var b = n.getBoundingClientRect(); return b.top + b.height / 2; }), c = 0; for (var k = 0; k < r.length; k++) if (y > r[k]) c = k; if (y <= r[0]) c = 0; return c; }
+      h.onpointermove = function (ev) {
+        cible = ou(ev.clientY); rows.forEach(function (n, k) { n.classList.toggle('ik-au-dessus', k === cible && cible < de); n.classList.toggle('ik-en-dessous', k === cible && cible > de); });
+      };
+      h.onpointerup = h.onpointercancel = function () { h.onpointermove = h.onpointerup = h.onpointercancel = null; rows.forEach(function (n) { n.classList.remove('ik-drag', 'ik-au-dessus', 'ik-en-dessous'); }); if (cible !== de) deplacer(de, cible); };
+    };
+  }
   function ikTotal() { var t = totalLegs(); el('ikKm').value = t ? fmt(t, 1) : ''; ikAper(); }
   window.ikLegAdd = function () { var p = legs[legs.length - 1]; legs.push({ de: p ? p.vers : '', vers: '', km: '' }); ikLegsRendre(); var n = el('ikLegs').querySelectorAll('input[data-k="vers"]'); if (n.length) n[n.length - 1].focus(); };
-  window.ikLegRetour = function () { var p = legs[legs.length - 1]; legs.push({ de: p ? p.vers : '', vers: legs[0].de, km: '' }); ikLegsRendre(); var n = el('ikLegs').querySelectorAll('input[data-k="km"]'); if (n.length) n[n.length - 1].focus(); };
-  window.ikLegDel = function (i) { legs.splice(i, 1); if (!legs.length) legs.push({ de: '', vers: '', km: '' }); ikLegsRendre(); };
+  /* retour au point de départ : de l'arrivée précédente (le client) vers le premier départ (le local) */
+  window.ikLegRetour = function () { var p = legs[legs.length - 1]; legs.push({ de: p ? p.vers : '', vers: (legs[0] && legs[0].de) || adresseLocal(), km: '' }); ikLegsRendre(); var n = el('ikLegs').querySelectorAll('input[data-k="km"]'); if (n.length) n[n.length - 1].focus(); };
+  window.ikLegDel = function (i) { legs.splice(i, 1); if (!legs.length) legs.push({ de: adresseLocal(), vers: '', km: '' }); ikLegsRendre(); };
+
+  /* ── client / événement : recherche dans les réservations et la base clients ── */
+  var sans = function (x) { return String(x || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); };
+  function adr1(a) { return String(a || '').split(/\r?\n/).map(function (x) { return x.trim(); }).filter(Boolean).join(', '); }
+  function isoDe(d) { var m = /^(\d{2})\/(\d{2})\/(\d{4})/.exec(String(d || '')); return m ? m[3] + '-' + m[2] + '-' + m[1] : (/^\d{4}-\d{2}-\d{2}/.test(String(d || '')) ? String(d).slice(0, 10) : ''); }
+  function candidats(q) {
+    var n = sans(q); if (n.length < 2) return [];
+    var vus = {}, out = [];
+    ((typeof cache !== 'undefined' && cache.demandes) || []).forEach(function (d) {
+      if (!d || !d.nom) return;
+      var cle = d.resaId ? 'r' + d.resaId : 'd' + d.id; if (vus[cle]) return;
+      if (sans([d.nom, d.societe, d.date, d.adresse, d.type].join(' ')).indexOf(n) < 0) return;
+      vus[cle] = 1; out.push({ nom: d.nom, societe: d.societe || '', date: d.date || '', adresse: adr1(d.adresse), type: d.type || '' });
+    });
+    try { (typeof _clientsBase !== 'undefined' ? _clientsBase : []).forEach(function (c) {
+      if (!c || c._deleted || !c.fullName) return;
+      if (out.some(function (o) { return sans(o.nom) === sans(c.fullName); })) return;
+      if (sans([c.fullName, c.societe, c.billAdresse].join(' ')).indexOf(n) < 0) return;
+      out.push({ nom: c.fullName, societe: c.societe || '', date: '', adresse: adr1(c.billAdresse), type: '' });
+    }); } catch (e) {}
+    return out.slice(0, 8);
+  }
+  function brancherClient() {
+    var inp = el('ikClient'); if (!inp || inp._cl) return; inp._cl = 1;
+    var liste = document.createElement('div'); liste.className = 'ik-ad'; liste.hidden = true; inp.parentNode.style.position = 'relative'; inp.parentNode.appendChild(liste);
+    function fermer() { liste.hidden = true; liste.innerHTML = ''; }
+    inp.addEventListener('input', function () {
+      var c = candidats(inp.value); if (!c.length) { fermer(); return; }
+      liste.innerHTML = c.map(function (x, i) { return '<button type="button" data-i="' + i + '"><b>' + esc2(x.nom + (x.societe ? ' · ' + x.societe : '')) + (x.date ? ' — ' + esc2(x.date) : '') + '</b><small>' + esc2(x.adresse || 'adresse à saisir') + '</small></button>'; }).join(''); liste.hidden = false;
+      Array.prototype.forEach.call(liste.querySelectorAll('button'), function (b) {
+        b.onmousedown = function (e) { e.preventDefault(); };
+        b.onclick = function () {
+          var x = c[+b.dataset.i]; fermer();
+          inp.value = x.nom + (x.date ? ' — ' + x.date : '');
+          var d = isoDe(x.date); if (d) { el('ikDate').value = d; }
+          if (!el('ikMotif').value.trim()) el('ikMotif').value = 'Livraison / reprise du matériel — ' + x.nom;
+          /* le premier tronçon part du local ; le client est l'arrivée */
+          if (!legs[0].de) legs[0].de = adresseLocal();
+          if (x.adresse) { var i = legs.findIndex(function (l) { return !l.vers; }); if (i < 0) { legs.push({ de: legs[legs.length - 1].vers, vers: '', km: '' }); i = legs.length - 1; } legs[i].vers = x.adresse; if (legs[i + 1] && !legs[i + 1].de) legs[i + 1].de = x.adresse; }
+          ikLegsRendre(); ikAper();
+        };
+      });
+    });
+    inp.addEventListener('blur', function () { setTimeout(fermer, 150); });
+  }
 
   window.nfOnglet = function (v) {
     el('nfVueNotes').hidden = v !== 'notes'; el('nfVueIK').hidden = v !== 'ik';
@@ -80,12 +180,17 @@
     if (v === 'ik') ikOuvrir();
   };
 
+  var localPrec = '';
   window.ikOuvrir = function () {
     var cv = el('ikCv'); if (!cv.options.length) cv.innerHTML = Object.keys(BAREME).map(function (k) { return '<option value="' + k + '">' + BAREME[k].nom + '</option>'; }).join('');
+    brancherClient(); suggere(el('ikLocal'), function () { ikLocalSauver(); if (legs.length && (!legs[0].de || legs[0].de === localPrec)) { legs[0].de = el('ikLocal').value; ikLegsRendre(); } localPrec = el('ikLocal').value; });
+    if (!el('ikLocal').value) el('ikLocal').value = adresseLocal(); localPrec = el('ikLocal').value;
+    if (legs.length && !legs[0].de) legs[0].de = adresseLocal();
     cv.value = loc('cv') || '5'; el('ikElec').checked = loc('elec') === '1'; el('ikImmat').value = loc('immat') || '';
     var b = el('ikBenef'), cur = b.value; b.innerHTML = benefs().map(function (x) { return '<option>' + esc2(x) + '</option>'; }).join(''); if (cur) b.value = cur;
     if (!el('ikDate').value) el('ikDate').value = aujourdhui();
     ikLegsRendre();
+    ikChargerLocal();
     if (!charge) ikCharger();
   };
   async function ikCharger() {
@@ -112,7 +217,7 @@
       benef: el('ikBenef').value, cv: el('ikCv').value, elec: el('ikElec').checked };
     try {
       await api('/data', { method: 'POST', body: JSON.stringify({ collection: 'indemnites-km', item: item }) });
-      lignes.push(item); legs = [{ de: '', vers: '', km: '' }]; ikLegsRendre(); el('ikMotif').value = ''; el('ikClient').value = ''; ikRendre(); ikAper();
+      lignes.push(item); legs = [{ de: adresseLocal(), vers: '', km: '' }]; ikLegsRendre(); el('ikMotif').value = ''; el('ikClient').value = ''; ikRendre(); ikAper();
       if (typeof showToast === 'function') showToast('Trajet enregistré');
     } catch (e) { if (typeof showToast === 'function') showToast('Enregistrement impossible : ' + e.message, true); }
   };
