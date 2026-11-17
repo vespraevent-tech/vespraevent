@@ -31,6 +31,9 @@ const SANS_NOM = '(sans nom d’événement)';   /* nom affiché dans le back-of
 const PJ_MAX = 18 * 1024 * 1024;
 const idOk = (s) => /^[A-Za-z0-9_-]{6,60}$/.test(s || '');
 const jeton = (id) => createHmac('sha256', process.env.VIDEOBOOTH_CLE || '').update('vb:' + id).digest('hex').slice(0, 32);
+/* lien envoyé à l'invité par e-mail : jeton distinct de celui de la galerie, valable une semaine seulement */
+const LIEN_MAIL_JOURS = 7;
+const jetonMail = (id) => createHmac('sha256', process.env.VIDEOBOOTH_CLE || '').update('mail:' + id).digest('hex').slice(0, 32);
 const jetonEvt = (label) => createHmac('sha256', process.env.VIDEOBOOTH_CLE || '').update('ev:' + label).digest('hex').slice(0, 32);
 const store = () => getStore('videobooth');
 export const videoStore = store;
@@ -69,9 +72,9 @@ async function nettoyer(st) {
 async function envoyerMail(m, octets, site) {
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) return { ok: false, erreur: "RESEND_API_KEY n'est pas définie dans Netlify" };
-  const lien = `${site}/api/videobooth/v/${m.id}?t=${jeton(m.id)}`;
+  const lien = `${site}/api/videobooth/v/${m.id}?t=${jetonMail(m.id)}`;
   const pj = octets.byteLength <= PJ_MAX;
-  const html = htmlVideo({ prenom: m.prenom, evenement: m.event, lien, pj, jours: gardeJours(m), site });
+  const html = htmlVideo({ prenom: m.prenom, evenement: m.event, lien, pj, jours: LIEN_MAIL_JOURS, site });
   const body = {
     from: process.env.NOTIFY_FROM || 'Vespra Event <onboarding@resend.dev>',
     to: [m.email],
@@ -130,7 +133,7 @@ const labelSession = (e) => e.nom + (e.date ? ' — ' + e.date : '');
 const aujourdhuiParis = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 const visible = (e) => e.actif !== false && (!e.fin || e.fin >= aujourdhuiParis());
 const carte = (e) => ({ id: e.id, nom: e.nom, date: e.date, prot: !!e.mdp });
-export { envoyerMail, jeton, jetonEvt, GARDE_JOURS, gardeJours, visible, galLire, galEcrire, genMdp, accesLire, accesEcrire, sessionsLire, sessionsEcrire, labelSession };
+export { envoyerMail, jeton, jetonMail, jetonEvt, GARDE_JOURS, gardeJours, visible, galLire, galEcrire, genMdp, accesLire, accesEcrire, sessionsLire, sessionsEcrire, labelSession };
 
 export default async (request) => {
   if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
@@ -239,9 +242,15 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
   const mv = /\/api\/videobooth\/v\/([A-Za-z0-9_-]+)$/.exec(url.pathname);
   if (request.method === 'GET' && mv) {
     const id = mv[1];
-    if (!cle || url.searchParams.get('t') !== jeton(id)) return new Response('Lien invalide', { status: 403 });
+    const tj = url.searchParams.get('t');
+    const parMail = tj === jetonMail(id);
+    if (!cle || (tj !== jeton(id) && !parMail)) return new Response('Lien invalide', { status: 403 });
     const st = store();
     const m = await st.get('meta/' + id, { type: 'json' }).catch(() => null);
+    /* le lien de l'e-mail ne vaut qu'une semaine (à partir de l'envoi, ou du dernier renvoi) ; la galerie des organisateurs, elle, n'expire pas */
+    if (parMail && m && Date.now() > Date.parse(m.renvoye || m.cree) + LIEN_MAIL_JOURS * 86400000) {
+      return new Response(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Lien expiré</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0f2237;font-family:Inter,Arial,sans-serif;color:#fff;padding:20px;text-align:center}main{max-width:420px}h1{font-size:22px}p{color:#b9c6d8;line-height:1.5}</style></head><body><main><small style="letter-spacing:.3em;font-size:11px;color:#9fb0c6">VESPRA EVENT</small><h1>Ce lien n’est plus valable</h1><p>Les liens de téléchargement restent actifs une semaine. Votre vidéo est <strong>jointe à l’e-mail</strong> que vous avez reçu : retrouvez-la dans votre boîte mail.</p></main></body></html>`, { status: 410, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
+    }
     if (!m || perimee(m)) return new Response('Cette vidéo n’est plus disponible.', { status: 410 });
     const buf = await st.get('video/' + id, { type: 'arrayBuffer' }).catch(() => null);
     if (!buf) return new Response('Vidéo introuvable', { status: 404 });
@@ -254,7 +263,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
 <small>VESPRA EVENT</small><h1>${esc(m.prenom)}, voici votre message vidéo</h1><p>${esc(m.event || '')}</p>
 <video controls playsinline preload="metadata" src="/api/videobooth/v/${esc(id)}${q}&amp;lecture=1"></video>
 <a href="/api/videobooth/v/${esc(id)}${q}&amp;dl=1" download>Télécharger ma vidéo</a>
-<div class="n">${gardeJours(m) ? 'Disponible ' + gardeJours(m) + ' jours après l’enregistrement.' : 'Pensez à télécharger votre vidéo pour la garder.'}<br>Vespra Event — spécialiste de la location événementielle dans le Grand Ouest.</div></main></body></html>`;
+<div class="n">Ce lien est valable une semaine : pensez à télécharger votre vidéo pour la garder.<br>Vespra Event — spécialiste de la location événementielle dans le Grand Ouest.</div></main></body></html>`;
       return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
     }
     /* lecture par morceaux (Range) : indispensable pour que la vidéo se lance sur téléphone */

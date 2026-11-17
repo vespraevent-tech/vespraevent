@@ -2697,7 +2697,7 @@ function vbFormSession(){
     f('max','Durée maximale (secondes)',e.max,'30','number')+f('cadrage','Message de cadrage',e.cadrage,'')+
     sel('format','Format de la vidéo',[['auto','Automatique'],['16:9','Paysage 16:9'],['4:3','Paysage 4:3'],['9:16','Story 9:16'],['3:4','Portrait 3:4']],e.format)+
     sel('qualite','Qualité de la vidéo',[['haute','Haute (≈ 26 Mo/min)'],['standard','Standard (≈ 19 Mo/min)'],['eco','Économique (≈ 13 Mo/min)']],e.qualite||'standard')+
-    f('conserv','Suppression automatique sur le site après (jours) — 0 = jamais',e.conserv||0,'0','number')+f('garde','Gardée sur la tablette après envoi (jours)',e.garde||14,'14','number')+
+    f('conserv','Suppression automatique sur le site après (jours) — 0 = jamais',e.conserv||0,'0','number')+
     '<label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" id="vs-choixformat"'+(e.choixFormat!==false?' checked':'')+'> Laisser l’invité choisir : vertical (story) ou horizontal</label>'+
     '<label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" id="vs-noel"'+(e.noel?' checked':'')+'> Thème Noël</label>'+
     '</div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" onclick="vbSessSauver()">Enregistrer la session</button><button class="btn btn-ghost" onclick="vbSessEdit(null)">Annuler</button></div></div>';
@@ -2725,7 +2725,7 @@ function vbAccesSauver(){
 function vbSessSauver(){
   const v=id=>(document.getElementById('vs-'+id)||{}).value||'';
   const prot=document.getElementById('vs-prot').checked;
-  const s={nom:v('nom').trim(),date:v('date').trim(),fin:v('fin'),actif:document.getElementById('vs-actif').checked,mdp:prot?v('mdp').trim():'',titre:v('titre').trim(),sous:v('sous').trim(),qui:v('qui').trim(),quiSous:v('quiSous').trim(),max:Number(v('max'))||30,cadrage:v('cadrage').trim(),format:v('format'),qualite:v('qualite'),conserv:Number(v('conserv'))||0,garde:Number(v('garde'))||14,choixFormat:!!document.getElementById('vs-choixformat').checked,noel:!!document.getElementById('vs-noel').checked};
+  const s={nom:v('nom').trim(),date:v('date').trim(),fin:v('fin'),actif:document.getElementById('vs-actif').checked,mdp:prot?v('mdp').trim():'',titre:v('titre').trim(),sous:v('sous').trim(),qui:v('qui').trim(),quiSous:v('quiSous').trim(),max:Number(v('max'))||30,cadrage:v('cadrage').trim(),format:v('format'),qualite:v('qualite'),conserv:Number(v('conserv'))||0,choixFormat:!!document.getElementById('vs-choixformat').checked,noel:!!document.getElementById('vs-noel').checked};
   if(!s.nom){ showToast('Indiquez le nom de la session',true); return; }
   if(prot&&!s.mdp){ showToast('Saisissez le mot de passe, ou décochez la protection',true); return; }
   const l=(VBCFG.sessions||[]).slice(); const ancien=VBEDIT.i>=0?l[VBEDIT.i]:null;

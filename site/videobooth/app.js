@@ -233,10 +233,10 @@ $('b-stop').onclick = arreterRec;
     $('b-fin').disabled = true;
     var v = { id: 'v' + Date.now() + Math.random().toString(36).slice(2, 7), event: cfg.event, nom: invite.nom, prenom: invite.prenom, email: invite.email, consent: true,
       son: sonNiveau, fichier: nomFichier(), type: blobFinal.type, duree: Math.round((Date.now() - t0) / 1000), cree: new Date().toISOString(), essais: 0, blob: blobFinal };
-    ajouter(v).catch(function () { return liberer(true).then(function () { return ajouter(v); }); }).then(function () {
+    ajouter(v).then(function () {
       try { URL.revokeObjectURL($('v-revoir').src); } catch (e) {} blobFinal = null; invite = null; $('b-fin').disabled = false;
       montrer('s-merci'); synchro(); setTimeout(function () { accueil(); }, 7000);
-    }).catch(function () { $('b-fin').disabled = false; alert('La vidéo n’a pas pu être enregistrée : la tablette est pleine. Prévenez l’équipe.'); });
+    }).catch(function () { $('b-fin').disabled = false; alert('La vidéo n’a pas pu être enregistrée : la mémoire de la tablette est pleine. Prévenez l’équipe.'); });
   };
 
   /* ───────── envoi au serveur ───────── */
@@ -250,25 +250,9 @@ $('b-stop').onclick = arreterRec;
       $('a-file').textContent = ((cfg.jeton || cfg.cle) ? '' : '⚠ Aucune session ouverte : les vidéos restent sur la tablette. ') + tot + ' vidéo(s) gardée(s) sur la tablette, dont ' + (tot - att) + ' envoyée(s)' + (att ? ' — ' + att + ' en attente' : '') + (dernierMsg ? ' — ' + dernierMsg : '');
     }).catch(function () {});
   }
-  /* ── place sur la tablette : une vidéo envoyée n'est effacée de la tablette qu'après le délai réglé sur la session
-        (14 jours par défaut), ou plus tôt si la tablette se remplit. Une vidéo pas encore envoyée n'est JAMAIS effacée. ── */
-  function liberer(urgence) {
-    return toutes().then(function (l) {
-      var jours = Math.max(1, Number(cfg.garde) || 14), limite = Date.now() - jours * 86400000;
-      var envoyees = l.filter(function (v) { return v.envoye; }).sort(function (a, b) { return String(a.envoyeLe || a.cree) < String(b.envoyeLe || b.cree) ? -1 : 1; });
-      var aSupprimer = envoyees.filter(function (v) { return Date.parse(v.envoyeLe || v.cree) < limite; });
-      var suite = function () { return aSupprimer.reduce(function (p, v) { return p.then(function () { return retirer(v.id); }); }, Promise.resolve()).then(function () { return aSupprimer.length; }); };
-      if (!navigator.storage || !navigator.storage.estimate) return suite();
-      return navigator.storage.estimate().then(function (e) {
-        /* tablette presque pleine (plus de 80 %) : on libère aussi les plus anciennes déjà envoyées, jusqu'à repasser sous 70 % */
-        if (e.quota && (urgence || e.usage / e.quota > 0.8)) {
-          var reste = envoyees.filter(function (v) { return aSupprimer.indexOf(v) < 0; }), usage = e.usage;
-          reste.forEach(function (v) { if ((usage / e.quota > 0.7 || urgence) && v.blob) { usage -= v.blob.size; aSupprimer.push(v); } });
-        }
-        return suite();
-      }).catch(suite);
-    }).catch(function () { return 0; });
-  }
+  /* ── aucune vidéo n'est jamais effacée de la tablette : elles y restent toutes, même une fois envoyées.
+        C'est vous qui videz la tablette quand vous le décidez. ── */
+  function liberer() { return Promise.resolve(0); }
   var TAILLE = 3 * 1024 * 1024;
   function envoyer(v) {
     var base = (cfg.serveur || location.origin).replace(/\/+$/, '');
