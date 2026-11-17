@@ -185,3 +185,12 @@ html,body,#app{height:100dvh}
 .son-alerte{position:absolute;left:50%;bottom:calc(14vh + 70px);transform:translateX(-50%);z-index:6;max-width:88vw;background:#b03a2a;color:#fff;border-radius:12px;padding:12px 18px;text-align:center;font:600 clamp(14px,2vw,18px) Inter,sans-serif}
 .son-alerte[hidden]{display:none}
 .mic em{font:600 clamp(12px,1.6vw,14px) Inter,sans-serif;color:#fff;font-style:normal;opacity:.9}
+
+/* écrans d'accès (code, mot de passe, sessions) : des boutons discrets, pas les grands boutons des invités */
+#s-pin .rang,#s-acces .rang,#s-sess-mdp .rang{gap:10px;flex-wrap:nowrap;margin-top:6px}
+#s-pin .rang .sec,#s-sess-mdp .rang .sec,#s-sessions>.sec,#s-acces .sec{padding:10px 20px;font-size:15px;border-radius:10px;border-width:1.5px;font-weight:600}
+#s-pin .rang .gros,#s-sess-mdp .rang .gros,#s-acces .gros{padding:11px 26px;font-size:15px;border-radius:10px;letter-spacing:.06em;box-shadow:0 8px 18px -10px rgba(245,158,11,.6);white-space:nowrap}
+#s-pin h2,#s-acces h2,#s-sess-mdp h2{font-size:clamp(26px,4vw,38px)}
+#pin-in,#acces-in,#sm-in{font-size:24px}
+#pin-in{width:min(260px,70vw);letter-spacing:.35em}
+#s-acces form,#s-sess-mdp form{width:min(300px,86vw)!important;gap:10px!important}

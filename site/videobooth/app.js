@@ -468,6 +468,21 @@ $('b-stop').onclick = arreterRec;
     });
   };
 
+  /* ───────── l'appli reste dans son monde : le bouton « retour » de la tablette ne mène jamais au site ─────────
+     On met un état d'historique devant la page : un retour ne quitte pas l'appli, il remonte d'un écran (ou ne fait rien). */
+  try {
+    history.replaceState({ vb: 0 }, '', location.href); history.pushState({ vb: 1 }, '', location.href);
+    window.addEventListener('popstate', function () {
+      history.pushState({ vb: 1 }, '', location.href);
+      var on = document.querySelector('.ecran.on'); var id = on ? on.id : '';
+      if (id === 's-form' || id === 's-pin') accueil();
+      else if (id === 's-admin') { if (!$('adm-edit').hidden) $('e-retour').click(); else $('a-close').click(); }
+      else if (id === 's-sess-mdp') $('sm-retour').click();
+      else if (id === 's-cam' && !enregistrement && !decompte) $('b-x').click();
+      else if (id === 's-revoir') $('b-refaire').click();
+    });
+  } catch (e) {}
+
   /* ───────── démarrage ───────── */
   document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
   window.addEventListener('beforeunload', function (e) { if (enregistrement) { e.preventDefault(); e.returnValue = ''; } });
