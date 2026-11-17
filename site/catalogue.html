@@ -717,7 +717,7 @@ transform:none!important;stroke-dashoffset:0!important}}
   <div class="cc-intro"><h2>Notre catalogue</h2><p>Découvrez notre sélection de matériel pour tous vos événements. Parcourez nos catégories et trouvez les équipements qui vous correspondent.</p></div>
   <form class="cc-search" id="ccSearch" role="search" autocomplete="off">
     <span class="cc-search-ico" aria-hidden="true">⌕</span>
-    <input type="search" id="ccSearchIn" class="cc-search-in" placeholder="Rechercher un produit : photobooth, enceinte, barnum…" aria-label="Rechercher un produit dans le catalogue" aria-controls="ccSuggest" autocomplete="off">
+    <input type="search" id="ccSearchIn" class="cc-search-in" placeholder="Rechercher un produit" aria-label="Rechercher un produit dans le catalogue" aria-controls="ccSuggest" autocomplete="off">
     <button type="submit" class="cc-search-go">Rechercher</button>
     <div class="cc-suggest" id="ccSuggest" role="listbox" hidden></div>
   </form>
@@ -1282,7 +1282,7 @@ if(urlCat){
       const q=inp.value.trim();if(NORM(q).length<2){fermer();return;}
       const L=trouver(q);
       if(!L.length){box.innerHTML='<div style="padding:12px 16px;color:#646D7C;font-size:14px">Aucun produit ne correspond. Essayez un autre mot, ou contactez-nous.</div>';box.hidden=false;return;}
-      box.innerHTML=L.slice(0,6).map(p=>'<a href="'+esc(p.page||'catalogue.html')+'" role="option">'+(p.img?'<img src="'+esc(p.img)+'" alt="" loading="lazy" decoding="async" width="42" height="42">':'')+'<span><b>'+esc(p.name)+'</b><small>'+(p.variants&&p.variants.length?'dès ':'')+esc(p.price)+' €</small></span></a>').join('')
+      box.innerHTML=L.slice(0,6).map(p=>'<a href="'+esc(p.page||'catalogue.html')+'" role="option">'+(p.img?'<img src="'+esc(p.img)+'" alt="" loading="eager" decoding="async" width="42" height="42">':'')+'<span><b>'+esc(p.name)+'</b><small>'+(p.variants&&p.variants.length?'dès ':'')+esc(p.price)+' €</small></span></a>').join('')
         +(L.length>6?'<button type="button" class="cc-sg-tous">Voir les '+L.length+' résultats →</button>':'');
       box.hidden=false;
       const t=box.querySelector('.cc-sg-tous');if(t)t.onclick=function(){resultats(q);};
