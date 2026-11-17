@@ -134,6 +134,9 @@ html,body,#app{height:100dvh}
 /* ── thème Noël (fixe, rien ne bouge) ── */
 .noel{display:none;position:absolute;left:0;right:0;pointer-events:none;z-index:1}
 .noel-on .noel{display:block}
+.amp{animation:vbLum 2s ease-in-out infinite}
+@keyframes vbLum{0%,100%{opacity:1}50%{opacity:.42}}
+@media (prefers-reduced-motion:reduce){.amp{animation:none}}
 .noel-haut{top:0;height:min(11vh,90px)}
 .noel-bas{bottom:0;height:min(15vh,150px)}
 .noel-on #s-accueil .marque,.noel-on #s-merci .marque{bottom:calc(min(15vh,150px) + 1.5vh)}

@@ -97,12 +97,19 @@ export async function creerSauvegarde({ motif = 'manuel' } = {}) {
      ils restent sur la tablette et 30 jours sur le site, et se téléchargent en .zip depuis le back-office) */
   try {
     const vb = getStoreBlobs('videobooth');
+    /* lecture par paquets de 25 en parallèle, avec un délai maximal : des milliers de vidéos ne doivent jamais bloquer la sauvegarde du soir */
+    const debut = Date.now();
     const lire = async (prefixe) => {
       const { blobs } = await vb.list({ prefix: prefixe }); const out = [];
-      for (const b of blobs) { const j = await vb.get(b.key, { type: 'json' }).catch(() => null); if (j) out.push(j); }
+      for (let i = 0; i < blobs.length; i += 25) {
+        if (Date.now() - debut > 9000) { contenu.videobooth_incomplet = true; break; }
+        const lot = await Promise.all(blobs.slice(i, i + 25).map((b) => vb.get(b.key, { type: 'json' }).catch(() => null)));
+        for (const j of lot) if (j) out.push(j);
+      }
       return out;
     };
-    contenu.videobooth = { videos: await lire('meta/'), galeries: await lire('galerie/') };
+    const sessions = await vb.get('config/sessions', { type: 'json' }).catch(() => null);
+    contenu.videobooth = { videos: await lire('meta/'), galeries: await lire('galerie/'), sessions: Array.isArray(sessions) ? sessions : [] };
   } catch (e) { contenu.erreurVideobooth = e.message; }
 
   const nbResa = contenu.collections.reservations.filter((x) => x && x.id && x.id !== 'cfg').length;

@@ -41,14 +41,27 @@ async function noter(quoi, detail) {
 }
 export { noter };
 
+/* durée de conservation propre à chaque vidéo (réglée sur la session au moment de l'enregistrement) */
+const gardeJours = (m) => Math.min(365, Math.max(7, Number(m && m.garde) || GARDE_JOURS));
+const perimee = (m) => Date.parse(m.cree) < Date.now() - gardeJours(m) * 86400000;
+/* lecture des fiches en parallèle, par paquets : des milliers de vidéos restent lisibles en quelques secondes */
+export async function lireMetas(st, filtre) {
+  const { blobs } = await st.list({ prefix: 'meta/' });
+  const sortie = [];
+  for (let i = 0; i < blobs.length; i += 25) {
+    const lot = await Promise.all(blobs.slice(i, i + 25).map((b) => st.get(b.key, { type: 'json' }).catch(() => null)));
+    for (const m of lot) if (m && (!filtre || filtre(m))) sortie.push(m);
+  }
+  return sortie;
+}
+/* nettoyage au plus toutes les 6 h (et non à chaque vidéo reçue) */
 async function nettoyer(st) {
   try {
-    const { blobs } = await st.list({ prefix: 'meta/' });
-    const limite = Date.now() - GARDE_JOURS * 86400000;
-    for (const b of blobs) {
-      const m = await st.get(b.key, { type: 'json' }).catch(() => null);
-      if (m && Date.parse(m.cree) < limite) { await st.delete('video/' + m.id).catch(() => {}); await st.delete(b.key).catch(() => {}); }
-    }
+    const dern = await st.get('etat/nettoyage', { type: 'json' }).catch(() => null);
+    if (dern && Date.now() - Date.parse(dern.date) < 6 * 3600e3) return;
+    await st.setJSON('etat/nettoyage', { date: new Date().toISOString() });
+    const vieilles = await lireMetas(st, perimee);
+    for (const m of vieilles) { await st.delete('video/' + m.id).catch(() => {}); await st.delete('meta/' + m.id).catch(() => {}); }
   } catch (e) { console.error('Videobooth : nettoyage impossible', e.message); }
 }
 
@@ -57,7 +70,7 @@ async function envoyerMail(m, octets, site) {
   if (!resendKey) return { ok: false, erreur: "RESEND_API_KEY n'est pas définie dans Netlify" };
   const lien = `${site}/api/videobooth/v/${m.id}?t=${jeton(m.id)}`;
   const pj = octets.byteLength <= PJ_MAX;
-  const html = htmlVideo({ prenom: m.prenom, evenement: m.event, lien, pj, jours: GARDE_JOURS, site });
+  const html = htmlVideo({ prenom: m.prenom, evenement: m.event, lien, pj, jours: gardeJours(m), site });
   const body = {
     from: process.env.NOTIFY_FROM || 'Vespra Event <onboarding@resend.dev>',
     to: [m.email],
@@ -95,7 +108,7 @@ function lireJeton(t, type) {
 }
 const hMdp = (kind, v) => createHmac('sha256', process.env.VIDEOBOOTH_CLE || '').update(kind + ':' + v).digest('hex');
 async function accesLire(st) { return st.get('config/acces', { type: 'json' }).catch(() => null); }
-async function accesEcrire(st, mdp) { if (!mdp) { await st.delete('config/acces').catch(() => {}); return null; } const a = { mdp, h: hMdp('acces', mdp), maj: new Date().toISOString() }; await st.setJSON('config/acces', a); return a; }
+async function accesEcrire(st, mdp, libre) { if (!mdp && libre) { const a = { libre: true, maj: new Date().toISOString() }; await st.setJSON('config/acces', a); return a; } if (!mdp) { await st.delete('config/acces').catch(() => {}); return null; } const a = { mdp, h: hMdp('acces', mdp), maj: new Date().toISOString() }; await st.setJSON('config/acces', a); return a; }
 async function sessionsLire(st) { const l = await st.get('config/sessions', { type: 'json' }).catch(() => null); return Array.isArray(l) ? l : []; }
 async function sessionsEcrire(st, liste) {
   const propre = liste.slice(0, 200).map((e) => ({
@@ -103,11 +116,19 @@ async function sessionsEcrire(st, liste) {
     nom: String(e.nom || '').slice(0, 80), date: String(e.date || '').slice(0, 40), mdp: String(e.mdp || '').slice(0, 40),
     titre: String(e.titre || '').slice(0, 80), sous: String(e.sous || '').slice(0, 160), max: Math.min(120, Math.max(5, Number(e.max) || 30)),
     format: ['auto', '16:9', '4:3', '9:16', '3:4'].includes(e.format) ? e.format : 'auto', noel: !!e.noel, cadrage: String(e.cadrage == null ? '' : e.cadrage).slice(0, 160),
+    qui: String(e.qui || '').slice(0, 80), quiSous: String(e.quiSous == null ? '' : e.quiSous).slice(0, 160),
+    actif: e.actif !== false, fin: /^\d{4}-\d{2}-\d{2}$/.test(String(e.fin || '')) ? String(e.fin) : '',
+    conserv: Math.min(365, Math.max(7, Math.round(Number(e.conserv)) || GARDE_JOURS)), garde: Math.min(365, Math.max(1, Math.round(Number(e.garde)) || 14)),
+    qualite: ['haute', 'standard', 'eco'].includes(e.qualite) ? e.qualite : 'haute',
   })).filter((e) => e.nom);
   await st.setJSON('config/sessions', propre); return propre;
 }
 const labelSession = (e) => e.nom + (e.date ? ' — ' + e.date : '');
-export { envoyerMail, jeton, jetonEvt, GARDE_JOURS, galLire, galEcrire, genMdp, accesLire, accesEcrire, sessionsLire, sessionsEcrire, labelSession };
+/* jour d'aujourd'hui à Paris (AAAA-MM-JJ) : une session « terminée » disparaît de la tablette le lendemain de sa date de fin */
+const aujourdhuiParis = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+const visible = (e) => e.actif !== false && (!e.fin || e.fin >= aujourdhuiParis());
+const carte = (e) => ({ id: e.id, nom: e.nom, date: e.date, prot: !!e.mdp });
+export { envoyerMail, jeton, jetonEvt, GARDE_JOURS, gardeJours, visible, galLire, galEcrire, genMdp, accesLire, accesEcrire, sessionsLire, sessionsEcrire, labelSession };
 
 export default async (request) => {
   if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
@@ -121,19 +142,25 @@ export default async (request) => {
     const route = url.pathname.split('/').pop();
     if (route === 'acces') {
       const a = await accesLire(st);
-      if (!a || !a.h) return rep({ ok: false, erreur: 'Aucun mot de passe d’accès n’est défini : créez-le dans le back-office (onglet Vidéobooth).' }, 409);
-      if (!egal(hMdp('acces', String(d.mdp || '').trim()), a.h)) { await new Promise((r) => setTimeout(r, 900)); await noter('refus', 'mot de passe d’accès incorrect'); return rep({ ok: false, erreur: 'Mot de passe incorrect.' }, 401); }
+      if (!a || (!a.h && !a.libre)) return rep({ ok: false, erreur: 'Aucun mot de passe d’accès n’est défini : créez-le dans le back-office (onglet Vidéobooth).' }, 409);
+      /* accès libre (choisi dans le back-office) : pas de mot de passe général, la liste des sessions s'ouvre directement */
+      if (!a.libre) {
+        if (!String(d.mdp || '').trim()) return rep({ ok: false, erreur: 'Mot de passe requis.', requis: true }, 401);
+        if (!egal(hMdp('acces', String(d.mdp || '').trim()), a.h)) { await new Promise((r) => setTimeout(r, 900)); await noter('refus', 'mot de passe d’accès incorrect'); return rep({ ok: false, erreur: 'Mot de passe incorrect.' }, 401); }
+      }
       await noter('contact', 'accès tablette');
       const ses = await sessionsLire(st);
-      return rep({ ok: true, acces: signer({ t: 'acces', exp: Date.now() + 12 * 3600e3 }), sessions: ses.map((e) => ({ id: e.id, nom: e.nom, date: e.date })) });
+      return rep({ ok: true, libre: !!a.libre, acces: signer({ t: 'acces', exp: Date.now() + 12 * 3600e3 }), sessions: ses.filter(visible).map(carte) });
     }
     if (!lireJeton(d.acces, 'acces') && !lireJeton(d.acces, 'session')) return rep({ ok: false, erreur: 'Accès expiré : saisissez de nouveau le mot de passe.', expire: true }, 401);
-    if (route === 'sessions') { const ses = await sessionsLire(st); return rep({ ok: true, sessions: ses.map((e) => ({ id: e.id, nom: e.nom, date: e.date })) }); }
+    if (route === 'sessions') { const ses = await sessionsLire(st); return rep({ ok: true, sessions: ses.filter(visible).map(carte) }); }
     const ses = (await sessionsLire(st)).find((e) => e.id === String(d.id || ''));
-    if (!ses) return rep({ ok: false, erreur: 'Session introuvable.' }, 404);
+    if (!ses || !visible(ses)) return rep({ ok: false, erreur: 'Session introuvable ou terminée.' }, 404);
     if (ses.mdp && !egal(hMdp('s', String(d.mdp || '').trim()), hMdp('s', ses.mdp))) { await new Promise((r) => setTimeout(r, 900)); return rep({ ok: false, erreur: 'Mot de passe de la session incorrect.' }, 401); }
     await noter('contact', 'session ouverte : ' + ses.nom);
-    return rep({ ok: true, jeton: signer({ t: 'session', id: ses.id, exp: Date.now() + 72 * 3600e3 }), session: { id: ses.id, nom: ses.nom, date: ses.date, label: labelSession(ses), titre: ses.titre, sous: ses.sous, max: ses.max, format: ses.format, noel: ses.noel, cadrage: ses.cadrage } });
+    /* une tablette installée pour un événement de plusieurs semaines garde sa session 60 jours */
+    const exp = Date.now() + 60 * 86400e3;
+    return rep({ ok: true, jeton: signer({ t: 'session', id: ses.id, exp }), exp, session: { id: ses.id, nom: ses.nom, date: ses.date, label: labelSession(ses), titre: ses.titre, sous: ses.sous, max: ses.max, format: ses.format, noel: ses.noel, cadrage: ses.cadrage, qui: ses.qui, quiSous: ses.quiSous, qualite: ses.qualite, garde: ses.garde } });
   }
 
   /* ── test de connexion depuis les réglages de la tablette ── */
@@ -170,9 +197,7 @@ export default async (request) => {
       }
     }
     if (request.method !== 'GET') return new Response('Méthode non autorisée', { status: 405 });
-    const { blobs } = await st.list({ prefix: 'meta/' });
-    const liste = [];
-    for (const b of blobs) { const m = await st.get(b.key, { type: 'json' }).catch(() => null); if (m && (m.event || SANS_NOM) === label && Date.parse(m.cree) >= Date.now() - GARDE_JOURS * 86400000) liste.push(m); }
+    const liste = await lireMetas(st, (m) => (m.event || SANS_NOM) === label && !perimee(m));
     liste.sort((a, b) => String(a.cree).localeCompare(String(b.cree)));
     const lignes = liste.map((m) => ({ nom: `${m.prenom} ${m.nom}`.trim(), fichier: m.fichier, date: m.cree, mo: Math.round((m.octets || 0) / 104857.6) / 10, href: `/api/videobooth/v/${m.id}?t=${jeton(m.id)}` }));
     const rows = lignes.map((l, i) => `<div class="c"><button class="pl" type="button" data-i="${i}" aria-label="Voir la vidéo de ${esc(l.nom)}"><svg viewBox="0 0 24 24" width="30" height="30" fill="#fff"><path d="M8 5v14l11-7z"/></svg></button><div class="n"><b>${esc(l.nom)}</b><span>${esc(new Date(l.date).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }))}</span></div><a href="${esc(l.href)}&amp;dl=1" download>Télécharger</a></div>`).join('');
@@ -180,17 +205,20 @@ export default async (request) => {
 <style>*{box-sizing:border-box}body{margin:0;background:#0f2237;font-family:Inter,Arial,sans-serif;color:#fff}header{padding:34px 18px 18px;text-align:center;background:radial-gradient(700px 300px at 85% 0,rgba(245,158,11,.2),transparent 70%)}header small{letter-spacing:.3em;font-size:11px;color:#9fb0c6}h1{font-size:26px;margin:8px 0 4px}header p{margin:0;color:#9fb0c6;font-size:14px}main{max-width:760px;margin:0 auto;padding:6px 14px 60px}.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:14px}.c{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}.pl{height:92px;border:0;border-radius:10px;background:linear-gradient(135deg,#2B4A6B,#16365a);display:flex;align-items:center;justify-content:center;cursor:pointer}.n b{display:block;font-size:15px}.n span{font-size:12px;color:#9fb0c6}.c a{background:#F59E0B;color:#1a1205;border-radius:8px;padding:9px;text-align:center;text-decoration:none;font:700 13px Arial,sans-serif}#zip{display:block;width:100%;margin-top:6px;background:#F59E0B;color:#1a1205;border:0;border-radius:10px;padding:14px;font:700 15px Arial,sans-serif;cursor:pointer}#st{font-size:13px;color:#9fb0c6;text-align:center;margin-top:8px;min-height:16px}#m{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;z-index:5;padding:14px}#m.on{display:flex}#m video{max-width:100%;max-height:78vh;border-radius:12px;background:#000}#m button{background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:9px;padding:10px 22px;font:600 14px Arial,sans-serif}.note{text-align:center;color:#9fb0c6;font-size:12.5px;margin-top:22px}.vide{text-align:center;color:#9fb0c6;padding:40px 0}</style></head><body>
 <header><small>VESPRA EVENT</small><h1>${esc(label)}</h1><p>${lignes.length} message${lignes.length > 1 ? 's' : ''} vidéo de vos invités</p></header>
 <main>${lignes.length ? '<button id="zip" type="button">Tout télécharger (.zip)</button><div id="st"></div>' : ''}<div class="g">${rows || '<div class="vide">Aucune vidéo disponible.</div>'}</div>
-<p class="note">Les vidéos restent disponibles ${GARDE_JOURS} jours après l’enregistrement : pensez à les télécharger pour les garder.<br>Vespra Event — spécialiste de la location événementielle dans le Grand Ouest.</p></main>
+<p class="note">Les vidéos restent disponibles plusieurs semaines après l’enregistrement : pensez à les télécharger pour les garder.<br>Vespra Event — spécialiste de la location événementielle dans le Grand Ouest.</p></main>
 <div id="m"><video id="mv" controls playsinline></video><button id="mx" type="button">Fermer</button></div>
 <script src="/videobooth/zip.js"></script><script>
 var L=${JSON.stringify(lignes).replace(/</g, '\\u003c')};
 var m=document.getElementById('m'),mv=document.getElementById('mv');
 Array.prototype.forEach.call(document.querySelectorAll('.pl'),function(b){b.onclick=function(){mv.src=L[+b.dataset.i].href+'&lecture=1';m.classList.add('on');mv.play().catch(function(){});};});
 document.getElementById('mx').onclick=function(){mv.pause();mv.removeAttribute('src');mv.load();m.classList.remove('on');};
-var b=document.getElementById('zip');if(b)b.onclick=function(){b.disabled=true;var st=document.getElementById('st'),f=[],i=0;
-function next(){if(i>=L.length)return vbZip(f).then(function(z){var a=document.createElement('a');a.href=URL.createObjectURL(z);a.download=${JSON.stringify(label.replace(/[\\/:*?"<>|]+/g, ' ').trim() || 'videos')}+'.zip';document.body.appendChild(a);a.click();st.textContent='Terminé.';b.disabled=false;});
-st.textContent='Préparation… '+(i+1)+' / '+L.length;return fetch(L[i].href+'&dl=1').then(function(r){return r.blob()}).then(function(x){f.push({nom:L[i].fichier,blob:x});i++;return next()});}
-next().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez les vidéos une par une.';b.disabled=false;});};
+var b=document.getElementById('zip');if(b)b.onclick=function(){b.disabled=true;var st=document.getElementById('st'),LOT=30,NB=Math.ceil(L.length/LOT),NOM=${JSON.stringify(label.replace(/[\\/:*?"<>|]+/g, ' ').trim() || 'videos')},p=0;
+function lot(){if(p>=NB){st.textContent='Terminé.';b.disabled=false;return Promise.resolve();}
+var part=L.slice(p*LOT,(p+1)*LOT),f=[],i=0;
+function next(){if(i>=part.length)return vbZip(f).then(function(z){var a=document.createElement('a');a.href=URL.createObjectURL(z);a.download=NOM+(NB>1?' - partie '+(p+1)+' sur '+NB:'')+'.zip';document.body.appendChild(a);a.click();p++;return new Promise(function(r){setTimeout(r,1200)}).then(lot);});
+st.textContent='Archive '+(p+1)+'/'+NB+' · vidéo '+(i+1)+'/'+part.length+'…';return fetch(part[i].href+'&dl=1').then(function(r){return r.blob()}).then(function(x){f.push({nom:part[i].fichier,blob:x});i++;return next()});}
+return next();}
+lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez les vidéos une par une.';b.disabled=false;});};
 </script></body></html>`;
     return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
   }
@@ -202,7 +230,7 @@ next().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez l
     if (!cle || url.searchParams.get('t') !== jeton(id)) return new Response('Lien invalide', { status: 403 });
     const st = store();
     const m = await st.get('meta/' + id, { type: 'json' }).catch(() => null);
-    if (!m || Date.parse(m.cree) < Date.now() - GARDE_JOURS * 86400000) return new Response('Cette vidéo n’est plus disponible (conservée 30 jours).', { status: 410 });
+    if (!m || perimee(m)) return new Response('Cette vidéo n’est plus disponible.', { status: 410 });
     const buf = await st.get('video/' + id, { type: 'arrayBuffer' }).catch(() => null);
     if (!buf) return new Response('Vidéo introuvable', { status: 404 });
     const lecture = url.searchParams.get('lecture') === '1', dl = url.searchParams.get('dl') === '1';
@@ -214,7 +242,7 @@ next().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez l
 <small>VESPRA EVENT</small><h1>${esc(m.prenom)}, voici votre message vidéo</h1><p>${esc(m.event || '')}</p>
 <video controls playsinline preload="metadata" src="/api/videobooth/v/${esc(id)}${q}&amp;lecture=1"></video>
 <a href="/api/videobooth/v/${esc(id)}${q}&amp;dl=1" download>Télécharger ma vidéo</a>
-<div class="n">Disponible ${GARDE_JOURS} jours après l’enregistrement.<br>Vespra Event — spécialiste de la location événementielle dans le Grand Ouest.</div></main></body></html>`;
+<div class="n">Disponible ${gardeJours(m)} jours après l’enregistrement.<br>Vespra Event — spécialiste de la location événementielle dans le Grand Ouest.</div></main></body></html>`;
       return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
     }
     /* lecture par morceaux (Range) : indispensable pour que la vidéo se lance sur téléphone */
@@ -240,11 +268,14 @@ next().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez l
     const email = String(q.get('email') || '').trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || email.length > 200) return rep({ ok: false, erreur: 'Adresse e-mail invalide' }, 400);
     const st = store();
-    /* garde-fou : pas plus de 400 vidéos par jour, même avec une clé valide */
+    /* déjà reçue (renvoi après une coupure de réseau) : on confirme, sans rien refaire ni renvoyer d'e-mail */
+    const deja = await st.get('meta/' + id, { type: 'json' }).catch(() => null);
+    if (deja) return rep({ ok: true, termine: true, mail: deja.mail === 'envoye', mailErreur: deja.mailErreur || '', deja: true });
+    /* garde-fou : le site ne se remplit pas sans limite */
     if (i === 0) {
       try {
         const { blobs } = await st.list({ prefix: 'meta/' });
-        if (blobs.length > 2000) return rep({ ok: false, erreur: 'Trop de vidéos stockées sur le site : supprimez les anciennes dans le back-office' }, 429);
+        if (blobs.length > 8000) return rep({ ok: false, erreur: 'Trop de vidéos stockées sur le site : supprimez les anciennes dans le back-office' }, 429);
       } catch (e) {}
     }
     const donnees = await request.arrayBuffer();
@@ -266,13 +297,18 @@ next().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez l
       fichier: String(q.get('fichier') || 'video.mp4').replace(/[\\/:*?"<>|\r\n]+/g, ' ').trim().slice(0, 150) || 'video.mp4',
       type: String(q.get('type') || 'video/mp4').slice(0, 40), duree: Number(q.get('duree')) || 0, octets: total, cree: new Date().toISOString(),
     };
+    /* durée de conservation propre à la session de cette vidéo */
+    try { const ses = (await sessionsLire(st)).find((e) => labelSession(e) === m.event); if (ses) m.garde = ses.conserv || GARDE_JOURS; } catch {}
     await st.set('video/' + id, tout.buffer);
     for (let k = 0; k < n; k++) await st.delete(`chunk/${id}/${k}`).catch(() => {});
+    /* la fiche est écrite AVANT l'e-mail : si l'envoi est interrompu, la vidéo reste visible dans le back-office */
+    m.mail = 'attente'; m.mailErreur = '';
+    await st.setJSON('meta/' + id, m);
     const site = (process.env.URL || `${url.protocol}//${url.host}`).replace(/\/$/, '');
     const mail = await envoyerMail(m, tout, site);
     m.mail = mail.ok ? 'envoye' : 'erreur'; m.mailErreur = mail.erreur || ''; m.pj = !!mail.pj;
     await st.setJSON('meta/' + id, m);
-    nettoyer(st);
+    await nettoyer(st);
     return rep({ ok: true, termine: true, mail: mail.ok, mailErreur: mail.erreur || '' });
   }
   return rep({ ok: false, erreur: 'Route inconnue' }, 404);

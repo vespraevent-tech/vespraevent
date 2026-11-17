@@ -40,7 +40,7 @@ import { createHmac, timingSafeEqual, createHash, randomUUID, randomBytes, rando
    introuvable au moment de l'exécution et TOUTE modification depuis le
    back-office échouerait. */
 import { getStore, stockageActif, stats as stockStats } from './_stockage.mjs';
-import { videoStore, envoyerMail as vbEnvoyerMail, jetonEvt as vbJetonEvt, galLire as vbGalLire, galEcrire as vbGalEcrire, genMdp as vbGenMdp, accesLire as vbAccesLire, accesEcrire as vbAccesEcrire, sessionsLire as vbSessionsLire, sessionsEcrire as vbSessionsEcrire } from './videobooth.mjs';
+import { lireMetas as vbLireMetas, videoStore, envoyerMail as vbEnvoyerMail, jetonEvt as vbJetonEvt, galLire as vbGalLire, galEcrire as vbGalEcrire, genMdp as vbGenMdp, accesLire as vbAccesLire, accesEcrire as vbAccesEcrire, sessionsLire as vbSessionsLire, sessionsEcrire as vbSessionsEcrire } from './videobooth.mjs';
 import * as secu from './_sauvegarde.mjs';
 /* Fabrication du PDF de facture : écrite à la main, sans dépendance,
    pour la même raison que la bibliothèque Blobs est jointe au dossier. */
@@ -2372,20 +2372,20 @@ const gestionnaire = async (request) => {
   }
   if (path === '/videobooth/config' && request.method === 'GET') {
     const st = videoStore(); const a = await vbAccesLire(st);
-    return json({ acces: a ? a.mdp : '', sessions: await vbSessionsLire(st) });
+    return json({ acces: a ? (a.mdp || '') : '', accesLibre: !!(a && a.libre), sessions: await vbSessionsLire(st) });
   }
   if (path === '/videobooth/config' && request.method === 'POST') {
     let body = {}; try { body = await request.json(); } catch {}
     const st = videoStore();
-    if (body.acces !== undefined) {
+    if (body.acces !== undefined || body.accesLibre !== undefined) {
       const m = String(body.acces || '').trim();
       if (m && m.length < 6) return json({ error: 'Mot de passe d’accès : 6 caractères minimum' }, 400);
-      await vbAccesEcrire(st, m.slice(0, 60));
+      await vbAccesEcrire(st, m.slice(0, 60), body.accesLibre === true);
     }
     let sessions = null;
     if (Array.isArray(body.sessions)) sessions = await vbSessionsEcrire(st, body.sessions);
     const a = await vbAccesLire(st);
-    return json({ ok: true, acces: a ? a.mdp : '', sessions: sessions || await vbSessionsLire(st) });
+    return json({ ok: true, acces: a ? (a.mdp || '') : '', accesLibre: !!(a && a.libre), sessions: sessions || await vbSessionsLire(st) });
   }
   if (path === '/videobooth/galerie' && request.method === 'POST') {
     let body = {}; try { body = await request.json(); } catch {}
@@ -2406,9 +2406,7 @@ const gestionnaire = async (request) => {
         return new Response(buf, { headers: { 'Content-Type': m.type || 'video/mp4', 'Content-Disposition': `attachment; filename="${String(m.fichier).replace(/"/g, '')}"`, 'Cache-Control': 'private, no-store' } });
       }
       if (request.method === 'GET') {
-        const { blobs } = await st.list({ prefix: 'meta/' });
-        const liste = [];
-        for (const b of blobs) { const m = await st.get(b.key, { type: 'json' }).catch(() => null); if (m) liste.push(m); }
+        const liste = await vbLireMetas(st);
         liste.sort((a, b) => String(b.cree).localeCompare(String(a.cree)));
         const etat = {};
         for (const k of ['contact', 'refus']) etat[k] = await st.get('etat/' + k, { type: 'json' }).catch(() => null);
@@ -2427,6 +2425,14 @@ const gestionnaire = async (request) => {
         m.mail = r.ok ? 'envoye' : 'erreur'; m.mailErreur = r.erreur || ''; m.pj = !!r.pj; m.renvoye = new Date().toISOString();
         await st.setJSON('meta/' + id, m);
         return json({ ok: r.ok, erreur: r.erreur || '', video: m });
+      }
+      if (request.method === 'DELETE' && url.searchParams.has('event')) {
+        /* vider toutes les vidéos d'un événement (après les avoir téléchargées) */
+        const ev = String(url.searchParams.get('event') || '');
+        const SANS = '(sans nom d’événement)';
+        const cibles = await vbLireMetas(st, (m) => (m.event || SANS) === ev);
+        for (const m of cibles) { await st.delete('video/' + m.id).catch(() => {}); await st.delete('meta/' + m.id).catch(() => {}); }
+        return json({ ok: true, supprimees: cibles.length });
       }
       if (request.method === 'DELETE') {
         const id = String(url.searchParams.get('id') || '').replace(/[^A-Za-z0-9_-]/g, '');

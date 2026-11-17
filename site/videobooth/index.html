@@ -8,9 +8,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>Vidéobooth Vespra Event</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="/favicon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/videobooth/icones/favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/videobooth/icones/favicon-48.png">
+<link rel="apple-touch-icon" href="/videobooth/icones/apple-touch-icon.png">
 <link rel="stylesheet" href="/polices.css?v=1">
-<link rel="stylesheet" href="app.css?v=21">
+<link rel="stylesheet" href="app.css?v=22">
 </head>
 <body>
 <main id="app">
@@ -25,8 +27,8 @@
   </section>
 
   <section id="s-form" class="ecran">
-    <h2>Qui êtes-vous ?</h2>
-    <p class="petit">Pour vous envoyer votre vidéo par e-mail</p>
+    <h2 id="t-qui">Qui êtes-vous ?</h2>
+    <p class="petit" id="p-qui">Pour vous envoyer votre vidéo par e-mail</p>
     <form id="form" autocomplete="off" novalidate>
       <label>Nom<input id="f-nom" type="text" inputmode="text" autocapitalize="words" required></label>
       <label>Prénom<input id="f-prenom" type="text" inputmode="text" autocapitalize="words" required></label>
@@ -104,7 +106,7 @@
         <h3>Sauvegarde de la tablette</h3>
         <div id="a-stock" class="adm-m"></div>
         <div class="adm-l"><button id="a-exp-cfg" class="adm-b" type="button">Exporter les réglages</button><label class="adm-b" style="cursor:pointer">Importer les réglages<input id="a-imp-cfg" type="file" accept="application/json,.json" hidden></label></div>
-        <div class="adm-m">Les vidéos restent sur la tablette sans limite ; « Exporter les vidéos » (ci-dessus) les copie toutes avec la liste des contacts.</div>
+        <div class="adm-m">Les vidéos envoyées restent sur la tablette pendant le délai réglé sur la session (14 jours par défaut), puis sont libérées ; une vidéo pas encore envoyée n’est jamais effacée. « Exporter les vidéos » copie toutes celles qui sont sur la tablette.</div>
       </div>
     </div>
 
@@ -137,6 +139,6 @@
     <div class="rang"><button id="pin-x" class="sec" type="button">Annuler</button><button id="pin-ok" class="gros" type="button">Valider</button></div>
   </section>
 </main>
-<script src="app.js?v=21"></script>
+<script src="app.js?v=22"></script>
 </body>
 </html>

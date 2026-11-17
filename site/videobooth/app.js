@@ -36,6 +36,7 @@
   ['pointerdown', 'keydown'].forEach(function (t) { document.addEventListener(t, veille, { passive: true }); });
   function accueil(garder) {
     $('t-accueil').textContent = cfg.titre || CFG0.titre; $('p-accueil').textContent = cfg.sous || '';
+    $('t-qui').textContent = cfg.qui || 'Qui êtes-vous ?'; $('p-qui').textContent = cfg.quiSous == null ? 'Pour vous envoyer votre vidéo par e-mail' : cfg.quiSous;
     if (!garder) $('form').reset(); $('f-err').textContent = ''; montrer('s-accueil'); majEtat();
   }
   function fmt(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
@@ -129,10 +130,12 @@
     $('compte-msg').textContent = 'Vous avez ' + (Number(cfg.max) || 30) + ' secondes maximum';
     var n = 3; $('compte-n').textContent = n; decompte = setInterval(function () { n--; if (n > 0) { $('compte-n').textContent = n; } else { clearInterval(decompte); decompte = null; $('compte').hidden = true; $('s-cam').classList.remove('flou'); demarrer(); } }, 1000);
   };
+  /* qualité choisie sur la session : haute 3,5 Mbit/s, standard 2,5, économique 1,8 (vidéos plus légères, moins de stockage et de données mobiles) */
+  function debitVideo() { return { eco: 1800000, standard: 2500000 }[cfg.qualite] || 3500000; }
   function demarrer() {
     morceaux = []; blobFinal = null; mime = meilleurMime();
     var flot = new MediaStream(cv.captureStream(30).getVideoTracks().concat(flux.getAudioTracks()));
-    try { rec = mime ? new MediaRecorder(flot, { mimeType: mime, videoBitsPerSecond: 3500000 }) : new MediaRecorder(flot); } catch (e) { rec = new MediaRecorder(flot); }
+    try { rec = mime ? new MediaRecorder(flot, { mimeType: mime, videoBitsPerSecond: debitVideo() }) : new MediaRecorder(flot); } catch (e) { rec = new MediaRecorder(flot); }
     mime = rec.mimeType || mime || 'video/webm';
     rec.ondataavailable = function (e) { if (e.data && e.data.size) morceaux.push(e.data); };
     rec.onstop = function () {
@@ -172,10 +175,10 @@ $('b-stop').onclick = arreterRec;
     $('b-fin').disabled = true;
     var v = { id: 'v' + Date.now() + Math.random().toString(36).slice(2, 7), event: cfg.event, nom: invite.nom, prenom: invite.prenom, email: invite.email, consent: true,
       fichier: nomFichier(), type: blobFinal.type, duree: Math.round((Date.now() - t0) / 1000), cree: new Date().toISOString(), essais: 0, blob: blobFinal };
-    ajouter(v).then(function () {
+    ajouter(v).catch(function () { return liberer(true).then(function () { return ajouter(v); }); }).then(function () {
       try { URL.revokeObjectURL($('v-revoir').src); } catch (e) {} blobFinal = null; invite = null; $('b-fin').disabled = false;
       montrer('s-merci'); synchro(); setTimeout(function () { accueil(); }, 7000);
-    }).catch(function () { $('b-fin').disabled = false; alert('La vidéo n’a pas pu être enregistrée : la tablette est peut-être pleine. Prévenez l’équipe.'); });
+    }).catch(function () { $('b-fin').disabled = false; alert('La vidéo n’a pas pu être enregistrée : la tablette est pleine. Prévenez l’équipe.'); });
   };
 
   /* ───────── envoi au serveur ───────── */
@@ -188,6 +191,25 @@ $('b-stop').onclick = arreterRec;
       
       $('a-file').textContent = ((cfg.jeton || cfg.cle) ? '' : '⚠ Aucune session ouverte : les vidéos restent sur la tablette. ') + tot + ' vidéo(s) gardée(s) sur la tablette, dont ' + (tot - att) + ' envoyée(s)' + (att ? ' — ' + att + ' en attente' : '') + (dernierMsg ? ' — ' + dernierMsg : '');
     }).catch(function () {});
+  }
+  /* ── place sur la tablette : une vidéo envoyée n'est effacée de la tablette qu'après le délai réglé sur la session
+        (14 jours par défaut), ou plus tôt si la tablette se remplit. Une vidéo pas encore envoyée n'est JAMAIS effacée. ── */
+  function liberer(urgence) {
+    return toutes().then(function (l) {
+      var jours = Math.max(1, Number(cfg.garde) || 14), limite = Date.now() - jours * 86400000;
+      var envoyees = l.filter(function (v) { return v.envoye; }).sort(function (a, b) { return String(a.envoyeLe || a.cree) < String(b.envoyeLe || b.cree) ? -1 : 1; });
+      var aSupprimer = envoyees.filter(function (v) { return Date.parse(v.envoyeLe || v.cree) < limite; });
+      var suite = function () { return aSupprimer.reduce(function (p, v) { return p.then(function () { return retirer(v.id); }); }, Promise.resolve()).then(function () { return aSupprimer.length; }); };
+      if (!navigator.storage || !navigator.storage.estimate) return suite();
+      return navigator.storage.estimate().then(function (e) {
+        /* tablette presque pleine (plus de 80 %) : on libère aussi les plus anciennes déjà envoyées, jusqu'à repasser sous 70 % */
+        if (e.quota && (urgence || e.usage / e.quota > 0.8)) {
+          var reste = envoyees.filter(function (v) { return aSupprimer.indexOf(v) < 0; }), usage = e.usage;
+          reste.forEach(function (v) { if ((usage / e.quota > 0.7 || urgence) && v.blob) { usage -= v.blob.size; aSupprimer.push(v); } });
+        }
+        return suite();
+      }).catch(suite);
+    }).catch(function () { return 0; });
   }
   var TAILLE = 3 * 1024 * 1024;
   function envoyer(v) {
@@ -216,9 +238,10 @@ $('b-stop').onclick = arreterRec;
         });
       });
       return suite;
-    }).then(function () { envoiEnCours = false; majEtat(); }, function () { envoiEnCours = false; });
+    }).then(function () { envoiEnCours = false; return liberer(false); }).then(function () { majEtat(); }, function () { envoiEnCours = false; });
   }
   setInterval(synchro, 20000); window.addEventListener('online', synchro);
+  setTimeout(function () { liberer(false).then(majEtat); }, 4000);
 
   /* ───────── réglages (code d'accès) ───────── */
   var pressions = 0, tPress = 0, modePin = 'verifier';
@@ -236,11 +259,23 @@ $('b-stop').onclick = arreterRec;
   /* ── décor de Noël : sapins et guirlandes fixes (rien ne bouge) ── */
   (function () {
     var cols = ['#F59E0B', '#ffffff', '#e8564a', '#7cc4f2'];
+    /* guirlande : un fil en arcs, des douilles accrochées au fil, des ampoules allumées qui scintillent doucement */
     var guirlande = (function () {
-      var p = 'M-10,6', b = '';
-      for (var x = 0; x <= 810; x += 90) { p += ' Q' + (x + 45) + ',46 ' + (x + 90) + ',6'; }
-      for (var k = 0; k < 18; k++) { var x2 = 22 + k * 45, y = 6 + 30 * Math.sin(Math.PI * ((k * 45 + 22) % 90) / 90) * 0.92 + 4; b += '<line x1="' + x2 + '" y1="' + (y - 3) + '" x2="' + x2 + '" y2="' + (y + 1) + '" stroke="#ffffff55" stroke-width="1.2"/><ellipse cx="' + x2 + '" cy="' + (y + 7) + '" rx="4.2" ry="6" fill="' + cols[k % 4] + '"/>'; }
-      return '<svg viewBox="0 0 800 60" preserveAspectRatio="xMidYMin slice" width="100%" height="100%"><path d="' + p + '" fill="none" stroke="#ffffff66" stroke-width="1.6"/>' + b + '</svg>';
+      var H0 = 6, CY = 40, fil = 'M-10,' + H0, amp = '', k = 0;
+      var pt = function (x0, t) { var u = 1 - t; return [x0 + 90 * t, u * u * H0 + 2 * u * t * CY + t * t * H0]; };
+      for (var x = -10; x < 820; x += 90) {
+        fil += ' Q' + (x + 45) + ',' + CY + ' ' + (x + 90) + ',' + H0;
+        [0.2, 0.5, 0.8].forEach(function (t) {
+          var q = pt(x, t), c = cols[k % 4], d = ((k * 0.37) % 2.4).toFixed(2), du = (1.7 + (k % 3) * 0.45).toFixed(2);
+          amp += '<g class="amp" style="animation-delay:-' + d + 's;animation-duration:' + du + 's">' +
+            '<circle cx="' + q[0].toFixed(1) + '" cy="' + (q[1] + 11).toFixed(1) + '" r="11" fill="' + c + '" opacity=".28"/>' +
+            '<rect x="' + (q[0] - 2.4).toFixed(1) + '" y="' + (q[1] - 0.5).toFixed(1) + '" width="4.8" height="5.5" rx="1" fill="#b9954a"/>' +
+            '<path d="M' + (q[0] - 4.2).toFixed(1) + ',' + (q[1] + 5).toFixed(1) + ' Q' + (q[0] - 5.2).toFixed(1) + ',' + (q[1] + 16).toFixed(1) + ' ' + q[0].toFixed(1) + ',' + (q[1] + 17.5).toFixed(1) + ' Q' + (q[0] + 5.2).toFixed(1) + ',' + (q[1] + 16).toFixed(1) + ' ' + (q[0] + 4.2).toFixed(1) + ',' + (q[1] + 5).toFixed(1) + ' Z" fill="' + c + '"/>' +
+            '<ellipse cx="' + (q[0] - 1.4).toFixed(1) + '" cy="' + (q[1] + 9).toFixed(1) + '" rx="1.1" ry="2.4" fill="#fff" opacity=".7"/></g>';
+          k++;
+        });
+      }
+      return '<svg viewBox="0 0 800 62" preserveAspectRatio="xMidYMin slice" width="100%" height="100%"><path d="' + fil + '" fill="none" stroke="#3f9a6c" stroke-width="2.4" stroke-linecap="round"/>' + amp + '</svg>';
     })();
     function sapin(x, h, id) {
       var w = h * 0.62, y0 = 118, lum = '';
@@ -271,6 +306,7 @@ $('b-stop').onclick = arreterRec;
     cfg.event = s ? (s.label || s.nom || '') : '';
     cfg.titre = (s && s.titre) || CFG0.titre; cfg.sous = s ? (s.sous || '') : CFG0.sous; cfg.max = (s && Number(s.max)) || 30;
     cfg.noel = !!(s && s.noel); cfg.format = (s && s.format) || 'auto';
+    cfg.qui = (s && s.qui) || ''; cfg.quiSous = s ? (s.quiSous == null || s.quiSous === '' ? null : s.quiSous) : null; cfg.qualite = (s && s.qualite) || 'haute'; cfg.garde = (s && Number(s.garde)) || 14;
     cfg.cadrage = (s && s.cadrage != null && s.cadrage !== '') ? s.cadrage : (s ? '' : 'Vous pouvez incliner doucement la tablette pour vous cadrer');
     document.body.classList.toggle('noel-on', cfg.noel); document.body.classList.toggle('fmt34', cfg.format === '3:4' || cfg.format === '4:3');
     ecrireCfg(cfg);
@@ -377,13 +413,37 @@ $('b-stop').onclick = arreterRec;
   function sessionStockee() { try { var s = JSON.parse(localStorage.getItem('vb-sess') || 'null'); if (s && s.exp > Date.now() && s.jeton && s.session) return s; } catch (e) {} return null; }
   function accesStocke() { try { var a = JSON.parse(sessionStorage.getItem('vb-acces') || 'null'); if (a && a.exp > Date.now()) return a; } catch (e) {} return null; }
   function ouvrirSession(s) { cfg.session = s.session; cfg.jeton = s.jeton; appliquerActif(); accueil(); synchro(); }
-  function versAcces() { cfg.session = null; cfg.jeton = ''; ecrireCfg(cfg); $('acces-in').value = ''; $('acces-err').textContent = ''; montrer('s-acces'); setTimeout(function () { $('acces-in').focus(); }, 100); }
+  var accesLibre = false;
+  function memoriserAcces(j) { accesLibre = !!j.libre; try { sessionStorage.setItem('vb-acces', JSON.stringify({ acces: j.acces, exp: Date.now() + 11 * 3600e3 })); } catch (e) {} }
+  function ecranMdpAcces() { $('acces-in').value = ''; $('acces-err').textContent = ''; montrer('s-acces'); setTimeout(function () { $('acces-in').focus(); }, 100); }
+  /* sans mot de passe général (réglage du back-office) la liste des sessions s'ouvre directement ; sinon on le demande */
+  function versAcces() {
+    cfg.session = null; cfg.jeton = ''; ecrireCfg(cfg);
+    appelApi('acces', { mdp: '' }).then(function (j) {
+      if (j.ok) { memoriserAcces(j); rendreSessions(j.sessions || []); } else ecranMdpAcces();
+    }).catch(function () { ecranMdpAcces(); });
+  }
+  function connecter(e, mdp) {
+    var a = accesStocke(); if (!a) return versAcces();
+    return appelApi('session', { acces: a.acces, id: e.id, mdp: mdp }).then(function (j) {
+      if (!j.ok) return j;
+      var s = { jeton: j.jeton, session: j.session, exp: (Number(j.exp) || (Date.now() + 60 * 86400e3)) - 86400e3 };
+      try { localStorage.setItem('vb-sess', JSON.stringify(s)); } catch (x) {}
+      ouvrirSession(s); return j;
+    });
+  }
   function rendreSessions(liste) {
     var z = $('sess-cartes'); z.innerHTML = '';
-    if (!liste.length) { z.innerHTML = '<p>Aucune session pour le moment. Créez-en une dans le back-office.</p>'; }
+    $('sess-retour').hidden = accesLibre;
+    if (!liste.length) { z.innerHTML = '<p>Aucune session ouverte pour le moment. Créez-en une dans le back-office.</p>'; }
     liste.forEach(function (e) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'adm-carte'; b.innerHTML = '<b></b><span></span>'; b.querySelector('b').textContent = e.nom; b.querySelector('span').textContent = e.date || '';
-      b.onclick = function () { choisie = e; $('sm-titre').textContent = e.nom; $('sm-in').value = ''; $('sm-err').textContent = ''; montrer('s-sess-mdp'); setTimeout(function () { $('sm-in').focus(); }, 100); };
+      b.onclick = function () {
+        choisie = e;
+        if (e.prot !== false) { $('sm-titre').textContent = e.nom; $('sm-in').value = ''; $('sm-err').textContent = ''; montrer('s-sess-mdp'); setTimeout(function () { $('sm-in').focus(); }, 100); return; }
+        b.disabled = true;
+        connecter(e, '').then(function (j) { b.disabled = false; if (j && !j.ok) { z.insertAdjacentHTML('afterbegin', '<p class="err">' + (j.erreur || 'Connexion impossible.') + '</p>'); } }).catch(function () { b.disabled = false; z.insertAdjacentHTML('afterbegin', '<p class="err">Pas de réseau : réessayez.</p>'); });
+      };
       z.appendChild(b);
     });
     montrer('s-sessions');
@@ -398,26 +458,28 @@ $('b-stop').onclick = arreterRec;
     appelApi('acces', { mdp: m }).then(function (j) {
       $('acces-ok').disabled = false;
       if (!j.ok) { $('acces-err').textContent = j.erreur || 'Connexion impossible.'; return; }
-      try { sessionStorage.setItem('vb-acces', JSON.stringify({ acces: j.acces, exp: Date.now() + 11 * 3600e3 })); } catch (e) {}
-      rendreSessions(j.sessions || []);
+      memoriserAcces(j); rendreSessions(j.sessions || []);
     }).catch(function () { $('acces-ok').disabled = false; $('acces-err').textContent = 'Pas de réseau : branchez la tablette à internet pour ouvrir une session.'; });
   };
   $('acces-in').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('acces-ok').click(); });
-  $('sess-retour').onclick = function () { try { sessionStorage.removeItem('vb-acces'); } catch (e) {} versAcces(); };
+  $('sess-retour').onclick = function () { try { sessionStorage.removeItem('vb-acces'); } catch (e) {} ecranMdpAcces(); };
   $('sm-retour').onclick = function () { listerSessions(); };
   $('sm-ok').onclick = function () {
-    var a = accesStocke(); if (!a || !choisie) return versAcces();
+    if (!choisie) return versAcces();
     $('sm-err').textContent = ''; $('sm-ok').disabled = true;
-    appelApi('session', { acces: a.acces, id: choisie.id, mdp: $('sm-in').value.trim() }).then(function (j) {
+    connecter(choisie, $('sm-in').value.trim()).then(function (j) {
       $('sm-ok').disabled = false;
-      if (!j.ok) { $('sm-err').textContent = j.erreur || 'Connexion impossible.'; if (j.expire) versAcces(); return; }
-      var s = { jeton: j.jeton, session: j.session, exp: Date.now() + 70 * 3600e3 };
-      try { localStorage.setItem('vb-sess', JSON.stringify(s)); } catch (e) {}
-      ouvrirSession(s);
+      if (j && !j.ok) { $('sm-err').textContent = j.erreur || 'Connexion impossible.'; if (j.expire) versAcces(); }
     }).catch(function () { $('sm-ok').disabled = false; $('sm-err').textContent = 'Pas de réseau : réessayez.'; });
   };
   $('sm-in').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('sm-ok').click(); });
   $('a-chsess').onclick = function () { if (!confirm('Fermer la session en cours et en choisir une autre ? Les vidéos déjà enregistrées restent sur la tablette.')) return; try { localStorage.removeItem('vb-sess'); } catch (e) {} cfg.session = null; cfg.jeton = ''; appliquerActif(); if (accesStocke()) listerSessions(); else versAcces(); };
+  /* tablette allumée toute la journée : rechargement discret (écran d'accueil, personne en train d'enregistrer) au bout de 8 h,
+     pour repartir d'une mémoire propre et récupérer les mises à jour de l'appli */
+  var debutPage = Date.now();
+  setInterval(function () {
+    if (Date.now() - debutPage > 8 * 3600e3 && navigator.onLine && !enregistrement && $('s-accueil').classList.contains('on')) { try { location.reload(); } catch (e) {} }
+  }, 10 * 60e3);
   function demarrerAppli() { var s = sessionStockee(); if (s) ouvrirSession(s); else versAcces(); }
   ouvrirDb().then(function () { demarrerAppli(); }).catch(function () { demarrerAppli(); $('etat').hidden = false; $('etat').textContent = 'Stockage de la tablette indisponible'; $('etat').classList.add('alerte'); });
 })();

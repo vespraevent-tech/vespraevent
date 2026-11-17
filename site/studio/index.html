@@ -1919,11 +1919,13 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
       <div class="toolbar">
         <div>
           <h2 id="vbTitre">Vidéobooth</h2>
-          <div class="hint" id="vbSous">Les vidéos enregistrées sur la tablette arrivent ici et partent par e-mail à l’invité. Elles restent 30 jours sur le site ; la tablette, elle, garde tout.</div>
+          <div class="hint" id="vbSous">Les vidéos enregistrées sur la tablette arrivent ici et partent par e-mail à l’invité. Elles restent sur le site pendant la durée réglée sur chaque session (30 jours par défaut).</div>
         </div>
         <div class="actions-bar" style="margin-left:auto;padding-top:0;border:0">
           <button class="btn btn-ghost" id="vbRetour" onclick="vbOuvrir('')" hidden>‹ Tous les événements</button>
+          <button class="btn btn-ghost" id="vbReglages" onclick="vbReglagesOuvrir()" hidden>Réglages de la session</button>
           <button class="btn btn-ghost" id="vbZip" onclick="vbToutTelecharger()" hidden>Tout télécharger (.zip)</button>
+          <button class="btn btn-ghost" id="vbVider" onclick="vbViderEvenement()" hidden style="color:#b03a2a">Vider les vidéos</button>
           <button class="btn btn-ghost" id="vbLien" onclick="vbLienPartage()" hidden>Partager la galerie</button>
           <button class="btn btn-ghost" id="vbRelancer" onclick="vbRelancerEchecs()" hidden>Renvoyer les e-mails non partis</button>
           <button class="btn btn-ghost" onclick="vbCharger()">Actualiser</button>
@@ -2658,40 +2660,70 @@ function ouvrirPageSite(fichier, onglet){
 
 const VUES_PRODUITS={'produits':'cat','produits-ordre':'ordre','produits-bests':'bests','produits-evt':'evt'};
 /* ── Vidéobooth : accès à la tablette et sessions ── */
-let VBCFG={acces:'',sessions:[]}, VBEDIT=null;
+let VBCFG={acces:'',accesLibre:false,sessions:[]}, VBEDIT=null;
 const vbMdp=()=>{const a='abcdefghjkmnpqrstuvwxyz23456789';let s='';const b=crypto.getRandomValues(new Uint8Array(6));b.forEach(x=>s+=a[x%a.length]);return s;};
-async function vbConfigCharger(){ try{ VBCFG=await api('/videobooth/config'); }catch(e){ VBCFG={acces:'',sessions:[],err:e.message}; } vbConfigRendre(); }
+const vbLabel=e=>e.nom+(e.date?' — '+e.date:'');
+const vbAujourdhui=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris'}).format(new Date());
+const vbSessTerminee=e=>e.actif===false||(e.fin&&e.fin<vbAujourdhui());
+async function vbConfigCharger(){ try{ VBCFG=await api('/videobooth/config'); }catch(e){ VBCFG={acces:'',accesLibre:false,sessions:[],err:e.message}; } vbConfigRendre(); vbRendre(); }
+const VB_CARTE='background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:14px 16px;margin-bottom:14px';
+const VB_INPUT='padding:8px 10px;border:1px solid #d9dde5;border-radius:8px;font:inherit;font-size:13.5px;color:#111';
+function vbFormSession(){
+  const ses=VBCFG.sessions||[];
+  const e=VBEDIT.i>=0?ses[VBEDIT.i]:{nom:'',date:'',mdp:'',titre:'Enregistrer un souvenir',sous:'Laissez un petit message vidéo de 30 secondes',max:30,format:'auto',noel:false,cadrage:'Vous pouvez incliner doucement la tablette pour vous cadrer',qui:'',quiSous:'',actif:true,fin:'',conserv:30,garde:14,qualite:'standard'};
+  const lab='font-size:12px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px';
+  const f=(id,l,v,ph,type)=>'<label style="'+lab+'">'+l+'<input id="vs-'+id+'" type="'+(type||'text')+'" value="'+vbEsc(v==null?'':v)+'" placeholder="'+vbEsc(ph||'')+'" style="'+VB_INPUT+'"></label>';
+  const sel=(id,l,opts,cur)=>'<label style="'+lab+'">'+l+'<select id="vs-'+id+'" style="'+VB_INPUT+'">'+opts.map(o=>'<option value="'+o[0]+'"'+(String(cur)===String(o[0])?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></label>';
+  const prot=!!e.mdp;
+  return '<div style="background:#f7f5f0;border-radius:12px;padding:14px;margin:0 0 14px">'+
+    '<div style="font:700 14px Poppins,Inter,sans-serif;color:#14304f;margin-bottom:10px">'+(VBEDIT.i>=0?'Réglages de la session':'Nouvelle session')+'</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px">'+
+    f('nom','Nom de l’événement',e.nom,'Mariage Sylvie')+f('date','Date (affichée)',e.date,'21 novembre')+f('fin','Dernier jour (la session disparaît de la tablette ensuite)',e.fin,'','date')+
+    '<label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" id="vs-actif"'+(e.actif!==false?' checked':'')+'> Session ouverte sur la tablette</label>'+
+    '<label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" id="vs-prot"'+(prot?' checked':'')+' onchange="document.getElementById(\'vs-mdpbloc\').style.display=this.checked?\'\':\'none\';if(this.checked&&!document.getElementById(\'vs-mdp\').value)document.getElementById(\'vs-mdp\').value=vbMdp()"> Protéger par un mot de passe</label>'+
+    '<div id="vs-mdpbloc" style="'+(prot?'':'display:none')+'">'+f('mdp','Mot de passe de la session',e.mdp,'')+'</div>'+
+    f('titre','Titre d’accueil',e.titre,'')+f('sous','Sous-titre d’accueil',e.sous,'')+
+    f('qui','Titre du formulaire',e.qui,'Qui êtes-vous ?')+f('quiSous','Phrase sous ce titre',e.quiSous,'Pour vous envoyer votre vidéo par e-mail')+
+    f('max','Durée maximale (secondes)',e.max,'30','number')+f('cadrage','Message de cadrage',e.cadrage,'')+
+    sel('format','Format de la vidéo',[['auto','Automatique'],['16:9','Paysage 16:9'],['4:3','Paysage 4:3'],['9:16','Story 9:16'],['3:4','Portrait 3:4']],e.format)+
+    sel('qualite','Qualité de la vidéo',[['haute','Haute (≈ 26 Mo/min)'],['standard','Standard (≈ 19 Mo/min)'],['eco','Économique (≈ 13 Mo/min)']],e.qualite||'haute')+
+    f('conserv','Conservée sur le site (jours)',e.conserv||30,'30','number')+f('garde','Gardée sur la tablette après envoi (jours)',e.garde||14,'14','number')+
+    '<label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" id="vs-noel"'+(e.noel?' checked':'')+'> Thème Noël</label>'+
+    '</div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" onclick="vbSessSauver()">Enregistrer la session</button><button class="btn btn-ghost" onclick="vbSessEdit(null)">Annuler</button></div></div>';
+}
 function vbConfigRendre(){
   const z=document.getElementById('vbConfig'); if(!z) return;
-  if(VBEVT){ z.innerHTML=''; return; }
-  const c='background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:14px 16px;margin-bottom:14px';
-  const ses=VBCFG.sessions||[];
-  let h='<div style="'+c+'"><div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f">Accès à l’appli de la tablette</div><div style="font-size:12.5px;color:#6b7280;margin:3px 0 10px">Adresse : <b>'+location.origin+'/videobooth/</b> — la tablette demande ce mot de passe, puis la liste des sessions, puis le mot de passe de la session choisie.</div>'+
-    '<div style="display:flex;gap:8px;flex-wrap:wrap"><input id="vbAcces" value="'+vbEsc(VBCFG.acces||'')+'" placeholder="Mot de passe d’accès (6 caractères minimum)" style="flex:1 1 240px;padding:9px 12px;border:1px solid #d9dde5;border-radius:9px;font:600 14px monospace" autocomplete="off"><button class="btn btn-ghost" onclick="document.getElementById(\'vbAcces\').value=vbMdp()">Générer</button><button class="btn" onclick="vbAccesSauver()">Enregistrer</button></div>'+(VBCFG.acces?'':'<div style="color:#b03a2a;font-size:12.5px;margin-top:8px">Aucun mot de passe d’accès défini : la tablette ne peut pas se connecter.</div>')+'</div>';
-  h+='<div style="'+c+'"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f">Sessions (événements)</div><button class="btn" onclick="vbSessEdit(-1)">+ Nouvelle session</button></div>';
-  if(VBEDIT!==null){
-    const e=VBEDIT.i>=0?ses[VBEDIT.i]:{nom:'',date:'',mdp:vbMdp(),titre:'Enregistrer un souvenir',sous:'Laissez un petit message vidéo de 30 secondes',max:30,format:'auto',noel:false,cadrage:'Vous pouvez incliner doucement la tablette pour vous cadrer'};
-    const f=(id,lab,v,ph)=>'<label style="font-size:12px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">'+lab+'<input id="vs-'+id+'" value="'+vbEsc(v==null?'':v)+'" placeholder="'+vbEsc(ph||'')+'" style="padding:8px 10px;border:1px solid #d9dde5;border-radius:8px;font:inherit;font-size:13.5px;color:#111"></label>';
-    h+='<div style="background:#f7f5f0;border-radius:10px;padding:12px;margin:10px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">'+f('nom','Nom de la session',e.nom,'Mariage Sylvie')+f('date','Date',e.date,'21 novembre')+f('mdp','Mot de passe de la session',e.mdp,'')+f('titre','Titre d’accueil',e.titre,'')+f('sous','Sous-titre',e.sous,'')+f('max','Durée maximale (secondes)',e.max,'30')+f('cadrage','Message de cadrage',e.cadrage,'')+
-      '<label style="font-size:12px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px">Format de la vidéo<select id="vs-format" style="padding:8px 10px;border:1px solid #d9dde5;border-radius:8px;font:inherit;font-size:13.5px">'+[['auto','Automatique'],['16:9','Paysage 16:9'],['4:3','Paysage 4:3'],['9:16','Story 9:16'],['3:4','Portrait 3:4']].map(o=>'<option value="'+o[0]+'"'+(e.format===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></label>'+
-      '<label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" id="vs-noel"'+(e.noel?' checked':'')+'> Thème Noël</label>'+
-      '<div style="grid-column:1/-1;display:flex;gap:8px"><button class="btn" onclick="vbSessSauver()">Enregistrer la session</button><button class="btn btn-ghost" onclick="vbSessEdit(null)">Annuler</button></div></div>';
+  let h='';
+  if(VBEDIT!==null) h+=vbFormSession();
+  if(!VBEVT){
+    h+='<details style="'+VB_CARTE+'"'+((VBCFG.acces||VBCFG.accesLibre)?'':' open')+'><summary style="cursor:pointer;font:700 15px Poppins,Inter,sans-serif;color:#14304f">Accès à l’appli de la tablette</summary>'+
+    '<div style="font-size:12.5px;color:#6b7280;margin:8px 0 10px">Adresse : <b>'+location.origin+'/videobooth/</b>. La tablette affiche la liste des événements en cours : on touche le sien, et c’est parti (avec un mot de passe seulement si vous en avez mis un sur la session).</div>'+
+    '<label style="font-size:13.5px;display:flex;align-items:center;gap:8px;margin-bottom:10px"><input type="checkbox" id="vbExiger"'+(VBCFG.accesLibre?'':' checked')+' onchange="document.getElementById(\'vbAccesBloc\').style.display=this.checked?\'flex\':\'none\'"> Demander un mot de passe général pour ouvrir l’appli</label>'+
+    '<div id="vbAccesBloc" style="display:'+(VBCFG.accesLibre?'none':'flex')+';gap:8px;flex-wrap:wrap"><input id="vbAcces" value="'+vbEsc(VBCFG.acces||'')+'" placeholder="Mot de passe d’accès (6 caractères minimum)" style="flex:1 1 240px;'+VB_INPUT+';font:600 14px monospace" autocomplete="off"><button class="btn btn-ghost" onclick="document.getElementById(\'vbAcces\').value=vbMdp()">Générer</button></div>'+
+    '<div style="margin-top:10px"><button class="btn" onclick="vbAccesSauver()">Enregistrer</button></div>'+((VBCFG.acces||VBCFG.accesLibre)?'':'<div style="color:#b03a2a;font-size:12.5px;margin-top:8px">Rien n’est réglé : la tablette ne peut pas se connecter. Choisissez un mot de passe, ou décochez la case pour une appli sans mot de passe général.</div>')+'</details>';
   }
-  h+=ses.length?'<div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">'+ses.map((e,i)=>'<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;border:1px solid #eee8dc;border-radius:10px;padding:10px 12px"><div><b>'+vbEsc(e.nom)+'</b> <span style="color:#6b7280;font-size:13px">'+vbEsc(e.date||'')+'</span><div style="font-size:12px;color:#6b7280">mot de passe : <span style="font-family:monospace;font-weight:700;color:#14304f">'+vbEsc(e.mdp||'(aucun)')+'</span></div></div><div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="vbSessEdit('+i+')">Modifier</button><button class="btn btn-ghost" onclick="vbSessSuppr('+i+')">Supprimer</button></div></div>').join('')+'</div>':'<div class="hint" style="padding:10px 0">Aucune session. Créez-en une pour chaque événement : la tablette la proposera après le mot de passe d’accès.</div>';
-  h+='</div>';
   z.innerHTML=h;
 }
-function vbSessEdit(i){ VBEDIT=(i===null)?null:{i}; vbConfigRendre(); }
-async function vbConfigPoster(corps,msg){ try{ VBCFG=await api('/videobooth/config',{method:'POST',body:JSON.stringify(corps)}); showToast(msg); }catch(e){ showToast('Échec : '+e.message,true); } VBEDIT=null; vbConfigRendre(); }
-function vbAccesSauver(){ vbConfigPoster({acces:document.getElementById('vbAcces').value.trim()},'Mot de passe d’accès enregistré'); }
+function vbSessEdit(i){ VBEDIT=(i===null)?null:{i}; vbConfigRendre(); if(i!==null) { const z=document.getElementById('vbConfig'); if(z) z.scrollIntoView({block:'start',behavior:'smooth'}); } }
+async function vbConfigPoster(corps,msg){ try{ VBCFG=await api('/videobooth/config',{method:'POST',body:JSON.stringify(corps)}); showToast(msg); }catch(e){ showToast('Échec : '+e.message,true); } VBEDIT=null; vbConfigRendre(); vbRendre(); }
+function vbAccesSauver(){
+  const exiger=document.getElementById('vbExiger').checked, m=document.getElementById('vbAcces').value.trim();
+  if(exiger&&!m){ showToast('Saisissez un mot de passe, ou décochez la case',true); return; }
+  vbConfigPoster(exiger?{acces:m,accesLibre:false}:{acces:'',accesLibre:true},exiger?'Mot de passe d’accès enregistré':'Appli ouverte sans mot de passe général');
+}
 function vbSessSauver(){
   const v=id=>(document.getElementById('vs-'+id)||{}).value||'';
-  const s={nom:v('nom').trim(),date:v('date').trim(),mdp:v('mdp').trim(),titre:v('titre').trim(),sous:v('sous').trim(),max:Number(v('max'))||30,cadrage:v('cadrage').trim(),format:v('format'),noel:!!document.getElementById('vs-noel').checked};
+  const prot=document.getElementById('vs-prot').checked;
+  const s={nom:v('nom').trim(),date:v('date').trim(),fin:v('fin'),actif:document.getElementById('vs-actif').checked,mdp:prot?v('mdp').trim():'',titre:v('titre').trim(),sous:v('sous').trim(),qui:v('qui').trim(),quiSous:v('quiSous').trim(),max:Number(v('max'))||30,cadrage:v('cadrage').trim(),format:v('format'),qualite:v('qualite'),conserv:Number(v('conserv'))||30,garde:Number(v('garde'))||14,noel:!!document.getElementById('vs-noel').checked};
   if(!s.nom){ showToast('Indiquez le nom de la session',true); return; }
-  const l=(VBCFG.sessions||[]).slice(); if(VBEDIT.i>=0){ s.id=l[VBEDIT.i].id; l[VBEDIT.i]=s; } else l.push(s);
+  if(prot&&!s.mdp){ showToast('Saisissez le mot de passe, ou décochez la protection',true); return; }
+  const l=(VBCFG.sessions||[]).slice(); const ancien=VBEDIT.i>=0?l[VBEDIT.i]:null;
+  if(ancien){ s.id=ancien.id; l[VBEDIT.i]=s; } else l.push(s);
+  /* le nom change : les vidéos déjà reçues restent rangées sous l'ancien nom, on garde la même fiche */
   vbConfigPoster({sessions:l},'Session enregistrée');
+  if(ancien&&vbLabel(ancien)!==vbLabel(s)&&VBEVT===vbLabel(ancien)) VBEVT=vbLabel(s);
 }
-function vbSessSuppr(i){ const l=(VBCFG.sessions||[]).slice(); if(!confirm('Supprimer la session « '+l[i].nom+' » ? Les vidéos déjà reçues ne sont pas supprimées.')) return; l.splice(i,1); vbConfigPoster({sessions:l},'Session supprimée'); }
+function vbSessSuppr(i){ const l=(VBCFG.sessions||[]).slice(); if(!confirm('Supprimer la session « '+l[i].nom+' » ? Les vidéos déjà reçues ne sont pas supprimées.')) return; l.splice(i,1); vbConfigPoster({sessions:l},'Session supprimée'); if(VBEVT) vbOuvrir(''); }
 
 /* ── Vidéobooth ── */
 let VB=[], VBEVT='';
@@ -2708,47 +2740,70 @@ async function vbCharger(){
     const et=d.etat||{}; let msg='';
     if(!d.cle) msg='La variable VIDEOBOOTH_CLE n’est pas définie dans Netlify (ou le site n’a pas été redéployé depuis) : la tablette ne peut pas envoyer ses vidéos.';
     else if(et.refus && (!et.contact || et.refus.date>et.contact.date)) msg='La tablette a essayé d’envoyer le '+fh(et.refus)+' mais l’accès a été refusé : vérifiez les mots de passe saisis sur la tablette.';
-    else if(!et.contact) msg='Aucun contact de la tablette pour l’instant. Sur la tablette, ouvrez /videobooth/, saisissez le mot de passe d’accès, puis celui de la session.';
+    else if(!et.contact) msg='Aucun contact de la tablette pour l’instant. Sur la tablette, ouvrez /videobooth/ et choisissez la session.';
     a.style.display=msg?'block':'none'; a.textContent=msg;
     a.style.color=(msg&&d.cle&&et.contact&&!et.refus)?'#6b7280':'#b03a2a';
     if(!msg&&et.contact){ a.style.display='block'; a.style.color='#6b7280'; a.textContent='Dernier contact de la tablette : '+fh(et.contact)+'.'; }
     vbRendre(); vbConfigCharger();
   }catch(e){ z.innerHTML='<div class="hint" style="color:#b03a2a">Chargement impossible : '+vbEsc(e.message)+'</div>'; }
 }
-function vbOuvrir(nom){ VBEVT=nom; vbRendre(); vbConfigRendre(); }
+function vbOuvrir(nom){ VBEVT=nom; VBEDIT=null; vbRendre(); vbConfigRendre(); window.scrollTo({top:0}); }
+const vbMo=n=>n>=1073741824?(n/1073741824).toFixed(2).replace('.',',')+' Go':(n/1048576).toFixed(1).replace('.',',')+' Mo';
 function vbRendre(){
   const z=document.getElementById('vbListe'); if(!z) return;
   const fd=d=>new Date(d).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
-  const mo=n=>(n/1048576).toFixed(1).replace('.',',')+' Mo';
+  const mo=vbMo;
+  const ses=VBCFG.sessions||[];
+  const sesDe=nom=>ses.findIndex(e=>vbLabel(e)===nom);
   document.getElementById('vbRetour').hidden=!VBEVT; document.getElementById('vbZip').hidden=!VBEVT; document.getElementById('vbLien').hidden=!VBEVT; document.getElementById('vbSous').style.display=VBEVT?'none':'';
+  const vid=document.getElementById('vbVider'); if(vid) vid.hidden=!VBEVT;
+  const rg=document.getElementById('vbReglages'); if(rg) rg.hidden=!(VBEVT&&sesDe(VBEVT)>=0);
   if(!VBEVT){
     document.getElementById('vbTitre').textContent='Vidéobooth';
     document.getElementById('vbRelancer').hidden=true;
     const ev={}; VB.forEach(v=>{const k=vbNomEvt(v);(ev[k]=ev[k]||[]).push(v);});
-    const noms=Object.keys(ev).sort((a,b)=>String(ev[b][0].cree).localeCompare(String(ev[a][0].cree)));
-    if(!noms.length){ z.innerHTML='<div class="hint" style="padding:24px 0">Aucune vidéo pour l’instant. Elles apparaîtront ici dès que la tablette les enverra.</div>'; return; }
-    z.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px">'+noms.map(n=>{
-      const l=ev[n], ds=l.map(v=>+new Date(v.cree)), d1=Math.min(...ds), d2=Math.max(...ds), ko=l.filter(v=>v.mail!=='envoye').length;
-      const quand=fd(d1)===fd(d2)?fd(d1):fd(d1)+' → '+fd(d2);
-      return '<button type="button" onclick="vbOuvrir(this.dataset.n)" data-n="'+vbEsc(n)+'" style="text-align:left;background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:16px 18px;cursor:pointer;font:inherit">'+
-        '<div style="font:700 16px Poppins,Inter,sans-serif;color:#14304f">'+vbEsc(n)+'</div>'+
-        '<div style="color:#6b7280;font-size:13px;margin:3px 0 10px">'+quand+'</div>'+
-        '<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:15px">'+l.length+' vidéo'+(l.length>1?'s':'')+'</b>'+
-        (ko?'<span style="color:#b03a2a;font-size:12.5px;font-weight:600">'+ko+' e-mail non parti</span>':'<span style="color:#3d6e36;font-size:12.5px;font-weight:600">Tous les e-mails partis</span>')+'</div></button>';}).join('')+'</div>';
+    /* toutes les sessions créées, même sans vidéo, puis les événements qui n'ont plus de session */
+    const cartes=ses.map((e,i)=>({nom:vbLabel(e),i,s:e}));
+    Object.keys(ev).forEach(n=>{ if(sesDe(n)<0) cartes.push({nom:n,i:-1,s:null}); });
+    cartes.sort((a,b)=>{ const ta=a.s&&!vbSessTerminee(a.s)?1:0, tb=b.s&&!vbSessTerminee(b.s)?1:0; if(ta!==tb) return tb-ta; const la=(ev[a.nom]||[]).map(v=>String(v.cree)).sort().pop()||'', lb=(ev[b.nom]||[]).map(v=>String(v.cree)).sort().pop()||''; return lb.localeCompare(la); });
+    const total=VB.reduce((t,v)=>t+(v.octets||0),0);
+    const tete='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px"><div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f">Événements <span style="font-weight:500;color:#6b7280;font-size:13px">· '+VB.length+' vidéo'+(VB.length>1?'s':'')+' sur le site ('+mo(total)+')</span></div><button class="btn" onclick="vbSessEdit(-1)">+ Nouvelle session</button></div>';
+    if(!cartes.length){ z.innerHTML=tete+'<div class="hint" style="padding:24px 0">Aucune session pour l’instant. Créez-en une : elle apparaîtra sur la tablette.</div>'; return; }
+    z.innerHTML=tete+'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">'+cartes.map(c=>{
+      const l=ev[c.nom]||[], ds=l.map(v=>+new Date(v.cree)), ko=l.filter(v=>v.mail!=='envoye').length, poids=l.reduce((t,v)=>t+(v.octets||0),0);
+      const quand=ds.length?(fd(Math.min(...ds))===fd(Math.max(...ds))?fd(Math.min(...ds)):fd(Math.min(...ds))+' → '+fd(Math.max(...ds))):'';
+      const pastille=(txt,coul,fond)=>'<span style="font-size:11.5px;font-weight:700;color:'+coul+';background:'+fond+';border-radius:20px;padding:2px 9px">'+txt+'</span>';
+      let ch=''; if(c.s){ ch+=vbSessTerminee(c.s)?pastille('Terminée','#6b7280','#eef0f3'):pastille('En cours sur la tablette','#2f6b2a','#e4f2df'); ch+=' '+(c.s.mdp?pastille('Mot de passe','#14304f','#e5ecf5'):pastille('Sans mot de passe','#8a5a00','#fdf0d5')); } else ch+=pastille('Session supprimée','#6b7280','#eef0f3');
+      return '<div role="button" tabindex="0" onclick="vbOuvrir(this.dataset.n)" onkeydown="if(event.key===\'Enter\')vbOuvrir(this.dataset.n)" data-n="'+vbEsc(c.nom)+'" style="text-align:left;background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:16px 18px;cursor:pointer;font:inherit">'+
+        '<div style="font:700 16px Poppins,Inter,sans-serif;color:#14304f">'+vbEsc(c.nom)+'</div>'+
+        '<div style="margin:6px 0 8px;display:flex;gap:6px;flex-wrap:wrap">'+ch+'</div>'+
+        '<div style="color:#6b7280;font-size:13px;margin:0 0 10px">'+(quand||'Aucune vidéo pour l’instant')+'</div>'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:15px">'+l.length+' vidéo'+(l.length>1?'s':'')+(l.length?' <span style="font-weight:500;color:#8a8f98;font-size:12.5px">· '+mo(poids)+'</span>':'')+'</b>'+
+        (l.length?(ko?'<span style="color:#b03a2a;font-size:12.5px;font-weight:600">'+ko+' e-mail non parti</span>':'<span style="color:#3d6e36;font-size:12.5px;font-weight:600">E-mails partis</span>'):'')+'</div>'+
+        (c.s?'<div style="margin-top:10px"><button class="btn btn-ghost" style="padding:5px 12px;font-size:12.5px" onclick="event.stopPropagation();vbSessEdit('+c.i+')">Réglages</button></div>':'')+'</div>';}).join('')+'</div>';
     return;
   }
   const l=VB.filter(v=>vbNomEvt(v)===VBEVT).sort((a,b)=>String(a.cree).localeCompare(String(b.cree)));
   document.getElementById('vbTitre').textContent=VBEVT;
   document.getElementById('vbRelancer').hidden=!l.some(v=>v.mail!=='envoye');
-  z.innerHTML='<div class="hint" style="margin-bottom:10px">'+l.length+' vidéo'+(l.length>1?'s':'')+'</div><div style="display:flex;flex-direction:column;gap:10px">'+
-  l.map(v=>{const d=new Date(v.cree);const ok=v.mail==='envoye';const j=Math.max(0,30-Math.floor((Date.now()-d)/86400000));
+  const poids=l.reduce((t,v)=>t+(v.octets||0),0);
+  z.innerHTML='<div class="hint" style="margin-bottom:10px">'+l.length+' vidéo'+(l.length>1?'s':'')+' · '+mo(poids)+'</div>'+(l.length?'':'<div class="hint" style="padding:18px 0">Aucune vidéo pour cet événement pour l’instant. Elles apparaîtront ici dès que la tablette les enverra.</div>')+'<div style="display:flex;flex-direction:column;gap:10px">'+
+  l.map(v=>{const d=new Date(v.cree);const ok=v.mail==='envoye';const j=Math.max(0,(Number(v.garde)||30)-Math.floor((Date.now()-d)/86400000));
     const btn='class="btn btn-ghost" style="text-decoration:none;padding:7px 12px;font-size:13px"';
     return '<div style="background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:14px 16px">'+
       '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><b style="font-size:15px">'+vbEsc(v.prenom)+' '+vbEsc(v.nom)+'</b>'+
-      '<span style="color:'+(ok?'#3d6e36':'#b03a2a')+';font-weight:600;font-size:13px">'+(ok?'E-mail envoyé'+(v.pj?' (vidéo jointe)':' (lien)'):'E-mail non parti'+(v.mailErreur?' — '+vbEsc(v.mailErreur):''))+'</span></div>'+
+      '<span style="color:'+(ok?'#3d6e36':'#b03a2a')+';font-weight:600;font-size:13px">'+(ok?'E-mail envoyé'+(v.pj?' (vidéo jointe)':' (lien)'):(v.mail==='attente'?'E-mail en cours d’envoi':'E-mail non parti'+(v.mailErreur?' — '+vbEsc(v.mailErreur):'')))+'</span></div>'+
       '<div style="color:#4a5565;font-size:13.5px;margin-top:2px;word-break:break-all">'+vbEsc(v.email)+'</div>'+
       '<div style="color:#8a8f98;font-size:12.5px;margin-top:2px">'+d.toLocaleDateString('fr-FR')+' à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+' · '+mo(v.octets||0)+' · supprimée du site dans '+j+' j</div>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><a '+btn+' href="/api/admin/videobooth/video?id='+encodeURIComponent(v.id)+'" download>Télécharger</a><button '+btn+' onclick="vbRenvoyer(\''+v.id+'\')">Renvoyer l’e-mail</button><button '+btn+' onclick="vbSupprimer(\''+v.id+'\')">Supprimer</button></div></div>';}).join('')+'</div>';
+}
+function vbReglagesOuvrir(){ const i=(VBCFG.sessions||[]).findIndex(e=>vbLabel(e)===VBEVT); if(i>=0) vbSessEdit(i); }
+async function vbViderEvenement(){
+  const l=VB.filter(v=>vbNomEvt(v)===VBEVT); if(!l.length){ showToast('Aucune vidéo à supprimer',true); return; }
+  const poids=l.reduce((t,v)=>t+(v.octets||0),0);
+  if(!confirm('Supprimer les '+l.length+' vidéo'+(l.length>1?'s':'')+' de « '+VBEVT+' » du site ('+vbMo(poids)+') ?\n\nIl n’y a pas de retour en arrière. Téléchargez-les d’abord (« Tout télécharger »). Les e-mails déjà envoyés aux invités ne sont pas concernés, mais leurs liens ne fonctionneront plus.')) return;
+  if(!confirm('Dernière confirmation : supprimer définitivement ces '+l.length+' vidéos du site ?')) return;
+  try{ const r=await api('/videobooth?event='+encodeURIComponent(VBEVT),{method:'DELETE'}); showToast(r.supprimees+' vidéo'+(r.supprimees>1?'s supprimées':' supprimée')); await vbCharger(); }catch(e){ showToast('Échec : '+e.message,true); }
 }
 async function vbRenvoyer(id){
   const v=VB.find(x=>x.id===id); if(!v) return;
@@ -2767,20 +2822,25 @@ async function vbRelancerEchecs(){
 }
 function vbScript(src){ return new Promise((ok,ko)=>{ if(window.vbZip) return ok(); const s=document.createElement('script'); s.src=src; s.onload=ok; s.onerror=()=>ko(new Error('Chargement impossible')); document.head.appendChild(s); }); }
 async function vbToutTelecharger(){
-  const l=VB.filter(v=>vbNomEvt(v)===VBEVT); if(!l.length) return;
+  const l=VB.filter(v=>vbNomEvt(v)===VBEVT).sort((a,b)=>String(a.cree).localeCompare(String(b.cree))); if(!l.length) return;
   const b=document.getElementById('vbZip'), txt=b.textContent; b.disabled=true;
+  /* par archives de 30 vidéos : une seule archive de plusieurs centaines de vidéos saturerait la mémoire du navigateur */
+  const LOT=30, nb=Math.ceil(l.length/LOT), base=(VBEVT.replace(/[\\/:*?"<>|]+/g,' ').trim()||'videos');
   try{
     await vbScript('/videobooth/zip.js');
-    const f=[];
-    for(let i=0;i<l.length;i++){
-      b.textContent='Préparation '+(i+1)+' / '+l.length+'…';
-      const r=await fetch('/api/admin/videobooth/video?id='+encodeURIComponent(l[i].id),{credentials:'same-origin'});
-      if(!r.ok) throw new Error('vidéo '+(i+1)+' introuvable (supprimée ?)');
-      f.push({nom:l[i].fichier,blob:await r.blob()});
+    for(let p=0;p<nb;p++){
+      const f=[], part=l.slice(p*LOT,(p+1)*LOT);
+      for(let i=0;i<part.length;i++){
+        b.textContent='Archive '+(p+1)+'/'+nb+' · vidéo '+(i+1)+'/'+part.length+'…';
+        const r=await fetch('/api/admin/videobooth/video?id='+encodeURIComponent(part[i].id),{credentials:'same-origin'});
+        if(!r.ok) throw new Error('vidéo '+(p*LOT+i+1)+' introuvable (supprimée ?)');
+        f.push({nom:part[i].fichier,blob:await r.blob()});
+      }
+      const z=await vbZip(f), a=document.createElement('a'); a.href=URL.createObjectURL(z);
+      a.download=base+(nb>1?' - partie '+(p+1)+' sur '+nb:'')+'.zip'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);
+      await new Promise(r=>setTimeout(r,1200));
     }
-    const z=await vbZip(f), a=document.createElement('a'); a.href=URL.createObjectURL(z);
-    a.download=(VBEVT.replace(/[\\/:*?"<>|]+/g,' ').trim()||'videos')+'.zip'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);
-    showToast('Archive téléchargée ('+l.length+' vidéo'+(l.length>1?'s':'')+')');
+    showToast(nb>1?nb+' archives téléchargées ('+l.length+' vidéos)':'Archive téléchargée ('+l.length+' vidéo'+(l.length>1?'s':'')+')');
   }catch(e){ showToast('Échec : '+e.message,true); }
   b.disabled=false; b.textContent=txt;
 }
