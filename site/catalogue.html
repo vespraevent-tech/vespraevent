@@ -750,7 +750,7 @@ transform:none!important;stroke-dashoffset:0!important}}
     <option value="Mobilier, réception et barnums">Mobilier, réception et barnums</option>
     <option value="Restauration">Restauration</option>
     <option value="Chauffage et ventilation">Chauffage et ventilation</option>
-    <option value="Décoration">Décoration</option>
+    <option value="Décoration">Panneau de bienvenue et décoration</option>
     <option value="Jeux en bois">Jeux en bois</option>
   </select>
   <select class="filter-select" id="priceSelect" onchange="applyFilters()">
@@ -1100,6 +1100,9 @@ function renderGrid(products){
 /* anciennes catégories (produits créés depuis le back-office) → nouvelles */
 const CAT_ANCIENNES={'Photobooth et accessoires':'Photobooth et Vidéobooth','Confort':'Chauffage et ventilation','Décoration et signalétique':'Décoration','Photobooth':'Photobooth et Vidéobooth','Animation':'Animations','Son et vidéo':'Son, lumière et vidéo','Lumière':'Son, lumière et vidéo','Lumières':'Son, lumière et vidéo','Effets':'Effets spéciaux et artifices','Barnums':'Mobilier, réception et barnums'};
 const normCat=c=>CAT_ANCIENNES[c]||c;
+/* nom affiché d'une catégorie : la clé interne « Décoration » reste (liens, produits, back-office), seul son titre change */
+const LIB_CAT={'Décoration':'Panneau de bienvenue et décoration'};
+const lib=n=>LIB_CAT[n]||n;
 const NORM=t=>(t||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 function clearSearch(){const i=document.getElementById('searchInput');i.value='';i.focus();applyFilters();}
 function applyFilters(){
@@ -1142,7 +1145,7 @@ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded'
 // URL params
 const urlCat=new URLSearchParams(location.search).get('cat');
 if(urlCat){
-  const catMap={'photobooth et accessoires':'Photobooth et Vidéobooth','photobooth-et-accessoires':'Photobooth et Vidéobooth','confort':'Chauffage et ventilation','chauffage':'Chauffage et ventilation','ventilation':'Chauffage et ventilation','voitures':'Voitures de collection','voiture':'Voitures de collection','voitures-de-collection':'Voitures de collection','collection':'Voitures de collection','jeux-en-bois':'Jeux en bois','jeux':'Jeux en bois','photobooth':'Photobooth et Vidéobooth','animation':'Animations','animations':'Animations','barnums':'Mobilier, réception et barnums','barnum':'Mobilier, réception et barnums','mobilier':'Mobilier, réception et barnums','sono':'Son, lumière et vidéo','video':'Son, lumière et vidéo','lumiere':'Son, lumière et vidéo','lumieres':'Son, lumière et vidéo','effets':'Effets spéciaux et artifices','effets-speciaux':'Effets spéciaux et artifices','restauration':'Restauration','decoration':'Décoration','signaletique':'Décoration'};
+  const catMap={'panneau de bienvenue et décoration':'Décoration','panneau-de-bienvenue-et-decoration':'Décoration','panneau-de-bienvenue':'Décoration','photobooth et accessoires':'Photobooth et Vidéobooth','photobooth-et-accessoires':'Photobooth et Vidéobooth','confort':'Chauffage et ventilation','chauffage':'Chauffage et ventilation','ventilation':'Chauffage et ventilation','voitures':'Voitures de collection','voiture':'Voitures de collection','voitures-de-collection':'Voitures de collection','collection':'Voitures de collection','jeux-en-bois':'Jeux en bois','jeux':'Jeux en bois','photobooth':'Photobooth et Vidéobooth','animation':'Animations','animations':'Animations','barnums':'Mobilier, réception et barnums','barnum':'Mobilier, réception et barnums','mobilier':'Mobilier, réception et barnums','sono':'Son, lumière et vidéo','video':'Son, lumière et vidéo','lumiere':'Son, lumière et vidéo','lumieres':'Son, lumière et vidéo','effets':'Effets spéciaux et artifices','effets-speciaux':'Effets spéciaux et artifices','restauration':'Restauration','decoration':'Décoration','signaletique':'Décoration'};
   const mapped=catMap[urlCat.toLowerCase()]||(urlCat.toLowerCase()==='tout'?'Tous':[...document.getElementById('filterSelect').options].map(o=>o.value).find(v=>v===urlCat));
   if(mapped){
     document.getElementById('filterSelect').value=mapped;
@@ -1186,22 +1189,22 @@ if(urlCat){
         {const MOB='Mobilier, réception et barnums',RES='Restauration',EXTRA={p7:[MOB],p53:[MOB],p59:[MOB,RES],p60:[MOB,RES]};
          PRODUCTS.forEach(p=>{const e=EXTRA[p.id];if(e){const cs=(p.cats||[]).slice();e.forEach(c=>{if(cs.indexOf(c)<0)cs.push(c);});p.cats=cs;}});}
         const fs=document.getElementById('filterSelect');
-        if(fs){const v=fs.value;fs.innerHTML='<option value="Tous">Toutes les catégories</option>'+P.map(c=>'<option value="'+String(c[0]).replace(/"/g,'&quot;')+'">'+c[0]+'</option>').join('');fs.value=P.some(c=>c[0]===v)?v:'Tous';applyFilters();}
+        if(fs){const v=fs.value;fs.innerHTML='<option value="Tous">Toutes les catégories</option>'+P.map(c=>'<option value="'+String(c[0]).replace(/"/g,'&quot;')+'">'+lib(c[0])+'</option>').join('');fs.value=P.some(c=>c[0]===v)?v:'Tous';applyFilters();}
       }
     }
   }catch(e){}
   const ul=document.getElementById('ccList'),ph=document.getElementById('ccPhoto'),lb=document.getElementById('ccLabel');
   if(!ul||!ph)return;
   const crumbSep=document.querySelector('.crumb-cat-sep'),crumbCurrent=document.getElementById('crumbCurrent'),crumbCatalogue=document.getElementById('crumbCatalogue');
-  function updateCrumb(name){const active=!!name&&name!=='Tous';if(crumbSep)crumbSep.hidden=!active;if(crumbCurrent){crumbCurrent.hidden=!active;crumbCurrent.textContent=active?name:'';}if(crumbCatalogue)crumbCatalogue.setAttribute('aria-current',active?'false':'page');}
+  function updateCrumb(name){const active=!!name&&name!=='Tous';if(crumbSep)crumbSep.hidden=!active;if(crumbCurrent){crumbCurrent.hidden=!active;crumbCurrent.textContent=active?lib(name):'';}if(crumbCatalogue)crumbCatalogue.setAttribute('aria-current',active?'false':'page');}
   if(crumbCatalogue)crumbCatalogue.addEventListener('click',function(e){e.preventDefault();window.vespraChoixCategories();});
   const CO=p=>(p.cats||[p.cat]).map(normCat);
-  const DESC={'Photobooth et Vidéobooth':"Photobooth, cabines téléphoniques, livre d'or audio, panneau de bienvenue et néon : des souvenirs que vos invités garderont.",'Voitures de collection':"Une Citroën Traction ou une Ford Mustang pour vos photos, votre arrivée ou une belle mise en scène.",'Animations':"Karaoké, jeux, photobooth, pop-corn et châteaux gonflables : de quoi animer toute la soirée, des enfants aux plus grands.",'Son, lumière et vidéo':"Sonorisation, micros, jeux de lumières, boule à facettes et vidéoprojecteur pour une ambiance à la hauteur.",'Effets spéciaux et artifices':"Feux d'artifice de jour, fumée lourde, étincelles froides et machines à bulles pour les grands moments.",'Châteaux gonflables':"Du mini château aux grands châteaux avec toboggan, sans oublier la boîte de nuit gonflable : livrés et installés chez vous.",'Mobilier, réception et barnums':"Barnums, tentes étoile, buvette et mange-debout pour recevoir à l'abri, à l'extérieur comme à l'intérieur.",'Restauration':"Brasero, pop-corn, fontaine à cocktail, machine à glaçons et mange-debout pour régaler vos invités.",'Chauffage et ventilation':"Chauffage pour l'hiver, ventilateur pour l'été : tout le monde est bien, quelle que soit la météo.",'Décoration':"Guirlandes, néon lumineux, spots LED et panneaux pour une ambiance chaleureuse et soignée.",'Jeux en bois':"Baby-foot, cornhole, palet breton, puissance 4 géant et passe-trappe pour occuper petits et grands."};
+  const DESC={'Photobooth et Vidéobooth':"Photobooth, cabines téléphoniques, livre d'or audio, panneau de bienvenue et néon : des souvenirs que vos invités garderont.",'Voitures de collection':"Une Citroën Traction ou une Ford Mustang pour vos photos, votre arrivée ou une belle mise en scène.",'Animations':"Karaoké, jeux, photobooth, pop-corn et châteaux gonflables : de quoi animer toute la soirée, des enfants aux plus grands.",'Son, lumière et vidéo':"Sonorisation, micros, jeux de lumières, boule à facettes et vidéoprojecteur pour une ambiance à la hauteur.",'Effets spéciaux et artifices':"Feux d'artifice de jour, fumée lourde, étincelles froides et machines à bulles pour les grands moments.",'Châteaux gonflables':"Du mini château aux grands châteaux avec toboggan, sans oublier la boîte de nuit gonflable : livrés et installés chez vous.",'Mobilier, réception et barnums':"Barnums, tentes étoile, buvette et mange-debout pour recevoir à l'abri, à l'extérieur comme à l'intérieur.",'Restauration':"Brasero, pop-corn, fontaine à cocktail, machine à glaçons et mange-debout pour régaler vos invités.",'Chauffage et ventilation':"Chauffage pour l'hiver, ventilateur pour l'été : tout le monde est bien, quelle que soit la météo.",'Décoration':"Panneau de bienvenue, panneau de direction, néon lumineux, guirlandes et spots LED : accueillez vos invités et soignez l'ambiance de votre événement.",'Jeux en bois':"Baby-foot, cornhole, palet breton, puissance 4 géant et passe-trappe pour occuper petits et grands."};
   const imgs={},cnt=[],rows=[];
   P.forEach(function(c,i){
     const n=PRODUCTS.filter(p=>CO(p).includes(c[0])).length;cnt[i]=n;
     const li=document.createElement('li');
-    li.innerHTML='<button type="button" data-i="'+i+'"><span class="cc-cat-name">'+c[0]+'</span><span class="cc-cat-meta"><small>'+n+'</small><svg class="cc-chevron" viewBox="0 0 8 14" aria-hidden="true"><path d="M1 1l6 6-6 6"/></svg></span></button>';
+    li.innerHTML='<button type="button" data-i="'+i+'"><span class="cc-cat-name">'+lib(c[0])+'</span><span class="cc-cat-meta"><small>'+n+'</small><svg class="cc-chevron" viewBox="0 0 8 14" aria-hidden="true"><path d="M1 1l6 6-6 6"/></svg></span></button>';
     ul.appendChild(li);rows[i]=li;
     const im=new Image();im.src=(window.VESPRA_IMG?window.VESPRA_IMG(c[1],900):c[1]);im.alt='';im.decoding='async';im.loading='eager';im.fetchPriority=i<1?'high':'low';im.dataset.categoryIndex=String(i);im.style.cursor='pointer';im.setAttribute('role','button');im.setAttribute('tabindex','0');im.setAttribute('aria-label','Afficher la catégorie '+c[0]);im.onerror=function(){this.style.display='none';};ph.insertBefore(im,ph.firstChild);imgs[i]=im;
   });
@@ -1222,7 +1225,7 @@ if(urlCat){
       const L=PRODUCTS.filter(p=>CO(p).includes(P[i][0])&&p.img).slice(0,4);
       t.innerHTML=L.map(p=>'<a href="'+(p.page||'catalogue.html')+'"><img src="'+p.img+'" alt="'+String(p.name).replace(/"/g,'&quot;')+'" loading="lazy" decoding="async" width="160" height="160"><b>'+p.name+'</b><small>'+(p.variants&&p.variants.length?'dès ':'')+p.price+' €</small></a>').join('');
       g.textContent='Voir les '+cnt[i]+' produit'+(cnt[i]>1?'s':'')+' →';g.onclick=function(){choisir(P[i][0],'push');};})();
-    lb.textContent=P[i][0];document.getElementById('ccCount').textContent=cnt[i]+' produit'+(cnt[i]>1?'s':'');
+    lb.textContent=lib(P[i][0]);document.getElementById('ccCount').textContent=cnt[i]+' produit'+(cnt[i]>1?'s':'');
     /* L'aperçu suit la catégorie sélectionnée : il est placé juste sous son titre. */
     if(window.matchMedia&&window.matchMedia('(max-width: 900px)').matches){
       const btn=rows[i].querySelector('button[data-i]');
