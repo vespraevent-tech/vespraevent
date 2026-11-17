@@ -195,6 +195,12 @@
   };
   async function ikCharger() {
     try { lignes = (await api('/data?collection=indemnites-km')) || []; if (!Array.isArray(lignes)) lignes = [];
+      /* le serveur range chaque valeur en texte : on remet les nombres, le booléen « électrique » et la liste des tronçons en forme */
+      lignes = lignes.map(function (x) {
+        var o = Object.assign({}, x); o.km = Number(x.km) || 0; o.elec = x.elec === true || x.elec === 'true';
+        if (typeof x.legs === 'string') { try { o.legs = JSON.parse(x.legs); } catch (e) { o.legs = null; } }
+        return o;
+      });
       lignes = lignes.filter(function (x) { return x && /^\d{4}-\d{2}-\d{2}/.test(String(x.date || '')) && Number(x.km) > 0 && x.id; }); charge = true; } catch (e) { lignes = []; }
     ikRendre();
   }

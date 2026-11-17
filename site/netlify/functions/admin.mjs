@@ -92,6 +92,8 @@ const LOGISTIQUE_FORM = 'logistique-admin';
    les relit ici et n'y touche que pour cocher un avoir comme déduit. */
 const PARRAIN_FORM = 'parrainage-admin';
 const NOTES_FORM = 'notes-frais-admin';
+/* indemnités kilométriques : un enregistrement par trajet */
+const IK_FORM = 'indemnites-km-admin';
 const ENTREPRISE_FORM = 'entreprise-admin';
 const ENTREPRISE_PRIVE_FORM = 'entreprise-prive-admin';
 /* Le formulaire public dans lequel arrivent les demandes de devis du site. */
@@ -136,7 +138,7 @@ async function getEffectiveCredentials() {
 const INTERNAL_FORMS = new Set([
   CATALOGUE_FORM, PRODUCT_FORM, BLOG_FORM, AVIS_FORM, THEME_FORM, TEXTE_FORM, GOOGLE_FORM,
   NOTICE_FORM, RESA_FORM, SUIVI_FORM, LOGISTIQUE_FORM, FICHIER_FORM, IMAGE_FORM,
-  MISEENPAGE_FORM, SALLE_FORM, PRESTA_FORM, PARRAIN_FORM, ENTREPRISE_FORM, ENTREPRISE_PRIVE_FORM, NOTES_FORM,
+  MISEENPAGE_FORM, SALLE_FORM, PRESTA_FORM, PARRAIN_FORM, ENTREPRISE_FORM, ENTREPRISE_PRIVE_FORM, NOTES_FORM, IK_FORM,
 ]);
 
 /* collection appelée par le back-office → formulaire Netlify correspondant */
@@ -158,6 +160,7 @@ const COLLECTIONS = {
   logistique: LOGISTIQUE_FORM,
   parrainage: PARRAIN_FORM,
   'notes-frais': NOTES_FORM,
+  'indemnites-km': IK_FORM,
   /* informations de l'entreprise : une part publique (affichée sur le site)
      et une part privée (RIB, conditions), jamais exposée au public */
   entreprise: ENTREPRISE_FORM,

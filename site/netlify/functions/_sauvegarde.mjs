@@ -17,7 +17,7 @@ import { getStore as getStoreBlobs } from './_blobs.mjs';
 export const DATA_STORE = 'vespra-admin-data';
 export const CLIENT_STORE = 'vespra-clients';
 export const SAUVEGARDE_STORE = 'vespra-sauvegardes';
-const COLLECTIONS_SAUVEGARDEES = ['reservations', 'suivi', 'logistique'];
+const COLLECTIONS_SAUVEGARDEES = ['reservations', 'suivi', 'logistique', 'indemnites-km'];
 const GARDER_AUTO = 60;
 const GARDER_MANUEL = 40;
 
