@@ -2745,6 +2745,21 @@ async function vbCharger(){
     a.style.display=msg?'block':'none'; a.textContent=msg;
     a.style.color=(msg&&d.cle&&et.contact&&!et.refus)?'#6b7280':'#b03a2a';
     if(!msg&&et.contact){ a.style.display='block'; a.style.color='#6b7280'; a.textContent='Dernier contact de la tablette : '+fh(et.contact)+'.'; }
+    /* état envoyé par la tablette toutes les 2 minutes */
+    if(!msg&&et.tablette&&et.tablette.detail){
+      const t=et.tablette.detail, age=Math.round((Date.now()-new Date(et.tablette.date))/60000), pb=[];
+      if(age>30) pb.push('plus de nouvelles depuis '+(age>=120?Math.round(age/60)+' h':age+' min'));
+      if(t.batt!=null&&t.batt<20&&!t.charge) pb.push('batterie faible, tablette pas en charge');
+      if(t.cam==='perdue'||t.cam==='absent') pb.push('caméra non détectée');
+      if(t.mic==='perdu'||t.mic==='absent') pb.push('micro non détecté');
+      if(t.quota&&t.usage/t.quota>0.85) pb.push('tablette presque pleine');
+      if(t.att>5) pb.push(t.att+' vidéos en attente d’envoi');
+      const infos=['en ligne il y a '+(age<1?'moins d’une minute':age+' min')];
+      if(t.batt!=null) infos.push('batterie '+t.batt+' %'+(t.charge?' (en charge)':''));
+      if(t.att!=null) infos.push(t.att+' vidéo'+(t.att>1?'s':'')+' en attente');
+      a.style.display='block'; a.style.color=pb.length?'#b03a2a':'#3d6e36';
+      a.textContent=(pb.length?'⚠ Tablette : '+pb.join(' · ')+' — ':'Tablette : ')+infos.join(' · ')+'.';
+    }
     try{ const al=await api('/videobooth/alerte'); VBALERTE=al.go||20; }catch(e){}
     vbRendre(); vbConfigCharger();
   }catch(e){ z.innerHTML='<div class="hint" style="color:#b03a2a">Chargement impossible : '+vbEsc(e.message)+'</div>'; }
@@ -2806,7 +2821,7 @@ function vbRendre(){
   l.map(v=>{const d=new Date(v.cree);const ok=v.mail==='envoye';const j=Math.max(0,(Number(v.garde)||0)-Math.floor((Date.now()-d)/86400000));
     const btn='class="btn btn-ghost" style="text-decoration:none;padding:7px 12px;font-size:13px"';
     return '<div style="background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:14px 16px">'+
-      '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><b style="font-size:15px">'+vbEsc(v.prenom)+' '+vbEsc(v.nom)+'</b>'+
+      '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><b style="font-size:15px">'+vbEsc(v.prenom)+' '+vbEsc(v.nom)+'</b>'+(v.son!=null&&v.son<3?'<span style="color:#b03a2a;font-size:12.5px;font-weight:700">⚠ son très faible</span>':'')+
       '<span style="color:'+(ok?'#3d6e36':'#b03a2a')+';font-weight:600;font-size:13px">'+(ok?'E-mail envoyé'+(v.pj?' (vidéo jointe)':' (lien)'):(v.mail==='attente'?'E-mail en cours d’envoi':'E-mail non parti'+(v.mailErreur?' — '+vbEsc(v.mailErreur):'')))+'</span></div>'+
       '<div style="color:#4a5565;font-size:13.5px;margin-top:2px;word-break:break-all">'+vbEsc(v.email)+'</div>'+
       '<div style="color:#8a8f98;font-size:12.5px;margin-top:2px">'+d.toLocaleDateString('fr-FR')+' à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+' · '+mo(v.octets||0)+' · '+(Number(v.garde)>0?'supprimée du site dans '+j+' j':'conservée jusqu’à votre suppression')+'</div>'+

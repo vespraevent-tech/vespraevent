@@ -61,6 +61,7 @@
     for (var i = 0; i < l.length; i++) { try { if (window.MediaRecorder && MediaRecorder.isTypeSupported(l[i])) return l[i]; } catch (e) {} }
     return '';
   }
+  var sonNiveau = 100;
   var cv = $('v-live'), cx = cv.getContext('2d'), boucle = 0;
   /* Rendu toujours VERTICAL (3:4) : l'image de la caméra est recadrée sur un canvas, et c'est ce canvas qui est filmé. */
   /* format de la vidéo : automatique = suit l'orientation de la tablette (vertical 9:16, horizontal 16:9) */
@@ -87,18 +88,56 @@
       if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
       var sc = Math.max(W / vw, H / vh), sw = W / sc, sh = H / sc;
       cx.drawImage(v, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, W, H);
+      /* image figée plus de 5 s alors que la caméra est ouverte : la caméra a décroché */
+      if (v.currentTime !== derniereImage) { derniereImage = v.currentTime; tFige = Date.now(); } else if (tFige && Date.now() - tFige > 5000) { tFige = 0; perteCapteur('cam'); }
     }
+    if (Date.now() - tNiveau > 120) { tNiveau = Date.now(); suivreNiveau(); }
     boucle = requestAnimationFrame(dessiner);
   }
-  function arreterCam() { if (boucle) { cancelAnimationFrame(boucle); boucle = 0; } if (flux) { flux.getTracks().forEach(function (t) { t.stop(); }); flux = null; } $('v-src').srcObject = null; }
+  /* ── surveillance du micro et de la caméra ──
+     niveau du micro (jauge + détection d'un enregistrement silencieux), perte de la caméra ou du micro, image figée */
+  var audioCtx = null, analyseur = null, niveau = 0, niveauMax = 0, tNiveau = 0, camEtat = 'inconnu', micEtat = 'inconnu', derniereImage = 0, tFige = 0;
+  function brancherMicro(s) {
+    try {
+      var a = s.getAudioTracks()[0]; if (!a) { micEtat = 'absent'; return; }
+      var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+      if (!audioCtx) audioCtx = new AC(); if (audioCtx.state === 'suspended') audioCtx.resume().catch(function () {});
+      analyseur = audioCtx.createAnalyser(); analyseur.fftSize = 512; audioCtx.createMediaStreamSource(new MediaStream([a])).connect(analyseur);
+      micEtat = 'ok'; niveauMax = 0;
+    } catch (e) {}
+  }
+  function lireNiveau() {
+    if (!analyseur) return 0;
+    var d = new Uint8Array(analyseur.fftSize); analyseur.getByteTimeDomainData(d); var m = 0;
+    for (var i = 0; i < d.length; i++) { var v = Math.abs(d[i] - 128) / 128; if (v > m) m = v; }
+    return m;
+  }
+  function suivreNiveau() {
+    var n = lireNiveau(); niveau = n; if (enregistrement && n > niveauMax) niveauMax = n;
+    var b = $('mic-i'); if (b) b.style.width = Math.min(100, Math.round(n * 220)) + '%';
+  }
+  function perteCapteur(quoi) {
+    if (quoi === 'cam') camEtat = 'perdue'; else micEtat = 'perdu';
+    if (enregistrement) { arreterRec(); return; }
+    if ($('s-cam').classList.contains('on')) {
+      $('cam-err').textContent = quoi === 'cam' ? 'La caméra ne répond plus : nouvelle tentative…' : 'Le micro ne répond plus : nouvelle tentative…'; $('cam-err').hidden = false;
+      setTimeout(function () { if ($('s-cam').classList.contains('on') && !enregistrement) ouvrirCam(); }, 1500);
+    }
+  }
+  function arreterCam() {
+    analyseur = null; $('mic').hidden = true; if (boucle) { cancelAnimationFrame(boucle); boucle = 0; } if (flux) { flux.getTracks().forEach(function (t) { t.stop(); }); flux = null; } $('v-src').srcObject = null; }
   function ouvrirCam() {
     montrer('s-cam'); $('s-cam').classList.remove('flou'); $('cam-err').hidden = true; $('compte').hidden = true; $('rec').hidden = true; $('barre').hidden = true;
     $('b-go').hidden = true; $('b-stop').hidden = true; $('fmt').hidden = true; enregistrement = false;
-    var contraintes = { audio: Object.assign({ echoCancellation: true, noiseSuppression: true }, cfg.mic ? { deviceId: { exact: cfg.mic } } : {}), video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, { width: { ideal: 1920 }, height: { ideal: 1080 } }) };
+    var contraintes = { audio: Object.assign({ echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1, sampleRate: 48000 }, cfg.mic ? { deviceId: { exact: cfg.mic } } : {}), video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, { width: { ideal: 1920 }, height: { ideal: 1080 } }) };
     arreterCam();
     navigator.mediaDevices.getUserMedia(contraintes).then(function (s) {
       flux = s; $('b-go').hidden = false; $('fmt').hidden = !(cfg.choixFormat !== false) || testCam; majFormat(); $('cadrage').textContent = cfg.cadrage || ''; $('cadrage').hidden = !cfg.cadrage; $('v-src').srcObject = s; $('v-src').play().catch(function () {}); boucle = requestAnimationFrame(dessiner);
       grandAngle(s);
+      camEtat = 'ok'; tFige = Date.now(); brancherMicro(s); $('mic').hidden = false;
+      s.getVideoTracks().forEach(function (t) { t.onended = function () { perteCapteur('cam'); }; });
+      s.getAudioTracks().forEach(function (t) { t.onended = function () { perteCapteur('mic'); }; });
+      if (!s.getAudioTracks().length) { $('cam-err').textContent = 'Aucun micro détecté sur cette tablette : le son ne sera pas enregistré.'; $('cam-err').hidden = false; }
       if (testCam) infoCamera(s);
     }).catch(function (e) {
       $('cam-err').textContent = 'Impossible d’accéder à la caméra ou au micro. Autorisez-les dans les réglages de la tablette, puis réessayez.'; $('cam-err').hidden = false; $('b-go').hidden = true;
@@ -143,14 +182,16 @@
   /* qualité choisie sur la session : haute 3,5 Mbit/s, standard 2,5, économique 1,8 (vidéos plus légères, moins de stockage et de données mobiles) */
   function debitVideo() { return { eco: 1800000, haute: 3500000 }[cfg.qualite] || 2500000; }
   function demarrer() {
-    morceaux = []; blobFinal = null; mime = meilleurMime();
+    morceaux = []; blobFinal = null; mime = meilleurMime(); niveauMax = 0;
     var flot = new MediaStream(cv.captureStream(30).getVideoTracks().concat(flux.getAudioTracks()));
-    try { rec = mime ? new MediaRecorder(flot, { mimeType: mime, videoBitsPerSecond: debitVideo() }) : new MediaRecorder(flot); } catch (e) { rec = new MediaRecorder(flot); }
+    try { rec = mime ? new MediaRecorder(flot, { mimeType: mime, videoBitsPerSecond: debitVideo(), audioBitsPerSecond: 128000 }) : new MediaRecorder(flot); } catch (e) { rec = new MediaRecorder(flot); }
     mime = rec.mimeType || mime || 'video/webm';
     rec.ondataavailable = function (e) { if (e.data && e.data.size) morceaux.push(e.data); };
     rec.onstop = function () {
       enregistrement = false; clearInterval(minuteur);
       blobFinal = new Blob(morceaux, { type: mime.split(';')[0] });
+      sonNiveau = Math.round(niveauMax * 100); var faible = sonNiveau < 3;
+      $('son-alerte').hidden = !faible; $('son-alerte').textContent = faible ? 'Le micro n’a presque rien capté. Parlez plus près de la tablette, ou recommencez.' : '';
       arreterCam(); $('v-revoir').src = URL.createObjectURL(blobFinal); montrer('s-revoir'); $('v-revoir').play().catch(function () {});
     };
     rec.start(1000); enregistrement = true; t0 = Date.now();
@@ -184,7 +225,7 @@ $('b-stop').onclick = arreterRec;
     if (!blobFinal || !invite) return;
     $('b-fin').disabled = true;
     var v = { id: 'v' + Date.now() + Math.random().toString(36).slice(2, 7), event: cfg.event, nom: invite.nom, prenom: invite.prenom, email: invite.email, consent: true,
-      fichier: nomFichier(), type: blobFinal.type, duree: Math.round((Date.now() - t0) / 1000), cree: new Date().toISOString(), essais: 0, blob: blobFinal };
+      son: sonNiveau, fichier: nomFichier(), type: blobFinal.type, duree: Math.round((Date.now() - t0) / 1000), cree: new Date().toISOString(), essais: 0, blob: blobFinal };
     ajouter(v).catch(function () { return liberer(true).then(function () { return ajouter(v); }); }).then(function () {
       try { URL.revokeObjectURL($('v-revoir').src); } catch (e) {} blobFinal = null; invite = null; $('b-fin').disabled = false;
       montrer('s-merci'); synchro(); setTimeout(function () { accueil(); }, 7000);
@@ -226,7 +267,7 @@ $('b-stop').onclick = arreterRec;
     var base = (cfg.serveur || location.origin).replace(/\/+$/, '');
     var n = Math.max(1, Math.ceil(v.blob.size / TAILLE)), i = 0, dernier = {};
     function suite() {
-      var q = new URLSearchParams({ id: v.id, i: i, n: n, fichier: v.fichier, type: v.type || '', nom: v.nom, prenom: v.prenom, email: v.email, event: v.event || '', duree: v.duree || 0 });
+      var q = new URLSearchParams({ id: v.id, i: i, n: n, fichier: v.fichier, type: v.type || '', nom: v.nom, prenom: v.prenom, email: v.email, event: v.event || '', duree: v.duree || 0, son: (v.son == null ? '' : v.son) });
       return fetch(base + '/api/videobooth/chunk?' + q.toString(), { method: 'POST', headers: { 'x-appareil': (cfg.jeton || cfg.cle), 'content-type': 'application/octet-stream' }, body: v.blob.slice(i * TAILLE, (i + 1) * TAILLE) }).then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (j) {
           if (!r.ok || j.ok === false) throw new Error(j.erreur || ('Serveur : ' + r.status));
@@ -250,6 +291,20 @@ $('b-stop').onclick = arreterRec;
       return suite;
     }).then(function () { envoiEnCours = false; return liberer(false); }).then(function () { majEtat(); }, function () { envoiEnCours = false; });
   }
+  /* ── état de la tablette, envoyé toutes les 2 minutes au back-office (batterie, vidéos en attente, caméra, micro, place) ── */
+  function battement() {
+    if (!(cfg.jeton || cfg.cle)) return;
+    var etat = { cam: camEtat, mic: micEtat, ver: 23, enreg: !!enregistrement };
+    var fin = function () {
+      toutes().then(function (l) { etat.att = l.filter(function (v) { return !v.envoye; }).length; etat.tot = l.length; }).catch(function () {}).then(function () {
+        return (navigator.storage && navigator.storage.estimate) ? navigator.storage.estimate().then(function (e) { etat.usage = e.usage || 0; etat.quota = e.quota || 0; }).catch(function () {}) : null;
+      }).then(function () {
+        return fetch(baseApi() + '/api/videobooth/etat', { method: 'POST', headers: { 'x-appareil': (cfg.jeton || cfg.cle), 'content-type': 'application/json' }, body: JSON.stringify(etat) }).catch(function () {});
+      });
+    };
+    if (navigator.getBattery) navigator.getBattery().then(function (b) { etat.batt = Math.round(b.level * 100); etat.charge = !!b.charging; fin(); }).catch(fin); else fin();
+  }
+  setInterval(battement, 120000); setTimeout(battement, 8000);
   setInterval(synchro, 20000); window.addEventListener('online', synchro);
   setTimeout(function () { liberer(false).then(majEtat); }, 4000);
 

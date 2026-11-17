@@ -2420,7 +2420,7 @@ const gestionnaire = async (request) => {
         const liste = await vbLireMetas(st);
         liste.sort((a, b) => String(b.cree).localeCompare(String(a.cree)));
         const etat = {};
-        for (const k of ['contact', 'refus']) etat[k] = await st.get('etat/' + k, { type: 'json' }).catch(() => null);
+        for (const k of ['contact', 'refus', 'tablette']) etat[k] = await st.get('etat/' + k, { type: 'json' }).catch(() => null);
         return json({ videos: liste, cle: !!process.env.VIDEOBOOTH_CLE, etat });
       }
       if (request.method === 'POST') {

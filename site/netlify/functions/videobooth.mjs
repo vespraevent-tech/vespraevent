@@ -173,6 +173,16 @@ export default async (request) => {
     return rep({ ok: true, resend: !!process.env.RESEND_API_KEY });
   }
 
+  /* ── état de la tablette (batterie, vidéos en attente, caméra, micro) : affiché dans le back-office ── */
+  if (request.method === 'POST' && /\/api\/videobooth\/etat$/.test(url.pathname)) {
+    if (!cle || (request.headers.get('x-appareil') !== cle && !lireJeton(request.headers.get('x-appareil'), 'session'))) return rep({ ok: false }, 403);
+    let d = {}; try { d = await request.json(); } catch {}
+    const n = (x, a, b) => Math.min(b, Math.max(a, Math.round(Number(x) || 0)));
+    const mot = (x) => String(x || '').replace(/[^a-z]/g, '').slice(0, 12);
+    await noter('tablette', { batt: d.batt == null ? null : n(d.batt, 0, 100), charge: !!d.charge, att: n(d.att, 0, 100000), tot: n(d.tot, 0, 100000), usage: n(d.usage, 0, 1e13), quota: n(d.quota, 0, 1e13), cam: mot(d.cam), mic: mot(d.mic), ver: n(d.ver, 0, 9999), enreg: !!d.enreg });
+    return rep({ ok: true });
+  }
+
   /* ── page de partage d'un événement : toutes les vidéos, pour les mariés / organisateurs ── */
   if ((request.method === 'GET' || request.method === 'POST') && /\/api\/videobooth\/evenement$/.test(url.pathname)) {
     const label = String(url.searchParams.get('e') || '');
@@ -297,7 +307,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
     const m = {
       id, event: String(q.get('event') || '').slice(0, 160), nom: String(q.get('nom') || '').slice(0, 80), prenom: String(q.get('prenom') || '').slice(0, 80), email,
       fichier: String(q.get('fichier') || 'video.mp4').replace(/[\\/:*?"<>|\r\n]+/g, ' ').trim().slice(0, 150) || 'video.mp4',
-      type: String(q.get('type') || 'video/mp4').slice(0, 40), duree: Number(q.get('duree')) || 0, octets: total, cree: new Date().toISOString(),
+      type: String(q.get('type') || 'video/mp4').slice(0, 40), duree: Number(q.get('duree')) || 0, son: q.get('son') === '' || q.get('son') == null ? null : Math.min(100, Math.max(0, Math.round(Number(q.get('son')) || 0))), octets: total, cree: new Date().toISOString(),
     };
     /* durée de conservation propre à la session de cette vidéo */
     try { const ses = (await sessionsLire(st)).find((e) => labelSession(e) === m.event); if (ses) m.garde = ses.conserv || 0; } catch {}
