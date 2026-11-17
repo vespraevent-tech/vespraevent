@@ -741,8 +741,6 @@ html body.cat-in #filtersBar.filters,html body.cat-choose #catCrumb{display:none
 .cat-crumb #crumbCurrent{color:#0c0f14;font-weight:600}
 @media(max-width:1024px){.cat-crumb{padding:20px 40px 12px}}
 @media(max-width:760px){.cat-crumb{padding:20px 20px 12px;font-size:min(12px,3.05vw)}}
-.prod-grid.vc-fondu{animation:vcFondu .26s ease}
-@keyframes vcFondu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 /* « Voir tout » et recherche : barre de filtres plus nette */
 .cc-back-s{border:0!important;background:none!important;box-shadow:none!important;height:auto!important;padding:2px 0!important;border-radius:0!important;color:var(--navy,#2b4a6b)!important;font:600 14px 'Inter',sans-serif!important}
 .filter-search-in{border-radius:8px}
@@ -1277,28 +1275,30 @@ if(urlCat){
     /* on arrive sur le fil d'Ariane (juste sous l'en-tête) : on comprend qu'on est en haut de la catégorie, et le premier produit suit */
     const c=document.getElementById('catCrumb');const ref=(c&&c.offsetParent!==null)?c:(document.querySelector('#prodGrid .prod-card')||document.getElementById('prodGrid'));if(!ref)return;
     const n=document.querySelector('.nav');const h=n?Math.round(n.getBoundingClientRect().height):64;
-    window.scrollTo({top:Math.max(0,ref.getBoundingClientRect().top+scrollY-h-6),behavior:'smooth'});
+    window.scrollTo({top:Math.max(0,ref.getBoundingClientRect().top+scrollY-h-6),behavior:'instant'});
   }
   /* au retour sur le choix des catégories, on retrouve l'endroit où l'on avait cliqué (pas le haut de la page) */
-  function memoriserChoix(){try{sessionStorage.setItem('vespra_cat_y',String(Math.round(window.scrollY)));}catch(e){}}
-  function restaurerChoix(){
-    let y=NaN;try{y=Number(sessionStorage.getItem('vespra_cat_y'));}catch(e){}
-    if(!isFinite(y)||y<0)return;
-    requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'instant'})));
+  function memoriserChoix(v){
+    try{
+      const i=P.findIndex(c=>c[0]===v),li=i>=0?rows[i]:null;
+      sessionStorage.setItem('vespra_cat_y',JSON.stringify({y:Math.round(window.scrollY),i:i,top:li?Math.round(li.getBoundingClientRect().top):null}));
+    }catch(e){}
   }
-  /* un clic sur une catégorie un peu trop basse : la page remonte doucement pour la montrer, sans sauter */
-  function ajusterVue(el){
-    if(!el)return;
-    const n=document.querySelector('.nav'),h=n?Math.round(n.getBoundingClientRect().height):64;
-    const r=el.getBoundingClientRect(),vh=window.innerHeight||800;
-    if(r.bottom>vh*0.82||r.top<h+8){window.scrollTo({top:Math.max(0,window.scrollY+r.top-Math.round(vh*0.30)),behavior:'smooth'});}
+  /* on remet la catégorie cliquée à la même hauteur d'écran qu'au moment du clic (même si l'aperçu a décalé la page) */
+  function restaurerChoix(){
+    let o=null;try{o=JSON.parse(sessionStorage.getItem('vespra_cat_y'));}catch(e){}
+    if(!o)return;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      if(o.i>=0&&rows[o.i]&&o.top!=null){const d=rows[o.i].getBoundingClientRect().top-o.top;window.scrollTo({top:Math.max(0,window.scrollY+d),behavior:'instant'});}
+      else if(isFinite(o.y))window.scrollTo({top:o.y,behavior:'instant'});
+    }));
   }
   try{history.scrollRestoration='manual';}catch(e){}
   /* arrivée sur la page (lien depuis une autre page, retour arrière) : aucun défilement forcé, on reste où le navigateur nous met */
 
   let selectedIndex=-1,armedIndex=-1;
   function choisir(v,mode){
-    if(mode==='push'&&document.body.classList.contains('cat-choose'))memoriserChoix();
+    if(mode==='push'&&document.body.classList.contains('cat-choose'))memoriserChoix(v);
     document.getElementById('filterSelect').value=v;
     document.body.classList.remove('cat-choose');
     updateCrumb(v==='Tous'?'':v);
@@ -1307,14 +1307,14 @@ if(urlCat){
     /* entrée dans une catégorie depuis le choix : nouvelle étape d'historique, pour que « retour » revienne au choix des catégories */
     try{const u='catalogue.html?cat='+(v==='Tous'?'tout':encodeURIComponent(v));if(mode==='push')history.pushState(null,'',u);else if(mode!=='none')history.replaceState(null,'',u);}catch(e){}
     /* entrer dans une catégorie : on arrive en haut de la page (l'aperçu au premier clic, lui, ne fait jamais défiler) */
-    if(mode==='push'){const g=document.getElementById('prodGrid');if(g){g.classList.remove('vc-fondu');void g.offsetWidth;g.classList.add('vc-fondu');}allerPremierProduit();}
+    if(mode==='push')allerPremierProduit();
   }
   ul.addEventListener('click',function(e){
     const b=e.target.closest('button[data-i]');if(!b)return;
     const i=+b.dataset.i;
     /* 1er clic = aperçu de la photo, 2e clic sur la même catégorie = entrer (souris comme tactile) */
     if(armedIndex===i){choisir(P[i][0],'push');return;}
-    selectedIndex=i;armedIndex=i;show(i);setTimeout(()=>ajusterVue(rows[i]),70);
+    selectedIndex=i;armedIndex=i;show(i);
   });
   /* ── recherche au-dessus du choix des catégories : suggestions en direct, et page de résultats sur tout le catalogue ── */
   (function(){
