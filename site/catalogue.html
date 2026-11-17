@@ -732,6 +732,22 @@ transform:none!important;stroke-dashoffset:0!important}}
 
 
 
+<style id="filtres-mobile">
+/* filtres sur téléphone : un lien « Catégories », la recherche pleine largeur, puis deux listes fines côte à côte */
+@media(max-width:700px){
+  html body #filtersBar.filters{display:grid!important;grid-template-columns:1.8fr 1fr!important;gap:8px;padding:14px 16px 16px!important;align-items:stretch;justify-content:stretch;border-bottom:1px solid #e8ebf0}
+  .cc-back-row{grid-column:1/-1;order:0;flex:none;margin:0 0 -2px}
+  .cc-back-s{border:0!important;background:none!important;box-shadow:none!important;height:auto!important;padding:2px 0!important;border-radius:0!important;color:var(--navy,#2b4a6b)!important;font:600 14px 'Inter',sans-serif!important}
+  .filter-search{grid-column:1/-1;order:1!important;max-width:none;flex:none;min-width:0}
+  .filter-search-in{height:46px;padding-top:0;padding-bottom:0;border:1px solid #d3d9e3;border-radius:8px;font-size:15px}
+  .filters .sj-wrap{order:2!important;min-width:0}
+  .filters .sj-btn{height:44px;padding:0 10px!important;gap:6px!important;border:1px solid #d3d9e3!important;border-radius:8px!important;box-shadow:none!important;background-color:#fff;font:600 12.5px 'Inter',sans-serif!important;text-align:left}
+  .filters .sj-btn[aria-expanded=true],.filters .sj-btn:focus-visible{border-color:var(--navy,#2b4a6b)!important;box-shadow:0 0 0 3px rgba(43,74,107,.12)!important}
+  .filters .sj-list{border-radius:8px}
+  .filter-select{order:2!important;width:100%;min-width:0!important;max-width:100%;height:44px;padding:0 28px 0 12px!important;border:1px solid #d3d9e3!important;border-radius:8px!important;box-shadow:none!important;background-color:#fff;font:600 13px 'Inter',sans-serif;text-align:left!important;text-align-last:left!important;text-overflow:ellipsis}
+  .filter-select:focus{border-color:var(--navy,#2b4a6b)!important;box-shadow:0 0 0 3px rgba(43,74,107,.12)!important}
+}
+</style>
 <div class="filters" id="filtersBar">
   <div class="cc-back-row"><button type="button" class="cc-back-s" onclick="vespraChoixCategories()"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 2L3.5 6l4 4"/></svg>Catégories</button></div>
   <div class="filter-search">
