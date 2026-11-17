@@ -194,3 +194,8 @@ html,body,#app{height:100dvh}
 #pin-in,#acces-in,#sm-in{font-size:24px}
 #pin-in{width:min(260px,70vw);letter-spacing:.35em}
 #s-acces form,#s-sess-mdp form{width:min(300px,86vw)!important;gap:10px!important}
+
+.pour{display:flex;gap:8px;margin:2px 0}
+.pour button{flex:1;border:2px solid rgba(255,255,255,.35);background:transparent;color:#fff;border-radius:12px;padding:10px 12px;font:600 15px Inter,sans-serif;cursor:pointer;transition:background .15s,border-color .15s}
+.pour button.on{background:rgba(245,158,11,.18);border-color:var(--or)}
+.aide-mail{margin:-2px 0 0;font-size:13px;color:#cdd8e6;line-height:1.35}

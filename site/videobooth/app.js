@@ -37,20 +37,35 @@
   function accueil(garder) {
     $('t-accueil').textContent = cfg.titre || CFG0.titre; $('p-accueil').textContent = cfg.sous || '';
     $('t-qui').textContent = cfg.qui || 'Qui êtes-vous ?'; $('p-qui').textContent = cfg.quiSous == null ? 'Pour vous envoyer votre vidéo par e-mail' : cfg.quiSous;
-    if (!garder) { $('form').reset(); formatInvite = null; majFormat(); } $('f-err').textContent = ''; montrer('s-accueil'); majEtat();
+    if (!garder) { $('form').reset(); formatInvite = null; majFormat(); choisirPour('moi'); } $('f-err').textContent = ''; montrer('s-accueil'); majEtat();
   }
   function fmt(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
 
   /* ───────── formulaire ───────── */
   $('b-commencer').onclick = function () { montrer('s-form'); setTimeout(function () { $('f-nom').focus(); }, 80); };
   $('f-retour').onclick = function () { accueil(); };
+  /* envoyer la vidéo à soi-même ou à quelqu'un d'autre */
+  var pour = 'moi';
+  var CONSENT_MOI = 'J’accepte que Vespra Event conserve ma vidéo et mon adresse e-mail pour m’envoyer ma vidéo et la remettre aux organisateurs de l’événement. Elles sont supprimées peu après la fin de l’événement. Mes données ne sont pas utilisées autrement.';
+  var CONSENT_AUTRE = 'J’accepte que Vespra Event conserve ma vidéo et l’adresse e-mail indiquée pour y envoyer ma vidéo, et la remettre aux organisateurs de l’événement. Cette personne ne recevra que ce message. Elles sont supprimées peu après la fin de l’événement.';
+  function choisirPour(p) {
+    pour = p;
+    Array.prototype.forEach.call(document.querySelectorAll('.pour button'), function (b) { var on = b.dataset.p === p; b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false'); });
+    $('l-dest').hidden = p !== 'autre'; $('f-aide').hidden = p !== 'autre';
+    $('t-email').textContent = p === 'autre' ? 'Adresse e-mail de cette personne' : 'Votre adresse e-mail';
+    $('f-ok-txt').textContent = p === 'autre' ? CONSENT_AUTRE : CONSENT_MOI;
+    $('f-err').textContent = '';
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.pour button'), function (b) { b.onclick = function () { choisirPour(b.dataset.p); }; });
   $('form').onsubmit = function (e) {
     e.preventDefault();
     var p = $('f-prenom').value.trim(), n = $('f-nom').value.trim(), m = $('f-email').value.trim();
     if (!p || !n) return ($('f-err').textContent = 'Merci d’indiquer votre prénom et votre nom.');
+    var dp = $('f-dest').value.trim();
+    if (pour === 'autre' && !dp) return ($('f-err').textContent = 'Merci d’indiquer le prénom de la personne.');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(m)) return ($('f-err').textContent = 'Cette adresse e-mail ne semble pas valide.');
     if (!$('f-ok').checked) return ($('f-err').textContent = 'Merci de cocher la case pour recevoir votre vidéo.');
-    $('f-err').textContent = ''; invite = { prenom: p, nom: n, email: m }; ouvrirCam();
+    $('f-err').textContent = ''; invite = { prenom: p, nom: n, email: m, pour: pour, dest: pour === 'autre' ? dp : '' }; ouvrirCam();
   };
   var invite = null;
 
@@ -232,9 +247,10 @@ $('b-stop').onclick = arreterRec;
     if (!blobFinal || !invite) return;
     $('b-fin').disabled = true;
     var v = { id: 'v' + Date.now() + Math.random().toString(36).slice(2, 7), event: cfg.event, nom: invite.nom, prenom: invite.prenom, email: invite.email, consent: true,
-      son: sonNiveau, fichier: nomFichier(), type: blobFinal.type, duree: Math.round((Date.now() - t0) / 1000), cree: new Date().toISOString(), essais: 0, blob: blobFinal };
+      son: sonNiveau, pour: invite.pour || 'moi', dest: invite.dest || '', fichier: nomFichier(), type: blobFinal.type, duree: Math.round((Date.now() - t0) / 1000), cree: new Date().toISOString(), essais: 0, blob: blobFinal };
     ajouter(v).then(function () {
       try { URL.revokeObjectURL($('v-revoir').src); } catch (e) {} blobFinal = null; invite = null; $('b-fin').disabled = false;
+      $('m-txt').textContent = v.pour === 'autre' ? 'Votre vidéo sera envoyée à ' + v.dest + ' par e-mail.' : 'Votre vidéo vous sera envoyée par e-mail.';
       montrer('s-merci'); synchro(); setTimeout(function () { accueil(); }, 7000);
     }).catch(function () { $('b-fin').disabled = false; alert('La vidéo n’a pas pu être enregistrée : la mémoire de la tablette est pleine. Prévenez l’équipe.'); });
   };
@@ -258,7 +274,7 @@ $('b-stop').onclick = arreterRec;
     var base = (cfg.serveur || location.origin).replace(/\/+$/, '');
     var n = Math.max(1, Math.ceil(v.blob.size / TAILLE)), i = 0, dernier = {};
     function suite() {
-      var q = new URLSearchParams({ id: v.id, i: i, n: n, fichier: v.fichier, type: v.type || '', nom: v.nom, prenom: v.prenom, email: v.email, event: v.event || '', duree: v.duree || 0, son: (v.son == null ? '' : v.son) });
+      var q = new URLSearchParams({ id: v.id, i: i, n: n, fichier: v.fichier, type: v.type || '', nom: v.nom, prenom: v.prenom, email: v.email, event: v.event || '', duree: v.duree || 0, son: (v.son == null ? '' : v.son), pour: v.pour || 'moi', dest: v.dest || '' });
       return fetch(base + '/api/videobooth/chunk?' + q.toString(), { method: 'POST', headers: { 'x-appareil': (cfg.jeton || cfg.cle), 'content-type': 'application/octet-stream' }, body: v.blob.slice(i * TAILLE, (i + 1) * TAILLE) }).then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (j) {
           if (!r.ok || j.ok === false) throw new Error(j.erreur || ('Serveur : ' + r.status));

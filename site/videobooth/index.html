@@ -12,7 +12,7 @@
 <link rel="icon" type="image/png" sizes="48x48" href="/videobooth/icones/favicon-48.png?v=3">
 <link rel="apple-touch-icon" href="/videobooth/icones/apple-touch-icon.png">
 <link rel="stylesheet" href="/polices.css?v=1">
-<link rel="stylesheet" href="app.css?v=27">
+<link rel="stylesheet" href="app.css?v=28">
 </head>
 <body>
 <main id="app">
@@ -32,8 +32,11 @@
     <form id="form" autocomplete="off" novalidate>
       <label>Nom<input id="f-nom" type="text" inputmode="text" autocapitalize="words" required></label>
       <label>Prénom<input id="f-prenom" type="text" inputmode="text" autocapitalize="words" required></label>
-      <label>Adresse e-mail<input id="f-email" type="email" inputmode="email" autocomplete="off" autocapitalize="none" required></label>
-      <label class="coche"><input id="f-ok" type="checkbox"><span>J’accepte que Vespra Event conserve ma vidéo et mon adresse e-mail pour m’envoyer ma vidéo et la remettre aux organisateurs de l’événement. Elles sont supprimées peu après la fin de l’événement. Mes données ne sont pas utilisées autrement.</span></label>
+      <div class="pour" role="radiogroup" aria-label="À qui envoyer la vidéo ?"><button type="button" role="radio" aria-checked="true" data-p="moi" class="on">Je reçois ma vidéo</button><button type="button" role="radio" aria-checked="false" data-p="autre">Je l’envoie à quelqu’un</button></div>
+      <label id="l-dest" hidden>Prénom de la personne<input id="f-dest" type="text" inputmode="text" autocapitalize="words"></label>
+      <label><span id="t-email">Votre adresse e-mail</span><input id="f-email" type="email" inputmode="email" autocomplete="off" autocapitalize="none" required></label>
+      <p id="f-aide" class="petit aide-mail" hidden>Vous ne connaissez pas son adresse e-mail ? Choisissez « Je reçois ma vidéo » : vous pourrez la lui transférer plus tard.</p>
+      <label class="coche"><input id="f-ok" type="checkbox"><span id="f-ok-txt">J’accepte que Vespra Event conserve ma vidéo et mon adresse e-mail pour m’envoyer ma vidéo et la remettre aux organisateurs de l’événement. Elles sont supprimées peu après la fin de l’événement. Mes données ne sont pas utilisées autrement.</span></label>
       <div id="f-err" class="err" role="alert"></div>
       <div class="rang"><button id="f-retour" class="sec" type="button">Retour</button><button class="gros" type="submit">Continuer</button></div>
     </form>
@@ -66,7 +69,7 @@
     <div class="noel noel-haut" aria-hidden="true"></div><div class="noel noel-bas" aria-hidden="true"></div>
     <div class="coche-ok">✓</div>
     <h2>Merci !</h2>
-    <p>Votre vidéo vous sera envoyée par e-mail.</p>
+    <p id="m-txt">Votre vidéo vous sera envoyée par e-mail.</p>
     <p class="petit">L’envoi peut prendre quelques minutes selon la taille de la vidéo. Pensez à vérifier vos courriers indésirables.</p>
   </section>
 
@@ -142,6 +145,6 @@
     <div class="rang"><button id="pin-x" class="sec" type="button">Annuler</button><button id="pin-ok" class="gros" type="button">Valider</button></div>
   </section>
 </main>
-<script src="app.js?v=28"></script>
+<script src="app.js?v=29"></script>
 </body>
 </html>

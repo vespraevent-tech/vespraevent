@@ -2833,9 +2833,9 @@ function vbRendre(){
   l.map(v=>{const d=new Date(v.cree);const ok=v.mail==='envoye';const j=Math.max(0,(Number(v.garde)||0)-Math.floor((Date.now()-d)/86400000));
     const btn='class="btn btn-ghost" style="text-decoration:none;padding:7px 12px;font-size:13px"';
     return '<div style="background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:14px 16px">'+
-      '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><b style="font-size:15px">'+vbEsc(v.prenom)+' '+vbEsc(v.nom)+'</b>'+(v.son!=null&&v.son<3?'<span style="color:#b03a2a;font-size:12.5px;font-weight:700">⚠ son très faible</span>':'')+
+      '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><b style="font-size:15px">'+vbEsc(v.prenom)+' '+vbEsc(v.nom)+(v.pour==='autre'?' <span style="font-weight:500;color:#6b7280">→ pour '+vbEsc(v.dest||'une autre personne')+'</span>':'')+'</b>'+(v.son!=null&&v.son<3?'<span style="color:#b03a2a;font-size:12.5px;font-weight:700">⚠ son très faible</span>':'')+
       '<span style="color:'+(ok?'#3d6e36':'#b03a2a')+';font-weight:600;font-size:13px">'+(ok?'E-mail envoyé'+(v.pj?' (vidéo jointe)':' (lien)'):(v.mail==='attente'?'E-mail en cours d’envoi':'E-mail non parti'+(v.mailErreur?' — '+vbEsc(v.mailErreur):'')))+'</span></div>'+
-      '<div style="color:#4a5565;font-size:13.5px;margin-top:2px;word-break:break-all">'+vbEsc(v.email)+'</div>'+
+      '<div style="color:#4a5565;font-size:13.5px;margin-top:2px;word-break:break-all">'+(v.pour==='autre'?'Envoyée à : ':'')+vbEsc(v.email)+'</div>'+
       '<div style="color:#8a8f98;font-size:12.5px;margin-top:2px">'+d.toLocaleDateString('fr-FR')+' à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+' · '+mo(v.octets||0)+' · '+(Number(v.garde)>0?'supprimée du site dans '+j+' j':'conservée jusqu’à votre suppression')+'</div>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><a '+btn+' href="/api/admin/videobooth/video?id='+encodeURIComponent(v.id)+'" download>Télécharger</a><button '+btn+' onclick="vbRenvoyer(\''+v.id+'\')">Renvoyer l’e-mail</button><button '+btn+' onclick="vbSupprimer(\''+v.id+'\')">Supprimer</button></div></div>';}).join('')+'</div>';
 }

@@ -74,11 +74,11 @@ async function envoyerMail(m, octets, site) {
   if (!resendKey) return { ok: false, erreur: "RESEND_API_KEY n'est pas définie dans Netlify" };
   const lien = `${site}/api/videobooth/v/${m.id}?t=${jetonMail(m.id)}`;
   const pj = octets.byteLength <= PJ_MAX;
-  const html = htmlVideo({ prenom: m.prenom, evenement: m.event, lien, pj, jours: LIEN_MAIL_JOURS, site });
+  const html = htmlVideo({ prenom: m.prenom, expediteur: `${m.prenom} ${m.nom}`.trim(), destinataire: m.dest, pour: m.pour === 'autre' ? 'autre' : 'moi', evenement: m.event, lien, pj, jours: LIEN_MAIL_JOURS, site });
   const body = {
     from: process.env.NOTIFY_FROM || 'Vespra Event <onboarding@resend.dev>',
     to: [m.email],
-    subject: m.event ? `Votre message vidéo — ${m.event}` : 'Votre message vidéo',
+    subject: m.pour === 'autre' ? `Un message vidéo de ${m.prenom}${m.event ? ' — ' + m.event : ''}` : (m.event ? `Votre message vidéo — ${m.event}` : 'Votre message vidéo'),
     html,
     headers: { 'X-Entity-Ref-ID': 'videobooth-' + m.id },
   };
@@ -316,7 +316,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
     const m = {
       id, event: String(q.get('event') || '').slice(0, 160), nom: String(q.get('nom') || '').slice(0, 80), prenom: String(q.get('prenom') || '').slice(0, 80), email,
       fichier: String(q.get('fichier') || 'video.mp4').replace(/[\\/:*?"<>|\r\n]+/g, ' ').trim().slice(0, 150) || 'video.mp4',
-      type: String(q.get('type') || 'video/mp4').slice(0, 40), duree: Number(q.get('duree')) || 0, son: q.get('son') === '' || q.get('son') == null ? null : Math.min(100, Math.max(0, Math.round(Number(q.get('son')) || 0))), octets: total, cree: new Date().toISOString(),
+      type: String(q.get('type') || 'video/mp4').slice(0, 40), duree: Number(q.get('duree')) || 0, pour: q.get('pour') === 'autre' ? 'autre' : 'moi', dest: q.get('pour') === 'autre' ? String(q.get('dest') || '').replace(/[<>\r\n]+/g, ' ').trim().slice(0, 60) : '', son: q.get('son') === '' || q.get('son') == null ? null : Math.min(100, Math.max(0, Math.round(Number(q.get('son')) || 0))), octets: total, cree: new Date().toISOString(),
     };
     /* durée de conservation propre à la session de cette vidéo */
     try { const ses = (await sessionsLire(st)).find((e) => labelSession(e) === m.event); if (ses) m.garde = ses.conserv || 0; } catch {}
