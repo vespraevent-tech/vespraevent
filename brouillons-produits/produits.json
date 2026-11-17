@@ -67,7 +67,7 @@
         "Photobooth et Vidéobooth",
         "Décoration"
       ],
-      "idee_description": "Fonds décoratifs carrés pour vos photos : mur de fleurs, squelettes et autres thèmes, à choisir selon votre événement. Ils se posent derrière le photobooth ou le coin photo.",
+      "idee_description": "Fonds décoratifs carrés pour vos photos : mur de fleurs, squelettes et autres thèmes, à choisir selon votre événement. Ils se posent derrière le photobooth ou le coin photo. Ajout : fonds à sequins.",
       "usages": [
         "fond de photobooth",
         "coin photo",
@@ -77,7 +77,8 @@
       "options_possibles": [
         "thème au choix (fleurs, squelettes, autres)",
         "taille du fond",
-        "avec support / pied"
+        "avec support / pied",
+        "fond à sequins (couleurs au choix)"
       ],
       "questions": [
         "Quels thèmes exacts as-tu ou veux-tu ? (fleurs : quelles couleurs ? squelettes : style ? autres ?)",
@@ -85,7 +86,8 @@
         "Un fiche produit par thème, ou une fiche « Fonds de photobooth » avec un choix de thèmes ?",
         "Prix : identique pour tous les thèmes ? Caution ?",
         "Compatible avec quels photobooths (le tien, d'autres) ?",
-        "Photos à fournir (une par thème) ?"
+        "Photos à fournir (une par thème) ?",
+        "Fonds à sequins : quelles couleurs, quelle taille ?"
       ],
       "prix": null,
       "photos": null,
@@ -93,7 +95,7 @@
     },
     {
       "id_provisoire": "effets-speciaux",
-      "nom": "Effets spéciaux : lance-flammes, machines à confettis, machines à CO2",
+      "nom": "Effets spéciaux : lance-flammes, machines à confettis, CO2, canon à mousse, canon à neige",
       "categories_visees": [
         "Effets spéciaux (nouvelle catégorie à créer)"
       ],
@@ -114,7 +116,8 @@
         "CO2 : bouteilles incluses ? Recharge facturée à l'usage ?",
         "Confettis : papier, biodégradable ? Nettoyage à la charge du client ?",
         "Une fiche par machine ou une fiche « Effets spéciaux » avec choix ?",
-        "Prix, caution, photos / vidéos de démonstration ?"
+        "Prix, caution, photos / vidéos de démonstration ?",
+        "Canon à mousse / canon à neige : liquide fourni et facturé à l'usage ? Intérieur ou extérieur seulement ? Nettoyage et sol glissant (précautions) ?"
       ],
       "prix": null,
       "photos": null,
@@ -143,6 +146,35 @@
         "Prix « à partir de » ou uniquement sur devis ?",
         "Zone d'intervention (Vitré et alentours ?) ?",
         "Photos d'événements déjà faits ?"
+      ],
+      "prix": null,
+      "photos": null,
+      "statut": "brouillon"
+    },
+    {
+      "id_provisoire": "chiffres-lettres-lumineux",
+      "nom": "Chiffres et lettres géants lumineux",
+      "categories_visees": [
+        "Décoration"
+      ],
+      "idee_description": "Chiffres et lettres géants lumineux (ampoules ou LED) pour un âge, un prénom, LOVE : l'effet waouh du soir, très visible sur les photos.",
+      "usages": [
+        "anniversaire",
+        "mariage",
+        "fond de photobooth",
+        "soirée à thème"
+      ],
+      "options_possibles": [
+        "taille",
+        "couleur de lumière",
+        "chiffre / lettre / mot"
+      ],
+      "questions": [
+        "Hauteurs, alimentation (secteur, piles) ?",
+        "Quels caractères disponibles et en combien d'exemplaires ?",
+        "Prix par caractère, caution, livraison ?",
+        "Même fiche que les lettres en bois (avec choix bois / lumineux) ou fiche séparée ?",
+        "Photos (allumées de préférence) ?"
       ],
       "prix": null,
       "photos": null,

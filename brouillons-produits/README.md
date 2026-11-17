@@ -13,8 +13,9 @@ Rien ici n'est publié tant que les prix et les photos ne sont pas fournis.
 |---|---------|-----------------|------|
 | 1 | Chiffres et lettres géants en bois | Panneau de bienvenue et décoration | idée notée — prix, tailles, photos à fournir |
 | 2 | Arche de ballons | Panneau de bienvenue et décoration | idée notée — prix, tailles, photos à fournir |
-| 3 | Fonds de photobooth (fleurs, squelettes, etc.) | Photobooth et Vidéobooth + Décoration | idée notée — thèmes, tailles, prix, photos à fournir |
-| 4 | Effets spéciaux : lance-flammes, machines à confettis, machines à CO2 | Effets spéciaux (nouvelle catégorie) | idée notée |
+| 3 | Fonds de photobooth (fleurs, squelettes, sequins, etc.) | Photobooth et Vidéobooth + Décoration | idée notée — thèmes, tailles, prix, photos à fournir |
+| 4 | Effets spéciaux : lance-flammes, confettis, CO2, canon à mousse, canon à neige | Effets spéciaux (nouvelle catégorie) | idée notée |
+| 6 | Chiffres et lettres géants lumineux | Décoration | idée notée |
 | 5 | **Mise en avant : soirées et événements à thème clé en main** | Section accueil + page dédiée | idée notée, à valoriser |
 
 ## Où un produit doit apparaître quand il est mis en ligne (à vérifier à chaque ajout)
