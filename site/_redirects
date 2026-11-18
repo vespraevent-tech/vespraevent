@@ -57,6 +57,8 @@ http://www.vespraevent.com/*   https://www.vespraevent.fr/:splat   301!
 /ADMIN-MODIFS-CLIENTS-PARAMETRES.md /404.html 404!
 /BLOBS-MIGRATION.md               /404.html   404!
 /MODIFICATIONS-V332.md            /404.html   404!
+/GUIDE-SUPABASE.md               /404.html   404!
+/supabase/*                      /404.html   404!
 /package.json                     /404.html   404!
 /package-lock.json                /404.html   404!
 /netlify.toml                     /404.html   404!

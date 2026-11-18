@@ -18,6 +18,9 @@ export const DATA_STORE = 'vespra-admin-data';
 export const CLIENT_STORE = 'vespra-clients';
 export const SAUVEGARDE_STORE = 'vespra-sauvegardes';
 const COLLECTIONS_SAUVEGARDEES = ['reservations', 'suivi', 'logistique', 'indemnites-km'];
+/* contenu du site et frais, copiés eux aussi chaque nuit (lecture seule, sans effet sur la restauration) :
+   une erreur sur l'un d'eux n'empêche jamais la sauvegarde principale */
+const COLLECTIONS_COMPLEMENT = ['produits', 'textes', 'theme', 'catalogue', 'images', 'mise-en-page', 'notices', 'prestataires', 'salles', 'parrainage', 'notes-frais', 'blog', 'entreprise', 'entreprise-prive', 'google'];
 const GARDER_AUTO = 60;
 const GARDER_MANUEL = 40;
 
@@ -88,6 +91,11 @@ export async function creerSauvegarde({ motif = 'manuel' } = {}) {
 
   const contenu = { version: 1, creeLe: new Date().toISOString(), motif, collections: {}, clients: [] };
   for (const c of COLLECTIONS_SAUVEGARDEES) contenu.collections[c] = await lireCollection(data, c);
+  const debutComplement = Date.now();
+  for (const c of COLLECTIONS_COMPLEMENT) {
+    if (Date.now() - debutComplement > 8000) { contenu.complement_incomplet = true; break; }
+    try { contenu.collections[c] = await lireCollection(data, c); } catch (e) { (contenu.erreursComplement = contenu.erreursComplement || {})[c] = e.message; }
+  }
   try {
     const cl = await clientsStore.get('clients', { type: 'json', consistency: 'strong' });
     contenu.clients = Array.isArray(cl) ? cl : [];
