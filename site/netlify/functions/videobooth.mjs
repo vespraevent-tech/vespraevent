@@ -186,6 +186,32 @@ export default async (request) => {
     return rep({ ok: true });
   }
 
+  /* ── relance douce des e-mails non partis : appelée par la tablette quand elle se rallume, jamais en boucle ──
+     • au plus une passe toutes les 6 h ; au plus 25 e-mails par passe ; au plus 3 essais par vidéo ;
+     • au premier refus du service d'e-mail, on s'arrête (pas d'insistance, pas de saturation). */
+  if (request.method === 'POST' && /\/api\/videobooth\/relance$/.test(url.pathname)) {
+    if (!cle || (request.headers.get('x-appareil') !== cle && !lireJeton(request.headers.get('x-appareil'), 'session'))) return rep({ ok: false }, 403);
+    const st = store();
+    const dernier = await st.get('etat/relance-mails', { type: 'json' }).catch(() => null);
+    if (dernier && Date.now() - Date.parse(dernier.date) < 6 * 3600 * 1000) return rep({ ok: true, ignore: 'passe récente', envoyes: 0, restants: dernier.restants || 0 });
+    const aEnvoyer = (await lireMetas(st, (m) => m.mail !== 'envoye' && m.email && (Number(m.mailEssais) || 0) < 3 && !(m.mail === 'attente' && Date.now() - Date.parse(m.cree) < 15 * 60000))).sort((a, b) => String(a.cree).localeCompare(String(b.cree)));
+    const site = (process.env.URL || `${url.protocol}//${url.host}`).replace(/\/$/, '');
+    let envoyes = 0, stop = false;
+    for (const m of aEnvoyer.slice(0, 25)) {
+      const buf = await st.get('video/' + m.id, { type: 'arrayBuffer' }).catch(() => null);
+      m.mailEssais = (Number(m.mailEssais) || 0) + 1; m.mailEssaiLe = new Date().toISOString();
+      if (!buf) { m.mailErreur = 'Fichier vidéo expiré'; await st.setJSON('meta/' + m.id, m); continue; }
+      const r = await envoyerMail(m, buf, site);
+      m.mail = r.ok ? 'envoye' : 'erreur'; m.mailErreur = r.erreur || ''; m.pj = !!r.pj; if (r.ok) m.renvoye = new Date().toISOString();
+      await st.setJSON('meta/' + m.id, m);
+      if (r.ok) envoyes++; else { stop = true; break; }
+      await new Promise((ok) => setTimeout(ok, 700));
+    }
+    const restants = Math.max(0, aEnvoyer.length - envoyes);
+    await st.setJSON('etat/relance-mails', { date: new Date().toISOString(), envoyes, restants, arret: stop });
+    return rep({ ok: true, envoyes, restants, arret: stop });
+  }
+
   /* ── page de partage d'un événement : toutes les vidéos, pour les mariés / organisateurs ── */
   if ((request.method === 'GET' || request.method === 'POST') && /\/api\/videobooth\/evenement$/.test(url.pathname)) {
     const label = String(url.searchParams.get('e') || '');

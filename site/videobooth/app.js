@@ -301,7 +301,7 @@ $('b-stop').onclick = arreterRec;
   /* ── état de la tablette, envoyé toutes les 2 minutes au back-office (batterie, vidéos en attente, caméra, micro, place) ── */
   function battement() {
     if (!(cfg.jeton || cfg.cle)) return;
-    var etat = { cam: camEtat, mic: micEtat, ver: 25, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
+    var etat = { cam: camEtat, mic: micEtat, ver: 26, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
     var fin = function () {
       toutes().then(function (l) { etat.att = l.filter(function (v) { return !v.envoye; }).length; etat.tot = l.length; }).catch(function () {}).then(function () {
         return (navigator.storage && navigator.storage.estimate) ? navigator.storage.estimate().then(function (e) { etat.usage = e.usage || 0; etat.quota = e.quota || 0; }).catch(function () {}) : null;
@@ -315,6 +315,15 @@ $('b-stop').onclick = arreterRec;
   setInterval(battement, 60000); setTimeout(battement, 5000);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) setTimeout(battement, 800); });
   window.addEventListener('online', function () { setTimeout(battement, 1500); });
+  /* e-mails non partis : une relance douce quand la tablette se rallume (au plus une toutes les 6 h, jamais en boucle ; le serveur limite aussi à 3 essais par vidéo) */
+  function relanceMails() {
+    if (!(cfg.jeton || cfg.cle)) return;
+    var der = 0; try { der = +localStorage.getItem('vb-relance') || 0; } catch (e) {}
+    if (Date.now() - der < 6 * 3600 * 1000) return;
+    try { localStorage.setItem('vb-relance', String(Date.now())); } catch (e) {}
+    fetch(baseApi() + '/api/videobooth/relance', { method: 'POST', headers: { 'x-appareil': (cfg.jeton || cfg.cle) } }).catch(function () {});
+  }
+  setTimeout(relanceMails, 60000); setInterval(relanceMails, 30 * 60000);
   setInterval(synchro, 20000); window.addEventListener('online', synchro);
   setTimeout(function () { liberer(false).then(majEtat); }, 4000);
 
