@@ -58,8 +58,8 @@ PAGES['organisation-mariage'] = dict(
  cards_k="Votre mariage de A à Z", cards_t="CE QUE NOUS <em>ORGANISONS</em>",
  cards=[
   dict(n="01",t="Le lieu",p="Domaine, ferme rénovée ou salle : nous vous aidons à choisir parmi les lieux où nous livrons toute l'année.",href="nos-recommandations.html",l="Voir les lieux de réception →",img="tente-etoile-situation.webp",alt="Château avec une grande tente étoile pour un mariage"),
-  dict(n="02",t="Le matériel et le décor",p="Mange-debout, guirlandes, panneau de bienvenue, éclairage ; sur demande, arche de ballons et lettres lumineuses.",href="catalogue.html",l="Voir le catalogue →",img="mange-debout-ambiance-verte.webp",alt="Table de mariage décorée en extérieur"),
-  dict(n="03",t="Les animations",p="Photobooth, étincelles froides pour la première danse, bulles, fumée lourde : des moments magiques pour vos photos.",href="catalogue.html",l="Voir les effets →",img="etincelles-froides-situation.webp",alt="Première danse avec fontaines d'étincelles froides"),
+  dict(n="02",t="Matériel et décor",p="Mange-debout, guirlandes, éclairage ; sur demande, arche de ballons et lettres lumineuses.",href="catalogue.html",l="Voir le catalogue →",img="mange-debout-ambiance-verte.webp",alt="Table de mariage décorée en extérieur"),
+  dict(n="03",t="Les animations",p="Photobooth, étincelles froides pour la première danse, bulles, fumée lourde : des moments magiques.",href="catalogue.html",l="Voir les effets →",img="etincelles-froides-situation.webp",alt="Première danse avec fontaines d'étincelles froides"),
   dict(n="04",t="Les prestataires",p="Serveuse privée, chef pâtissier pour votre wedding cake, et bientôt photographe et vidéaste.",href="evenements.html#prestataires",l="Nos prestataires →",img="mariage-gateau-maries.webp",alt="Mariés qui coupent leur wedding cake entourés de verrines",pos="22% 60%"),
  ],
  service=dict(k="Vin d'honneur et cocktail",t='UN COCKTAIL <em>QUI FAIT DIFFÉRENCE</em>',p1="Le vin d'honneur est un moment clé : les invités se rencontrent, les photos s'enchaînent. Notre serveuse privée assure le service, la présentation et le rythme, pour que vous profitiez de vos proches.",p2='Bouchées, plateaux, découpe devant les invités : nous coordonnons avec vous le traiteur et le buffet qui correspondent à votre mariage. Ces prestations se font sur devis.'),
@@ -91,7 +91,7 @@ PAGES['organisation-anniversaire'] = dict(
  mq=["Anniversaire surprise","Grands chiffres","Soirée à thème","Karaoké","Photobooth","Confettis","Boîte de nuit","Gâteau"],
  cards_k="Votre anniversaire de A à Z", cards_t="UNE FÊTE <em>QUI MARQUE</em>",
  cards=[
-  dict(n="01",t="L'effet surprise",p="Vous préparez une surprise ? Nous vous aidons à organiser le déroulé, l'installation discrète et le grand moment.",href="#rdv",l="Préparer ma surprise →",img="anniversaire-ballons-etincelles.webp",alt="Jeune fille surprise par son gâteau d'anniversaire, confettis et bougies étincelantes"),
+  dict(n="01",t="L'effet surprise",p="Une surprise à préparer ? Nous organisons avec vous le déroulé, l'installation discrète et le grand moment.",href="#rdv",l="Préparer ma surprise →",img="anniversaire-ballons-etincelles.webp",alt="Jeune fille surprise par son gâteau d'anniversaire, confettis et bougies étincelantes"),
   dict(n="02",t="L'ambiance",p="Boîte de nuit gonflable, boule à facettes et jeux de lumières : une vraie piste de danse.",href="produit-boite-nuit.html",l="Voir la boîte de nuit →",img="boite-nuit-situation.webp",alt="Boîte de nuit gonflable installée dans un jardin"),
   dict(n="03",t="Les animations",p="Baby-foot, karaoké, photobooth : de quoi occuper et amuser tous vos invités, petits et grands.",href="produit-baby-foot.html",l="Voir le baby-foot →",img="baby-foot-ambiance.webp",alt="Partie de baby-foot entre amis"),
   dict(n="04",t="Les gourmandises",p="Machine à pop-corn, fontaine à cocktail, gâteau sur mesure avec notre chef pâtissier.",href="produit-popcorn.html",l="Voir la machine à pop-corn →",img="popcorn-situation.webp",alt="Pop-corn dans des cornets rayés"),
@@ -125,7 +125,7 @@ PAGES['organisation-gender-reveal'] = dict(
  cards_k="Votre gender reveal de A à Z", cards_t="UNE RÉVÉLATION <em>INOUBLIABLE</em>",
  cards=[
   dict(n="01",t="La révélation",p="Canon à poudre colorée, fumée, étincelles : l'instant où tout le monde découvre le sexe du bébé.",href="article-gender-reveal.html",l="Lire notre guide →",img="canon-poudre-gender-bleu.webp",alt="Canon à poudre bleue lors d'un gender reveal"),
-  dict(n="02",t="Les effets",p="Machine à bulles, fumée lourde ou étincelles froides pour une scène spectaculaire en extérieur comme en salle.",href="catalogue.html",l="Voir les effets →",img="machine-bulles-situation.webp",alt="Bulles de savon lors d'un moment de fête"),
+  dict(n="02",t="Les effets",p="Machine à bulles, fumée lourde ou étincelles froides, en extérieur comme en salle.",href="catalogue.html",l="Voir les effets →",img="machine-bulles-situation.webp",alt="Bulles de savon lors d'un moment de fête"),
   dict(n="03",t="Le décor",p="Guirlandes, néon, panneau de bienvenue ; sur demande, arche de ballons et fond photobooth.",href="produit-neon-lumineux.html",l="Voir le néon lumineux →",img="neon-lumineux.webp",alt="Néon lumineux « Laisser un message »"),
   dict(n="04",t="Les souvenirs",p="Photobooth et vidéobooth pour garder la trace de ce jour, avec un livre d'or.",href="produit-photobooth.html",l="Voir le photobooth →",img="photobooth-lifestyle.webp",alt="Photobooth en bois dans un jardin"),
  ],
@@ -200,7 +200,7 @@ PAGES['organisation-soiree-entreprise'] = dict(
  cards_k="Votre soirée de A à Z", cards_t="UNE SOIRÉE <em>QUI MARQUE</em>",
  cards=[
   dict(n="01",t="L'ambiance",p="Son, jeux de lumières, boule à facettes ; sur demande, fonds photobooth et lettres lumineuses.",href="catalogue.html",l="Voir le son et la lumière →",img="jeux-lumieres-situation.webp",alt="Jeux de lumières lors d'une soirée"),
-  dict(n="02",t="Le photobooth personnalisé",p="Cadres aux couleurs de votre entreprise ou de votre thème, pour faire parler de votre soirée.",href="produit-photobooth.html",l="Voir le photobooth →",img="photobooth-salon.webp",alt="Photobooth lors d'un événement d'entreprise"),
+  dict(n="02",t="Votre photobooth",p="Cadres aux couleurs de votre entreprise ou de votre thème, pour faire parler de votre soirée.",href="produit-photobooth.html",l="Voir le photobooth →",img="photobooth-salon.webp",alt="Photobooth lors d'un événement d'entreprise"),
   dict(n="03",t="Les effets",p="Fumée lourde, étincelles froides, canons : des moments forts pour les temps clés de la soirée.",href="catalogue.html",l="Voir les effets →",img="fumee-lourde-nuage.webp",alt="Fumée lourde éclairée en bleu"),
   dict(n="04",t="Le service",p="Serveuse privée, chef pâtissier et coordination de vos prestataires.",href="evenements.html#prestataires",l="Nos prestataires →",img="prestation-serveuse.webp",alt="Serveuse privée"),
  ],
@@ -233,8 +233,8 @@ PAGES['organisation-seminaire'] = dict(
  mq=["Séminaire","Conférence","Formation","Team building","Vidéoprojection","Sonorisation","Café d'accueil","Cocktail"],
  cards_k="Votre séminaire de A à Z", cards_t="TOUT POUR UNE JOURNÉE <em>RÉUSSIE</em>",
  cards=[
-  dict(n="01",t="Vidéoprojection et sonorisation",p="Vidéoprojecteur, écran, sonorisation et micros pour que chacun voie et entende, de la salle de réunion à la grande salle.",href="produit-videoprojecteur.html",l="Voir la vidéoprojection →",img="rdv-materiel.webp",alt="Scène avec projecteurs et sonorisation"),
-  dict(n="02",t="Accueil et restauration",p="L'accueil des participants et les pauses, avec notre serveuse privée et nos prestataires.",href="evenements.html#prestataires",l="Nos prestataires →",img="prestation-serveuse.webp",alt="Serveuse privée qui présente des bouchées"),
+  dict(n="01",t="Vidéo et sonorisation",p="Vidéoprojecteur, écran, sonorisation et micros : chacun voit et entend.",href="produit-videoprojecteur.html",l="Voir la vidéoprojection →",img="rdv-materiel.webp",alt="Scène avec projecteurs et sonorisation"),
+  dict(n="02",t="Accueil et pauses",p="L'accueil des participants et les pauses, avec notre serveuse privée et nos prestataires.",href="evenements.html#prestataires",l="Nos prestataires →",img="prestation-serveuse.webp",alt="Serveuse privée qui présente des bouchées"),
   dict(n="03",t="Pauses et cocktail",p="Fontaine à cocktail, buvette, mange-debout : des pauses conviviales entre deux sessions.",href="produit-fontaine-cocktail.html",l="Voir la fontaine à cocktail →",img="fontaine-cocktail.webp",alt="Fontaine à cocktail dans une salle en pierre"),
   dict(n="04",t="Mobilier et décoration",p="Mange-debout, signalétique, décoration : un cadre soigné pour vos participants.",href="produit-mange-debout.html",l="Voir les mange-debout →",img="mange-debout-ambiance-verte.webp",alt="Mange-debout décorés pour une réception en extérieur"),
  ],
@@ -267,7 +267,7 @@ PAGES['organisation-anniversaire-entreprise'] = dict(
  mq=["Anniversaire d'entreprise","Équipes et clients","Cocktail","Discours","Photobooth","Animation","Sonorisation","Souvenirs"],
  cards_k="Votre anniversaire d'entreprise de A à Z", cards_t="UNE FÊTE <em>QUI RASSEMBLE</em>",
  cards=[
-  dict(n="01",t="Les discours",p="Sonorisation, micros et vidéoprojection pour les prises de parole et la projection de vos photos et de votre histoire.",href="produit-sonorisation.html",l="Voir la sonorisation →",img="rdv-materiel.webp",alt="Scène avec projecteurs et sonorisation"),
+  dict(n="01",t="Les discours",p="Sonorisation, micros et vidéoprojection pour les discours et la projection de votre histoire.",href="produit-sonorisation.html",l="Voir la sonorisation →",img="rdv-materiel.webp",alt="Scène avec projecteurs et sonorisation"),
   dict(n="02",t="Le cocktail",p="Mange-debout, fontaine à cocktail et service par notre serveuse privée pour accueillir vos invités.",href="produit-fontaine-cocktail.html",l="Voir la fontaine à cocktail →",img="fontaine-cocktail.webp",alt="Fontaine à cocktail dans une salle en pierre"),
   dict(n="03",t="Le photobooth",p="Un photobooth aux couleurs de votre entreprise : chaque invité repart avec un souvenir de la fête.",href="produit-videobooth.html",l="Voir le vidéobooth →",img="videobooth-standard.webp",alt="Vidéobooth décoré de fleurs"),
   dict(n="04",t="Le décor",p="Néon, guirlandes ; sur demande, chiffre géant lumineux et fond photobooth.",href="produit-neon-lumineux.html",l="Voir le néon lumineux →",img="neon-lumineux.webp",alt="Néon lumineux pour décorer une réception"),

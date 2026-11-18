@@ -731,6 +731,11 @@ textarea.pr-i{resize:vertical;min-height:96px}
 .ev-dots-clair i.on{background:#fff!important}
 .ev-liste li::before,.ev-pan li::before{border-color:var(--navy)!important}
 .rdv-l li::before,.pr-pane li::before,.pr-pane li::marker{border-color:var(--navy)!important}
+
+/* cartes : numéro, titre, texte et lien toujours alignés d'une carte à l'autre */
+.ev-pc-b{display:flex;flex-direction:column;width:100%;min-height:262px}
+.ev-pc-b p{min-height:5.6em}
+.ev-pc-b a{margin-top:auto}
 .pr-hero .pr-kicker{font-family:inherit;font-size:11px;font-weight:600;line-height:1.3;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85);margin:0 0 6px}
 @media(max-width:980px){
  .ev-car,.ev-steps{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;padding:4px 16px 8px;margin:0 -16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -780,10 +785,10 @@ textarea.pr-i{resize:vertical;min-height:96px}
   <h2 class="ev-t">UN SEUL INTERLOCUTEUR <em>POUR TOUT</em></h2>
   <p class="ev-sub">Vous nous racontez votre événement, nous nous occupons du reste : le matériel, les intervenants, l'ambiance et la coordination.</p>
   <div class="ev-car" data-evcar>
-    <article class="ev-pc"><img src="photobooth-salle.webp" alt="Photobooth en bois installé dans une salle de réception" loading="lazy" decoding="async" width="1000" height="750"><div class="ev-pc-b"><span class="ev-pc-n">01</span><h3>Location de matériel</h3><p>Photobooth, décoration, son, lumière, mobilier : tout le catalogue, avec les prix affichés, livré et installé.</p><a href="catalogue.html">Découvrir le catalogue →</a></div></article>
+    <article class="ev-pc"><img src="photobooth-salle.webp" alt="Photobooth en bois installé dans une salle de réception" loading="lazy" decoding="async" width="1000" height="750"><div class="ev-pc-b"><span class="ev-pc-n">01</span><h3>Location de matériel</h3><p>Photobooth, son, lumière, mobilier, décoration : tout le catalogue, livré et installé.</p><a href="catalogue.html">Découvrir le catalogue →</a></div></article>
     <article class="ev-pc"><img src="prestation-serveuse.webp" alt="Serveuse privée qui présente des bouchées lors d'une réception" loading="lazy" decoding="async" width="1400" height="1023"><div class="ev-pc-b"><span class="ev-pc-n">02</span><h3>Nos prestataires</h3><p>Serveuse privée, chef pâtissier, et bientôt photographe et vidéaste : nous les coordonnons pour vous.</p><a href="#prestataires">Voir les prestataires →</a></div></article>
-    <article class="ev-pc"><img src="fumee-lourde-nuage.webp" alt="Ambiance de soirée avec fumée et lumières bleues" loading="lazy" decoding="async" width="926" height="698"><div class="ev-pc-b"><span class="ev-pc-n">03</span><h3>Soirée à thème</h3><p>Fonds photobooth, lettres géantes lumineuses, arche de ballons, effets spéciaux : nous composons l'ambiance de votre soirée.</p><a href="#rdv">Imaginons votre thème →</a></div></article>
-    <article class="ev-pc"><img src="pack-mariage.webp" alt="Mariés qui dansent sur la pelouse dans un nuage de fumée colorée" loading="lazy" decoding="async" width="1000" height="1500"><div class="ev-pc-b"><span class="ev-pc-n">04</span><h3>Sur mesure, sur devis</h3><p>Chaque événement est unique. Vous nous parlez de votre idée, nous vous proposons un devis adapté, sans engagement.</p><a href="#rdv">Demander un devis →</a></div></article>
+    <article class="ev-pc"><img src="fumee-lourde-nuage.webp" alt="Ambiance de soirée avec fumée et lumières bleues" loading="lazy" decoding="async" width="926" height="698"><div class="ev-pc-b"><span class="ev-pc-n">03</span><h3>Soirée à thème</h3><p>Fonds photobooth, lettres lumineuses, arche de ballons, effets spéciaux : l'ambiance de votre soirée.</p><a href="#rdv">Imaginons votre thème →</a></div></article>
+    <article class="ev-pc"><img src="pack-mariage.webp" alt="Mariés qui dansent sur la pelouse dans un nuage de fumée colorée" loading="lazy" decoding="async" width="1000" height="1500"><div class="ev-pc-b"><span class="ev-pc-n">04</span><h3>Sur mesure, sur devis</h3><p>Chaque événement est unique : parlez-nous de votre idée, nous vous proposons un devis adapté.</p><a href="#rdv">Demander un devis →</a></div></article>
   </div>
   <div class="ev-dots" data-evdots aria-hidden="true"></div>
 </div></section>
