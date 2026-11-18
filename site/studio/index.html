@@ -3090,6 +3090,22 @@ function ajusterCadreResa(){
 }
 window.addEventListener('resize', ajusterCadreResa);
 
+/* voile pendant le changement de page du cadre (Planning → Chiffre d'affaires…) */
+function resaVoile(on){
+  const c = document.getElementById('resaFrame'); if(!c || window._resaDepuisListe) return;
+  let v = document.getElementById('resaVoile');
+  clearTimeout(window._resaVoileT);
+  if(on){
+    if(!v){
+      v = document.createElement('div'); v.id = 'resaVoile'; v.textContent = 'Chargement…';
+      v.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:500 14px Inter,system-ui,sans-serif;color:#646D7C;background:#fff;z-index:5;border-radius:12px';
+      const p = c.parentNode; if(!p.style.position) p.style.position = 'relative';
+      p.insertBefore(v, c);
+    }
+    v.style.display = 'flex';
+    window._resaVoileT = setTimeout(() => resaVoile(false), 9000);   /* garde-fou : le voile ne reste jamais */
+  }else if(v){ v.style.display = 'none'; }
+}
 function ouvrirResa(page){
   const cadre = document.getElementById('resaFrame');
   if(!cadre) return;
@@ -3102,6 +3118,8 @@ function ouvrirResa(page){
   const courante = cadre.dataset.page || '';
   if(!cadre.src || courante !== page){
     resaPrete = false;
+    /* pendant le rechargement, on ne montre plus l'ancienne page (le planning) puis un écran blanc : un voile « Chargement… » */
+    resaVoile(true);
     cadre.dataset.page = page;
     cadre.src = '/studio/reservation.html?page=' + encodeURIComponent(page);
     return;
@@ -3117,6 +3135,7 @@ window.addEventListener('message', e => {
   if(e.origin !== location.origin) return;
   if(e.data && e.data.type === 'vespra-prete'){
     resaPrete = true;
+    setTimeout(() => resaVoile(false), 500);
     if(resaAttend) ouvrirResa(resaAttend);
   }
   /* une fiche s'ouvre à l'intérieur du cadre : on lui donne tout l'écran,

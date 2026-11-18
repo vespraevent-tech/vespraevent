@@ -14,7 +14,7 @@ PAGES['organisation-evenements-particuliers'] = dict(
  eyebrow="Pour les particuliers · Vitré · Rennes · Grand Ouest",
  h1="ÉVÉNEMENTS DE PARTICULIERS<br><em>ORGANISÉS POUR VOUS</em>",
  lead="Mariage, anniversaire, gender reveal : choisissez votre événement, nous l'organisons avec vous.",
- img="boite-nuit-ambiance.webp", imgpos="center 35%", alt="Amis qui fêtent un anniversaire sous les confettis",
+ img="anniversaire-groupe-gateau.webp", imgpos="center 30%", alt="Groupe d'amis qui fête un anniversaire autour du gâteau",
  chips=["Mariage","Anniversaire","Gender reveal"],
  mq=["Mariage","Anniversaire surprise","Gender reveal","Baptême","EVJF &amp; EVG","Fiançailles","Départ à la retraite","Fête de famille"],
  choix_k="Choisissez votre événement", choix_t="QUEL ÉVÉNEMENT <em>ORGANISEZ-VOUS ?</em>",

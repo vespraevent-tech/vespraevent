@@ -241,6 +241,8 @@
     }
     function corrige(img){
       if(!img||img.nodeName!=='IMG')return;
+      /* pages d'organisation d'événements : photos servies telles quelles (nettes, sans nouvelle compression) */
+      if(img.closest&&img.closest('.ev-hero,.ev-pc,.ev-pan,.ev-bur-img,.ev-svc-i'))return;
       var src=img.getAttribute('src')||'',key=basename(src);
       if(deleted[key])return;
       var rep=map[key];

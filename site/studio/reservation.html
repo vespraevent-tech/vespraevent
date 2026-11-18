@@ -3995,7 +3995,7 @@ window.faPendOk=async function(){
     var ttc=+x.ttc||0,ht=x.ht===''?null:+x.ht,tva=x.tva===''?null:+x.tva;
     if(!ttc&&x.ht!==''&&(+x.ht)>0&&(x.tva===''||+x.tva===0)){ttc=+x.ht;if(x.tva==='')x.tva=0;}
     if(!x.d||!ttc){keepIdx[i]=1;continue;}
-    if(ht==null&&tva==null){ht=r2(ttc/1.2);tva=r2(ttc-ht);}else if(tva==null)tva=r2(ttc-ht);else if(ht==null)ht=r2(ttc-tva);
+    if(ht==null&&tva==null){ht=ttc;tva=0;}   /* ni HT ni TVA saisis (achat à un particulier, Vinted…) : pas de TVA */else if(tva==null)tva=r2(ttc-ht);else if(ht==null)ht=r2(ttc-tva);
     var o={id:'fa'+ts+'_'+i,g:(x.g||'AUTRES').trim(),d:x.d,f:(x.f||'Fournisseur').trim(),n:(x.n||'').trim(),ht:ht,tva:tva,ttc:ttc,st:'ok',note:x.note||''};
     if(x.pT&&x.p&&x.p!==x.d)o.p=x.p;if(x.m)o.m=x.m;
     if(x.imgs&&x.imgs.length){
@@ -4133,6 +4133,7 @@ function faPendingHtml(){
       +'<div><label style="'+L+'">Paiement</label><select onchange="faPend('+i+',\'m\',this.value)" style="'+IN+'">'+FA_MODES.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===(x.m||'')?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></div>'
       +fld('Fournisseur','f','text')+fld('N° de facture','n','text')+fld('HT','ht','number')+fld('TVA','tva','number')+fld('TTC','ttc','number')
       +'</div>'
+      +'<div style="margin-top:6px;font:11.5px Inter,system-ui,sans-serif;color:#8a8f98">TVA et HT laissés vides = achat sans TVA (particulier, Vinted…) : le TTC est compté tel quel.</div>'
       +((x.file&&/\.pdf$/i.test(x.file))?'':'<div style="margin-top:8px;font:11.5px Inter,system-ui,sans-serif;color:#8a8f98"><label style="cursor:pointer;text-decoration:underline">+ photos (facture, ticket…)<input type="file" accept="image/*" multiple onchange="faPendPhotos('+i+',this)" style="display:none"></label>'+((x.imgs&&x.imgs.length)?' · '+x.imgs.length+' photo'+(x.imgs.length>1?'s':'')+', réunies en un seul PDF <button onclick="faPendPhotosDel('+i+')" style="border:none;background:none;cursor:pointer;color:#8a8f98;text-decoration:underline;font:inherit">retirer</button>':'')+'</div>')
       +((x.warn||bad)?'<div style="font:11.5px Inter,system-ui,sans-serif;color:#8a6420;margin-top:8px">'+escAttr(x.warn||'')+(bad?(x.warn?' · ':'')+'HT + TVA ne font pas le TTC':'')+'</div>':'')
       +'</div>';

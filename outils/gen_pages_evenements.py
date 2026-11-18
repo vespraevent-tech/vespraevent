@@ -69,6 +69,15 @@ EXTRA_CSS = '''
 @media(max-width:980px){.ev-ev3 .ev-pc{min-height:430px}}
 '''
 # la 1re section de sous-page n'a pas besoin de marge haute supplémentaire
+
+HD = ['fumee-lourde-wgf-2000-situation','boite-nuit-ambiance','canon-poudre-arc-en-ciel','photobooth-salon','tente-etoile-situation','rdv-materiel','jeux-lumieres-situation','fumee-lourde-nuage','popcorn-situation','photobooth-salle','canon-poudre-gender-bleu','photobooth-lifestyle','boite-nuit-situation','mange-debout-ambiance-verte','neon-lumineux']
+def apply_hd(page):
+    """photos du site un peu petites : version agrandie, réservée aux pages d'événements"""
+    for n in HD:
+        if os.path.exists(os.path.join(SITE, n + '-hd.webp')):
+            page = page.replace('"%s.webp"' % n, '"%s-hd.webp"' % n)
+    return page
+
 def esc(s): return html.escape(s, quote=True)
 
 def card(c):
@@ -122,7 +131,7 @@ def build(slug, P):
         out.append('<section class="ev-sec"><div class="ev-in"><p class="ev-k">Pour les professionnels</p><h2 class="ev-t">NOS <em>ENGAGEMENTS</em></h2><div class="ev-gar">%s</div></div></section>' % ''.join('<div class="ev-gi"><span class="ev-ico">%s</span><b>%s</b><small>%s</small></div>' % (ic[k], a, b) for k, a, b in gar))
     steps = ''.join('<div class="ev-st"><span class="ev-sn">%d</span><h3>%s</h3><p>%s</p></div>' % (i + 1, t, d) for i, (t, d) in enumerate(P['steps']))
     out.append('<section class="ev-sec ev-sec-sombre"><div class="ev-in"><p class="ev-k">Comment ça se passe</p><h2 class="ev-t">DU PREMIER MESSAGE <em>À L\'ÉVÉNEMENT</em></h2><div class="ev-steps" data-evcar>%s</div><div class="ev-dots ev-dots-clair" data-evdots aria-hidden="true"></div></div></section>' % steps)
-    out.append('<section class="ev-sec ev-prod"><div class="ev-in"><div class="pr-sec pr-sec-b"><span class="pr-lab">Le matériel pour votre événement</span><h3 class="pr-t">À louer <em class="ac">pour votre projet</em></h3><div class="bests pr-bests" id="prB" data-vcar="prB" data-add data-img-origine data-ids="%s"><div class="bests-shell"><button class="bests-arrow bests-arrow-prev" id="prBPrev" aria-label="Produits précédents">‹</button><div class="bests-carousel" id="prBWrap"><div class="bests-track" id="prBTrack"></div></div><button class="bests-arrow bests-arrow-next" id="prBNext" aria-label="Produits suivants">›</button></div><div class="bests-dots" id="prBDots"></div></div></div></div></section>' % P['prod_ids'])
+    out.append('<section class="ev-sec ev-prod"><div class="ev-in"><div class="pr-sec pr-sec-b"><span class="pr-lab">Le matériel pour votre événement</span><h3 class="pr-t">À louer <em class="ac">pour votre projet</em></h3><div class="bests pr-bests" id="prB" data-vcar="prB" data-add data-img-origine data-img-map="p3=photobooth-salle-hd.webp" data-ids="%s"><div class="bests-shell"><button class="bests-arrow bests-arrow-prev" id="prBPrev" aria-label="Produits précédents">‹</button><div class="bests-carousel" id="prBWrap"><div class="bests-track" id="prBTrack"></div></div><button class="bests-arrow bests-arrow-next" id="prBNext" aria-label="Produits suivants">›</button></div><div class="bests-dots" id="prBDots"></div></div></div></div></section>' % P['prod_ids'])
     pr = P.get('presta')
     if pr:
         out.append('<section class="ev-sec ev-presta" id="prestataires"><div class="ev-in"><p class="ev-k">%s</p><h2 class="ev-t">%s</h2><p class="ev-sub">%s</p></div></section>' % (pr['k'], pr['t'], pr['sub']))
@@ -175,7 +184,8 @@ def build(slug, P):
     ld['@graph'][1]['itemListElement'][1]['name'] = "Organisation d'événements"
     head = re.sub(r'<script type="application/ld\+json">.*?</script>', lambda m: '<script type="application/ld+json">' + json.dumps(ld, ensure_ascii=False) + '</script>', head, 1, flags=re.S)
     head = head.replace('</style>', EXTRA_CSS + '</style>', 1) if '<style id="evenements-css">' not in head else re.sub(r'(<style id="evenements-css">.*?)(</style>)', lambda m: m.group(1) + EXTRA_CSS + m.group(2), head, 1, flags=re.S)
-    return head + content + '\n' + TAIL
+    page = head + content + '\n' + TAIL
+    return apply_hd(page)
 
 for slug, P in PAGES.items():
     # vérifie les fichiers cités
