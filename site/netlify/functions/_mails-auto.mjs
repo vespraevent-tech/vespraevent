@@ -60,7 +60,7 @@ export function htmlRelance({ txt, site, emetteur }) {
   return cadre(`${txt.titre ? `<h1 style="margin:0 0 16px;font-size:21px;line-height:1.25;color:#0c0f14;font-weight:700">${esc(txt.titre)}</h1>
 ` : ''}<p style="margin:0 0 12px">Bonjour,</p>
 ${para(txt.message)}
-${boutons(btn(mailtoRep(emetteur), 'Répondre'), btn2(site + '/rendez-vous.html', 'Prendre rendez-vous'))}
+${boutons(btn(mailtoRep(emetteur), 'Répondre'), btn2(site + '/evenements.html#rdv', 'Prendre rendez-vous'))}
 <p style="margin:0 0 4px;font-size:12px;color:#646D7C">Adresse : ${esc(emetteur.adresse.join(', '))}</p>
 <p style="margin:14px 0 0">À très vite,</p>`, site);
 }

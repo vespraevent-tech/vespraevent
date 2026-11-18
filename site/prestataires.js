@@ -45,7 +45,7 @@ window.VESPRA_PRESTATAIRES = [
     metier: "Serveuse privée", nom: "Candice", type: "Service lors de votre événement",
     commune: "Vitré",
     mot: "Candice vous accompagne pour le service lors de votre événement : présentation, service et mise en place.",
-    site: "", tel: "", lien: "/prestations.html#serveuse", exemple: false
+    site: "", tel: "", lien: "/evenements.html#serveuse", exemple: false
   },
 
   /* ——— Pâtisserie ——— */
@@ -53,7 +53,7 @@ window.VESPRA_PRESTATAIRES = [
     metier: "Pâtisserie & wedding cake", nom: "Emmanuel", type: "Chef pâtissier, création sur mesure",
     commune: "Vitré",
     mot: "Emmanuel crée sur mesure : gâteaux, desserts, mignardises pour tous vos événements. Un rendez-vous dégustation peut être organisé.",
-    site: "", tel: "", lien: "/prestations.html#patissier", exemple: false
+    site: "", tel: "", lien: "/evenements.html#patissier", exemple: false
   },
 
   /* ——— Vaisselle, tables, chaises ——— */

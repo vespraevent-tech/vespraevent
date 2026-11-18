@@ -1,3 +1,9 @@
+# Pages fusionnées en « Événements »
+/prestations        /evenements  301!
+/prestations.html   /evenements  301!
+/rendez-vous        /evenements  301!
+/rendez-vous.html   /evenements  301!
+
 /videobooth   /videobooth/   301
 # ─────────────────────────────────────────────────────────────
 #  Vespra Event — redirections Netlify

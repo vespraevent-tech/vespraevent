@@ -5,8 +5,7 @@
  var cible;
  if(p==='index')cible='index';
  else if(p==='catalogue'||p.indexOf('produit-')===0||p==='pack-mariage')cible='catalogue';
- else if(p==='prestations'||p==='nos-prestataires')cible='prestations';
- else if(p==='rendez-vous')cible='rendez-vous';
+ else if(p==='evenements'||p==='prestations'||p==='rendez-vous')cible='evenements';
  else if(p==='blog'||p.indexOf('article-')===0)cible='blog';
  else if(p==='faq')cible='faq';
  else return;

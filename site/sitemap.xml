@@ -591,8 +591,7 @@
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
-  <url><loc>https://www.vespraevent.fr/rendez-vous</loc></url>
-  <url><loc>https://www.vespraevent.fr/prestations</loc></url>
+  <url><loc>https://www.vespraevent.fr/evenements</loc></url>
   <url><loc>https://www.vespraevent.fr/evenements-pro</loc><priority>0.7</priority></url>
   <url>
     <loc>https://www.vespraevent.fr/article-materiel-mariage-vitre</loc>
