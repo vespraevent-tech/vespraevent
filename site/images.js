@@ -210,7 +210,7 @@
         var cl=' '+(img&&img.className||'')+' ';
         if(img&&(img.id==='prodMainImg'||img.id==='pgImg'))w=1400;
         else if(img&&img.closest&&img.closest('#prodThumbs'))w=300;
-        else if(/ (prod-img|bc-img|pc-img|blog-thumb|c-item-img|vm-img|evc-img) /.test(cl))w=450;
+        else if(/ (prod-img|bc-img|pc-img|blog-thumb|c-item-img|vm-img|evc-img) /.test(cl))w=640;
         else{var r=img&&img.getBoundingClientRect?img.getBoundingClientRect().width:0;if(r>0)w=Math.max(300,Math.min(1400,Math.ceil(r/100)*100));}
       }catch(e){}
       return window.VESPRA_IMG(src,w);

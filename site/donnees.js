@@ -61,7 +61,7 @@
       var dpr = window.devicePixelRatio || 1;
       if (dpr > 1.5) w = Math.min(Math.round(w * 1.5), 1600);
     } catch (e) {}
-    return '/.netlify/images?url=' + encodeURIComponent(s) + '&w=' + w + '&fm=webp&q=72';
+    return '/.netlify/images?url=' + encodeURIComponent(s) + '&w=' + w + '&fm=webp&q=80';
   };
   var VIDE = { theme: {}, ambiance: {}, bandeau: {}, textes: [], notices: [], produits: [], google: [],
                images: [], miseEnPage: [], salles: [], prestataires: [], catalogue: [], entreprise: {} };
