@@ -18,6 +18,13 @@ CAR_JS = re.search(r'<script>\n/\* Carrousels de la page.*?</script>', shell, re
 LIBS = '<script src="/date-fr.js" defer></script>\n<script src="/selects-jolis.js" defer></script>\n'
 
 EXTRA_CSS = '''
+.ev-svc{display:grid;grid-template-columns:1fr 1.1fr;gap:44px;align-items:center}
+.ev-svc-t p{font-size:16px;line-height:1.75;color:var(--g1);margin:0 0 14px}
+.ev-svc-i{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ev-svc-i img{width:100%;height:100%;min-height:340px;object-fit:cover;border-radius:18px;box-shadow:0 12px 36px rgba(12,15,20,.14)}
+.ev-svc-i img:nth-child(2){margin-top:34px}
+@media(max-width:980px){.ev-svc{grid-template-columns:1fr;gap:22px}.ev-svc-i img{min-height:230px}.ev-svc-i img:nth-child(2){margin-top:22px}}
+
 .ev-ev3{grid-template-columns:repeat(3,1fr)}
 .ev-ev3 .ev-pc{min-height:480px}
 .ev-txt{max-width:820px}
@@ -32,8 +39,8 @@ EXTRA_CSS = '''
 def esc(s): return html.escape(s, quote=True)
 
 def card(c):
-    return ('<article class="ev-pc"><img src="%s" alt="%s" loading="lazy" decoding="async"><div class="ev-pc-b"><span class="ev-pc-n">%s</span><h3>%s</h3><p>%s</p><a href="%s">%s</a></div></article>'
-            % (c['img'], esc(c['alt']), c['n'], c['t'], c['p'], c['href'], c['l']))
+    return ('<article class="ev-pc"><img src="%s" alt="%s" loading="lazy" decoding="async"%s><div class="ev-pc-b"><span class="ev-pc-n">%s</span><h3>%s</h3><p>%s</p><a href="%s">%s</a></div></article>'
+            % (c['img'], esc(c['alt']), (' style="object-position:%s"' % c['pos']) if c.get('pos') else '', c['n'], c['t'], c['p'], c['href'], c['l']))
 
 def build(slug, P):
     out = []
@@ -63,6 +70,9 @@ def build(slug, P):
                    % (P['cards_k'], P['cards_t'], ''.join(card(c) for c in P['cards'])))
         out.append('<section class="ev-sec"><div class="ev-in ev-txt"><p class="ev-k">%s</p><h2 class="ev-t">%s</h2>%s</div></section>'
                    % (P['intro_k'], P['intro_t'], ''.join('<p>%s</p>' % p for p in P['intro'])))
+    if P.get('service'):
+        sv = P['service']
+        out.append('<section class="ev-sec"><div class="ev-in ev-svc"><div class="ev-svc-t"><p class="ev-k">%s</p><h2 class="ev-t">%s</h2><p>%s</p><p>%s</p><a class="ev-lien" href="evenements.html#prestataires">Découvrir nos prestataires →</a></div><div class="ev-svc-i"><img src="cocktail-service-bouchees.webp" alt="Serveur en gilet qui présente un plateau de bouchées lors d\'un cocktail en extérieur" loading="lazy" decoding="async" width="1600" height="1067"><img src="cocktail-decoupe-jambon.webp" alt="Découpe de jambon devant les invités lors d\'un cocktail en extérieur" loading="lazy" decoding="async" width="1600" height="1067"></div></div></section>' % (sv['k'], sv['t'], sv['p1'], sv['p2']))
     steps = ''.join('<div class="ev-st"><span class="ev-sn">%d</span><h3>%s</h3><p>%s</p></div>' % (i + 1, t, d) for i, (t, d) in enumerate(P['steps']))
     out.append('<section class="ev-sec ev-sec-sombre"><div class="ev-in"><p class="ev-k">Comment ça se passe</p><h2 class="ev-t">DU PREMIER MESSAGE <em>À L\'ÉVÉNEMENT</em></h2><div class="ev-steps" data-evcar>%s</div><div class="ev-dots ev-dots-clair" data-evdots aria-hidden="true"></div></div></section>' % steps)
     out.append('<section class="ev-sec ev-prod"><div class="ev-in"><div class="pr-sec pr-sec-b"><span class="pr-lab">Le matériel pour votre événement</span><h3 class="pr-t">À louer <em class="ac">pour votre projet</em></h3><div class="bests pr-bests" id="prB" data-vcar="prB" data-add data-ids="%s"><div class="bests-shell"><button class="bests-arrow bests-arrow-prev" id="prBPrev" aria-label="Produits précédents">‹</button><div class="bests-carousel" id="prBWrap"><div class="bests-track" id="prBTrack"></div></div><button class="bests-arrow bests-arrow-next" id="prBNext" aria-label="Produits suivants">›</button></div><div class="bests-dots" id="prBDots"></div></div></div></div></section>' % P['prod_ids'])
