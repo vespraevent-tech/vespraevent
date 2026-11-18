@@ -248,7 +248,8 @@
          (« Photobooth — vue de face ») : on ne lui prête jamais la photo
          principale du produit d'après son nom, sinon la deuxième photo
          choisie dans le back-office redevenait identique à la première. */
-      var galerie=img.id==='prodMainImg'||img.id==='pgImg'||(img.closest&&img.closest('#prodThumbs,#pgOv'));
+      var galerie=img.id==='prodMainImg'||img.id==='pgImg'||(img.closest&&img.closest('#prodThumbs,#pgOv'))
+        ||(img.closest&&img.closest('[data-img-origine]'));   /* carrousels des pages d'événements : photo prévue pour la carte, sans substitution d'après le nom du produit */
       if(!rep&&!galerie){
         var alt=norm(img.getAttribute('alt'));
         if(alt){
