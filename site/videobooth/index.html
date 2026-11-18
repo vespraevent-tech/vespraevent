@@ -12,7 +12,7 @@
 <link rel="icon" type="image/png" sizes="48x48" href="/videobooth/icones/favicon-48.png?v=3">
 <link rel="apple-touch-icon" href="/videobooth/icones/apple-touch-icon.png">
 <link rel="stylesheet" href="/polices.css?v=1">
-<link rel="stylesheet" href="app.css?v=28">
+<link rel="stylesheet" href="app.css?v=29">
 </head>
 <body>
 <main id="app">
@@ -71,6 +71,7 @@
     <h2>Merci !</h2>
     <p id="m-txt">Votre vidéo vous sera envoyée par e-mail.</p>
     <p class="petit">L’envoi peut prendre quelques minutes selon la taille de la vidéo. Pensez à vérifier vos courriers indésirables.</p>
+    <div id="m-qr" class="m-qr" hidden><div id="m-qr-img" class="m-qr-img" aria-hidden="true"></div><p class="m-qr-t">Scannez pour récupérer votre vidéo directement</p><button id="m-fin" class="sec" type="button">Terminé</button></div>
   </section>
 
   <section id="s-acces" class="ecran">
@@ -145,6 +146,7 @@
     <div class="rang"><button id="pin-x" class="sec" type="button">Annuler</button><button id="pin-ok" class="gros" type="button">Valider</button></div>
   </section>
 </main>
-<script src="app.js?v=31"></script>
+<script src="qr.js?v=1"></script>
+<script src="app.js?v=32"></script>
 </body>
 </html>

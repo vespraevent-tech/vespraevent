@@ -243,15 +243,38 @@ $('b-stop').onclick = arreterRec;
     var d = new Date(), j = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2) + '_' + ('0' + d.getHours()).slice(-2) + 'h' + ('0' + d.getMinutes()).slice(-2);
     return net(invite.nom) + '_' + net(invite.prenom) + '_' + j + (/mp4/.test(blobFinal.type) ? '.mp4' : '.webm');
   }
+  /* ───────── QR code de l'écran de remerciement : l'invité scanne et récupère sa vidéo ───────── */
+  function cleRecup() {
+    try { var a = new Uint8Array(12); crypto.getRandomValues(a); return Array.prototype.map.call(a, function (x) { return ('0' + x.toString(16)).slice(-2); }).join(''); } catch (e) { return (Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + '000000000000').slice(0, 20); }
+  }
+  var minuteurMerci = null;
+  function retourAccueilMerci() { clearTimeout(minuteurMerci); minuteurMerci = null; $('m-qr').hidden = true; accueil(); }
+  function afficherQr(v) {
+    clearTimeout(minuteurMerci);
+    var zone = $('m-qr'), svg = $('m-qr-img');
+    var base = (cfg.serveur || location.origin).replace(/\/+$/, '');
+    var ok = false;
+    try {
+      if (window.qrcode && v.rk) {
+        var q = window.qrcode(0, 'M'); q.addData(base + '/api/videobooth/mv/' + v.id + '?k=' + v.rk); q.make();
+        svg.innerHTML = q.createSvgTag({ cellSize: 6, margin: 2, scalable: true }); ok = true;
+      }
+    } catch (e) { ok = false; }
+    zone.hidden = !ok;
+    /* avec le QR code, l'invité a le temps de scanner (25 s) ; il peut aussi toucher « Terminé » */
+    minuteurMerci = setTimeout(retourAccueilMerci, ok ? 25000 : 7000);
+  }
+  $('m-fin').onclick = retourAccueilMerci;
+
   $('b-fin').onclick = function () {
     if (!blobFinal || !invite) return;
     $('b-fin').disabled = true;
-    var v = { id: 'v' + Date.now() + Math.random().toString(36).slice(2, 7), event: cfg.event, nom: invite.nom, prenom: invite.prenom, email: invite.email, consent: true,
+    var v = { id: 'v' + Date.now() + Math.random().toString(36).slice(2, 7), rk: cleRecup(), event: cfg.event, nom: invite.nom, prenom: invite.prenom, email: invite.email, consent: true,
       son: sonNiveau, pour: invite.pour || 'moi', dest: invite.dest || '', fichier: nomFichier(), type: blobFinal.type, duree: Math.round((Date.now() - t0) / 1000), cree: new Date().toISOString(), essais: 0, blob: blobFinal };
     ajouter(v).then(function () {
       try { URL.revokeObjectURL($('v-revoir').src); } catch (e) {} blobFinal = null; invite = null; $('b-fin').disabled = false;
       $('m-txt').textContent = v.pour === 'autre' ? 'Votre vidéo sera envoyée à ' + v.dest + ' par e-mail.' : 'Votre vidéo vous sera envoyée par e-mail.';
-      montrer('s-merci'); synchro(); setTimeout(function () { accueil(); }, 7000);
+      montrer('s-merci'); synchro(); afficherQr(v);
     }).catch(function () { $('b-fin').disabled = false; alert('La vidéo n’a pas pu être enregistrée : la mémoire de la tablette est pleine. Prévenez l’équipe.'); });
   };
 
@@ -274,7 +297,7 @@ $('b-stop').onclick = arreterRec;
     var base = (cfg.serveur || location.origin).replace(/\/+$/, '');
     var n = Math.max(1, Math.ceil(v.blob.size / TAILLE)), i = 0, dernier = {};
     function suite() {
-      var q = new URLSearchParams({ id: v.id, i: i, n: n, fichier: v.fichier, type: v.type || '', nom: v.nom, prenom: v.prenom, email: v.email, event: v.event || '', duree: v.duree || 0, son: (v.son == null ? '' : v.son), pour: v.pour || 'moi', dest: v.dest || '' });
+      var q = new URLSearchParams({ id: v.id, i: i, n: n, fichier: v.fichier, type: v.type || '', nom: v.nom, prenom: v.prenom, email: v.email, event: v.event || '', duree: v.duree || 0, son: (v.son == null ? '' : v.son), pour: v.pour || 'moi', dest: v.dest || '', rk: v.rk || '' });
       return fetch(base + '/api/videobooth/chunk?' + q.toString(), { method: 'POST', headers: { 'x-appareil': (cfg.jeton || cfg.cle), 'content-type': 'application/octet-stream' }, body: v.blob.slice(i * TAILLE, (i + 1) * TAILLE) }).then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (j) {
           if (!r.ok || j.ok === false) throw new Error(j.erreur || ('Serveur : ' + r.status));
@@ -301,7 +324,7 @@ $('b-stop').onclick = arreterRec;
   /* ── état de la tablette, envoyé toutes les 2 minutes au back-office (batterie, vidéos en attente, caméra, micro, place) ── */
   function battement() {
     if (!(cfg.jeton || cfg.cle)) return;
-    var etat = { cam: camEtat, mic: micEtat, ver: 26, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
+    var etat = { cam: camEtat, mic: micEtat, ver: 27, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
     var fin = function () {
       toutes().then(function (l) { etat.att = l.filter(function (v) { return !v.envoye; }).length; etat.tot = l.length; }).catch(function () {}).then(function () {
         return (navigator.storage && navigator.storage.estimate) ? navigator.storage.estimate().then(function (e) { etat.usage = e.usage || 0; etat.quota = e.quota || 0; }).catch(function () {}) : null;
@@ -316,8 +339,11 @@ $('b-stop').onclick = arreterRec;
   document.addEventListener('visibilitychange', function () { if (!document.hidden) setTimeout(battement, 800); });
   window.addEventListener('online', function () { setTimeout(battement, 1500); });
   /* e-mails non partis : une relance douce quand la tablette se rallume (au plus une toutes les 6 h, jamais en boucle ; le serveur limite aussi à 3 essais par vidéo) */
+  var derniereAction = Date.now(); document.addEventListener('pointerdown', function () { derniereAction = Date.now(); }, true);
   function relanceMails() {
     if (!(cfg.jeton || cfg.cle)) return;
+    /* on attend un moment calme : personne n'est en train de filmer, aucun envoi en cours, personne n'a touché l'écran depuis 2 minutes */
+    if (enregistrement || envoiEnCours || Date.now() - derniereAction < 120000) { setTimeout(relanceMails, 120000); return; }
     var der = 0; try { der = +localStorage.getItem('vb-relance') || 0; } catch (e) {}
     if (Date.now() - der < 6 * 3600 * 1000) return;
     try { localStorage.setItem('vb-relance', String(Date.now())); } catch (e) {}

@@ -186,6 +186,22 @@ export default async (request) => {
     return rep({ ok: true });
   }
 
+  /* ── ouverture de sa vidéo par QR code (écran de remerciement de la tablette) ──
+     La vidéo peut ne pas être encore arrivée : la page patiente et se rafraîchit seule. Sans la bonne clé : rien. */
+  if (request.method === 'GET' && /\/api\/videobooth\/mv\/[A-Za-z0-9_-]+$/.test(url.pathname)) {
+    const id = url.pathname.split('/').pop(), k = String(url.searchParams.get('k') || '').replace(/[^A-Za-z0-9]/g, '');
+    if (!cle || !idOk(id) || k.length < 12) return new Response('Lien invalide', { status: 404 });
+    const st = store();
+    const m = await st.get('meta/' + id, { type: 'json' }).catch(() => null);
+    const entete = { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' };
+    if (!m) {
+      const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta http-equiv="refresh" content="6"><title>Votre vidéo arrive</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0f2237;font-family:Inter,Arial,sans-serif;color:#fff;text-align:center;padding:24px}main{max-width:380px}small{letter-spacing:.3em;font-size:11px;color:#9fb0c6}h1{font-size:22px;margin:12px 0 8px}p{color:#9fb0c6;font-size:14px;line-height:1.6;margin:0 0 10px}.r{width:34px;height:34px;border:4px solid #2c4766;border-top-color:#f59e0b;border-radius:50%;margin:18px auto;animation:t 1s linear infinite}@keyframes t{to{transform:rotate(360deg)}}</style></head><body><main><small>VESPRA EVENT</small><h1>Votre vidéo arrive</h1><div class="r"></div><p>Elle est en cours d’envoi depuis la tablette. Cette page se met à jour toute seule : quelques secondes à quelques minutes.</p><p>Vous la recevrez aussi par e-mail.</p></main></body></html>`;
+      return new Response(html, { status: 202, headers: entete });
+    }
+    if (!m.rk || !egal(m.rk, k)) return new Response('Lien invalide', { status: 404 });
+    return new Response(null, { status: 302, headers: { Location: `/api/videobooth/v/${id}?t=${jetonMail(id)}`, 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
+  }
+
   /* ── relance douce des e-mails non partis : appelée par la tablette quand elle se rallume, jamais en boucle ──
      • au plus une passe toutes les 6 h ; au plus 25 e-mails par passe ; au plus 3 essais par vidéo ;
      • au premier refus du service d'e-mail, on s'arrête (pas d'insistance, pas de saturation). */
@@ -194,7 +210,7 @@ export default async (request) => {
     const st = store();
     const dernier = await st.get('etat/relance-mails', { type: 'json' }).catch(() => null);
     if (dernier && Date.now() - Date.parse(dernier.date) < 6 * 3600 * 1000) return rep({ ok: true, ignore: 'passe récente', envoyes: 0, restants: dernier.restants || 0 });
-    const aEnvoyer = (await lireMetas(st, (m) => m.mail !== 'envoye' && m.email && (Number(m.mailEssais) || 0) < 3 && !(m.mail === 'attente' && Date.now() - Date.parse(m.cree) < 15 * 60000))).sort((a, b) => String(a.cree).localeCompare(String(b.cree)));
+    const aEnvoyer = (await lireMetas(st, (m) => m.mail !== 'envoye' && m.email && (Number(m.mailEssais) || 0) < 3 && !(m.mail === 'attente' && Date.now() - Date.parse(m.cree) < 15 * 60000) && !(m.mailEssaiLe && Date.now() - Date.parse(m.mailEssaiLe) < 6 * 3600 * 1000))).sort((a, b) => String(a.cree).localeCompare(String(b.cree)));
     const site = (process.env.URL || `${url.protocol}//${url.host}`).replace(/\/$/, '');
     let envoyes = 0, stop = false;
     for (const m of aEnvoyer.slice(0, 25)) {
@@ -344,6 +360,8 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
       fichier: String(q.get('fichier') || 'video.mp4').replace(/[\\/:*?"<>|\r\n]+/g, ' ').trim().slice(0, 150) || 'video.mp4',
       type: String(q.get('type') || 'video/mp4').slice(0, 40), duree: Number(q.get('duree')) || 0, pour: q.get('pour') === 'autre' ? 'autre' : 'moi', dest: q.get('pour') === 'autre' ? String(q.get('dest') || '').replace(/[<>\r\n]+/g, ' ').trim().slice(0, 60) : '', son: q.get('son') === '' || q.get('son') == null ? null : Math.min(100, Math.max(0, Math.round(Number(q.get('son')) || 0))), octets: total, cree: new Date().toISOString(),
     };
+    /* clé de récupération par QR code (aléatoire, générée sur la tablette) : permet à l'invité d'ouvrir sa propre vidéo depuis l'écran de remerciement */
+    { const rk = String(q.get('rk') || '').replace(/[^A-Za-z0-9]/g, '').slice(0, 40); if (rk.length >= 12) m.rk = rk; }
     /* durée de conservation propre à la session de cette vidéo */
     try { const ses = (await sessionsLire(st)).find((e) => labelSession(e) === m.event); if (ses) m.garde = ses.conserv || 0; } catch {}
     await st.set('video/' + id, tout.buffer);
