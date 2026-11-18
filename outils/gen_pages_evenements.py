@@ -18,6 +18,22 @@ CAR_JS = re.search(r'<script>\n/\* Carrousels de la page.*?</script>', shell, re
 LIBS = '<script src="/date-fr.js" defer></script>\n<script src="/selects-jolis.js" defer></script>\n'
 
 EXTRA_CSS = '''
+.ev-logos{border:0!important;padding:10px 0 0!important;margin-top:18px!important}
+.ev-logos-t{gap:84px!important}
+.ev-logos-t img{height:78px!important;opacity:.9!important}
+.ev-txt{max-width:1080px!important}
+.ev-txt p{max-width:820px}
+.ev-faq{max-width:1080px!important}
+.ev-pills{display:flex;flex-wrap:wrap;gap:10px}
+.ev-pills a,.ev-pills span{padding:12px 20px;border-radius:999px;background:#fff;border:1.5px solid var(--g3);font-weight:600;font-size:15px;color:var(--navy);text-decoration:none}
+.ev-pills a:hover{border-color:var(--navy)}
+.ev-gar{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.ev-gi{display:grid;gap:4px;justify-items:start}
+.ev-ico{width:54px;height:54px;border-radius:50%;background:var(--navy);display:grid;place-items:center;margin-bottom:10px}
+.ev-ico svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ev-gi b{font-size:17px;color:var(--black)}.ev-gi small{font-size:14px;color:var(--g2)}
+@media(max-width:820px){.ev-gar{grid-template-columns:1fr 1fr;gap:26px 16px}.ev-logos-t img{height:60px!important}.ev-logos-t{gap:60px!important}.ev-pills a,.ev-pills span{font-size:14px;padding:10px 16px}}
+
 .ev-card{background:#fff;border:1.5px solid var(--g3);border-radius:var(--rl);padding:22px}
 .ev-card h3{font-size:17px;margin:0 0 8px;color:var(--black)}
 .ev-card p{font-size:14.5px;line-height:1.65;color:var(--g1);margin:0}
@@ -89,10 +105,16 @@ def build(slug, P):
         logos = ['t-logo-armor-wash','t-logo-viva-tattoo','t-logo-3b-cave','t-logo-animal-trak','t-logo-blanchard','t-logo-jerrigan','t-logo-libre-inspi','t-logo-cooper-standard','t-logo-passion-reception','t-logo-seche']
         lg = ''.join('<img src="%s.webp" alt="" loading="lazy" decoding="async">' % x for x in logos)
         out.append('<section class="ev-sec"><div class="ev-in"><p class="ev-k">Ils nous ont fait confiance</p><h2 class="ev-t">ENTREPRISES, ASSOCIATIONS, <em>COLLECTIVITÉS</em></h2></div><div class="ev-logos" aria-hidden="true"><div class="ev-logos-t">%s</div></div></section>' % (lg + lg))
-        evts = [("Séminaires","Accueil, restauration, sonorisation : une logistique simple pour que l'équipe se concentre sur la journée."),("Inaugurations","Un moment fort : effets, lumière, sonorisation et accueil des invités."),("Soirées d'entreprise","Ambiance, lumière et animations pour réunir vos collaborateurs."),("Événements commerciaux","Salons, forums, portes ouvertes : stands et accueil installés avant l'ouverture."),("Événements de fin d'année","Lumière, musique et animations pour réunir vos équipes en fin d'année."),("Associations et collectivités","Kermesses, repas, fêtes de village : du matériel pour accueillir beaucoup de monde.")]
-        out.append('<section class="ev-sec"><div class="ev-in"><p class="ev-k">Vos événements</p><h2 class="ev-t">DU SÉMINAIRE À <em>LA FÊTE DE FIN D\'ANNÉE</em></h2><div class="ev-evt">%s</div></div></section>' % ''.join('<div class="ev-card"><h3>%s</h3><p>%s</p></div>' % e for e in evts))
-        rass = [("Installé et repris","aux horaires convenus"),("Devis sous 24 h","prix ferme, livraison détaillée"),("Facture à votre nom","société ou association, virement"),("Voir avant de choisir","à Vitré, sur rendez-vous")]
-        out.append('<section class="ev-sec"><div class="ev-in"><p class="ev-k">Ce que les professionnels apprécient</p><h2 class="ev-t">NOUS ORGANISONS, <em>VOUS PROFITEZ</em></h2><div class="ev-grid">%s</div></div></section>' % ''.join('<div class="ev-card"><h3>%s</h3><p>%s</p></div>' % r for r in rass))
+        pills = [("Séminaires","organisation-seminaire.html"),("Soirées d'entreprise","organisation-soiree-entreprise.html"),("Anniversaire d'entreprise","organisation-anniversaire-entreprise.html"),("Inaugurations",""),("Salons et portes ouvertes",""),("Événements de fin d'année",""),("Arbres de Noël",""),("Team building",""),("Associations et collectivités","")]
+        pl = ''.join(('<a href="%s">%s</a>' % (h, n)) if h else ('<span>%s</span>' % n) for n, h in pills)
+        out.append('<section class="ev-sec"><div class="ev-in"><p class="ev-k">Vos événements</p><h2 class="ev-t">TOUS VOS ÉVÉNEMENTS <em>PROFESSIONNELS</em></h2><div class="ev-pills">%s</div></div></section>' % pl)
+        ic = {
+         'box': '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>',
+         'clock': '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+         'euro': '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 6.5A6.5 6.5 0 1 0 17 17.5M4 10h9M4 14h9"/></svg>',
+         'eye': '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>'}
+        gar = [('box',"Installé et repris","aux horaires convenus"),('clock',"Devis sous 24 h","prix ferme"),('euro',"Facture à votre nom","société ou association"),('eye',"Voir avant de choisir","à Vitré, sur rendez-vous")]
+        out.append('<section class="ev-sec"><div class="ev-in"><p class="ev-k">Pour les professionnels</p><h2 class="ev-t">NOS <em>ENGAGEMENTS</em></h2><div class="ev-gar">%s</div></div></section>' % ''.join('<div class="ev-gi"><span class="ev-ico">%s</span><b>%s</b><small>%s</small></div>' % (ic[k], a, b) for k, a, b in gar))
     steps = ''.join('<div class="ev-st"><span class="ev-sn">%d</span><h3>%s</h3><p>%s</p></div>' % (i + 1, t, d) for i, (t, d) in enumerate(P['steps']))
     out.append('<section class="ev-sec ev-sec-sombre"><div class="ev-in"><p class="ev-k">Comment ça se passe</p><h2 class="ev-t">DU PREMIER MESSAGE <em>À L\'ÉVÉNEMENT</em></h2><div class="ev-steps" data-evcar>%s</div><div class="ev-dots ev-dots-clair" data-evdots aria-hidden="true"></div></div></section>' % steps)
     out.append('<section class="ev-sec ev-prod"><div class="ev-in"><div class="pr-sec pr-sec-b"><span class="pr-lab">Le matériel pour votre événement</span><h3 class="pr-t">À louer <em class="ac">pour votre projet</em></h3><div class="bests pr-bests" id="prB" data-vcar="prB" data-add data-ids="%s"><div class="bests-shell"><button class="bests-arrow bests-arrow-prev" id="prBPrev" aria-label="Produits précédents">‹</button><div class="bests-carousel" id="prBWrap"><div class="bests-track" id="prBTrack"></div></div><button class="bests-arrow bests-arrow-next" id="prBNext" aria-label="Produits suivants">›</button></div><div class="bests-dots" id="prBDots"></div></div></div></div></section>' % P['prod_ids'])
