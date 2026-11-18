@@ -698,6 +698,13 @@ textarea.pr-i{resize:vertical;min-height:96px}
 .ev-vmq-t a{background:#fff!important;color:var(--navy)!important;border:1.5px solid var(--g3)!important;padding:11px 22px!important}
 .ev-zones{display:flex;justify-content:flex-start;margin-top:4px}
 .ev-zones a{padding:12px 22px;border-radius:999px;background:var(--navy);color:#fff;font-weight:600;font-size:14px;text-decoration:none}
+
+.ev-bur-img{position:relative;aspect-ratio:4/3;border-radius:20px;overflow:hidden;box-shadow:0 14px 44px rgba(12,15,20,.16)}
+.ev-bur-img img{position:absolute!important;inset:0;width:100%!important;height:100%!important;aspect-ratio:auto!important;border-radius:0!important;box-shadow:none!important;object-fit:cover;opacity:0;transition:opacity 1.1s ease}
+.ev-bur-img img.on{opacity:1}
+.ev-bur-img img:nth-child(3){object-position:25% 60%}
+.ev-pc h3{font-size:19px}
+
 .pr-hero .pr-kicker{font-family:inherit;font-size:11px;font-weight:600;line-height:1.3;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85);margin:0 0 6px}
 @media(max-width:980px){
  .ev-car,.ev-steps{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;padding:4px 16px 8px;margin:0 -16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -779,9 +786,15 @@ textarea.pr-i{resize:vertical;min-height:96px}
 <div class="ev-marquee" aria-hidden="true"><div class="ev-mq-t"><span>Anniversaire d'entreprise</span><span>Équipes et clients</span><span>Cocktail</span><span>Discours</span><span>Photobooth</span><span>Animation</span><span>Sonorisation</span><span>Souvenirs</span><span>Anniversaire d'entreprise</span><span>Équipes et clients</span><span>Cocktail</span><span>Discours</span><span>Photobooth</span><span>Animation</span><span>Sonorisation</span><span>Souvenirs</span></div></div>
 <section class="ev-sec"><div class="ev-in"><p class="ev-k">Votre anniversaire d'entreprise de A à Z</p><h2 class="ev-t">UNE FÊTE <em>QUI RASSEMBLE</em></h2><div class="ev-car" data-evcar><article class="ev-pc"><img src="rdv-materiel.webp" alt="Scène avec projecteurs et sonorisation" loading="lazy" decoding="async"><div class="ev-pc-b"><span class="ev-pc-n">01</span><h3>Les discours</h3><p>Sonorisation, micros et vidéoprojection pour les prises de parole et la projection de vos photos et de votre histoire.</p><a href="produit-sonorisation.html">Voir la sonorisation →</a></div></article><article class="ev-pc"><img src="fontaine-cocktail.webp" alt="Fontaine à cocktail dans une salle en pierre" loading="lazy" decoding="async"><div class="ev-pc-b"><span class="ev-pc-n">02</span><h3>Le cocktail</h3><p>Mange-debout, fontaine à cocktail et service par notre serveuse privée pour accueillir vos invités.</p><a href="produit-fontaine-cocktail.html">Voir la fontaine à cocktail →</a></div></article><article class="ev-pc"><img src="videobooth-standard.webp" alt="Vidéobooth décoré de fleurs" loading="lazy" decoding="async"><div class="ev-pc-b"><span class="ev-pc-n">03</span><h3>Le photobooth</h3><p>Un photobooth aux couleurs de votre entreprise : chaque invité repart avec un souvenir de la fête.</p><a href="produit-videobooth.html">Voir le vidéobooth →</a></div></article><article class="ev-pc"><img src="neon-lumineux.webp" alt="Néon lumineux pour décorer une réception" loading="lazy" decoding="async"><div class="ev-pc-b"><span class="ev-pc-n">04</span><h3>Le décor</h3><p>Néon, guirlandes, mobilier : une ambiance soignée dès l'entrée.</p><a href="produit-neon-lumineux.html">Voir le néon lumineux →</a></div></article></div><div class="ev-dots" data-evdots aria-hidden="true"></div></div></section>
 <section class="ev-sec"><div class="ev-in ev-txt"><p class="ev-k">Votre anniversaire d'entreprise</p><h2 class="ev-t">L'HISTOIRE DE VOTRE ENTREPRISE, <em>EN FÊTE</em></h2><p>Un anniversaire d'entreprise marque une étape et remercie ceux qui ont fait son histoire. Nous préparons l'installation (sonorisation, vidéoprojection, mobilier), l'ambiance et les souvenirs, puis nous coordonnons les prestataires pour le service.</p><p>Nous intervenons à Vitré, Rennes et dans tout le Grand Ouest, dans vos locaux ou dans un lieu de réception. Vous avez un seul interlocuteur et une seule facture, avec un devis sur mesure et sans engagement.</p></div></section>
-<section class="ev-sec"><div class="ev-in ev-svc"><div class="ev-svc-t"><p class="ev-k">Cocktail et service</p><h2 class="ev-t">UN COCKTAIL <em>POUR CÉLÉBRER</em></h2><p>Pour fêter l'anniversaire de votre entreprise, le cocktail réunit équipes, clients et partenaires. Notre serveuse privée assure l'accueil, le service et la présentation des plateaux.</p><p>Bouchées, buffet ou découpe devant les invités : nous coordonnons avec vous les prestataires adaptés à votre fête. Ces prestations se font sur devis.</p><a class="ev-lien" href="evenements.html#prestataires">Découvrir nos prestataires →</a></div><div class="ev-svc-i"><img src="cocktail-service-bouchees.webp" alt="Serveur en gilet qui présente un plateau de bouchées lors d'un cocktail en extérieur" loading="lazy" decoding="async" width="1600" height="1067"><img src="cocktail-decoupe-jambon.webp" alt="Découpe de jambon devant les invités lors d'un cocktail en extérieur" loading="lazy" decoding="async" width="1600" height="1067"></div></div></section>
+<section class="ev-sec"><div class="ev-in ev-svc"><div class="ev-svc-t"><p class="ev-k">Cocktail et service</p><h2 class="ev-t">UN COCKTAIL <em>POUR CÉLÉBRER</em></h2><p>Pour fêter l'anniversaire de votre entreprise, le cocktail réunit équipes, clients et partenaires. Notre serveuse privée assure l'accueil, le service et la présentation des plateaux.</p><p>Bouchées, buffet ou découpe devant les invités : nous coordonnons avec vous les prestataires adaptés à votre fête. Ces prestations se font sur devis.</p><a class="ev-lien" href="#prestataires">Découvrir nos prestataires →</a></div><div class="ev-svc-i"><img src="cocktail-service-bouchees.webp" alt="Serveur en gilet qui présente un plateau de bouchées lors d'un cocktail en extérieur" loading="lazy" decoding="async" width="1600" height="1067"><img src="cocktail-decoupe-jambon.webp" alt="Découpe de jambon devant les invités lors d'un cocktail en extérieur" loading="lazy" decoding="async" width="1600" height="1067"></div></div></section>
 <section class="ev-sec ev-sec-sombre"><div class="ev-in"><p class="ev-k">Comment ça se passe</p><h2 class="ev-t">DU PREMIER MESSAGE <em>À L'ÉVÉNEMENT</em></h2><div class="ev-steps" data-evcar><div class="ev-st"><span class="ev-sn">1</span><h3>Vous nous parlez de la fête</h3><p>Âge de l'entreprise, date, nombre d'invités, lieu.</p></div><div class="ev-st"><span class="ev-sn">2</span><h3>Nous en discutons</h3><p>À Vitré ou sur place, pour définir le besoin.</p></div><div class="ev-st"><span class="ev-sn">3</span><h3>Nous composons la fête</h3><p>Son, vidéo, cocktail, photobooth, décor.</p></div><div class="ev-st"><span class="ev-sn">4</span><h3>Un devis, une seule facture</h3><p>Un devis clair, sans engagement.</p></div><div class="ev-st"><span class="ev-sn">5</span><h3>Le jour J, nous sommes là</h3><p>Installation avant l'arrivée des invités.</p></div></div><div class="ev-dots ev-dots-clair" data-evdots aria-hidden="true"></div></div></section>
 <section class="ev-sec ev-prod"><div class="ev-in"><div class="pr-sec pr-sec-b"><span class="pr-lab">Le matériel pour votre événement</span><h3 class="pr-t">À louer <em class="ac">pour votre projet</em></h3><div class="bests pr-bests" id="prB" data-vcar="prB" data-add data-ids="p3,p46,p32,p35,p49,p45,p15,p12,p23"><div class="bests-shell"><button class="bests-arrow bests-arrow-prev" id="prBPrev" aria-label="Produits précédents">‹</button><div class="bests-carousel" id="prBWrap"><div class="bests-track" id="prBTrack"></div></div><button class="bests-arrow bests-arrow-next" id="prBNext" aria-label="Produits suivants">›</button></div><div class="bests-dots" id="prBDots"></div></div></div></div></section>
+<section class="ev-sec ev-presta" id="prestataires"><div class="ev-in"><p class="ev-k">Nos prestataires partenaires</p><h2 class="ev-t">DES PROFESSIONNELS <em>QUI TRAVAILLENT AVEC NOUS</em></h2><p class="ev-sub">Notre chef pâtissier crée votre gâteau d'anniversaire sur mesure ; notre serveuse privée assure le service. Envoyez-nous votre demande.</p></div></section>
+<header class="pr-hero" id="prHero"><div class="pr-hero-in"><p class="pr-kicker">Prestataire partenaire</p><h2 id="prHT"></h2><p id="prHA"></p><div class="pr-nav" role="tablist" aria-label="Choisir une prestation" id="prNav"></div></div></header>
+<section class="pr"><div class="pr-in">
+  <article class="pr-card" id="prCard" aria-live="polite"></article>
+  <div class="pr-more" id="prMore"></div>
+</div></section>
 <section class="ev-sec"><div class="ev-in"><p class="ev-k">À découvrir aussi</p><h2 class="ev-t">D'AUTRES <em>ÉVÉNEMENTS</em></h2><div class="ev-villes ev-rel"><a href="organisation-soiree-entreprise.html">Soirée d'entreprise</a><a href="organisation-seminaire.html">Séminaire</a><a href="organisation-evenements-entreprises.html">Tous les événements professionnels</a><a href="evenements.html" class="ev-v-tous">Organisation clé en main →</a></div></div></section>
 <section class="ev-sec" id="faq-evenements"><div class="ev-in ev-faq"><p class="ev-k">Questions fréquentes</p><h2 class="ev-t">VOS QUESTIONS, <em>NOS RÉPONSES</em></h2><div class="ev-fq"><details><summary>Pouvez-vous organiser l'anniversaire de notre entreprise ?</summary><p>Oui : installation, sonorisation, vidéoprojection, cocktail et photobooth. Nous coordonnons le tout et vous remettons une seule facture.</p></details><details><summary>Le photobooth peut-il porter les couleurs de l'entreprise ?</summary><p>Oui, les cadres peuvent être personnalisés aux couleurs de votre entreprise ou de l'événement.</p></details><details><summary>Intervenez-vous dans nos locaux ?</summary><p>Oui, dans vos locaux comme dans un lieu de réception, à Rennes et dans tout le Grand Ouest.</p></details><details><summary>Comment est calculé le prix ?</summary><p>Les produits ont un prix affiché dans le catalogue. L'organisation se fait sur devis, sans engagement.</p></details></div></div></section>
 <section class="rdv" id="rdv">
@@ -856,6 +869,138 @@ textarea.pr-i{resize:vertical;min-height:96px}
 </script>
 <script src="/date-fr.js" defer></script>
 <script src="/selects-jolis.js" defer></script>
+<script>window.__prSansPlus=true;window.__prDefaut='patissier';</script>
+<script>
+(function(){
+var PR=[
+ {id:'serveuse',nom:'Serveuse privée',court:'Candice',img:'prestation-serveuse.webp',photo:true,
+  titre:'Serveuse privée — Candice',accroche:'Candice, serveuse privée partenaire, réalise le service de votre événement : présentation, service et mise en place.',
+  service:['Service du vin d\'honneur, du cocktail et du repas : présentation, passage des plateaux, service à table','Mise en place et rangement du bar et du buffet : verrerie, boissons, plats, décoration de table','Accueil et service des invités, avec le sourire et dans le calme','Gestion du rythme de la réception en lien avec vous et votre traiteur','Candice est une professionnelle expérimentée, avec une vingtaine d\'années d\'expérience','Un rendez-vous pour rencontrer Candice avant l\'événement et préparer le déroulé ensemble'],
+  infos:['Prestation réalisée par Candice, prestataire partenaire. Vespra Event encaisse pour son compte et assure la coordination.','Prestation sur devis : le prix dépend des heures et du nombre de personnes','Précisez l\'horaire de début et de fin souhaité','Vous pouvez la combiner avec la location de matériel (fontaine à cocktail, machine à glaçons, mange-debout…)'],
+  champs:'heures'},
+ {id:'patissier',nom:'Chef pâtissier',court:'Emmanuel',img:'prestation-patissier.webp',photo:true,
+  titre:'Chef pâtissier — Emmanuel',accroche:'Emmanuel, chef pâtissier partenaire, réalise sur mesure : tout est possible en pâtisserie. Gâteau, desserts ou buffet de douceurs, selon vos envies et le nombre d\'invités.',
+  service:['Création sur mesure : tout est possible en pâtisserie, selon vos envies et votre thème','Gâteaux à étages, pièces montées, entremets, mignardises et buffets de douceurs','Choix des saveurs, des textures et du décor avec vous, étape par étape','Prise en compte des allergies et des régimes particuliers','Un rendez-vous pour goûter les pâtisseries d\'Emmanuel peut être organisé : vous goûtez avant de choisir','Emmanuel est un chef expert, avec une dizaine d\'années d\'expérience'],
+  infos:['Prestation réalisée par Emmanuel, prestataire partenaire. Vespra Event encaisse pour son compte et assure la coordination.','Prestation sur devis : selon le nombre de parts, le thème et la complexité','Indiquez vos envies, allergies et contraintes dans les précisions','Prévoyez de commander plusieurs semaines à l\'avance'],
+  champs:'parts'}
+];
+
+var MORE={
+ serveuse:{quand:"Candice intervient pour les mariages, mais aussi pour les anniversaires, baptêmes, repas de famille, cocktails d'entreprise et fêtes d'association. Vous nous indiquez le déroulé et les horaires, elle s'occupe du reste : vous profitez de vos invités.",
+  sug:[['fontaine-cocktail','Fontaine à cocktail','produit-fontaine-cocktail.html','Restauration',"Fontaine à cocktail élégante pour le vin d'honneur."],['mange-debout','Mange-debout','produit-mange-debout.html','Mobilier',"Tables hautes pour cocktail et vin d'honneur."],['buvette','Buvette 4 comptoirs','produit-buvette.html','Restauration',"Buvette à 4 comptoirs pour servir boissons et snacks."],['guirlande-lumineuse','Guirlande lumineuse','produit-guirlande-lumineuse.html','Décoration',"Guirlandes lumineuses pour une ambiance chaleureuse."],['panneau-bienvenue','Panneau de bienvenue','produit-panneau-bienvenue.html','Décoration',"Panneau d'accueil personnalisable pour vos invités."],['popcorn','Machine à pop-corn','produit-popcorn.html','Restauration',"Machine à pop-corn sur chariot, gourmande et conviviale."]],
+  faq:[['Comment est calculé le prix ?','Sur devis, selon le nombre d\'heures et le nombre d\'invités. Indiquez l\'horaire de début et de fin souhaité dans le formulaire : le prix vous est communiqué après échange avec vous, sans engagement.'],['Quels services Candice peut-elle assurer ?','Le service du vin d\'honneur, du cocktail et du repas, l\'accueil des invités, ainsi que la mise en place et le rangement du bar et du buffet.'],['Peut-on la rencontrer avant l\'événement ?','Oui. Un rendez-vous est organisé avant l\'événement : vous faites connaissance et vous préparez ensemble le déroulé.'],['Pour quels événements ?','Mariages, anniversaires, baptêmes, repas de famille, cocktails d\'entreprise et fêtes d\'association.'],['Peut-on la combiner avec de la location de matériel ?','Oui, c\'est même pratique : fontaine à cocktail, mange-debout, buvette, vaisselle… Candice installe et range, vous n\'avez qu\'à profiter.'],['Dans quelles communes intervient-elle ?','Autour de Vitré, Fougères, Rennes, Laval. Précisez le lieu de votre événement dans le formulaire.'],['Comment réserver ?','Ajoutez la prestation au devis avec la date de votre événement, nous revenons vers vous rapidement pour valider les détails.']]},
+ patissier:{quand:"Emmanuel crée des gâteaux et desserts pour les mariages, mais aussi pour les anniversaires, baptêmes, communions, départs en retraite et événements d'entreprise : pièces montées, entremets, mignardises ou buffet de douceurs.",
+  sug:[['mange-debout','Mange-debout','produit-mange-debout.html','Mobilier',"Tables hautes pour cocktail et vin d'honneur."],['buvette','Buvette 4 comptoirs','produit-buvette.html','Restauration',"Buvette à 4 comptoirs pour servir boissons et snacks."],['neon-lumineux','Néon lumineux','produit-neon-lumineux.html','Décoration',"Néon lumineux pour une décoration marquante."],['panneau-bienvenue','Panneau de bienvenue','produit-panneau-bienvenue.html','Décoration',"Panneau d'accueil personnalisable pour vos invités."],['popcorn','Machine à pop-corn','produit-popcorn.html','Restauration',"Machine à pop-corn sur chariot, gourmande et conviviale."],['fontaine-cocktail','Fontaine à cocktail','produit-fontaine-cocktail.html','Restauration',"Fontaine à cocktail élégante pour le vin d'honneur."]],
+  faq:[['Comment est calculé le prix ?','Sur devis, selon le nombre de parts, le thème et la complexité de la création. Le prix vous est communiqué après échange avec vous, sans engagement.'],['Peut-on goûter avant de choisir ?','Oui. Un rendez-vous dégustation peut être organisé : tests de pâtisserie, vous goûtez et on affine ensemble la création.'],['Combien de temps à l\'avance faut-il commander ?','Prévoyez plusieurs semaines, davantage pour une pièce montée ou une création très personnalisée.'],['Que peut-on commander ?','Gâteaux à étages, pièces montées, entremets, mignardises ou buffet de douceurs : tout est possible sur mesure.'],['Pour quels événements ?','Mariages, anniversaires, baptêmes, communions, départs en retraite et événements d\'entreprise.'],['Et pour les allergies ou régimes particuliers ?','Indiquez vos contraintes dans le formulaire : elles sont prises en compte dès la création du devis.'],['Comment réserver ?','Ajoutez la prestation au devis avec la date de votre événement et le nombre d\'invités, nous revenons vers vous rapidement.']]}
+};
+var LEAD={serveuse:"Du repas de famille au cocktail d'entreprise, Candice s'adapte à votre événement : vous gardez l'esprit libre pour profiter de vos invités.",patissier:"Chaque création est pensée avec vous : saveurs, décor, nombre de parts. Vous goûtez avant de valider, sans engagement."};
+var REG=null;
+function variantes(pg){var R=window.VESPRA_PRIX_REGISTRE||[],o=[];R.forEach(function(v){if(v.pg===pg&&v.v&&!/^Option/.test(v.v)&&v.p!=null)o.push({l:v.v,p:v.p,n:v.n,i:v.i})});return o}
+function cartes(m){var R=window.VESPRA_PRIX_REGISTRE||[];return m.sug.map(function(x,k){var pr=null,base=null;R.forEach(function(v){if(v.pg===x[2]&&!/^Option/.test(v.v||'')&&v.p!=null){if(pr===null||v.p<pr)pr=v.p;if(!v.v&&base===null)base=v}});var va=variantes(x[2]);
+ var sel=va.length>1?'<select class="pr-cs" aria-label="Choisir une formule">'+va.map(function(v,i){return '<option value="'+i+'">'+esc(v.l)+' — '+v.p+' €</option>'}).join('')+'</select>':'';
+ return '<div class="pr-c" data-k="'+k+'"><a href="'+x[2]+'" class="pr-ci"><img src="'+x[0]+'.webp" alt="'+esc(x[1])+'" loading="lazy" decoding="async" width="400" height="300"></a><div class="pr-cb"><div class="pr-cc">'+esc(x[3])+'</div><a href="'+x[2]+'" class="pr-cn">'+esc(x[1])+'</a><div class="pr-cd">'+esc(x[4])+'</div>'+sel+(pr!=null?'<div class="pr-cf"><div class="pr-cp"><small>À partir de</small>'+pr+' €</div><button type="button" class="pr-add2" aria-label="Ajouter '+esc(x[1])+' au devis">+</button></div>':'')+'</div></div>'}).join('')}
+function ajoutRapide(card){var m=MORE[PR[cur].id],x=m.sug[+card.getAttribute('data-k')];
+ if(window.popupAjout)window.popupAjout({name:x[1],link:x[2],img:x[0]+'.webp',cat:x[3]});else location.href=x[2]}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.pr-add2');if(b){e.preventDefault();ajoutRapide(b.closest('.pr-c'))}});
+var railT=null;
+function rail(){var w=document.getElementById('prRW'),t=document.getElementById('prRT'),d=document.getElementById('prDots');if(!w)return;clearInterval(railT);
+ var n=t.children.length,step=function(){var c=t.children[0];return c?c.getBoundingClientRect().width+16:300};
+ d.innerHTML=Array.prototype.map.call(t.children,function(){return '<i></i>'}).join('');
+ var upd=function(){var k=Math.round(w.scrollLeft/step());Array.prototype.forEach.call(d.children,function(x,i){x.classList.toggle('on',i===k)})};
+ w.addEventListener('scroll',upd,{passive:true});upd();
+ var pause=0;['touchstart','pointerdown','wheel','mouseenter','focusin'].forEach(function(e){w.addEventListener(e,function(){pause=Date.now()+9000},{passive:true})});
+ document.getElementById('prRP').onclick=function(){pause=Date.now()+9000;w.scrollBy({left:-step(),behavior:'smooth'})};
+ document.getElementById('prRN').onclick=function(){pause=Date.now()+9000;w.scrollBy({left:step(),behavior:'smooth'})};
+ if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+ railT=setInterval(function(){if(Date.now()<pause||document.hidden)return;var max=w.scrollWidth-w.clientWidth;w.scrollTo({left:w.scrollLeft>=max-4?0:w.scrollLeft+step(),behavior:'smooth'})},4000)}
+/* produits à forte valeur : la sélection change à chaque affichage et d'un onglet à l'autre */
+function ordreProduits(){var P=['p3','p22','p35','p9','p12','p15','p11','p23','p34','p41','p45','p1','p49','p32','p46'],i=P.length,j,t;while(i>1){j=Math.floor(Math.random()*i);i--;t=P[i];P[i]=P[j];P[j]=t}return P.slice(0,10).join(',')}
+function more(){var m=MORE[PR[cur].id],box=document.getElementById('prMore');if(!m||window.__prSansPlus){box.innerHTML='';return}
+ box.innerHTML= '<div class="pr-sec pr-sec-b"><span class="pr-lab">Pour compléter votre événement</span><h3 class="pr-t">À louer <em class="ac">en complément</em></h3><div class="bests pr-bests" id="prB" data-vcar="prB" data-add data-ids="'+ordreProduits()+'"><div class="bests-shell"><button class="bests-arrow bests-arrow-prev" id="prBPrev" aria-label="Produits précédents">‹</button><div class="bests-carousel" id="prBWrap"><div class="bests-track" id="prBTrack"></div></div><button class="bests-arrow bests-arrow-next" id="prBNext" aria-label="Produits suivants">›</button></div><div class="bests-dots" id="prBDots"></div></div></div>'+
+ '<div class="pr-faq pr-sec"><span class="pr-lab">On vous répond</span><h3 class="pr-t">Questions <em class="ac">fréquentes</em></h3><div class="pr-fq">'+m.faq.map(function(q){return '<details><summary>'+esc(q[0])+'</summary><p>'+esc(q[1])+'</p></details>'}).join('')+'</div></div>';
+ if(window.vespraCarrousels)window.vespraCarrousels()}
+var nav=document.getElementById('prNav'),card=document.getElementById('prCard'),cur=0;
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function tabs(){nav.innerHTML=PR.map(function(p,i){return '<button class="pr-tab" role="tab" aria-selected="'+(i===cur)+'" data-i="'+i+'">'+esc(p.nom)+'</button>'}).join('')}
+/* Horaires proposés (au lieu d'une heure à taper) : par demi-heure, on fait défiler et on choisit.
+   Arrivée sur place : de 8 h à minuit. Fin souhaitée : de minuit à minuit (la fête peut finir tard). */
+function horaires(type){
+ var h=function(m){var H=Math.floor(m/60)%24,M=m%60;if(H===0&&M===0)return 'Minuit';if(H===12&&M===0)return 'Midi';return H+'h'+(M?'30':'')};
+ var out=[],i;
+ if(type==='arrivee'){for(i=8*60;i<=24*60;i+=30)out.push(h(i))}
+ else{for(i=0;i<24*60;i+=30)out.push(h(i));out.push('Minuit (fin de journée)')}
+ return out}
+function fiche(sub){
+ var p=PR[cur]; sub=sub||'service';
+ var liste=(sub==='service'?p.service:p.infos).map(function(t){return '<li>'+esc(t)+'</li>'}).join('');
+ var opt=function(arr){return arr.map(function(x){return '<option>'+x+'</option>'}).join('')};
+ var sel=function(id,ph,arr){return '<select class="pr-i" id="'+id+'" aria-label="'+ph+'"><option value="">'+ph+'</option>'+opt(arr)+'</select>'};
+ var NB='<select class="pr-i" id="prN" aria-label="Nombre d\'invités"><option value="">Nombre d\'invités</option>'+opt(['Moins de 20','20 à 30','30 à 50','50 à 80','80 à 150','150 à 300','Plus de 300'])+'</select>';
+ var champ;
+ if(p.champs==='parts'){
+   champ='<div class="pr-row">'+NB+'<input class="pr-i" id="prA" type="text" placeholder="Allergies / contraintes"></div>';
+ }else{
+   champ=''+NB+'<div class="pr-row">'+sel('prH','Arrivée sur place',horaires('arrivee'))+sel('prF','Fin souhaitée',horaires('fin'))+'</div>';
+ }
+ var rdvTxt=p.champs==='parts'?'Un rendez-vous dégustation sera organisé : tests de pâtisserie, vous venez goûter et on affine ensemble la création.':'Un rendez-vous sera organisé avec la serveuse privée partenaire : on échange sur sa façon de faire et sur la meilleure préparation de votre événement.';
+ var hero=document.getElementById('prHero'); hero.style.backgroundImage='url('+p.img+')'; document.getElementById('prHT').textContent=p.titre; document.getElementById('prHA').textContent=p.accroche;
+ card.innerHTML='<div class="pr-box">'+
+ '<div class="pr-sub" role="tablist"><button role="tab" data-s="service" aria-selected="'+(sub==='service')+'">Le service</button><button role="tab" data-s="infos" aria-selected="'+(sub==='infos')+'">Bon à savoir</button></div>'+
+ '<div class="pr-pane"><ul>'+liste+'</ul>'+(MORE[p.id]?'<div class="pr-evt"><h4>Pour quels événements ?</h4><p>'+esc(MORE[p.id].quand)+'</p></div>':'')+'</div></div>'+
+ '<form class="pr-form" id="prForm" novalidate><h3>Envoyer une demande</h3>'+
+ '<p class="pr-n pr-n0">Prestation : '+esc(p.nom)+'. Pas de panier ni de devis à remplir : décrivez votre événement, nous vous répondons rapidement pour en parler et nous rencontrer.</p>'+
+ '<div class="pr-row"><input class="pr-i" id="prNom" type="text" required autocomplete="name" placeholder="Prénom et nom *"><input class="pr-i" id="prTel" type="tel" required autocomplete="tel" placeholder="Téléphone *"></div>'+
+ '<input class="pr-i" id="prMail" type="email" required autocomplete="email" placeholder="Adresse e-mail *">'+
+ '<div class="pr-row pr-ev" id="prEv"><select class="pr-i" id="prT" aria-label="Type d\'événement"><option value="">Type d\'événement</option><option>Mariage</option><option>Anniversaire</option><option>Fête de village / Comité des fêtes</option><option>Événement d\'entreprise</option><option>Autre</option></select>'+
+ '<textarea class="pr-i" id="prTA" hidden placeholder="Décrivez votre événement"></textarea>'+
+ '<input class="pr-i" id="prD" type="text" data-date-fr placeholder="Date de l\'événement"></div>'+champ+
+ '<textarea class="pr-i" id="prM" placeholder="'+(p.champs==="parts"?"Votre création : gâteau, desserts, thème, envies…":"Précisions : lieu, déroulé, envies…")+'"></textarea>'+
+ '<div class="pr-rdv"><p>'+rdvTxt+'</p><div class="pr-row"><input class="pr-i" id="prRD" type="text" data-date-fr placeholder="Jour souhaité (facultatif)">'+sel('prRH','Moment de la journée',['Matin','Midi','Après-midi','Fin de journée'])+'</div></div>'+
+ '<label class="pr-chk"><input type="checkbox" id="prMat"> Je souhaite aussi louer du matériel pour cet événement</label>'+
+ '<button class="pr-add" type="submit">Envoyer ma demande</button><p class="pr-n" id="prMsg">Sans engagement. Les prix des prestations sont donnés sur devis, après échange avec vous.</p></form>';
+// activer calendrier/listes sur les nouveaux champs
+ var d=card.querySelector('[data-date-fr]'); if(d)d.dfrPret=false;
+ if(window.__dfrInit)window.__dfrInit(); else { var s=document.createElement('script'); s.src='/date-fr.js'; document.body.appendChild(s); }
+ if(window.__sjInit)window.__sjInit();
+ more();
+}
+nav.addEventListener('click',function(e){var b=e.target.closest('.pr-tab');if(!b)return;cur=+b.dataset.i;tabs();fiche();history.replaceState(null,'','#'+PR[cur].id)});
+card.addEventListener('click',function(e){var b=e.target.closest('[data-s]');if(!b)return;var p=PR[cur],l=b.dataset.s==='service'?p.service:p.infos;
+ card.querySelectorAll('[data-s]').forEach(function(x){x.setAttribute('aria-selected',String(x===b))});
+ card.querySelector('.pr-pane ul').innerHTML=l.map(function(t){return '<li>'+esc(t)+'</li>'}).join('')});
+card.addEventListener('change',function(e){if(e.target&&e.target.id==='prT'){var t=document.getElementById('prTA'),r=document.getElementById('prEv'),a=e.target.value==='Autre';if(t)t.hidden=!a;if(r)r.classList.toggle('autre',a)}});
+card.addEventListener('submit',function(e){
+ e.preventDefault(); var p=PR[cur], g=function(i){var x=document.getElementById(i);return x?x.value.trim():''};
+ var msg=document.getElementById('prMsg'),btn=card.querySelector('.pr-add');
+ var nom=g('prNom'),tel=g('prTel'),mail=g('prMail');
+ if(!nom||!tel||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)){if(msg){msg.style.color='#b03a2a';msg.textContent='Merci d\'indiquer votre nom, votre téléphone et une adresse e-mail valide.'}return}
+ var type=g('prT')==='Autre'&&g('prTA')?'Autre : '+g('prTA'):g('prT');
+ var evt=[type,g('prD')?'le '+g('prD'):'',g('prN')?g('prN')+' invités':''].filter(Boolean).join(', ');
+ var bits=[];
+ bits.push('Prestataire demandé : '+p.court+' ('+p.nom.toLowerCase()+')');
+ if(evt)bits.push('Événement : '+evt);
+ if(p.champs==='parts'){if(g('prA'))bits.push('Allergies / contraintes : '+g('prA'))}
+ else{if(g('prH'))bits.push('Arrivée sur place : '+g('prH'));if(g('prF'))bits.push('Fin souhaitée : '+g('prF'))}
+ if(document.getElementById('prMat')&&document.getElementById('prMat').checked)bits.push('Souhaite aussi louer du matériel : oui');
+ var texte=bits.join('\n')+(g('prM')?'\n\n'+g('prM'):'');
+ var rdv=g('prRD');
+ var data={'form-name':'rendez-vous','bot-field':'','demande':'Prestataire : '+p.court+' ('+p.nom.toLowerCase()+')','nom':nom,'telephone':tel,'email':mail,'date':rdv,'heure':g('prRH'),'message':texte,'date_evenement':g('prD'),'type':type,'convives':g('prN'),'prestataire':p.court+' — '+p.nom,'louer_materiel':(document.getElementById('prMat')&&document.getElementById('prMat').checked)?'Oui':''};
+ if(btn){btn.disabled=true;btn.textContent='Envoi en cours…'}
+ fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(data).toString()})
+  .then(function(r){if(!r.ok)throw 0;location.href='/merci.html'})
+  .catch(function(){if(btn){btn.disabled=false;btn.textContent='Envoyer ma demande'}if(msg){msg.style.color='#b03a2a';msg.textContent='Envoi impossible. Réessayez ou appelez le 06 50 83 68 28.'}});
+});
+function ancre(){var h=(location.hash||'').slice(1);PR.forEach(function(p,i){if(p.id===h)cur=i})}
+ancre();if(!location.hash&&window.__prDefaut)PR.forEach(function(p,i){if(p.id===window.__prDefaut)cur=i});tabs();fiche();
+window.addEventListener('load',function(){more()});
+/* titres, textes et photos modifiables depuis le back-office */
+try{fetch('/api/site',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(j){
+  if(!j||!Array.isArray(j.prestations)||!j.prestations.length)return;
+  PR=j.prestations.filter(function(p){return p&&p.nom}).map(function(p){return {id:p.id,nom:p.nom,court:p.court||'',img:p.img||'',photo:!/\.svg(\?|$)/i.test(p.img||''),titre:p.nom+(/^([^\s]+)$/.test(p.court||'')?' : '+RegExp.$1:''),accroche:p.accroche||'',service:p.service||[],infos:p.infos||[],champs:p.champs==='parts'?'parts':'heures'}});
+  cur=0;ancre();if(!location.hash&&window.__prDefaut)PR.forEach(function(p,i){if(p.id===window.__prDefaut)cur=i});tabs();fiche();
+}).catch(function(){})}catch(e){}
+})();
+</script>
 
 <script src="/contact-bloc.js" defer></script>
 <link rel="stylesheet" href="/accueil-sections.css?v=4">

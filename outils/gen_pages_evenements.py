@@ -15,6 +15,11 @@ TAIL = shell[shell.index('<script src="/contact-bloc.js" defer></script>'):]
 RDV = re.search(r'<section class="rdv" id="rdv">.*?</section>', shell, re.S).group(0)
 RDV_JS = re.search(r"<script>\n\(function\(\)\{\n  var f=document.getElementById\('rdvForm'\).*?</script>", shell, re.S).group(0)
 CAR_JS = re.search(r'<script>\n/\* Carrousels de la page.*?</script>', shell, re.S).group(0)
+PR_HEAD = re.search(r'<header class="pr-hero" id="prHero">.*?</header>', shell, re.S).group(0)
+PR_SEC = re.search(r'<section class="pr"><div class="pr-in">.*?</section>', shell, re.S).group(0)
+PR_JS = re.search(r'<script>\n\(function\(\)\{\nvar PR=\[.*?</script>', shell, re.S).group(0)
+PR_JS = PR_JS.replace("if(!m){box.innerHTML='';return}", "if(!m||window.__prSansPlus){box.innerHTML='';return}")
+PR_JS = PR_JS.replace('ancre();tabs();fiche();', "ancre();if(!location.hash&&window.__prDefaut)PR.forEach(function(p,i){if(p.id===window.__prDefaut)cur=i});tabs();fiche();")
 LIBS = '<script src="/date-fr.js" defer></script>\n<script src="/selects-jolis.js" defer></script>\n'
 
 EXTRA_CSS = '''
@@ -118,6 +123,11 @@ def build(slug, P):
     steps = ''.join('<div class="ev-st"><span class="ev-sn">%d</span><h3>%s</h3><p>%s</p></div>' % (i + 1, t, d) for i, (t, d) in enumerate(P['steps']))
     out.append('<section class="ev-sec ev-sec-sombre"><div class="ev-in"><p class="ev-k">Comment ça se passe</p><h2 class="ev-t">DU PREMIER MESSAGE <em>À L\'ÉVÉNEMENT</em></h2><div class="ev-steps" data-evcar>%s</div><div class="ev-dots ev-dots-clair" data-evdots aria-hidden="true"></div></div></section>' % steps)
     out.append('<section class="ev-sec ev-prod"><div class="ev-in"><div class="pr-sec pr-sec-b"><span class="pr-lab">Le matériel pour votre événement</span><h3 class="pr-t">À louer <em class="ac">pour votre projet</em></h3><div class="bests pr-bests" id="prB" data-vcar="prB" data-add data-ids="%s"><div class="bests-shell"><button class="bests-arrow bests-arrow-prev" id="prBPrev" aria-label="Produits précédents">‹</button><div class="bests-carousel" id="prBWrap"><div class="bests-track" id="prBTrack"></div></div><button class="bests-arrow bests-arrow-next" id="prBNext" aria-label="Produits suivants">›</button></div><div class="bests-dots" id="prBDots"></div></div></div></div></section>' % P['prod_ids'])
+    pr = P.get('presta')
+    if pr:
+        out.append('<section class="ev-sec ev-presta" id="prestataires"><div class="ev-in"><p class="ev-k">%s</p><h2 class="ev-t">%s</h2><p class="ev-sub">%s</p></div></section>' % (pr['k'], pr['t'], pr['sub']))
+        out.append(PR_HEAD)
+        out.append(PR_SEC)
     # autres pages
     if P['hub']:
         other = ['organisation-evenements-entreprises' if slug == 'organisation-evenements-particuliers' else 'organisation-evenements-particuliers']
@@ -140,7 +150,12 @@ def build(slug, P):
     rdv = re.sub(r'<p class="rdv-p">.*?</p>', '<p class="rdv-p">%s</p>' % P['rdv_p'], rdv, 1, flags=re.S)
     rdv = re.sub(r'(<input type="hidden" name="demande" value=")[^"]*(">)', r'\g<1>%s\2' % esc(P['rdv_demande']), rdv, 1)
     rdv = re.sub(r'(<textarea class="rdv-i" name="message" rows="4">).*?(</textarea>)', r'\g<1>%s\2' % esc(P['rdv_msg']), rdv, 1, flags=re.S)
-    content = '\n'.join(out) + '\n' + rdv + '\n' + RDV_JS + '\n' + CAR_JS + '\n' + LIBS
+    body = '\n'.join(out)
+    pjs = ''
+    if pr:
+        body = body.replace('evenements.html#prestataires', '#prestataires')
+        pjs = '<script>window.__prSansPlus=true;window.__prDefaut=%r;</script>\n' % pr['default'] + PR_JS + '\n'
+    content = body + '\n' + rdv + '\n' + RDV_JS + '\n' + CAR_JS + '\n' + LIBS + pjs
 
     head = PRE
     url = BASE + slug

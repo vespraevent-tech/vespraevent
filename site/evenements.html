@@ -698,6 +698,13 @@ textarea.pr-i{resize:vertical;min-height:96px}
 .ev-vmq-t a{background:#fff!important;color:var(--navy)!important;border:1.5px solid var(--g3)!important;padding:11px 22px!important}
 .ev-zones{display:flex;justify-content:flex-start;margin-top:4px}
 .ev-zones a{padding:12px 22px;border-radius:999px;background:var(--navy);color:#fff;font-weight:600;font-size:14px;text-decoration:none}
+
+.ev-bur-img{position:relative;aspect-ratio:4/3;border-radius:20px;overflow:hidden;box-shadow:0 14px 44px rgba(12,15,20,.16)}
+.ev-bur-img img{position:absolute!important;inset:0;width:100%!important;height:100%!important;aspect-ratio:auto!important;border-radius:0!important;box-shadow:none!important;object-fit:cover;opacity:0;transition:opacity 1.1s ease}
+.ev-bur-img img.on{opacity:1}
+.ev-bur-img img:nth-child(3){object-position:25% 60%}
+.ev-pc h3{font-size:19px}
+
 .pr-hero .pr-kicker{font-family:inherit;font-size:11px;font-weight:600;line-height:1.3;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85);margin:0 0 6px}
 @media(max-width:980px){
  .ev-car,.ev-steps{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;padding:4px 16px 8px;margin:0 -16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -748,8 +755,8 @@ textarea.pr-i{resize:vertical;min-height:96px}
   <p class="ev-sub">Vous nous racontez votre événement, nous nous occupons du reste : le matériel, les intervenants, l'ambiance et la coordination.</p>
   <div class="ev-car" data-evcar>
     <article class="ev-pc"><img src="photobooth-salle.webp" alt="Photobooth en bois installé dans une salle de réception" loading="lazy" decoding="async" width="1000" height="750"><div class="ev-pc-b"><span class="ev-pc-n">01</span><h3>Location de matériel</h3><p>Photobooth, décoration, son, lumière, mobilier : tout le catalogue, avec les prix affichés, livré et installé.</p><a href="catalogue.html">Découvrir le catalogue →</a></div></article>
-    <article class="ev-pc"><img src="prestation-serveuse.webp" alt="Serveuse privée qui présente des bouchées lors d'une réception" loading="lazy" decoding="async" width="1400" height="1023"><div class="ev-pc-b"><span class="ev-pc-n">02</span><h3>Prestataires de confiance</h3><p>Serveuse privée, chef pâtissier, et bientôt photographe et vidéaste : nous les coordonnons pour vous.</p><a href="#prestataires">Voir les prestataires →</a></div></article>
-    <article class="ev-pc"><img src="fumee-lourde-nuage.webp" alt="Ambiance de soirée avec fumée et lumières bleues" loading="lazy" decoding="async" width="926" height="698"><div class="ev-pc-b"><span class="ev-pc-n">03</span><h3>Soirées et décors à thème</h3><p>Fonds, lettres géantes, effets spéciaux, photobooth : nous composons l'ambiance de votre soirée.</p><a href="#rdv">Imaginons votre thème →</a></div></article>
+    <article class="ev-pc"><img src="prestation-serveuse.webp" alt="Serveuse privée qui présente des bouchées lors d'une réception" loading="lazy" decoding="async" width="1400" height="1023"><div class="ev-pc-b"><span class="ev-pc-n">02</span><h3>Nos prestataires</h3><p>Serveuse privée, chef pâtissier, et bientôt photographe et vidéaste : nous les coordonnons pour vous.</p><a href="#prestataires">Voir les prestataires →</a></div></article>
+    <article class="ev-pc"><img src="fumee-lourde-nuage.webp" alt="Ambiance de soirée avec fumée et lumières bleues" loading="lazy" decoding="async" width="926" height="698"><div class="ev-pc-b"><span class="ev-pc-n">03</span><h3>Soirée à thème</h3><p>Fonds, lettres géantes, effets spéciaux, photobooth : nous composons l'ambiance de votre soirée.</p><a href="#rdv">Imaginons votre thème →</a></div></article>
     <article class="ev-pc"><img src="pack-mariage.webp" alt="Mariés qui dansent sur la pelouse dans un nuage de fumée colorée" loading="lazy" decoding="async" width="1000" height="1500"><div class="ev-pc-b"><span class="ev-pc-n">04</span><h3>Sur mesure, sur devis</h3><p>Chaque événement est unique. Vous nous parlez de votre idée, nous vous proposons un devis adapté, sans engagement.</p><a href="#rdv">Demander un devis →</a></div></article>
   </div>
   <div class="ev-dots" data-evdots aria-hidden="true"></div>
@@ -776,8 +783,8 @@ textarea.pr-i{resize:vertical;min-height:96px}
   </div>
 </div></section>
 <section class="ev-sec"><div class="ev-in ev-bur">
-  <div class="ev-bur-h"><p class="ev-k">Venez nous voir</p><h2 class="ev-t">UN PROJET ? <em>PARLONS-EN À VITRÉ</em></h2></div>
-  <div class="ev-bur-img"><img src="anniversaire-groupe-gateau.webp" alt="Groupe d'amis qui fête un anniversaire autour du gâteau" loading="lazy" decoding="async" width="1700" height="1133"></div>
+  <div class="ev-bur-h"><p class="ev-k">Venez nous voir</p><h2 class="ev-t">UN PROJET ? <em>PARLONS-EN DANS NOS BUREAUX</em></h2></div>
+  <div class="ev-bur-img" data-evfade><img src="nous-organisons.webp" alt="Mariés qui se promènent devant un château"  decoding="async" width="1700" height="1133" class="on"><img src="anniversaire-groupe-gateau.webp" alt="Groupe d'amis qui fête un anniversaire autour du gâteau" loading="lazy" decoding="async" width="1700" height="1133"><img src="mariage-gateau-maries.webp" alt="Mariés qui coupent leur wedding cake" loading="lazy" decoding="async" width="1700" height="1133"><img src="anniversaire-ballons-etincelles.webp" alt="Jeune fille surprise par son gâteau d'anniversaire" loading="lazy" decoding="async" width="1700" height="1133"></div>
   <div class="ev-bur-t">
     <p>Passez dans nos bureaux : vous voyez le matériel, vous posez toutes vos questions et nous préparons ensemble votre événement et votre devis. Sans engagement.</p>
     <ul class="ev-liste"><li><b>Adresse :</b> 1 bis allée de la Haute Gasniais, 35500 Vitré</li><li><b>Particuliers et professionnels</b> bienvenus</li><li><b>Sans rendez-vous</b> le mercredi et le samedi, <b>sur rendez-vous</b> les autres jours</li></ul>
@@ -862,6 +869,11 @@ textarea.pr-i{resize:vertical;min-height:96px}
       .catch(function(){ b.disabled=false; b.textContent=t; alert('Envoi impossible. Réessayez ou appelez le 06 50 83 68 28.'); });
   });
 })();
+</script>
+<script>
+/* Diaporama de la section « bureaux » : les photos se fondent l'une dans l'autre */
+(function(){var w=document.querySelector('[data-evfade]');if(!w)return;var im=w.querySelectorAll('img'),k=0;if(im.length<2||(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches))return;
+setInterval(function(){if(document.hidden)return;im[k].classList.remove('on');k=(k+1)%im.length;im[k].classList.add('on')},4200)})();
 </script>
 <script>
 /* Carrousels de la page : défilement doux sur téléphone, points de repère, pause dès que l'on touche */
