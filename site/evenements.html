@@ -511,7 +511,7 @@ footer ::-webkit-scrollbar-thumb,.drawer ::-webkit-scrollbar-thumb{background:rg
   <div class="nav-links" id="navLinks">
     <a href="index.html">Accueil</a>
     <a href="catalogue.html">Catalogue</a>
-    <a href="evenements.html">Événements</a>
+    <a href="evenements.html">Événements clé en main</a>
     <a href="blog.html">Blog</a>
     <a href="faq.html">FAQ</a>
     <a href="reservation.html" class="nav-reserver-mobile" style="display:none;background:var(--navy);color:var(--white);padding:12px 20px;border-radius:var(--pill);font-weight:600;font-size:15px;text-align:center;border-radius:8px">Réserver</a>
@@ -960,8 +960,8 @@ function fiche(sub){
  card.innerHTML='<div class="pr-box">'+
  '<div class="pr-sub" role="tablist"><button role="tab" data-s="service" aria-selected="'+(sub==='service')+'">Le service</button><button role="tab" data-s="infos" aria-selected="'+(sub==='infos')+'">Bon à savoir</button></div>'+
  '<div class="pr-pane"><ul>'+liste+'</ul>'+(MORE[p.id]?'<div class="pr-evt"><h4>Pour quels événements ?</h4><p>'+esc(MORE[p.id].quand)+'</p></div>':'')+'</div></div>'+
- '<form class="pr-form" id="prForm" novalidate><h3>Envoyer ma demande à '+esc(p.court||p.nom)+'</h3>'+
- '<p class="pr-n pr-n0">Pas de panier ni de devis à remplir : décrivez votre événement, nous vous répondons rapidement pour en parler et nous rencontrer.</p>'+
+ '<form class="pr-form" id="prForm" novalidate><h3>Envoyer une demande</h3>'+
+ '<p class="pr-n pr-n0">Prestation : '+esc(p.nom)+'. Pas de panier ni de devis à remplir : décrivez votre événement, nous vous répondons rapidement pour en parler et nous rencontrer.</p>'+
  '<div class="pr-row"><input class="pr-i" id="prNom" type="text" required autocomplete="name" placeholder="Prénom et nom *"><input class="pr-i" id="prTel" type="tel" required autocomplete="tel" placeholder="Téléphone *"></div>'+
  '<input class="pr-i" id="prMail" type="email" required autocomplete="email" placeholder="Adresse e-mail *">'+
  '<div class="pr-row pr-ev" id="prEv"><select class="pr-i" id="prT" aria-label="Type d\'événement"><option value="">Type d\'événement</option><option>Mariage</option><option>Anniversaire</option><option>Fête de village / Comité des fêtes</option><option>Événement d\'entreprise</option><option>Autre</option></select>'+
