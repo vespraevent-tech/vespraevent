@@ -36,6 +36,7 @@ const LABELS = {
   livraison_installation: 'Livraison et installation', reprise_materiel: 'Reprise du matériel', adresse_livraison: 'Adresse de livraison',
   /* cases cochées dans le formulaire de la page d'accueil */
   interets: 'Catégories choisies', materiel: 'Matériel souhaité',
+  date_evenement: 'Date de l’événement', prestataire: 'Prestataire demandé', louer_materiel: 'Souhaite aussi louer du matériel',
 };
 
 /* Champs à ne jamais afficher tels quels */
@@ -341,7 +342,7 @@ const KINDS = {
   devis:       { badge: 'Demande de devis', title: 'Nouvelle demande de devis', bg: 'rgba(43,74,107,.1)',  fg: NAVY },
   reservation: { badge: 'Réservation',      title: 'Nouvelle réservation à traiter', bg: 'rgba(245,158,11,.15)', fg: '#92400e' },
   'avis-produit': { badge: 'Avis client',   title: 'Nouvel avis client à valider', bg: 'rgba(34,197,94,.12)', fg: '#15803d', review: true },
-  'rendez-vous': { badge: 'Rendez-vous', title: 'Demande de rendez-vous (visite du matériel)', bg: 'rgba(245,158,11,.15)', fg: '#92400e' },
+  'rendez-vous': { badge: 'Rendez-vous', title: 'Demande de contact et de rendez-vous', bg: 'rgba(245,158,11,.15)', fg: '#92400e' },
   newsletter:  { badge: 'Newsletter',       title: 'Nouvelle inscription à la newsletter', bg: 'rgba(43,74,107,.1)', fg: NAVY },
   disponibilite: { badge: 'Disponibilité',  title: 'Demande de disponibilité', bg: 'rgba(245,158,11,.15)', fg: '#92400e' },
 };
@@ -426,6 +427,8 @@ const OBJETS = {
 
 function sujet(formName, kind, data, ref) {
   const bouts = [OBJETS[formName] || kind.title || 'Nouveau message'];
+  /* demande de contact : on lit tout de suite de quoi il s'agit (mariage, prestataire demandé…) */
+  if (formName === 'rendez-vous' && data.demande) { const q = String(data.demande).replace(/^Rendez-vous\s*:\s*/i, '').trim(); if (q && !/visite du mat/i.test(q)) bouts[0] += ' — ' + q; }
   const nom = [data.prenom, data.nom].filter(Boolean).join(' ').trim();
   if (nom) bouts.push(nom);
   const d = data.date || data['date-evenement'] || '';
