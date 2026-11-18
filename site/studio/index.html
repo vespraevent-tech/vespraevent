@@ -2839,7 +2839,7 @@ function vbRendre(){
     const tete='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px"><div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f">Événements <span style="font-weight:500;color:#6b7280;font-size:13px">· '+VB.length+' vidéo'+(VB.length>1?'s':'')+' sur le site ('+mo(total)+')</span></div><button class="btn" onclick="vbSessEdit(-1)">+ Nouvelle session</button></div>';
     if(!cartes.length){ z.innerHTML=vbCarteTablette()+vbJauge(true)+tete+'<div class="hint" style="padding:24px 0">Aucune session pour l’instant. Créez-en une : elle apparaîtra sur la tablette.</div>'; return; }
     z.innerHTML=vbCarteTablette()+vbJauge(true)+tete+'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">'+cartes.map(c=>{
-      const l=ev[c.nom]||[], ds=l.map(v=>+new Date(v.cree)), ko=l.filter(v=>v.mail!=='envoye').length, poids=l.reduce((t,v)=>t+(v.octets||0),0);
+      const l=ev[c.nom]||[], ds=l.map(v=>+new Date(v.cree)), ko=l.filter(v=>v.mail!=='envoye'&&!v.scanne).length, poids=l.reduce((t,v)=>t+(v.octets||0),0);
       const quand=ds.length?(fd(Math.min(...ds))===fd(Math.max(...ds))?fd(Math.min(...ds)):fd(Math.min(...ds))+' → '+fd(Math.max(...ds))):'';
       const pastille=(txt,coul,fond)=>'<span style="font-size:11.5px;font-weight:700;color:'+coul+';background:'+fond+';border-radius:20px;padding:2px 9px">'+txt+'</span>';
       let ch=''; if(c.s){ ch+=vbSessTerminee(c.s)?pastille('Terminée','#6b7280','#eef0f3'):pastille('En cours sur la tablette','#2f6b2a','#e4f2df'); ch+=' '+(c.s.mdp?pastille('Mot de passe','#14304f','#e5ecf5'):pastille('Sans mot de passe','#8a5a00','#fdf0d5')); } else ch+=pastille('Session supprimée','#6b7280','#eef0f3');
@@ -2854,14 +2854,14 @@ function vbRendre(){
   }
   const l=VB.filter(v=>vbNomEvt(v)===VBEVT).sort((a,b)=>String(a.cree).localeCompare(String(b.cree)));
   document.getElementById('vbTitre').textContent=VBEVT;
-  document.getElementById('vbRelancer').hidden=!l.some(v=>v.mail!=='envoye');
+  document.getElementById('vbRelancer').hidden=!l.some(v=>v.mail!=='envoye'&&!v.scanne);
   const poids=l.reduce((t,v)=>t+(v.octets||0),0);
   z.innerHTML=vbJauge(false)+'<div class="hint" style="margin-bottom:10px">'+l.length+' vidéo'+(l.length>1?'s':'')+' · '+mo(poids)+'</div>'+(l.length?'':'<div class="hint" style="padding:18px 0">Aucune vidéo pour cet événement pour l’instant. Elles apparaîtront ici dès que la tablette les enverra.</div>')+'<div style="display:flex;flex-direction:column;gap:10px">'+
   l.map(v=>{const d=new Date(v.cree);const ok=v.mail==='envoye';const j=Math.max(0,(Number(v.garde)||0)-Math.floor((Date.now()-d)/86400000));
     const btn='class="btn btn-ghost" style="text-decoration:none;padding:7px 12px;font-size:13px"';
     return '<div style="background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:14px 16px">'+
       '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><b style="font-size:15px">'+vbEsc(v.prenom)+' '+vbEsc(v.nom)+(v.pour==='autre'?' <span style="font-weight:500;color:#6b7280">→ pour '+vbEsc(v.dest||'une autre personne')+'</span>':'')+'</b>'+(v.son!=null&&v.son<3?'<span style="color:#b03a2a;font-size:12.5px;font-weight:700">⚠ son très faible</span>':'')+
-      '<span style="color:'+(ok?'#3d6e36':'#b03a2a')+';font-weight:600;font-size:13px">'+(ok?'E-mail envoyé'+(v.pj?' (vidéo jointe)':' (lien)'):(v.mail==='attente'?'E-mail en cours d’envoi':'E-mail non parti'+(v.mailErreur?' — '+vbEsc(v.mailErreur):'')))+'</span></div>'+
+      '<span style="color:'+((ok||v.scanne)?'#3d6e36':'#b03a2a')+';font-weight:600;font-size:13px">'+(ok?'E-mail envoyé'+(v.pj?' (vidéo jointe)':' (lien)'):(v.mail==='attente'?'E-mail en cours d’envoi':'E-mail non parti'+(v.mailErreur?' — '+vbEsc(v.mailErreur):'')))+'</span></div>'+(v.scanne?'<div style="color:#3d6e36;font-size:12.5px;font-weight:600;margin-top:2px">✓ Vidéo déjà récupérée par QR code ('+new Date(v.scanne).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+')'+(ok?'':' : l’e-mail n’est plus nécessaire')+'</div>':'')+
       '<div style="color:#4a5565;font-size:13.5px;margin-top:2px;word-break:break-all">'+(v.pour==='autre'?'Envoyée à : ':'')+vbEsc(v.email)+'</div>'+
       '<div style="color:#8a8f98;font-size:12.5px;margin-top:2px">'+d.toLocaleDateString('fr-FR')+' à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+' · '+mo(v.octets||0)+' · '+(Number(v.garde)>0?'supprimée du site dans '+j+' j':'conservée jusqu’à votre suppression')+'</div>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><a '+btn+' href="/api/admin/videobooth/video?id='+encodeURIComponent(v.id)+'" download>Télécharger</a><button '+btn+' onclick="vbRenvoyer(\''+v.id+'\')">Renvoyer l’e-mail</button><button '+btn+' onclick="vbSupprimer(\''+v.id+'\')">Supprimer</button></div></div>';}).join('')+'</div>';
@@ -2890,7 +2890,7 @@ async function vbRenvoyer(id){
   }catch(e){ showToast('Échec : '+e.message,true); }
 }
 async function vbRelancerEchecs(){
-  const l=VB.filter(v=>vbNomEvt(v)===VBEVT&&v.mail!=='envoye'); if(!l.length) return;
+  const l=VB.filter(v=>vbNomEvt(v)===VBEVT&&v.mail!=='envoye'&&!v.scanne); if(!l.length) return;
   if(!confirm('Renvoyer '+l.length+' e-mail'+(l.length>1?'s':'')+' non parti'+(l.length>1?'s':'')+' ?')) return;
   let ok=0; for(const v of l){ try{ const r=await api('/videobooth',{method:'POST',body:JSON.stringify({id:v.id})}); if(r.ok) ok++; }catch(e){} }
   showToast(ok+' sur '+l.length+' e-mail'+(l.length>1?'s':'')+' envoyé'+(ok>1?'s':''), ok!==l.length);

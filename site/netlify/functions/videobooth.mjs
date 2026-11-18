@@ -199,6 +199,8 @@ export default async (request) => {
       return new Response(html, { status: 202, headers: entete });
     }
     if (!m.rk || !egal(m.rk, k)) return new Response('Lien invalide', { status: 404 });
+    /* l'invité a ouvert sa vidéo par QR code : on le note (première fois seulement). Le mail part quand même ; s'il n'est pas parti, ce n'est plus un souci. */
+    if (!m.scanne) { m.scanne = new Date().toISOString(); await st.setJSON('meta/' + id, m).catch(() => {}); }
     return new Response(null, { status: 302, headers: { Location: `/api/videobooth/v/${id}?t=${jetonMail(id)}`, 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
   }
 
@@ -210,7 +212,7 @@ export default async (request) => {
     const st = store();
     const dernier = await st.get('etat/relance-mails', { type: 'json' }).catch(() => null);
     if (dernier && Date.now() - Date.parse(dernier.date) < 6 * 3600 * 1000) return rep({ ok: true, ignore: 'passe récente', envoyes: 0, restants: dernier.restants || 0 });
-    const aEnvoyer = (await lireMetas(st, (m) => m.mail !== 'envoye' && m.email && (Number(m.mailEssais) || 0) < 3 && !(m.mail === 'attente' && Date.now() - Date.parse(m.cree) < 15 * 60000) && !(m.mailEssaiLe && Date.now() - Date.parse(m.mailEssaiLe) < 6 * 3600 * 1000))).sort((a, b) => String(a.cree).localeCompare(String(b.cree)));
+    const aEnvoyer = (await lireMetas(st, (m) => m.mail !== 'envoye' && !m.scanne && m.email && (Number(m.mailEssais) || 0) < 3 && !(m.mail === 'attente' && Date.now() - Date.parse(m.cree) < 15 * 60000) && !(m.mailEssaiLe && Date.now() - Date.parse(m.mailEssaiLe) < 6 * 3600 * 1000))).sort((a, b) => String(a.cree).localeCompare(String(b.cree)));
     const site = (process.env.URL || `${url.protocol}//${url.host}`).replace(/\/$/, '');
     let envoyes = 0, stop = false;
     for (const m of aEnvoyer.slice(0, 25)) {
