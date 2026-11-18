@@ -1,0 +1,121 @@
+# -*- coding: utf-8 -*-
+"""Génère les pages « Organisation d'événements » à partir de site/evenements.html (gabarit) et de pages_evenements_data.py.
+Usage : python3 outils/gen_pages_evenements.py   (depuis la racine du dépôt)"""
+import re, json, os, sys, html
+sys.path.insert(0, os.path.dirname(__file__))
+from pages_evenements_data import PAGES, ORGA
+SITE = os.path.join(os.path.dirname(__file__), '..', 'site')
+BASE = 'https://www.vespraevent.fr/'
+shell = open(os.path.join(SITE, 'evenements.html'), encoding='utf-8').read()
+
+# ── morceaux du gabarit
+i_hero = shell.index('<section class="ev-hero" id="evHero">')
+PRE = shell[:i_hero]
+TAIL = shell[shell.index('<script src="/contact-bloc.js" defer></script>'):]
+RDV = re.search(r'<section class="rdv" id="rdv">.*?</section>', shell, re.S).group(0)
+RDV_JS = re.search(r"<script>\n\(function\(\)\{\n  var f=document.getElementById\('rdvForm'\).*?</script>", shell, re.S).group(0)
+CAR_JS = re.search(r'<script>\n/\* Carrousels de la page.*?</script>', shell, re.S).group(0)
+LIBS = '<script src="/date-fr.js" defer></script>\n<script src="/selects-jolis.js" defer></script>\n'
+
+EXTRA_CSS = '''
+.ev-ev3{grid-template-columns:repeat(3,1fr)}
+.ev-ev3 .ev-pc{min-height:480px}
+.ev-txt{max-width:820px}
+.ev-txt p{font-size:16.5px;line-height:1.8;color:var(--g1);margin:0 0 16px}
+.ev-hero .ev-hero-img{object-position:var(--pos,center 30%)}
+.ev-ariane{font-size:13px;color:rgba(255,255,255,.8);margin:0 0 14px}
+.ev-ariane a{color:#fff;text-decoration:underline}
+.ev-prod .pr-sec{background:transparent;padding:0}
+@media(max-width:980px){.ev-ev3 .ev-pc{min-height:430px}}
+'''
+# la 1re section de sous-page n'a pas besoin de marge haute supplémentaire
+def esc(s): return html.escape(s, quote=True)
+
+def card(c):
+    return ('<article class="ev-pc"><img src="%s" alt="%s" loading="lazy" decoding="async"><div class="ev-pc-b"><span class="ev-pc-n">%s</span><h3>%s</h3><p>%s</p><a href="%s">%s</a></div></article>'
+            % (c['img'], esc(c['alt']), c['n'], c['t'], c['p'], c['href'], c['l']))
+
+def build(slug, P):
+    out = []
+    chips = ''.join('<li>%s</li>' % c for c in P['chips'])
+    ariane = ''
+    crumbs = [('Accueil', ''), (ORGA, 'evenements')]
+    if P['parent']:
+        pp = PAGES[P['parent']]
+        crumbs.append((pp['nom'], P['parent']))
+        ariane = '<p class="ev-ariane"><a href="index.html">Accueil</a> › <a href="evenements.html">Organisation d\'événements</a> › <a href="%s.html">%s</a> › %s</p>' % (P['parent'], pp['nom'], P['nom'])
+    else:
+        ariane = '<p class="ev-ariane"><a href="index.html">Accueil</a> › <a href="evenements.html">Organisation d\'événements</a> › %s</p>' % P['nom']
+    crumbs.append((P['nom'], slug))
+    out.append('<section class="ev-hero" id="evHero" style="--pos:%s"><picture><img class="ev-hero-img" src="%s" alt="%s" width="1500" height="1000" fetchpriority="high" decoding="async"></picture><div class="ev-hero-in">%s<p class="ev-eye">%s</p><h1 class="ev-h">%s</h1><p class="ev-lead">%s</p><div class="ev-btns"><a class="ev-cta" href="#rdv">Parlez-nous de votre projet</a><a class="ev-cta ev-cta2" href="catalogue.html">Voir le matériel</a></div><ul class="ev-chips" aria-label="Nos engagements">%s</ul></div></section>'
+               % (P['imgpos'], P['img'], esc(P['alt']), ariane, P['eyebrow'], P['h1'], P['lead'], chips))
+    mq = ''.join('<span>%s</span>' % w for w in P['mq'])
+    out.append('<div class="ev-marquee" aria-hidden="true"><div class="ev-mq-t">%s</div></div>' % (mq * 2))
+    if P['hub']:
+        out.append('<section class="ev-sec"><div class="ev-in"><p class="ev-k">%s</p><h2 class="ev-t">%s</h2><p class="ev-sub">%s</p><div class="ev-car ev-ev3" data-evcar>%s</div><div class="ev-dots" data-evdots aria-hidden="true"></div></div></section>'
+                   % (P['choix_k'], P['choix_t'], P['choix_sub'], ''.join(card(c) for c in P['choix'])))
+        out.append('<section class="ev-sec"><div class="ev-in ev-txt"><p class="ev-k">%s</p><h2 class="ev-t">%s</h2>%s</div></section>'
+                   % (P['intro_k'], P['intro_t'], ''.join('<p>%s</p>' % p for p in P['intro'])))
+        cards_html = '<section class="ev-sec"><div class="ev-in"><p class="ev-k">%s</p><h2 class="ev-t">%s</h2><div class="ev-car ev-ev3" data-evcar>%s</div><div class="ev-dots" data-evdots aria-hidden="true"></div></div></section>' % (P['cards_k'], P['cards_t'], ''.join(card(c) for c in P['cards']))
+        out.append(cards_html)
+    else:
+        out.append('<section class="ev-sec"><div class="ev-in"><p class="ev-k">%s</p><h2 class="ev-t">%s</h2><div class="ev-car" data-evcar>%s</div><div class="ev-dots" data-evdots aria-hidden="true"></div></div></section>'
+                   % (P['cards_k'], P['cards_t'], ''.join(card(c) for c in P['cards'])))
+        out.append('<section class="ev-sec"><div class="ev-in ev-txt"><p class="ev-k">%s</p><h2 class="ev-t">%s</h2>%s</div></section>'
+                   % (P['intro_k'], P['intro_t'], ''.join('<p>%s</p>' % p for p in P['intro'])))
+    steps = ''.join('<div class="ev-st"><span class="ev-sn">%d</span><h3>%s</h3><p>%s</p></div>' % (i + 1, t, d) for i, (t, d) in enumerate(P['steps']))
+    out.append('<section class="ev-sec ev-sec-sombre"><div class="ev-in"><p class="ev-k">Comment ça se passe</p><h2 class="ev-t">DU PREMIER MESSAGE <em>À L\'ÉVÉNEMENT</em></h2><div class="ev-steps" data-evcar>%s</div><div class="ev-dots ev-dots-clair" data-evdots aria-hidden="true"></div></div></section>' % steps)
+    out.append('<section class="ev-sec ev-prod"><div class="ev-in"><div class="pr-sec pr-sec-b"><span class="pr-lab">Le matériel pour votre événement</span><h3 class="pr-t">À louer <em class="ac">pour votre projet</em></h3><div class="bests pr-bests" id="prB" data-vcar="prB" data-add data-ids="%s"><div class="bests-shell"><button class="bests-arrow bests-arrow-prev" id="prBPrev" aria-label="Produits précédents">‹</button><div class="bests-carousel" id="prBWrap"><div class="bests-track" id="prBTrack"></div></div><button class="bests-arrow bests-arrow-next" id="prBNext" aria-label="Produits suivants">›</button></div><div class="bests-dots" id="prBDots"></div></div></div></div></section>' % P['prod_ids'])
+    # autres pages
+    if P['hub']:
+        other = ['organisation-evenements-entreprises' if slug == 'organisation-evenements-particuliers' else 'organisation-evenements-particuliers']
+        rel = []
+    else:
+        sibs = [s for s, q in PAGES.items() if q['parent'] == P['parent'] and s != slug]
+        rel = sibs + [P['parent']]
+    if rel:
+        links = ''.join('<a href="%s.html">%s</a>' % (s, PAGES[s]['nom'] if not PAGES[s]['hub'] else 'Tous les événements ' + ('de particuliers' if 'particuliers' in s else 'professionnels')) for s in rel)
+        out.append('<section class="ev-sec"><div class="ev-in"><p class="ev-k">À découvrir aussi</p><h2 class="ev-t">D\'AUTRES <em>ÉVÉNEMENTS</em></h2><div class="ev-villes ev-rel">%s<a href="evenements.html" class="ev-v-tous">Organisation clé en main →</a></div></div></section>' % links)
+    else:
+        other_s = other[0]
+        out.append('<section class="ev-sec"><div class="ev-in"><p class="ev-k">À découvrir aussi</p><h2 class="ev-t">UN AUTRE <em>TYPE D\'ÉVÉNEMENT ?</em></h2><div class="ev-villes ev-rel"><a href="%s.html">%s</a><a href="evenements.html" class="ev-v-tous">Organisation clé en main →</a></div></div></section>' % (other_s, 'Événements professionnels' if 'entreprises' in other_s else 'Événements de particuliers'))
+    faq = ''.join('<details><summary>%s</summary><p>%s</p></details>' % (q, a) for q, a in P['faq'])
+    out.append('<section class="ev-sec" id="faq-evenements"><div class="ev-in ev-faq"><p class="ev-k">Questions fréquentes</p><h2 class="ev-t">VOS QUESTIONS, <em>NOS RÉPONSES</em></h2><div class="ev-fq">%s</div></div></section>' % faq)
+    # formulaire
+    rdv = RDV
+    rdv = re.sub(r'<p class="rdv-eye">.*?</p>', '<p class="rdv-eye">%s</p>' % P['rdv_eye'], rdv, 1, flags=re.S)
+    rdv = re.sub(r'<h2 class="rdv-h">.*?</h2>', '<h2 class="rdv-h">%s</h2>' % P['rdv_h'], rdv, 1, flags=re.S)
+    rdv = re.sub(r'<p class="rdv-p">.*?</p>', '<p class="rdv-p">%s</p>' % P['rdv_p'], rdv, 1, flags=re.S)
+    rdv = re.sub(r'(<input type="hidden" name="demande" value=")[^"]*(">)', r'\g<1>%s\2' % esc(P['rdv_demande']), rdv, 1)
+    rdv = re.sub(r'(<textarea class="rdv-i" name="message" rows="4">).*?(</textarea>)', r'\g<1>%s\2' % esc(P['rdv_msg']), rdv, 1, flags=re.S)
+    content = '\n'.join(out) + '\n' + rdv + '\n' + RDV_JS + '\n' + CAR_JS + '\n' + LIBS
+
+    head = PRE
+    url = BASE + slug
+    head = re.sub(r'<title>.*?</title>', '<title>%s</title>' % esc(P['title']), head, 1, flags=re.S)
+    head = re.sub(r'<meta name="description" content="[^"]*"[^>]*>', '<meta name="description" content="%s">' % esc(P['desc']), head, 1)
+    head = re.sub(r'<meta property="og:title" content="[^"]*">', '<meta property="og:title" content="%s">' % esc(P['title']), head, 1)
+    head = re.sub(r'<meta property="og:description" content="[^"]*">', '<meta property="og:description" content="%s">' % esc(P['desc']), head, 1)
+    head = head.replace(BASE + 'evenements', url)
+    head = re.sub(r'<meta property="og:image" content="[^"]*">', '<meta property="og:image" content="%s%s">' % (BASE, P['img']), head, 1)
+    head = re.sub(r'<link rel="preload" as="image" href="[^"]*" fetchpriority="high">', '<link rel="preload" as="image" href="%s" fetchpriority="high">' % P['img'], head, 1)
+    ld = {"@context": "https://schema.org", "@graph": [
+        {"@type": "Service", "@id": url + "#service", "name": P['title'].split(' | ')[0], "serviceType": "Organisation d'événements", "description": P['desc'], "url": url,
+         "provider": {"@type": "LocalBusiness", "name": "Vespra Event", "url": BASE, "telephone": "+33650836828", "address": {"@type": "PostalAddress", "streetAddress": "1 bis allée de la Haute Gasniais", "postalCode": "35500", "addressLocality": "Vitré", "addressCountry": "FR"}},
+         "areaServed": [{"@type": "City", "name": "Vitré"}, {"@type": "City", "name": "Rennes"}, {"@type": "AdministrativeArea", "name": "Bretagne"}, {"@type": "AdministrativeArea", "name": "Pays de la Loire"}]},
+        {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": k + 1, "name": n, "item": BASE + (s + '' if s else '')} for k, (n, s) in enumerate(crumbs)]},
+        {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in P['faq']]}]}
+    ld['@graph'][1]['itemListElement'][1]['name'] = "Organisation d'événements"
+    head = re.sub(r'<script type="application/ld\+json">.*?</script>', lambda m: '<script type="application/ld+json">' + json.dumps(ld, ensure_ascii=False) + '</script>', head, 1, flags=re.S)
+    head = head.replace('</style>', EXTRA_CSS + '</style>', 1) if '<style id="evenements-css">' not in head else re.sub(r'(<style id="evenements-css">.*?)(</style>)', lambda m: m.group(1) + EXTRA_CSS + m.group(2), head, 1, flags=re.S)
+    return head + content + '\n' + TAIL
+
+for slug, P in PAGES.items():
+    # vérifie les fichiers cités
+    for k in [P['img']] + [c['img'] for c in P.get('cards', []) + P.get('choix', [])]:
+        assert os.path.exists(os.path.join(SITE, k)), (slug, k)
+    for c in P.get('cards', []) + P.get('choix', []):
+        h = c['href'].split('#')[0]
+        if h and h[:-5] not in PAGES and not os.path.exists(os.path.join(SITE, h)): raise SystemExit('lien cassé %s %s' % (slug, h))
+    open(os.path.join(SITE, slug + '.html'), 'w', encoding='utf-8').write(build(slug, P))
+    print('ok', slug)

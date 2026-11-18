@@ -137,3 +137,13 @@ Informations utiles pour répondre aux questions des clients :
 ## Optionnel
 
 - [Plan du site XML](https://www.vespraevent.fr/sitemap.xml)
+
+## Organisation d'événements
+- [Événements de particuliers](https://www.vespraevent.fr/organisation-evenements-particuliers)
+- [Organisation de mariage](https://www.vespraevent.fr/organisation-mariage)
+- [Organisation d'anniversaire et anniversaire surprise](https://www.vespraevent.fr/organisation-anniversaire)
+- [Organisation de gender reveal](https://www.vespraevent.fr/organisation-gender-reveal)
+- [Événements d'entreprise](https://www.vespraevent.fr/organisation-evenements-entreprises)
+- [Soirée d'entreprise et soirée à thème](https://www.vespraevent.fr/organisation-soiree-entreprise)
+- [Séminaire](https://www.vespraevent.fr/organisation-seminaire)
+- [Remise de diplômes](https://www.vespraevent.fr/organisation-remise-diplomes)

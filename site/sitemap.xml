@@ -592,6 +592,14 @@
     <priority>0.6</priority>
   </url>
   <url><loc>https://www.vespraevent.fr/evenements</loc></url>
+  <url><loc>https://www.vespraevent.fr/organisation-evenements-particuliers</loc><priority>0.7</priority></url>
+  <url><loc>https://www.vespraevent.fr/organisation-mariage</loc><priority>0.7</priority></url>
+  <url><loc>https://www.vespraevent.fr/organisation-anniversaire</loc><priority>0.7</priority></url>
+  <url><loc>https://www.vespraevent.fr/organisation-gender-reveal</loc><priority>0.7</priority></url>
+  <url><loc>https://www.vespraevent.fr/organisation-evenements-entreprises</loc><priority>0.7</priority></url>
+  <url><loc>https://www.vespraevent.fr/organisation-soiree-entreprise</loc><priority>0.7</priority></url>
+  <url><loc>https://www.vespraevent.fr/organisation-seminaire</loc><priority>0.7</priority></url>
+  <url><loc>https://www.vespraevent.fr/organisation-remise-diplomes</loc><priority>0.7</priority></url>
   <url><loc>https://www.vespraevent.fr/evenements-pro</loc><priority>0.7</priority></url>
   <url>
     <loc>https://www.vespraevent.fr/article-materiel-mariage-vitre</loc>
