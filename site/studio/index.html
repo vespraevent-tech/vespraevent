@@ -2778,29 +2778,26 @@ async function vbCharger(){
   }catch(e){ z.innerHTML='<div class="hint" style="color:#b03a2a">Chargement impossible : '+vbEsc(e.message)+'</div>'; }
 }
 /* état de la tablette (envoyé toutes les 2 minutes) : visible seulement ici, jamais sur la tablette */
+let VBTAB_OUVERTE=false;
 function vbCarteTablette(){
   if(!VBETAT||!VBETAT.detail) return '';
   const t=VBETAT.detail, age=Math.max(0,Math.round((Date.now()-new Date(VBETAT.date))/60000));
+  const enLigne=age<=6;   /* la tablette se signale chaque minute : au-delà de 6 minutes sans signal, elle n'est plus connectée */
+  const quand=age<1?'moins d’une minute':(age>=120?Math.round(age/60)+' h':age+' min');
   const pastille=(txt,ok,warn)=>'<span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;border-radius:20px;padding:4px 11px;color:'+(ok?'#2f6b2a':(warn?'#8a5a00':'#b03a2a'))+';background:'+(ok?'#e4f2df':(warn?'#fdf0d5':'#fbeae7'))+'">'+txt+'</span>';
+  const boite=(coul,fond,bord,resume,corps,ouvert)=>'<details id="vbCarteT"'+((VBTAB_OUVERTE||ouvert)?' open':'')+' ontoggle="VBTAB_OUVERTE=this.open" style="background:'+fond+';border:1px solid '+bord+';border-radius:12px;padding:12px 16px;margin:0 0 14px"><summary style="cursor:pointer;font-weight:700;color:'+coul+';list-style-position:inside">'+resume+'</summary><div style="margin-top:10px">'+corps+'</div></details>';
+  /* aucune tablette connectée : une ligne grise, et rien d'autre (pas de valeurs anciennes) */
+  if(!enLigne) return boite('#8a8f98','#fff','#e6e1d6','● Tablette · hors ligne','<div style="font-size:13px;color:#6b7280">Aucune tablette n’est connectée à l’appli en ce moment. Dernier signal : il y a '+quand+'.</div>',false);
   const p=[]; let grave=false;
-  const enLigne=age<=6; if(!enLigne) grave=true;   /* la tablette se signale toutes les 2 minutes : au-delà de 6 minutes sans signal, elle n'est plus en ligne */
-  p.push(pastille((enLigne?'● En ligne':'● Hors ligne')+' · il y a '+(age<1?'moins d’une minute':(age>=120?Math.round(age/60)+' h':age+' min')),enLigne,false));
   if(t.batt!=null){ const bas=t.batt<20&&!t.charge; if(bas) grave=true; p.push(pastille('🔋 '+t.batt+' %'+(t.charge?' ⚡ en charge':''),!bas&&(t.charge||t.batt>=40),!bas)); }
   else p.push(pastille('🔋 Batterie : non communiquée par la tablette',false,true));
-  /* tablette hors ligne : les chiffres reçus datent de son dernier signal, ils ne sont plus vrais. On ne les affiche pas comme actuels. */
-  if(!enLigne){
-    const der=[]; if(t.batt!=null) der.push('batterie '+t.batt+' %'+(t.charge?' (en charge)':'')); if((t.att||0)>0) der.push((t.att)+' vidéo'+(t.att>1?'s':'')+' en attente d’envoi');
-    return '<div id="vbCarteT" style="background:#fff6f4;border:1px solid #e9b4ab;border-radius:12px;padding:12px 16px;margin:0 0 14px"><div style="font:700 14px Poppins,Inter,sans-serif;color:#14304f;margin-bottom:8px">Tablette</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+p.slice(0,1).join('')+'</div>'
-      +'<div style="font-size:12.5px;color:#6b7280;margin-top:8px">Tablette éteinte, sans réseau ou appli fermée : aucune information actuelle (batterie, caméra, vidéos en attente…).'+(der.length?' Dernières valeurs reçues, à ne pas prendre pour l’état d’aujourd’hui : '+der.join(', ')+'.':'')+'</div></div>';
-  }
   const att=t.att||0; p.push(pastille(att+' vidéo'+(att>1?'s':'')+' en attente d’envoi',att===0,att<=5)); if(att>5) grave=true;
   const camOk=t.cam==='ok', camInc=t.cam==='inconnu'; if(!camOk&&!camInc) grave=true; p.push(pastille('Caméra : '+({ok:'OK',inconnu:'pas encore testée (démarre à l’ouverture d’une session)',perdue:'a décroché',absent:'absente',refusee:'non autorisée',erreur:'erreur'}[t.cam]||t.cam),camOk,camInc));
   const micOk=t.mic==='ok', micInc=t.mic==='inconnu'; if(!micOk&&!micInc) grave=true; p.push(pastille('Micro : '+({ok:'OK',inconnu:'pas encore testé',perdu:'a décroché',absent:'absent'}[t.mic]||t.mic),micOk,micInc));
-  if(t.quota){ const pc=Math.round(t.usage/t.quota*100); if(pc>85) grave=true; const mo=(t.usage||0)>=1073741824?((t.usage/1073741824).toFixed(2).replace('.',',')+' Go'):(Math.round((t.usage||0)/1048576)+' Mo');
-    /* chiffre réel : ce que l'appli occupe sur la tablette (vidéos en attente comprises). Pas de pourcentage tant que le navigateur n'approche pas sa limite. */
-    p.push(pastille('Vidéos gardées sur la tablette : '+mo+(pc>=70?' (le navigateur approche de sa limite, '+pc+' %)':''),pc<70,pc<=85)); }
+  if(t.quota){ const pc=Math.round(t.usage/t.quota*100); if(pc>85) grave=true; const mo=(t.usage||0)>=1073741824?((t.usage/1073741824).toFixed(2).replace('.',',')+' Go'):(Math.round((t.usage||0)/1048576)+' Mo'); p.push(pastille('Vidéos gardées sur la tablette : '+mo+(pc>=70?' (le navigateur approche de sa limite, '+pc+' %)':''),pc<70,pc<=85)); }
   const notes=[]; if(t.reco) notes.push('la caméra a été relancée '+t.reco+' fois depuis le dernier démarrage de la page'); if(t.mut) notes.push(t.mut+' vidéo'+(t.mut>1?'s':'')+' enregistrée'+(t.mut>1?'s':'')+' avec un son très faible');
-  return '<div id="vbCarteT" style="background:'+(grave?'#fff6f4':'#fff')+';border:1px solid '+(grave?'#e9b4ab':'#e6e1d6')+';border-radius:12px;padding:12px 16px;margin:0 0 14px"><div style="font:700 14px Poppins,Inter,sans-serif;color:#14304f;margin-bottom:8px">Tablette'+(t.enreg?' <span style="font-weight:500;color:#6b7280;font-size:12.5px">· un invité est en train de filmer</span>':'')+'</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+p.join('')+'</div>'+(notes.length?'<div style="font-size:12.5px;color:#6b7280;margin-top:8px">'+notes.join(' · ')+'.</div>':'')+'</div>';
+  const corps='<div style="font-size:12.5px;color:#6b7280;margin-bottom:8px">Dernier signal : il y a '+quand+(t.enreg?' · un invité est en train de filmer':'')+'</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+p.join('')+'</div>'+(notes.length?'<div style="font-size:12.5px;color:#6b7280;margin-top:8px">'+notes.join(' · ')+'.</div>':'');
+  return grave?boite('#b03a2a','#fff6f4','#e9b4ab','⚠ Tablette · en ligne · à vérifier',corps,true):boite('#2f6b2a','#fff','#e6e1d6','● Tablette · en ligne',corps,false);
 }
 /* jauge de stockage : visible seulement dans le back-office, jamais sur la tablette */
 let VBJAUGE_OUVERTE=false;
