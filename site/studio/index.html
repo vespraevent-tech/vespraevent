@@ -10417,8 +10417,7 @@ function rechRendre(){
     (groupes[cle] = groupes[cle] || {nom:x.nom, tel:x.tel, mail:x.mail, l:[]}).l.push(x);
   });
   const g = Object.values(groupes);
-  z.innerHTML = g.length ? g.slice(0,30).map(c => { c.l.sort((a,b)=>String(b.date).localeCompare(String(a.date))); return
-    '<div class="rech-p"><div class="rech-nom" style="cursor:pointer" onclick="rechOuvrirFiche(\'' + c.l[0].k + '\',\'' + escAttr(String(c.l[0].id)) + '\')"><b>' + esc(c.nom||'Sans nom') + '</b><small>' + esc([c.tel, c.mail].filter(Boolean).join(' · ')) + '</small></div>' +
+  z.innerHTML = g.length ? g.slice(0,30).map(c => { c.l.sort((a,b)=>String(b.date).localeCompare(String(a.date))); return '<div class="rech-p"><div class="rech-nom" style="cursor:pointer" onclick="rechOuvrirFiche(\'' + c.l[0].k + '\',\'' + escAttr(String(c.l[0].id)) + '\')"><b>' + esc(c.nom||'Sans nom') + '</b><small>' + esc([c.tel, c.mail].filter(Boolean).join(' · ')) + '</small></div>' +
     c.l.map(x => '<div class="rech-r" onclick="rechOuvrirFiche(\'' + x.k + '\',\'' + escAttr(String(x.id)) + '\')"><span>' + esc(x.date||'date ?') + ' · ' + esc(x.lib) + (x.adr ? ' · ' + esc(String(x.adr).replace(/\s*\n\s*/g,', ')) : '') + '</span><span>' + esc(x.st) + '</span></div>').join('') + '</div>'; }).join('')
     : '<div class="rech-vide">Aucun résultat.</div>';
 }
