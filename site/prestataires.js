@@ -31,6 +31,15 @@
 
 window.VESPRA_PRESTATAIRES = [
 
+  /* ——— Bar et cave : bière, vin, spiritueux ——— */
+  /* rang: 5000 = affiché en premier dans sa famille */
+  {
+    metier: "Bar & cave", nom: "3B Bar", type: "Réception, bar et cave",
+    commune: "Vitré",
+    mot: "Possibilité d'acheter des boissons (bière, vin…) et de louer des tireuses à bière pour votre événement.",
+    site: "https://www.instagram.com/3b_bar_craftbeer/", tel: "", exemple: false, rang: 5000
+  },
+
   /* ——— Service ——— */
   {
     metier: "Serveuse privée", nom: "Candice", type: "Service lors de votre événement",
@@ -45,10 +54,26 @@ window.VESPRA_PRESTATAIRES = [
     commune: "Vitré",
     mot: "Emmanuel crée sur mesure : gâteaux, desserts, mignardises pour tous vos événements. Un rendez-vous dégustation peut être organisé.",
     site: "", tel: "", lien: "/prestations.html#patissier", exemple: false
-  }
+  },
 
-  /* Retirés pour l'instant (pas de partenariat) : 3B Bar, Passion Réception.
-     Pour les remettre, ré-activer les blocs conservés dans brouillons-produits/prestataires-retires.js */
+  /* ——— Vaisselle, tables, chaises ——— */
+  {
+    metier: "Location de vaisselle", nom: "Passion Réception", type: "Vaisselle, mobilier et décoration",
+    commune: "Vitré",
+    mot: "Vaisselle, tables, chaises, nappage et décoration, au 173 boulevard de Laval. Une seule route pour tout récupérer.",
+    site: "https://passionreception.fr/", tel: "02 99 74 22 91", exemple: false
+  },
+
+  /* ——— Repas ———
+     La même maison que ci-dessus : elle apparaît dans deux familles
+     parce qu'elle fait deux métiers. C'est voulu. */
+  {
+    metier: "Traiteur", nom: "Passion Réception", type: "Gigot bitume",
+    commune: "Vitré",
+    mot: "Le gigot bitume, ce repas de fin de chantier où la viande cuit selon le procédé d'origine. C'est leur spécialité, surtout demandée par les entreprises.",
+    site: "https://passionreception.fr/organisateur-de-gigot-bitume-repas-de-fin-de-chantier/",
+    tel: "02 99 74 22 91", exemple: false
+  }
 
 ];
 
