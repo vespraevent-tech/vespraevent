@@ -3727,6 +3727,13 @@ async function loadDemandes(silencieux){
       rafraichirPlanning();
     })();
     const dejaDansDemandes = new Set(base.map(d => d.resaId).filter(Boolean).map(String));
+    /* validation en cours : la réservation existe déjà (elle porte l'identifiant de sa demande) mais la demande
+       n'est pas encore liée à elle. On les rapproche ici, sinon la réservation apparaît une seconde fois, puis disparaît. */
+    base.forEach(d => {
+      if(d.resaId) return;
+      const r = resas.find(x => x && x.demandeId !== undefined && x.demandeId !== null && String(x.demandeId) === String(d.id));
+      if(r){ d.resaId = String(r.id); dejaDansDemandes.add(String(r.id)); }
+    });
 
     /* Toute réservation du planning sans demande publique correspondante
        devient une ligne de la liste. Elle est considérée comme validée,
