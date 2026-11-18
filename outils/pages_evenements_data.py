@@ -9,8 +9,8 @@ PAGES = {}
 # ───────────────────────── PARTICULIERS (page d'accueil des particuliers) ─────────────────────────
 PAGES['organisation-evenements-particuliers'] = dict(
  hub=True, parent=None, nom="Particuliers",
- title="Organisation d'événements pour particuliers : mariage, anniversaire, gender reveal | Vespra Event",
- desc="Nous organisons tous vos événements de particuliers à Vitré, Rennes et dans le Grand Ouest : mariage, anniversaire, anniversaire surprise, gender reveal, baptême. Matériel, prestataires, décor. Parlez-nous de votre projet.",
+ title="Organisation d'événements de particuliers | Vespra Event",
+ desc="Mariage, anniversaire, anniversaire surprise, gender reveal : nous organisons votre événement à Vitré, Rennes et dans le Grand Ouest. Devis sur mesure.",
  eyebrow="Pour les particuliers · Vitré · Rennes · Grand Ouest",
  h1="ÉVÉNEMENTS DE PARTICULIERS<br><em>ORGANISÉS POUR VOUS</em>",
  lead="Mariage, anniversaire, anniversaire surprise, gender reveal, baptême : choisissez votre événement et laissez-nous l'organiser avec vous. Matériel, décor, prestataires et coordination : vous profitez, nous nous occupons du reste.",
@@ -47,8 +47,8 @@ PAGES['organisation-evenements-particuliers'] = dict(
 # ───────────────────────── MARIAGE ─────────────────────────
 PAGES['organisation-mariage'] = dict(
  hub=False, parent='organisation-evenements-particuliers', nom="Mariage",
- title="Organisation de mariage à Vitré, Rennes et Grand Ouest | Vespra Event",
- desc="Nous organisons votre mariage avec vous à Vitré, Rennes et dans le Grand Ouest : choix du lieu, matériel, décoration, photobooth, animations, prestataires et coordination. Une seule facture, devis sur mesure.",
+ title="Organisation de mariage à Vitré et Rennes | Vespra Event",
+ desc="Organisation de mariage à Vitré, Rennes et dans le Grand Ouest : lieu, matériel, décoration, animations et prestataires. Une seule facture, devis sur mesure.",
  eyebrow="Mariage · Vitré · Rennes · Grand Ouest",
  h1="ORGANISATION DE MARIAGE<br><em>SUR MESURE</em>",
  lead="Le plus beau jour de votre vie mérite d'être organisé sereinement. Nous vous accompagnons pour le lieu, le matériel, la décoration, les animations et les prestataires : vous gardez l'essentiel, nous gérons le reste.",
@@ -81,8 +81,8 @@ PAGES['organisation-mariage'] = dict(
 # ───────────────────────── ANNIVERSAIRE ─────────────────────────
 PAGES['organisation-anniversaire'] = dict(
  hub=False, parent='organisation-evenements-particuliers', nom="Anniversaire",
- title="Organisation d'anniversaire et anniversaire surprise à Vitré, Rennes | Vespra Event",
- desc="Nous organisons votre anniversaire à Vitré, Rennes et dans le Grand Ouest, y compris les anniversaires surprise : ambiance, boîte de nuit gonflable, photobooth, karaoké, effets, prestataires. Devis sur mesure.",
+ title="Organisation d'anniversaire à Vitré et Rennes | Vespra Event",
+ desc="Organisation d'anniversaire et d'anniversaire surprise à Vitré, Rennes et dans le Grand Ouest : ambiance, animations, effets, gâteau sur mesure. Devis gratuit.",
  eyebrow="Anniversaire · Vitré · Rennes · Grand Ouest",
  h1="ORGANISATION D'ANNIVERSAIRE<br><em>ET ANNIVERSAIRE SURPRISE</em>",
  lead="18 ans, 30 ans, 50 ans ou anniversaire surprise : nous organisons la fête avec vous. Ambiance, animations, effets et gourmandises : la soirée dont tout le monde se souviendra.",
@@ -114,8 +114,8 @@ PAGES['organisation-anniversaire'] = dict(
 # ───────────────────────── GENDER REVEAL ─────────────────────────
 PAGES['organisation-gender-reveal'] = dict(
  hub=False, parent='organisation-evenements-particuliers', nom="Gender reveal",
- title="Organisation de gender reveal à Vitré, Rennes et Grand Ouest | Vespra Event",
- desc="Nous organisons votre gender reveal à Vitré, Rennes et dans le Grand Ouest : canon à poudre colorée, fumée, étincelles, décor, photobooth. Un moment unique, un devis sur mesure.",
+ title="Organisation de gender reveal à Vitré | Vespra Event",
+ desc="Organisation de gender reveal à Vitré, Rennes et dans le Grand Ouest : canon à poudre colorée, fumée, décor, photobooth. Un moment unique, devis sur mesure.",
  eyebrow="Gender reveal · Vitré · Rennes · Grand Ouest",
  h1="ORGANISATION DE<br><em>GENDER REVEAL</em>",
  lead="Fille ou garçon ? Un moment unique à partager avec ceux que vous aimez. Canon à poudre, fumée colorée, décor et photos souvenirs : nous organisons la révélation avec vous.",
@@ -147,8 +147,8 @@ PAGES['organisation-gender-reveal'] = dict(
 PAGES['organisation-evenements-entreprises'] = dict(
  pro_extra=True,
  hub=True, parent=None, nom="Professionnels",
- title="Événements d'entreprise : organisation et location de matériel à Vitré, Rennes | Vespra Event",
- desc="Organisation d'événements professionnels et location de matériel à Vitré, Rennes et dans le Grand Ouest, pour entreprises, associations et collectivités : soirée d'entreprise, séminaire, anniversaire d'entreprise, inauguration. Matériel installé et repris, devis sous 24 h, facture à votre nom.",
+ title="Organisation d'événements d'entreprise à Vitré | Vespra Event",
+ desc="Événements d'entreprise à Vitré, Rennes et dans le Grand Ouest : soirée, séminaire, anniversaire d'entreprise. Matériel installé, devis sous 24 h, facture à votre nom.",
  eyebrow="Pour les professionnels · Vitré · Rennes · Grand Ouest",
  h1="ÉVÉNEMENTS D'ENTREPRISE<br><em>CLÉ EN MAIN</em>",
  lead="Soirée à thème, séminaire, anniversaire d'entreprise, inauguration : nous organisons vos événements professionnels de A à Z. Matériel, prestataires et coordination, avec un seul interlocuteur et une seule facture.",
@@ -189,8 +189,8 @@ PAGES['organisation-evenements-entreprises'] = dict(
 # ───────────────────────── SOIRÉE D'ENTREPRISE ─────────────────────────
 PAGES['organisation-soiree-entreprise'] = dict(
  hub=False, parent='organisation-evenements-entreprises', nom="Soirée d'entreprise",
- title="Organisation de soirée d'entreprise et soirée à thème à Vitré, Rennes | Vespra Event",
- desc="Nous organisons votre soirée d'entreprise ou soirée à thème à Vitré, Rennes et dans le Grand Ouest : ambiance son et lumière, photobooth personnalisé, effets, prestataires. Une seule facture, devis sur mesure.",
+ title="Organisation de soirée d'entreprise à Vitré | Vespra Event",
+ desc="Organisation de soirée d'entreprise et de soirée à thème à Vitré, Rennes et dans le Grand Ouest : ambiance, photobooth personnalisé, effets. Une seule facture.",
  eyebrow="Soirée d'entreprise · Vitré · Rennes · Grand Ouest",
  h1="ORGANISATION DE SOIRÉE<br><em>D'ENTREPRISE ET À THÈME</em>",
  lead="Soirée de fin d'année, anniversaire de l'entreprise ou soirée à thème : nous créons l'ambiance. Son, lumière, effets, photobooth personnalisé et prestataires, coordonnés avec une seule facture.",
@@ -223,8 +223,8 @@ PAGES['organisation-soiree-entreprise'] = dict(
 # ───────────────────────── SÉMINAIRE ─────────────────────────
 PAGES['organisation-seminaire'] = dict(
  hub=False, parent='organisation-evenements-entreprises', nom="Séminaire",
- title="Organisation de séminaire d'entreprise à Vitré, Rennes et Grand Ouest | Vespra Event",
- desc="Nous organisons votre séminaire ou conférence à Vitré, Rennes et dans le Grand Ouest : vidéoprojection, sonorisation, tentes, accueil, restauration. Une seule facture, devis sur mesure.",
+ title="Organisation de séminaire d'entreprise à Vitré | Vespra Event",
+ desc="Organisation de séminaire à Vitré, Rennes et dans le Grand Ouest : vidéoprojection, sonorisation, accueil, cocktail. Une seule facture, devis sur mesure.",
  eyebrow="Séminaire · Vitré · Rennes · Grand Ouest",
  h1="ORGANISATION DE<br><em>SÉMINAIRE</em>",
  lead="Séminaire, conférence, journée de formation ou team building : nous préparons le cadre pour que vos équipes se concentrent sur l'essentiel. Vidéoprojection, sonorisation, accueil et restauration, avec une seule facture.",
@@ -257,8 +257,8 @@ PAGES['organisation-seminaire'] = dict(
 # ───────────────────────── ANNIVERSAIRE D'ENTREPRISE ─────────────────────────
 PAGES['organisation-anniversaire-entreprise'] = dict(
  hub=False, parent='organisation-evenements-entreprises', nom="Anniversaire d'entreprise",
- title="Organisation d'anniversaire d'entreprise à Vitré, Rennes et Grand Ouest | Vespra Event",
- desc="Nous organisons l'anniversaire de votre entreprise à Vitré, Rennes et dans le Grand Ouest : accueil, cocktail, discours, sonorisation, vidéoprojection, photobooth personnalisé. Une seule facture, devis sur mesure.",
+ title="Organisation d'anniversaire d'entreprise | Vespra Event",
+ desc="Organisation d'anniversaire d'entreprise à Vitré, Rennes et dans le Grand Ouest : accueil, cocktail, discours, photobooth personnalisé. Une seule facture.",
  eyebrow="Anniversaire d'entreprise · Vitré · Rennes · Grand Ouest",
  h1="ORGANISATION D'ANNIVERSAIRE<br><em>D'ENTREPRISE</em>",
  lead="10 ans, 20 ans, 50 ans de votre entreprise : une belle occasion de réunir équipes, clients et partenaires. Accueil, cocktail, discours, photobooth personnalisé et animation, avec une seule facture.",
