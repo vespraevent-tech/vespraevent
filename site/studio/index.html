@@ -9462,7 +9462,7 @@ const PAGES_SITE = [
   ['produit-neon-lumineux.html','Fiche — Néon lumineux'],
   ['produit-guirlande-lumineuse.html','Fiche — Guirlande lumineuse'],
   ['article-panneau-bienvenue.html','Article — Panneau de bienvenue'],
-  ['nos-recommandations.html','Nos lieux de réception'], ['nos-prestataires.html','Nos prestataires'], ['rendez-vous.html','Prendre rendez-vous'], ['evenements-pro.html','Événements pro'],
+  ['nos-recommandations.html','Nos lieux de réception'], ['nos-prestataires.html','Nos prestataires'], ['evenements.html','Événements (organisation et rendez-vous)'], ['evenements-pro.html','Événements pro'],
   ['article-photobooth-vintage.html','Article — Photobooth vintage'],
   ['vitre.html','Ville — Vitré'], ['rennes.html','Ville — Rennes'], ['laval.html','Ville — Laval'],
   ['fougeres.html','Ville — Fougères'], ['nantes.html','Ville — Nantes'], ['saint-malo.html','Ville — Saint-Malo'],
@@ -9838,7 +9838,7 @@ async function resetTheme(){
    Réglage enregistré à part (id « bandeau »), lu par le site à chaque affichage. */
 const BD_DEFAUT = [
   {t:'Livraison offerte à Vitré', c:'Livraison offerte', l:'/zones-livraison.html', i:'camion'},
-  {t:'Visite sur rendez-vous', c:'Sur rendez-vous', l:'/rendez-vous.html', i:'calendrier'},
+  {t:'Visite sur rendez-vous', c:'Sur rendez-vous', l:'/evenements.html#rdv', i:'calendrier'},
   {t:'Service client 7j/7', c:'7j/7', l:'tel:+33650836828', i:'telephone'}
 ];
 const BD_ICO = {
@@ -9881,7 +9881,7 @@ function bdRender(){
     '<div class="bd-it"><div class="bd-l">' +
     '<button type="button" class="bd-ib" title="Choisir l\'icône" onclick="bdIcBasc('+i+')">'+(bdIco(m.i)||'<span class="bd-no">∅</span>')+'</button>' +
     '<input type="text" maxlength="120" placeholder="Message" value="'+escVal(m.t)+'" oninput="bdSaisie('+i+',\'t\',this.value)">' +
-    '<input type="text" maxlength="300" placeholder="Lien (ex. /rendez-vous.html), facultatif" value="'+escVal(m.l)+'" oninput="bdSaisie('+i+',\'l\',this.value)">' +
+    '<input type="text" maxlength="300" placeholder="Lien (ex. /evenements.html#rdv), facultatif" value="'+escVal(m.l)+'" oninput="bdSaisie('+i+',\'l\',this.value)">' +
     '<span class="bd-b"><button type="button" title="Monter" onclick="bdDeplacer('+i+',-1)">↑</button><button type="button" title="Descendre" onclick="bdDeplacer('+i+',1)">↓</button><button type="button" title="Retirer" onclick="bdRetirer('+i+')">✕</button></span></div>' +
     '<input type="text" class="bd-c" maxlength="40" placeholder="Version courte pour téléphone (facultatif)" value="'+escVal(m.c||'')+'" oninput="bdSaisie('+i+',\'c\',this.value)">' +
     (bdIcOuvert===i ? '<div class="bd-ig">'+Object.keys(BD_ICO).map(k=>'<button type="button" title="'+BD_ICO[k][0]+'" class="'+(m.i===k?'on':'')+'" onclick="bdIcChoix('+i+',\''+k+'\')">'+BD_ICO[k][1]+'</button>').join('')+
