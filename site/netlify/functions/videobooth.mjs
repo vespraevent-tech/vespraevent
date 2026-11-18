@@ -307,7 +307,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
 <small>VESPRA EVENT</small><h1>${esc(m.prenom)}, voici votre message vidéo</h1><p>${esc(m.event || '')}</p>
 <video controls playsinline preload="metadata" src="/api/videobooth/v/${esc(id)}${q}&amp;lecture=1"></video>
 <a href="/api/videobooth/v/${esc(id)}${q}&amp;dl=1" download>Télécharger ma vidéo</a>
-<div class="n">Ce lien est valable une semaine : pensez à télécharger votre vidéo pour la garder.<br>Un souci avec votre vidéo ? Contactez notre support : contact@vespraevent.com<br>Vespra Event — spécialiste de la location événementielle dans le Grand Ouest.</div></main></body></html>`;
+<div class="n">Ce lien est valable une semaine : pensez à télécharger votre vidéo pour la garder.<br>Vespra Event — spécialiste de la location événementielle dans le Grand Ouest.</div></main></body></html>`;
       return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
     }
     /* lecture par morceaux (Range) : indispensable pour que la vidéo se lance sur téléphone */
