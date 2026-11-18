@@ -26,3 +26,8 @@ Rien ici n'est publié tant que les prix et les photos ne sont pas fournis.
 - Référencement : `site/sitemap.xml`, `site/llms.txt`, `site/plan-du-site.html`, éventuellement `_redirects`
 - Images : fichiers `.webp` + registre d'images (`images-registre.js`)
 - Règle de la maison : quantités (qteMax), options, pas de promotion du M-Fog 1500, boutons à ~8 px de rayon, identité visuelle inchangée.
+
+## Règles données par Thomas (à respecter)
+- Les produits ci-dessus restent **en attente** (pas de fiche, pas de prix) tant qu'il n'a pas les photos et les prix.
+- **Exception** : on peut les **citer dans les textes** des pages d'organisation d'événements, avec la mention « sur demande » : arche de ballons, chiffres et lettres géants lumineux, fonds photobooth. Quand ces produits seront mis en ligne, retirer « sur demande » et ajouter un lien vers leur fiche (textes concernés : cartes « décor » / « ambiance » dans `outils/pages_evenements_data.py`, carte « Soirée à thème » de `site/evenements.html`).
+- **Photos** : sur les pages d'**organisation d'événements**, uniquement des photos avec un beau décor (pas de fonds blancs). Sur les pages de **location** (catalogue, fiches produit, carrousels « meilleures locations », carrousels « à louer »), les fonds blancs sont acceptés.
