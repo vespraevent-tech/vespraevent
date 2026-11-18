@@ -2740,6 +2740,29 @@ function vbSessSuppr(i){ const l=(VBCFG.sessions||[]).slice(); if(!confirm('Supp
 let VB=[], VBEVT='', VBALERTE=20, VBETAT=null;
 function vbEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 const vbNomEvt=v=>v.event||'(sans nom d’événement)';
+function vbMessageEtat(d){
+  const a=document.getElementById('vbAlerte'); if(!a) return;
+  const fh=x=>x?new Date(x.date).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):null;
+  const et=d.etat||{}; let msg='';
+    if(!d.cle) msg='La variable VIDEOBOOTH_CLE n’est pas définie dans Netlify (ou le site n’a pas été redéployé depuis) : la tablette ne peut pas envoyer ses vidéos.';
+    else if(et.refus && (!et.contact || et.refus.date>et.contact.date)) msg='La tablette a essayé d’envoyer le '+fh(et.refus)+' mais l’accès a été refusé : vérifiez les mots de passe saisis sur la tablette.';
+    else if(!et.contact) msg='Aucun contact de la tablette pour l’instant. Sur la tablette, ouvrez /videobooth/ et choisissez la session.';
+    a.style.display=msg?'block':'none'; a.textContent=msg;
+    a.style.color=(msg&&d.cle&&et.contact&&!et.refus)?'#6b7280':'#b03a2a';
+    if(!msg&&et.contact){ a.style.display='block'; a.style.color='#6b7280'; a.textContent='Dernier contact de la tablette : '+fh(et.contact)+'.'; }
+}
+/* le BO relit l'état de la tablette toutes les 20 secondes tant qu'on est sur l'onglet Vidéobooth */
+async function vbEtatSeul(){
+  try{
+    const d=await api('/videobooth'); const et=d.etat||{};
+    VBETAT=et.tablette||null;
+    vbMessageEtat(d);
+    const c=document.getElementById('vbCarteT'); const h=vbCarteTablette();
+    if(c){ if(h){ const t=document.createElement('div'); t.innerHTML=h; const n=t.firstElementChild; n.id='vbCarteT'; c.replaceWith(n); } }
+    else if(h){ vbRendre(); }
+  }catch(e){}
+}
+setInterval(()=>{ try{ if(!document.hidden && typeof ongletCourant==='function' && ongletCourant()==='videobooth') vbEtatSeul(); }catch(e){} }, 20000);
 async function vbCharger(){
   const z=document.getElementById('vbListe'); if(!z) return;
   z.innerHTML='<div class="hint">Chargement…</div>';
@@ -2748,13 +2771,7 @@ async function vbCharger(){
     VB=d.videos||[];
     const a=document.getElementById('vbAlerte');
     const fh=x=>x?new Date(x.date).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):null;
-    const et=d.etat||{}; let msg='';
-    if(!d.cle) msg='La variable VIDEOBOOTH_CLE n’est pas définie dans Netlify (ou le site n’a pas été redéployé depuis) : la tablette ne peut pas envoyer ses vidéos.';
-    else if(et.refus && (!et.contact || et.refus.date>et.contact.date)) msg='La tablette a essayé d’envoyer le '+fh(et.refus)+' mais l’accès a été refusé : vérifiez les mots de passe saisis sur la tablette.';
-    else if(!et.contact) msg='Aucun contact de la tablette pour l’instant. Sur la tablette, ouvrez /videobooth/ et choisissez la session.';
-    a.style.display=msg?'block':'none'; a.textContent=msg;
-    a.style.color=(msg&&d.cle&&et.contact&&!et.refus)?'#6b7280':'#b03a2a';
-    if(!msg&&et.contact){ a.style.display='block'; a.style.color='#6b7280'; a.textContent='Dernier contact de la tablette : '+fh(et.contact)+'.'; }
+    vbMessageEtat(d); const et=d.etat||{};
     VBETAT=et.tablette||null;
     try{ const al=await api('/videobooth/alerte'); VBALERTE=al.go||20; }catch(e){}
     vbRendre(); vbConfigCharger();
@@ -2773,7 +2790,7 @@ function vbCarteTablette(){
   /* tablette hors ligne : les chiffres reçus datent de son dernier signal, ils ne sont plus vrais. On ne les affiche pas comme actuels. */
   if(!enLigne){
     const der=[]; if(t.batt!=null) der.push('batterie '+t.batt+' %'+(t.charge?' (en charge)':'')); if((t.att||0)>0) der.push((t.att)+' vidéo'+(t.att>1?'s':'')+' en attente d’envoi');
-    return '<div style="background:#fff6f4;border:1px solid #e9b4ab;border-radius:12px;padding:12px 16px;margin:0 0 14px"><div style="font:700 14px Poppins,Inter,sans-serif;color:#14304f;margin-bottom:8px">Tablette</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+p.slice(0,1).join('')+'</div>'
+    return '<div id="vbCarteT" style="background:#fff6f4;border:1px solid #e9b4ab;border-radius:12px;padding:12px 16px;margin:0 0 14px"><div style="font:700 14px Poppins,Inter,sans-serif;color:#14304f;margin-bottom:8px">Tablette</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+p.slice(0,1).join('')+'</div>'
       +'<div style="font-size:12.5px;color:#6b7280;margin-top:8px">Tablette éteinte, sans réseau ou appli fermée : aucune information actuelle (batterie, caméra, vidéos en attente…).'+(der.length?' Dernières valeurs reçues, à ne pas prendre pour l’état d’aujourd’hui : '+der.join(', ')+'.':'')+'</div></div>';
   }
   const att=t.att||0; p.push(pastille(att+' vidéo'+(att>1?'s':'')+' en attente d’envoi',att===0,att<=5)); if(att>5) grave=true;
@@ -2783,7 +2800,7 @@ function vbCarteTablette(){
     /* chiffre réel : ce que l'appli occupe sur la tablette (vidéos en attente comprises). Pas de pourcentage tant que le navigateur n'approche pas sa limite. */
     p.push(pastille('Vidéos gardées sur la tablette : '+mo+(pc>=70?' (le navigateur approche de sa limite, '+pc+' %)':''),pc<70,pc<=85)); }
   const notes=[]; if(t.reco) notes.push('la caméra a été relancée '+t.reco+' fois depuis le dernier démarrage de la page'); if(t.mut) notes.push(t.mut+' vidéo'+(t.mut>1?'s':'')+' enregistrée'+(t.mut>1?'s':'')+' avec un son très faible');
-  return '<div style="background:'+(grave?'#fff6f4':'#fff')+';border:1px solid '+(grave?'#e9b4ab':'#e6e1d6')+';border-radius:12px;padding:12px 16px;margin:0 0 14px"><div style="font:700 14px Poppins,Inter,sans-serif;color:#14304f;margin-bottom:8px">Tablette'+(t.enreg?' <span style="font-weight:500;color:#6b7280;font-size:12.5px">· un invité est en train de filmer</span>':'')+'</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+p.join('')+'</div>'+(notes.length?'<div style="font-size:12.5px;color:#6b7280;margin-top:8px">'+notes.join(' · ')+'.</div>':'')+'</div>';
+  return '<div id="vbCarteT" style="background:'+(grave?'#fff6f4':'#fff')+';border:1px solid '+(grave?'#e9b4ab':'#e6e1d6')+';border-radius:12px;padding:12px 16px;margin:0 0 14px"><div style="font:700 14px Poppins,Inter,sans-serif;color:#14304f;margin-bottom:8px">Tablette'+(t.enreg?' <span style="font-weight:500;color:#6b7280;font-size:12.5px">· un invité est en train de filmer</span>':'')+'</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+p.join('')+'</div>'+(notes.length?'<div style="font-size:12.5px;color:#6b7280;margin-top:8px">'+notes.join(' · ')+'.</div>':'')+'</div>';
 }
 /* jauge de stockage : visible seulement dans le back-office, jamais sur la tablette */
 let VBJAUGE_OUVERTE=false;

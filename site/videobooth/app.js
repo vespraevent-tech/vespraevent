@@ -301,7 +301,7 @@ $('b-stop').onclick = arreterRec;
   /* ── état de la tablette, envoyé toutes les 2 minutes au back-office (batterie, vidéos en attente, caméra, micro, place) ── */
   function battement() {
     if (!(cfg.jeton || cfg.cle)) return;
-    var etat = { cam: camEtat, mic: micEtat, ver: 24, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
+    var etat = { cam: camEtat, mic: micEtat, ver: 25, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
     var fin = function () {
       toutes().then(function (l) { etat.att = l.filter(function (v) { return !v.envoye; }).length; etat.tot = l.length; }).catch(function () {}).then(function () {
         return (navigator.storage && navigator.storage.estimate) ? navigator.storage.estimate().then(function (e) { etat.usage = e.usage || 0; etat.quota = e.quota || 0; }).catch(function () {}) : null;
@@ -311,7 +311,10 @@ $('b-stop').onclick = arreterRec;
     };
     if (navigator.getBattery) navigator.getBattery().then(function (b) { etat.batt = Math.round(b.level * 100); etat.charge = !!b.charging; fin(); }).catch(fin); else fin();
   }
-  setInterval(battement, 120000); setTimeout(battement, 8000);
+  /* état renvoyé toutes les minutes, dès que la page redevient visible, dès que le réseau revient et après chaque envoi : le back-office reste à jour */
+  setInterval(battement, 60000); setTimeout(battement, 5000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) setTimeout(battement, 800); });
+  window.addEventListener('online', function () { setTimeout(battement, 1500); });
   setInterval(synchro, 20000); window.addEventListener('online', synchro);
   setTimeout(function () { liberer(false).then(majEtat); }, 4000);
 

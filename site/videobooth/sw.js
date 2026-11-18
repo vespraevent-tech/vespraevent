@@ -1,6 +1,6 @@
 /* Vidéobooth : l'appli s'ouvre même sans réseau (les vidéos, elles, vivent dans la tablette jusqu'à leur envoi). */
-const V = 'vb-29';
-const FICHIERS = ['/videobooth/', '/videobooth/index.html', '/videobooth/app.js?v=29', '/videobooth/app.css?v=28', '/videobooth/manifest.webmanifest', '/videobooth/icones/icon-192.png', '/videobooth/icones/favicon-32.png', '/videobooth/icones/apple-touch-icon.png', '/polices.css?v=1'];
+const V = 'vb-30';
+const FICHIERS = ['/videobooth/', '/videobooth/index.html', '/videobooth/app.js?v=30', '/videobooth/app.css?v=28', '/videobooth/manifest.webmanifest', '/videobooth/icones/icon-192.png', '/videobooth/icones/favicon-32.png', '/videobooth/icones/apple-touch-icon.png', '/polices.css?v=1'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(V).then((c) => Promise.all(FICHIERS.map((u) => c.add(u).catch(() => {})))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((k) => Promise.all(k.filter((x) => x !== V).map((x) => caches.delete(x)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', (e) => {
