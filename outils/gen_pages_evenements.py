@@ -87,8 +87,8 @@ def build(slug, P):
     else:
         ariane = '<p class="ev-ariane"><a href="index.html">Accueil</a> › <a href="evenements.html">Organisation d\'événements</a> › %s</p>' % P['nom']
     crumbs.append((P['nom'], slug))
-    out.append('<section class="ev-hero" id="evHero" style="--pos:%s"><picture><img class="ev-hero-img" src="%s" alt="%s" width="1500" height="1000" fetchpriority="high" decoding="async"></picture><div class="ev-hero-in">%s<p class="ev-eye">%s</p><h1 class="ev-h">%s</h1><p class="ev-lead">%s</p><div class="ev-btns"><a class="ev-cta" href="#rdv">Nous contacter</a><a class="ev-cta ev-cta2" href="catalogue.html">Voir le matériel</a></div><ul class="ev-chips" aria-label="Nos engagements">%s</ul></div></section>'
-               % (P['imgpos'], P['img'], esc(P['alt']), ariane, P['eyebrow'], P['h1'], P['lead'], chips))
+    out.append('<section class="ev-hero" id="evHero" style="--pos:%s"><picture><img class="ev-hero-img" src="%s" alt="%s" width="1500" height="1000" fetchpriority="high" decoding="async"></picture><div class="ev-hero-in">%s<p class="ev-eye">%s</p><h1 class="ev-h">%s</h1><p class="ev-lead">%s</p><div class="ev-btns"><a class="ev-cta" href="#rdv">Nous contacter</a><a class="ev-cta ev-cta2" href="catalogue.html">Voir le matériel</a></div></div></section>'
+               % (P['imgpos'], P['img'], esc(P['alt']), '', P['eyebrow'], P['h1'], P['lead']))
     mq = ''.join('<span>%s</span>' % w for w in P['mq'])
     out.append('<div class="ev-marquee" aria-hidden="true"><div class="ev-mq-t">%s</div></div>' % (mq * 2))
     if P['hub']:
