@@ -2780,16 +2780,20 @@ function vbCarteTablette(){
   return '<div style="background:'+(grave?'#fff6f4':'#fff')+';border:1px solid '+(grave?'#e9b4ab':'#e6e1d6')+';border-radius:12px;padding:12px 16px;margin:0 0 14px"><div style="font:700 14px Poppins,Inter,sans-serif;color:#14304f;margin-bottom:8px">Tablette'+(t.enreg?' <span style="font-weight:500;color:#6b7280;font-size:12.5px">· un invité est en train de filmer</span>':'')+'</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+p.join('')+'</div>'+(notes.length?'<div style="font-size:12.5px;color:#6b7280;margin-top:8px">'+notes.join(' · ')+'.</div>':'')+'</div>';
 }
 /* jauge de stockage : visible seulement dans le back-office, jamais sur la tablette */
+let VBJAUGE_OUVERTE=false;
 function vbJauge(detail){
   const total=VB.reduce((t,v)=>t+(v.octets||0),0), seuil=VBALERTE*1073741824, pct=Math.round(total/seuil*100);
   const coul=pct>=100?'#b03a2a':(pct>=70?'#c27a00':'#3d6e36'), fond=pct>=100?'#fbeae7':(pct>=70?'#fff4dc':'#eef6ec');
   const msg=pct>=100?'Seuil dépassé : téléchargez les vidéos puis videz-les dès que possible.':(pct>=70?'Le stockage se remplit : pensez à télécharger puis à vider les vidéos.':'');
   if(!detail&&pct<70) return '';
-  const barre='<div style="height:8px;background:#e8e4da;border-radius:6px;overflow:hidden;margin:8px 0 6px"><div style="height:100%;width:'+Math.min(100,pct)+'%;background:'+coul+'"></div></div>';
-  return '<div style="background:'+(msg?fond:'#fff')+';border:1px solid '+(msg?coul:'#e6e1d6')+';border-radius:12px;padding:12px 16px;margin:0 0 14px">'+
-    '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><b style="color:'+coul+'">'+(msg?'⚠ ':'')+'Stockage des vidéos : '+vbMo(total)+' sur '+String(VBALERTE).replace('.',',')+' Go d’alerte ('+pct+' %)</b>'+
-    (detail?'<span style="font-size:12.5px;color:#6b7280">Alerte à partir de <input id="vbSeuil" value="'+String(VBALERTE).replace('.',',')+'" style="width:60px;padding:4px 6px;border:1px solid #d9dde5;border-radius:6px;text-align:center"> Go <button class="btn btn-ghost" style="padding:4px 10px;font-size:12.5px" onclick="vbSeuilSauver()">Enregistrer</button></span>':'')+'</div>'+barre+
-    (msg?'<div style="font-size:13px;color:'+coul+';font-weight:600">'+msg+'</div>':'')+(detail?'<div style="font-size:12px;color:#8a8f98;margin-top:4px">Ce seuil est le vôtre : Netlify ne publie pas de limite de taille. Il vous prévient ici, et nulle part ailleurs (jamais sur la tablette).</div>':'')+'</div>';
+  const barre='<div style="height:8px;background:#e8e4da;border-radius:6px;overflow:hidden;margin:10px 0 6px"><div style="height:100%;width:'+Math.min(100,pct)+'%;background:'+coul+'"></div></div>';
+  /* une seule ligne : « Stockage 2,7 Mo / 20 Go » ; un clic déroule le détail (barre, seuil, explication) */
+  return '<details'+((VBJAUGE_OUVERTE||pct>=70)?' open':'')+' ontoggle="VBJAUGE_OUVERTE=this.open" style="background:'+(msg?fond:'#fff')+';border:1px solid '+(msg?coul:'#e6e1d6')+';border-radius:12px;padding:12px 16px;margin:0 0 14px">'+
+    '<summary style="cursor:pointer;font-weight:700;color:'+coul+';list-style-position:inside">'+(msg?'⚠ ':'')+'Stockage : '+vbMo(total)+' / '+String(VBALERTE).replace('.',',')+' Go</summary>'+
+    barre+
+    (msg?'<div style="font-size:13px;color:'+coul+';font-weight:600;margin-bottom:6px">'+msg+'</div>':'')+
+    (detail?'<div style="font-size:12.5px;color:#6b7280;margin-top:6px">Alerte à partir de <input id="vbSeuil" value="'+String(VBALERTE).replace('.',',')+'" style="width:60px;padding:4px 6px;border:1px solid #d9dde5;border-radius:6px;text-align:center"> Go <button class="btn btn-ghost" style="padding:4px 10px;font-size:12.5px" onclick="vbSeuilSauver()">Enregistrer</button></div>'+
+    '<div style="font-size:12px;color:#8a8f98;margin-top:6px">Ce seuil est le vôtre : Netlify ne publie pas de limite de taille. Il vous prévient ici, et nulle part ailleurs (jamais sur la tablette).</div>':'')+'</details>';
 }
 async function vbSeuilSauver(){ const v=document.getElementById('vbSeuil').value; try{ const r=await api('/videobooth/alerte',{method:'POST',body:JSON.stringify({go:v})}); VBALERTE=r.go; showToast('Seuil enregistré'); vbRendre(); }catch(e){ showToast('Échec : '+e.message,true); } }
 function vbOuvrir(nom){ VBEVT=nom; VBEDIT=null; vbRendre(); vbConfigRendre(); window.scrollTo({top:0}); }
