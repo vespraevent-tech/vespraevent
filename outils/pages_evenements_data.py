@@ -195,7 +195,7 @@ PAGES['organisation-soiree-entreprise'] = dict(
  h1="ORGANISATION DE SOIRÉE<br><em>D'ENTREPRISE ET À THÈME</em>",
  lead="Soirée de fin d'année, anniversaire de l'entreprise ou soirée à thème : nous créons l'ambiance. Son, lumière, effets, photobooth personnalisé et prestataires, coordonnés avec une seule facture.",
  img="fumee-lourde-wgf-2000-situation.webp", imgpos="center 50%", alt="Lumières bleues et fumée lors d'une soirée d'entreprise",
- chips=["À thème","Son &amp; lumière","Une facture"],
+ chips=["À thème","Son &amp; lumière","Photobooth"],
  mq=["Soirée à thème","Fin d'année","Anniversaire d'entreprise","Photobooth","Effets spéciaux","Animation","Cocktail","Ambiance"],
  cards_k="Votre soirée de A à Z", cards_t="UNE SOIRÉE <em>QUI MARQUE</em>",
  cards=[
