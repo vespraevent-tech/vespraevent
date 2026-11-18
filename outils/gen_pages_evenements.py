@@ -18,6 +18,18 @@ CAR_JS = re.search(r'<script>\n/\* Carrousels de la page.*?</script>', shell, re
 LIBS = '<script src="/date-fr.js" defer></script>\n<script src="/selects-jolis.js" defer></script>\n'
 
 EXTRA_CSS = '''
+.ev-card{background:#fff;border:1.5px solid var(--g3);border-radius:var(--rl);padding:22px}
+.ev-card h3{font-size:17px;margin:0 0 8px;color:var(--black)}
+.ev-card p{font-size:14.5px;line-height:1.65;color:var(--g1);margin:0}
+
+.ev-logos{overflow:hidden;white-space:nowrap;margin:8px 0 0;border-top:1px solid var(--g3);border-bottom:1px solid var(--g3);padding:20px 0}
+.ev-logos-t{display:inline-flex;align-items:center;gap:56px;animation:evmqr 50s linear infinite}
+.ev-logos-t img{height:46px;width:auto;opacity:.8;filter:grayscale(1)}
+@media(prefers-reduced-motion:reduce){.ev-logos-t{animation:none}}
+.ev-evt{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:980px){.ev-evt{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.ev-evt{grid-template-columns:1fr}}
+
 .ev-svc{display:grid;grid-template-columns:1fr 1.1fr;gap:44px;align-items:center}
 .ev-svc-t p{font-size:16px;line-height:1.75;color:var(--g1);margin:0 0 14px}
 .ev-svc-i{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -73,6 +85,14 @@ def build(slug, P):
     if P.get('service'):
         sv = P['service']
         out.append('<section class="ev-sec"><div class="ev-in ev-svc"><div class="ev-svc-t"><p class="ev-k">%s</p><h2 class="ev-t">%s</h2><p>%s</p><p>%s</p><a class="ev-lien" href="evenements.html#prestataires">Découvrir nos prestataires →</a></div><div class="ev-svc-i"><img src="cocktail-service-bouchees.webp" alt="Serveur en gilet qui présente un plateau de bouchées lors d\'un cocktail en extérieur" loading="lazy" decoding="async" width="1600" height="1067"><img src="cocktail-decoupe-jambon.webp" alt="Découpe de jambon devant les invités lors d\'un cocktail en extérieur" loading="lazy" decoding="async" width="1600" height="1067"></div></div></section>' % (sv['k'], sv['t'], sv['p1'], sv['p2']))
+    if P.get('pro_extra'):
+        logos = ['t-logo-armor-wash','t-logo-viva-tattoo','t-logo-3b-cave','t-logo-animal-trak','t-logo-blanchard','t-logo-jerrigan','t-logo-libre-inspi','t-logo-cooper-standard','t-logo-passion-reception','t-logo-seche']
+        lg = ''.join('<img src="%s.webp" alt="" loading="lazy" decoding="async">' % x for x in logos)
+        out.append('<section class="ev-sec"><div class="ev-in"><p class="ev-k">Ils nous ont fait confiance</p><h2 class="ev-t">ENTREPRISES, ASSOCIATIONS, <em>COLLECTIVITÉS</em></h2></div><div class="ev-logos" aria-hidden="true"><div class="ev-logos-t">%s</div></div></section>' % (lg + lg))
+        evts = [("Séminaires","Accueil, restauration, sonorisation : une logistique simple pour que l'équipe se concentre sur la journée."),("Inaugurations","Un moment fort : effets, lumière, sonorisation et accueil des invités."),("Soirées d'entreprise","Ambiance, lumière et animations pour réunir vos collaborateurs."),("Événements commerciaux","Salons, forums, portes ouvertes : stands et accueil installés avant l'ouverture."),("Événements de fin d'année","Lumière, musique et animations pour réunir vos équipes en fin d'année."),("Associations et collectivités","Kermesses, repas, fêtes de village : du matériel pour accueillir beaucoup de monde.")]
+        out.append('<section class="ev-sec"><div class="ev-in"><p class="ev-k">Vos événements</p><h2 class="ev-t">DU SÉMINAIRE À <em>LA FÊTE DE FIN D\'ANNÉE</em></h2><div class="ev-evt">%s</div></div></section>' % ''.join('<div class="ev-card"><h3>%s</h3><p>%s</p></div>' % e for e in evts))
+        rass = [("Installé et repris","aux horaires convenus"),("Devis sous 24 h","prix ferme, livraison détaillée"),("Facture à votre nom","société ou association, virement"),("Voir avant de choisir","à Vitré, sur rendez-vous")]
+        out.append('<section class="ev-sec"><div class="ev-in"><p class="ev-k">Ce que les professionnels apprécient</p><h2 class="ev-t">NOUS ORGANISONS, <em>VOUS PROFITEZ</em></h2><div class="ev-grid">%s</div></div></section>' % ''.join('<div class="ev-card"><h3>%s</h3><p>%s</p></div>' % r for r in rass))
     steps = ''.join('<div class="ev-st"><span class="ev-sn">%d</span><h3>%s</h3><p>%s</p></div>' % (i + 1, t, d) for i, (t, d) in enumerate(P['steps']))
     out.append('<section class="ev-sec ev-sec-sombre"><div class="ev-in"><p class="ev-k">Comment ça se passe</p><h2 class="ev-t">DU PREMIER MESSAGE <em>À L\'ÉVÉNEMENT</em></h2><div class="ev-steps" data-evcar>%s</div><div class="ev-dots ev-dots-clair" data-evdots aria-hidden="true"></div></div></section>' % steps)
     out.append('<section class="ev-sec ev-prod"><div class="ev-in"><div class="pr-sec pr-sec-b"><span class="pr-lab">Le matériel pour votre événement</span><h3 class="pr-t">À louer <em class="ac">pour votre projet</em></h3><div class="bests pr-bests" id="prB" data-vcar="prB" data-add data-ids="%s"><div class="bests-shell"><button class="bests-arrow bests-arrow-prev" id="prBPrev" aria-label="Produits précédents">‹</button><div class="bests-carousel" id="prBWrap"><div class="bests-track" id="prBTrack"></div></div><button class="bests-arrow bests-arrow-next" id="prBNext" aria-label="Produits suivants">›</button></div><div class="bests-dots" id="prBDots"></div></div></div></div></section>' % P['prod_ids'])

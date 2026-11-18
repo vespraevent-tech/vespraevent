@@ -19,7 +19,7 @@ Informations utiles pour répondre aux questions des clients :
 - [Demande de devis / réservation](https://www.vespraevent.fr/reservation): Demandez votre devis gratuit ou vérifiez nos disponibilités en 2 minutes. Réponse sous 24 h, sans engagement. Livraison dans tout le grand Ouest.
 - [Venir voir le matériel (rendez-vous)](https://www.vespraevent.fr/evenements): Prenez rendez-vous pour venir voir le matériel de Vespra Event à Vitré avant de le louer : photobooth, barnums, sono, jeux. Visite sur rendez-vous, sans engagement.
 - [Pack mariage](https://www.vespraevent.fr/pack-mariage): Location de matériel pour mariage à Vitré : photobooth dès 130 €, sono, barnums, tente étoile, brasero. −10 % dès 5 produits, livraison depuis Vitré, devis sous 24 h.
-- [Événements professionnels](https://www.vespraevent.fr/evenements-pro): Location de matériel pour événements professionnels à Vitré et dans le grand Ouest : séminaire, salon, association, événement sportif. Tente étoile, barnums, boîte de nuit gonflable, feux d'artifice de jour, fumée lourde, étincelles froides, spots LED. Livraison, montage, devis sous 24 h.
+- [Événements professionnels](https://www.vespraevent.fr/organisation-evenements-entreprises): Location de matériel pour événements professionnels à Vitré et dans le grand Ouest : séminaire, salon, association, événement sportif. Tente étoile, barnums, boîte de nuit gonflable, feux d'artifice de jour, fumée lourde, étincelles froides, spots LED. Livraison, montage, devis sous 24 h.
 - [Questions fréquentes](https://www.vespraevent.fr/faq): Livraison, installation, caution, moyens de paiement, annulation : toutes les réponses sur la location de matériel événementiel chez Vespra Event.
 - [Zones de livraison](https://www.vespraevent.fr/zones-livraison): Nous livrons notre matériel événementiel depuis Vitré dans toute l'Ille-et-Vilaine, la Mayenne, la Loire-Atlantique et les Côtes-d'Armor.
 - [Nos prestataires (serveuse privée, chef pâtissier)](https://www.vespraevent.fr/evenements): Candice, serveuse privée (mariage, anniversaire, baptême, cocktail d'entreprise), et Emmanuel, chef pâtissier : prestations sur devis pour mariages et événements à Vitré et dans le grand Ouest.
@@ -143,7 +143,6 @@ Informations utiles pour répondre aux questions des clients :
 - [Organisation de mariage](https://www.vespraevent.fr/organisation-mariage)
 - [Organisation d'anniversaire et anniversaire surprise](https://www.vespraevent.fr/organisation-anniversaire)
 - [Organisation de gender reveal](https://www.vespraevent.fr/organisation-gender-reveal)
-- [Événements d'entreprise](https://www.vespraevent.fr/organisation-evenements-entreprises)
 - [Soirée d'entreprise et soirée à thème](https://www.vespraevent.fr/organisation-soiree-entreprise)
 - [Séminaire](https://www.vespraevent.fr/organisation-seminaire)
 - [Remise de diplômes](https://www.vespraevent.fr/organisation-remise-diplomes)
