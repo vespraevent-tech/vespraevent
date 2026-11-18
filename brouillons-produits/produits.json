@@ -129,7 +129,7 @@
       "categories_visees": [
         "Page / section de mise en avant (pas un produit seul)"
       ],
-      "idee_description": "Mise en avant : Vespra Event coordonne tout, avec une seule facture, pour n'importe quel type d'événement (particuliers, mariages, professionnels). Accompagnement et conseil, avec les prestataires déjà présents sur le site (traiteur Passion Réception, bar 3B Bar, serveuse privée Candice, pâtisserie Emmanuel, location de vaisselle Passion Réception) et bientôt un photographe et un vidéaste. Seuls les produits loués affichent un prix ; tout le reste est sur devis, via une demande envoyée par le client. Aucune mention de rémunération, commission ou mode de facturation sur le site.",
+      "idee_description": "Page « Organisation d'événements » (à créer, accessible depuis le menu pour que les visiteurs voient tout de suite qu'on organise des événements). Message : on loue du matériel, on a des prestataires partenaires, on coordonne tout avec une seule facture, « Parlez-nous de votre projet : nous sommes là pour vous guider ». Prestataires partenaires cités : Candice (serveuse privée) et Emmanuel (chef pâtissier), plus bientôt un photographe et un vidéaste. Ne PAS citer Passion Réception ni 3B Bar (pas de partenariat ; on les oriente au cas par cas : vaisselle, chaises, bière). Prix affichés uniquement pour les produits loués ; tout le reste sur devis via une demande.",
       "usages": [
         "mariage",
         "soirée d'entreprise / événement pro",
@@ -140,20 +140,22 @@
         "sur devis uniquement"
       ],
       "questions": [
-        "Page dédiée ou section de la page nos-prestataires existante ?",
-        "Formulaire : quels champs (type d'événement, date, lieu, nombre d'invités, prestataires souhaités, budget) ?",
-        "Quand le photographe et le vidéaste arrivent : noms, photos, métiers à afficher ?",
-        "Photos ou exemples d'événements déjà organisés ?"
+        "La page « Nos prestataires » actuelle : la garder (Candice et Emmanuel) ou la remplacer par la page « Organisation d'événements » ?",
+        "Nom dans le menu : « Organisation d'événements » ?",
+        "Champs du formulaire : type d'événement, date, lieu, nombre d'invités, prestataires souhaités, budget ?",
+        "Photographe et vidéaste : noms, photos, dates d'arrivée ?",
+        "Photos d'événements déjà organisés ?"
       ],
       "prix": null,
       "photos": null,
       "statut": "brouillon",
       "regles": [
         "Prix affichés uniquement pour les produits en location",
-        "Prestations et organisation : sur devis, formulaire de demande",
+        "Prestations et organisation : sur devis, formulaire « Parlez-nous de votre projet »",
         "Ne pas parler de rémunération, commission ou facturation",
-        "Une seule facture, coordination par Vespra Event (message : un seul interlocuteur)",
-        "Prestataires cités : ceux de la page nos-prestataires ; photographe et vidéaste à ajouter bientôt"
+        "Une seule facture, coordination par Vespra Event",
+        "Prestataires cités : Candice et Emmanuel seulement ; photographe et vidéaste à ajouter bientôt",
+        "Ne pas citer Passion Réception ni 3B Bar"
       ]
     },
     {
