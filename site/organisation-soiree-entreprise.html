@@ -705,6 +705,14 @@ textarea.pr-i{resize:vertical;min-height:96px}
 .ev-bur-img img:nth-child(3){object-position:25% 60%}
 .ev-pc h3{font-size:19px}
 
+
+/* cartes entièrement cliquables (le lien du bouton s'étend sur toute la carte) */
+.ev-pc{cursor:pointer}
+.ev-pc a::after{content:"";position:absolute;inset:0;z-index:2}
+.ev-pan{position:relative;cursor:pointer}
+.ev-pan .ev-lien::after{content:"";position:absolute;inset:0;z-index:1}
+.ev-pan .ev-sous a{position:relative;z-index:2}
+.ev-pan:hover{border-color:var(--navy)}
 .pr-hero .pr-kicker{font-family:inherit;font-size:11px;font-weight:600;line-height:1.3;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85);margin:0 0 6px}
 @media(max-width:980px){
  .ev-car,.ev-steps{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;padding:4px 16px 8px;margin:0 -16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
