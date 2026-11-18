@@ -948,7 +948,7 @@ function fiche(sub){
  var liste=(sub==='service'?p.service:p.infos).map(function(t){return '<li>'+esc(t)+'</li>'}).join('');
  var opt=function(arr){return arr.map(function(x){return '<option>'+x+'</option>'}).join('')};
  var sel=function(id,ph,arr){return '<select class="pr-i" id="'+id+'" aria-label="'+ph+'"><option value="">'+ph+'</option>'+opt(arr)+'</select>'};
- var NB='<select class="pr-i" id="prN" aria-label="Nombre d\'invités" required><option value="">Nombre d\'invités *</option>'+opt(['Moins de 20','20 à 30','30 à 50','50 à 80','80 à 150','150 à 300','Plus de 300'])+'</select>';
+ var NB='<select class="pr-i" id="prN" aria-label="Nombre d\'invités"><option value="">Nombre d\'invités</option>'+opt(['Moins de 20','20 à 30','30 à 50','50 à 80','80 à 150','150 à 300','Plus de 300'])+'</select>';
  var champ;
  if(p.champs==='parts'){
    champ='<div class="pr-row">'+NB+'<input class="pr-i" id="prA" type="text" placeholder="Allergies / contraintes"></div>';
@@ -968,7 +968,7 @@ function fiche(sub){
  '<textarea class="pr-i" id="prTA" hidden placeholder="Décrivez votre événement"></textarea>'+
  '<input class="pr-i" id="prD" type="text" data-date-fr placeholder="Date de l\'événement"></div>'+champ+
  '<textarea class="pr-i" id="prM" placeholder="'+(p.champs==="parts"?"Votre création : gâteau, desserts, thème, envies…":"Précisions : lieu, déroulé, envies…")+'"></textarea>'+
- '<div class="pr-rdv"><p>'+rdvTxt+'</p><div class="pr-row"><input class="pr-i" id="prRD" type="text" data-date-fr placeholder="Jour souhaité pour en parler (facultatif)">'+sel('prRH','Moment de la journée',['Matin','Midi','Après-midi','Fin de journée'])+'</div></div>'+
+ '<div class="pr-rdv"><p>'+rdvTxt+'</p><div class="pr-row"><input class="pr-i" id="prRD" type="text" data-date-fr placeholder="Jour souhaité (facultatif)">'+sel('prRH','Moment de la journée',['Matin','Midi','Après-midi','Fin de journée'])+'</div></div>'+
  '<label class="pr-chk"><input type="checkbox" id="prMat"> Je souhaite aussi louer du matériel pour cet événement</label>'+
  '<button class="pr-add" type="submit">Envoyer ma demande</button><p class="pr-n" id="prMsg">Sans engagement. Les prix des prestations sont donnés sur devis, après échange avec vous.</p></form>';
 // activer calendrier/listes sur les nouveaux champs
