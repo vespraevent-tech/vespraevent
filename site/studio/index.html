@@ -2766,13 +2766,14 @@ function vbCarteTablette(){
   const t=VBETAT.detail, age=Math.max(0,Math.round((Date.now()-new Date(VBETAT.date))/60000));
   const pastille=(txt,ok,warn)=>'<span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;border-radius:20px;padding:4px 11px;color:'+(ok?'#2f6b2a':(warn?'#8a5a00':'#b03a2a'))+';background:'+(ok?'#e4f2df':(warn?'#fdf0d5':'#fbeae7'))+'">'+txt+'</span>';
   const p=[]; let grave=false;
-  const enLigne=age<=30; if(!enLigne) grave=true;
+  const enLigne=age<=6; if(!enLigne) grave=true;   /* la tablette se signale toutes les 2 minutes : au-delà de 6 minutes sans signal, elle n'est plus en ligne */
   p.push(pastille((enLigne?'● En ligne':'● Hors ligne')+' · il y a '+(age<1?'moins d’une minute':(age>=120?Math.round(age/60)+' h':age+' min')),enLigne,false));
   if(t.batt!=null){ const bas=t.batt<20&&!t.charge; if(bas) grave=true; p.push(pastille('🔋 '+t.batt+' %'+(t.charge?' ⚡ en charge':''),!bas&&(t.charge||t.batt>=40),!bas)); }
+  else p.push(pastille('🔋 Batterie : non communiquée par la tablette',false,true));
   const att=t.att||0; p.push(pastille(att+' vidéo'+(att>1?'s':'')+' en attente d’envoi',att===0,att<=5)); if(att>5) grave=true;
-  const camOk=t.cam==='ok'||t.cam==='inconnu'; if(!camOk) grave=true; p.push(pastille('Caméra : '+({ok:'OK',inconnu:'OK',perdue:'a décroché',absent:'absente',refusee:'non autorisée',erreur:'erreur'}[t.cam]||t.cam),camOk,false));
-  const micOk=t.mic==='ok'||t.mic==='inconnu'; if(!micOk) grave=true; p.push(pastille('Micro : '+({ok:'OK',inconnu:'OK',perdu:'a décroché',absent:'absent'}[t.mic]||t.mic),micOk,false));
-  if(t.quota){ const pc=Math.round(t.usage/t.quota*100); if(pc>85) grave=true; p.push(pastille('Mémoire tablette : '+pc+' %',pc<70,pc<=85)); }
+  const camOk=t.cam==='ok', camInc=t.cam==='inconnu'; if(!camOk&&!camInc) grave=true; p.push(pastille('Caméra : '+({ok:'OK',inconnu:'pas encore testée (démarre à l’ouverture d’une session)',perdue:'a décroché',absent:'absente',refusee:'non autorisée',erreur:'erreur'}[t.cam]||t.cam),camOk,camInc));
+  const micOk=t.mic==='ok', micInc=t.mic==='inconnu'; if(!micOk&&!micInc) grave=true; p.push(pastille('Micro : '+({ok:'OK',inconnu:'pas encore testé',perdu:'a décroché',absent:'absent'}[t.mic]||t.mic),micOk,micInc));
+  if(t.quota){ const pc=Math.round(t.usage/t.quota*100); if(pc>85) grave=true; p.push(pastille('Espace réservé à l’appli : '+pc+' % utilisé',pc<70,pc<=85)); }
   const notes=[]; if(t.reco) notes.push('la caméra a été relancée '+t.reco+' fois depuis le dernier démarrage de la page'); if(t.mut) notes.push(t.mut+' vidéo'+(t.mut>1?'s':'')+' enregistrée'+(t.mut>1?'s':'')+' avec un son très faible');
   return '<div style="background:'+(grave?'#fff6f4':'#fff')+';border:1px solid '+(grave?'#e9b4ab':'#e6e1d6')+';border-radius:12px;padding:12px 16px;margin:0 0 14px"><div style="font:700 14px Poppins,Inter,sans-serif;color:#14304f;margin-bottom:8px">Tablette'+(t.enreg?' <span style="font-weight:500;color:#6b7280;font-size:12.5px">· un invité est en train de filmer</span>':'')+'</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+p.join('')+'</div>'+(notes.length?'<div style="font-size:12.5px;color:#6b7280;margin-top:8px">'+notes.join(' · ')+'.</div>':'')+'</div>';
 }
