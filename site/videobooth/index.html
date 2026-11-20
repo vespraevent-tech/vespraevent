@@ -12,35 +12,54 @@
 <link rel="icon" type="image/png" sizes="48x48" href="/videobooth/icones/favicon-48.png?v=3">
 <link rel="apple-touch-icon" href="/videobooth/icones/apple-touch-icon.png">
 <link rel="stylesheet" href="/polices.css?v=1">
-<link rel="stylesheet" href="app.css?v=30">
+<link rel="stylesheet" href="app.css?v=31">
 </head>
 <body>
 <main id="app">
-  <section id="s-accueil" class="ecran on">
+  <section id="s-accueil" class="ecran inv on">
     <div class="noel noel-haut" aria-hidden="true"></div><div class="noel noel-bas" aria-hidden="true"></div>
     <button id="cadenas" class="cadenas" type="button" aria-label="Réglages"></button>
-    <h1 id="t-accueil">Enregistrer un souvenir</h1>
-    <p id="p-accueil">Laissez un petit message vidéo de 30 secondes</p>
-    <button id="b-commencer" class="gros" type="button">Commencer</button>
+    <header class="hero"><h1 id="t-accueil">Enregistrer un souvenir</h1><i class="filet"></i><p id="p-accueil"></p></header>
+    <button id="b-commencer" class="cta" type="button">Commencer</button>
     <div id="modes" class="modes" hidden></div>
-    <div class="marque">VESPRA EVENT</div>
     <div id="etat" class="etat" aria-live="polite" hidden></div>
   </section>
 
-  <section id="s-form" class="ecran">
-    <h2 id="t-qui">Qui êtes-vous ?</h2>
-    <p class="petit" id="p-qui">Pour vous envoyer votre vidéo par e-mail</p>
-    <form id="form" autocomplete="off" novalidate>
-      <label>Nom<input id="f-nom" type="text" inputmode="text" autocapitalize="words" required></label>
-      <label>Prénom<input id="f-prenom" type="text" inputmode="text" autocapitalize="words" required></label>
-      <div class="pour" role="radiogroup" aria-label="À qui envoyer la vidéo ?"><button type="button" role="radio" aria-checked="true" data-p="moi" class="on">Je reçois ma vidéo</button><button type="button" role="radio" aria-checked="false" data-p="autre">Je l’envoie à quelqu’un</button></div>
-      <label id="l-dest" hidden>Prénom de la personne<input id="f-dest" type="text" inputmode="text" autocapitalize="words"></label>
-      <label><span id="t-email">Votre adresse e-mail</span><input id="f-email" type="email" inputmode="email" autocomplete="off" autocapitalize="none" required></label>
-      <p id="f-aide" class="petit aide-mail" hidden>Vous ne connaissez pas son adresse e-mail ? Choisissez « Je reçois ma vidéo » : vous pourrez la lui transférer plus tard.</p>
-      <label class="coche"><input id="f-ok" type="checkbox"><span id="f-ok-txt">J’accepte que Vespra Event conserve ma vidéo et mon adresse e-mail pour m’envoyer ma vidéo et la remettre aux organisateurs de l’événement. Elles sont supprimées peu après la fin de l’événement. Mes données ne sont pas utilisées autrement.</span></label>
-      <div id="f-err" class="err" role="alert"></div>
-      <div class="rang"><button id="f-retour" class="sec" type="button">Retour</button><button class="gros" type="submit">Valider</button></div>
-    </form>
+  <section id="s-form" class="ecran inv">
+    <div class="panneau">
+      <h2 id="t-qui">Qui êtes-vous ?</h2>
+      <p class="sous" id="p-qui"></p>
+      <form id="form" autocomplete="off" novalidate>
+        <div class="duo">
+          <label>Prénom<input id="f-prenom" type="text" inputmode="text" autocapitalize="words" required></label>
+          <label>Nom<input id="f-nom" type="text" inputmode="text" autocapitalize="words" required></label>
+        </div>
+        <label class="coche"><input id="f-ok" type="checkbox"><span id="f-ok-txt">J’accepte que ma vidéo et mon nom soient conservés par Vespra Event et remis aux organisateurs de l’événement. Si je donne une adresse e-mail, elle sert uniquement à envoyer la vidéo. Tout est supprimé peu après la fin de l’événement.</span></label>
+        <div id="f-err" class="err" role="alert"></div>
+        <div class="rang"><button id="f-retour" class="ghost" type="button">Retour</button><button id="f-suite" class="cta" type="submit">Continuer</button></div>
+      </form>
+    </div>
+  </section>
+
+  <section id="s-livraison" class="ecran inv">
+    <div class="panneau large">
+      <h2 id="l-titre">Récupérer votre vidéo</h2>
+      <p id="l-info" class="info"></p>
+      <div class="choix">
+        <button id="l-qr" class="opt" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><path d="M14 14h3v3h-3zM20 14v.01M17 20h4M20 17v.01"/></svg><b id="l-qr-t">QR code</b></button>
+        <button id="l-mail" class="opt" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7.5 12 13.5l8.5-6"/></svg><b id="l-mail-t">Par e-mail</b></button>
+      </div>
+      <div class="vols">
+        <div id="p-qr" class="vol" hidden><div id="l-qr-img" class="m-qr-img" aria-hidden="true"></div><p id="l-qr-d" class="sous">Scannez ce code avec l’appareil photo de votre téléphone</p></div>
+        <div id="p-mail" class="vol" hidden><label><span id="l-mail-d">Votre adresse e-mail</span><input id="l-email" type="email" inputmode="email" autocomplete="off" autocapitalize="none"></label><p class="note">Pensez à vérifier vos courriers indésirables.</p></div>
+      </div>
+      <div class="sep"></div>
+      <p id="l-autre-q" class="question">Voulez-vous l’envoyer à quelqu’un ?</p>
+      <div class="seg" role="radiogroup"><button id="l-non" class="on" type="button" role="radio" aria-checked="true">Non</button><button id="l-oui" type="button" role="radio" aria-checked="false">Oui</button></div>
+      <div id="p-autre" class="vol" hidden><div class="duo"><label><span id="l-prenom-d">Prénom de la personne</span><input id="l-dest" type="text" inputmode="text" autocapitalize="words"></label><label><span id="l-email2-d">Son adresse e-mail</span><input id="l-email2" type="email" inputmode="email" autocomplete="off" autocapitalize="none"></label></div></div>
+      <div id="l-err" class="err" role="alert"></div>
+      <button id="l-fin" class="cta pleine" type="button">Terminé</button>
+    </div>
   </section>
 
   <section id="s-cam" class="ecran">
@@ -55,8 +74,9 @@
     <div id="mic" class="mic" hidden aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11z"/></svg><span><i id="mic-i"></i></span><em>Parlez à voix haute</em></div>
     <div id="fmt" class="fmt" hidden aria-label="Format de la vidéo"><button type="button" data-f="v"><i class="fm-v"></i>Vertical</button><button type="button" data-f="h"><i class="fm-h"></i>Horizontal</button></div>
     <div id="cadrage" class="cadrage" hidden></div>
+    <div id="pret" class="pret" hidden><small id="pret-m"></small><b id="pret-t">Êtes-vous prêts ?</b><span id="pret-h"></span></div>
     <div id="qbox" class="qbox" hidden><small id="q-lib"></small><b id="q-txt"></b><i id="q-n"></i></div>
-    <button id="b-go" class="gros go" type="button">Je suis prêt(e)</button>
+    <button id="b-go" class="gros go" type="button">C’est parti !</button>
     <button id="b-stop" class="stop" type="button" hidden>Terminer l’enregistrement</button>
     <div id="cam-err" class="err grand" role="alert" hidden></div>
   </section>
@@ -65,18 +85,17 @@
     <video id="v-revoir" playsinline controls></video>
     <div id="son-alerte" class="son-alerte" role="alert" hidden></div>
     <p id="rv-q" class="rv-q">La vidéo vous plaît ?</p>
-    <div class="rang bas"><button id="b-refaire" class="sec" type="button">Non, je recommence</button><button id="b-fin" class="gros" type="button">Oui, c’est parfait</button></div>
+    <div class="rang bas"><button id="b-refaire" class="ghost light" type="button">Non, on recommence</button><button id="b-fin" class="cta" type="button">Oui, c’est parfait</button></div>
   </section>
 
-  <section id="s-merci" class="ecran">
+  <section id="s-merci" class="ecran inv">
     <div class="noel noel-haut" aria-hidden="true"></div><div class="noel noel-bas" aria-hidden="true"></div>
-    <div class="coche-ok">✓</div>
-    <h2>Merci !</h2>
-    <p id="m-orga" class="m-orga" hidden></p>
-    <p id="m-txt">Votre vidéo vous sera envoyée par e-mail.</p>
-    <p class="petit">L’envoi peut prendre quelques minutes selon la taille de la vidéo. Pensez à vérifier vos courriers indésirables.</p>
-    <p class="petit">Vous n’avez pas reçu votre vidéo au bout de 72 heures ? Contactez notre support : contact@vespraevent.com</p>
-    <div id="m-qr" class="m-qr" hidden><div id="m-qr-img" class="m-qr-img" aria-hidden="true"></div><p class="m-qr-t">Scannez pour récupérer votre vidéo directement</p><button id="m-fin" class="sec" type="button">Terminé</button></div>
+    <div class="coche-ok"><svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <h2 id="m-titre">Merci !</h2>
+    <p id="m-txt">Votre vidéo a bien été enregistrée.</p>
+    <p id="m-mails" class="m-mails" hidden></p>
+    <p id="m-sup" class="petit" hidden>L’envoi peut prendre quelques minutes. Pensez à vérifier vos courriers indésirables. Vous n’avez rien reçu au bout de 72 heures ? Contactez notre support : contact@vespraevent.com</p>
+    <button id="m-fin" class="ghost" type="button">Retour à l’accueil</button>
   </section>
 
   <section id="s-acces" class="ecran">
@@ -152,6 +171,6 @@
   </section>
 </main>
 <script src="qr.js?v=1"></script>
-<script src="app.js?v=34"></script>
+<script src="app.js?v=35"></script>
 </body>
 </html>

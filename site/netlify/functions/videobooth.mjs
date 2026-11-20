@@ -115,6 +115,9 @@ async function accesLire(st) { return st.get('config/acces', { type: 'json' }).c
 async function accesEcrire(st, mdp, libre) { if (!mdp && libre) { const a = { libre: true, maj: new Date().toISOString() }; await st.setJSON('config/acces', a); return a; } if (!mdp) { await st.delete('config/acces').catch(() => {}); return null; } const a = { mdp, h: hMdp('acces', mdp), maj: new Date().toISOString() }; await st.setJSON('config/acces', a); return a; }
 async function sessionsLire(st) { const l = await st.get('config/sessions', { type: 'json' }).catch(() => null); return Array.isArray(l) ? l : []; }
 /* liste de questions : au plus 8, une par ligne, 140 caractères chacune ; « | » interdit (séparateur interne) */
+const AMBIANCES = ['ivoire', 'blanc', 'rose', 'sauge', 'nuit'];
+const TEXTES_CLES = ['go', 'm1n', 'm1d', 'm2n', 'm2d', 'm3n', 'm3d', 'm3b', 'pretT', 'pretB', 'plaitT', 'plaitNon', 'plaitOui', 'quiB', 'livT', 'livQr', 'livQrT', 'livMail', 'livMailT', 'livAutreQ', 'livOui', 'livNon', 'livPrenom', 'livEmail2', 'livFin', 'merciT', 'merciD'];
+const textesPropres = (t) => { const o = {}; const src = t && typeof t === 'object' ? t : {}; for (const k of TEXTES_CLES) { const v = String(src[k] == null ? '' : src[k]).replace(/[\r\n]+/g, ' ').trim().slice(0, 200); if (v) o[k] = v; } return o; };
 const lignes = (a, n = 8, m = 140) => (Array.isArray(a) ? a : String(a || '').split(/\r?\n/)).map((x) => String(x == null ? '' : x).replace(/[\s|]+/g, ' ').trim().slice(0, m)).filter(Boolean).slice(0, n);
 async function sessionsEcrire(st, liste) {
   const propre = liste.slice(0, 200).map((e) => ({
@@ -133,7 +136,10 @@ async function sessionsEcrire(st, liste) {
     heureP: /^([01]\d|2[0-3]):[0-5]\d$/.test(String(e.heureP || '')) ? String(e.heureP) : '23:00',
     qs: lignes(e.qs), qp: lignes(e.qp),
     secQ: Math.min(20, Math.max(0, Math.round(Number(e.secQ)) || 0)),
-    merciOrga: String(e.merciOrga || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 200),
+    merciOrga: String(e.merciOrga || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 300),
+    /* apparence de l'écran des invités et textes de chaque bouton / écran (vide = texte par défaut de la tablette) */
+    amb: AMBIANCES.includes(e.amb) ? e.amb : 'ivoire',
+    textes: textesPropres(e.textes),
   })).filter((e) => e.nom);
   await st.setJSON('config/sessions', propre); return propre;
 }
@@ -144,7 +150,7 @@ const visible = (e) => e.actif !== false && (!e.fin || e.fin >= aujourdhuiParis(
 const carte = (e) => ({ id: e.id, nom: e.nom, date: e.date, prot: !!e.mdp });
 /* ce que la tablette reçoit d'une session (à l'ouverture, puis régulièrement : une modification du back-office arrive seule sur la tablette) */
 const vueSession = (ses) => ({ id: ses.id, nom: ses.nom, date: ses.date, label: labelSession(ses), titre: ses.titre, sous: ses.sous, max: ses.max, format: ses.format, noel: ses.noel, cadrage: ses.cadrage, qui: ses.qui, quiSous: ses.quiSous, qualite: ses.qualite, garde: ses.garde, choixFormat: ses.choixFormat !== false,
-  type: ses.type || 'autre', modeQ: !!ses.modeQ, modeP: !!ses.modeP, heureP: ses.heureP || '23:00', qs: ses.qs || [], qp: ses.qp || [], secQ: ses.secQ || 0, merciOrga: ses.merciOrga || '' });
+  type: ses.type || 'autre', modeQ: !!ses.modeQ, modeP: !!ses.modeP, heureP: ses.heureP || '23:00', qs: ses.qs || [], qp: ses.qp || [], secQ: ses.secQ || 0, merciOrga: ses.merciOrga || '', amb: ses.amb || 'ivoire', textes: ses.textes || {} });
 export { envoyerMail, jeton, jetonMail, jetonEvt, GARDE_JOURS, gardeJours, visible, galLire, galEcrire, genMdp, accesLire, accesEcrire, sessionsLire, sessionsEcrire, labelSession };
 
 export default async (request) => {
@@ -233,20 +239,30 @@ export default async (request) => {
     const st = store();
     const dernier = await st.get('etat/relance-mails', { type: 'json' }).catch(() => null);
     if (dernier && Date.now() - Date.parse(dernier.date) < 6 * 3600 * 1000) return rep({ ok: true, ignore: 'passe récente', envoyes: 0, restants: dernier.restants || 0 });
-    const aEnvoyer = (await lireMetas(st, (m) => m.mail !== 'envoye' && !m.scanne && m.email && (Number(m.mailEssais) || 0) < 3 && !(m.mail === 'attente' && Date.now() - Date.parse(m.cree) < 15 * 60000) && !(m.mailEssaiLe && Date.now() - Date.parse(m.mailEssaiLe) < 6 * 3600 * 1000))).sort((a, b) => String(a.cree).localeCompare(String(b.cree)));
+    /* chaque envoi à refaire est une « tâche » : l'e-mail principal de la vidéo, ou un destinataire en plus */
+    const trop = (iso) => iso && Date.now() - Date.parse(iso) < 6 * 3600 * 1000;
+    const metas = await lireMetas(st, (m) => (m.email && m.mail !== 'envoye' && !m.scanne && (Number(m.mailEssais) || 0) < 3 && !(m.mail === 'attente' && Date.now() - Date.parse(m.cree) < 15 * 60000) && !trop(m.mailEssaiLe))
+      || (m.autres || []).some((a) => a.mail !== 'envoye' && (Number(a.essais) || 0) < 3 && !(a.mail === 'attente' && Date.now() - Date.parse(m.cree) < 15 * 60000) && !trop(a.essaiLe)));
+    const taches = [];
+    for (const m of metas) {
+      if (m.email && m.mail !== 'envoye' && !m.scanne && (Number(m.mailEssais) || 0) < 3 && !(m.mail === 'attente' && Date.now() - Date.parse(m.cree) < 15 * 60000) && !trop(m.mailEssaiLe)) taches.push({ m, a: null });
+      (m.autres || []).forEach((a) => { if (a.mail !== 'envoye' && (Number(a.essais) || 0) < 3 && !(a.mail === 'attente' && Date.now() - Date.parse(m.cree) < 15 * 60000) && !trop(a.essaiLe)) taches.push({ m, a }); });
+    }
+    taches.sort((x, y) => String(x.m.cree).localeCompare(String(y.m.cree)));
     const site = (process.env.URL || `${url.protocol}//${url.host}`).replace(/\/$/, '');
     let envoyes = 0, stop = false;
-    for (const m of aEnvoyer.slice(0, 25)) {
+    for (const { m, a } of taches.slice(0, 25)) {
       const buf = await st.get('video/' + m.id, { type: 'arrayBuffer' }).catch(() => null);
-      m.mailEssais = (Number(m.mailEssais) || 0) + 1; m.mailEssaiLe = new Date().toISOString();
-      if (!buf) { m.mailErreur = 'Fichier vidéo expiré'; await st.setJSON('meta/' + m.id, m); continue; }
-      const r = await envoyerMail(m, buf, site);
-      m.mail = r.ok ? 'envoye' : 'erreur'; m.mailErreur = r.erreur || ''; m.pj = !!r.pj; if (r.ok) m.renvoye = new Date().toISOString();
+      const maintenant = new Date().toISOString();
+      if (a) { a.essais = (Number(a.essais) || 0) + 1; a.essaiLe = maintenant; } else { m.mailEssais = (Number(m.mailEssais) || 0) + 1; m.mailEssaiLe = maintenant; }
+      if (!buf) { if (a) a.mailErreur = 'Fichier vidéo expiré'; else m.mailErreur = 'Fichier vidéo expiré'; await st.setJSON('meta/' + m.id, m); continue; }
+      const r = await envoyerMail(a ? { ...m, email: a.email, pour: 'autre', dest: a.dest } : m, buf, site);
+      if (a) { a.mail = r.ok ? 'envoye' : 'erreur'; a.mailErreur = r.erreur || ''; } else { m.mail = r.ok ? 'envoye' : 'erreur'; m.mailErreur = r.erreur || ''; m.pj = !!r.pj; if (r.ok) m.renvoye = new Date().toISOString(); }
       await st.setJSON('meta/' + m.id, m);
       if (r.ok) envoyes++; else { stop = true; break; }
       await new Promise((ok) => setTimeout(ok, 700));
     }
-    const restants = Math.max(0, aEnvoyer.length - envoyes);
+    const restants = Math.max(0, taches.length - envoyes);
     await st.setJSON('etat/relance-mails', { date: new Date().toISOString(), envoyes, restants, arret: stop });
     return rep({ ok: true, envoyes, restants, arret: stop });
   }
@@ -351,8 +367,10 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
     const q = url.searchParams, id = q.get('id') || '';
     const i = Number(q.get('i')), n = Number(q.get('n'));
     if (!idOk(id) || !(n >= 1 && n <= 40) || !(i >= 0 && i < n)) return rep({ ok: false, erreur: 'Paramètres invalides' }, 400);
-    const email = String(q.get('email') || '').trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || email.length > 200) return rep({ ok: false, erreur: 'Adresse e-mail invalide' }, 400);
+    /* l'adresse e-mail est facultative : l'invité peut ne vouloir que le QR code (les organisateurs reçoivent toutes les vidéos de toute façon) */
+    const email = String(q.get('email') || '').trim(), plusEmail = String(q.get('plusEmail') || '').trim();
+    const mailOk = (x) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(x) && x.length <= 200;
+    if ((email && !mailOk(email)) || (plusEmail && !mailOk(plusEmail))) return rep({ ok: false, erreur: 'Adresse e-mail invalide' }, 400);
     const st = store();
     /* déjà reçue (renvoi après une coupure de réseau) : on confirme, sans rien refaire ni renvoyer d'e-mail */
     const deja = await st.get('meta/' + id, { type: 'json' }).catch(() => null);
@@ -378,11 +396,14 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
     }
     const total = parts.reduce((t, p) => t + p.length, 0);
     const tout = new Uint8Array(total); let o = 0; for (const p of parts) { tout.set(p, o); o += p.length; }
+    const plusDest = String(q.get('plusDest') || '').replace(/[<>\r\n]+/g, ' ').trim().slice(0, 60);
     const m = {
       id, event: String(q.get('event') || '').slice(0, 160), nom: String(q.get('nom') || '').slice(0, 80), prenom: String(q.get('prenom') || '').slice(0, 80), email,
       fichier: String(q.get('fichier') || 'video.mp4').replace(/[\\/:*?"<>|\r\n]+/g, ' ').trim().slice(0, 150) || 'video.mp4',
       type: String(q.get('type') || 'video/mp4').slice(0, 40), duree: Number(q.get('duree')) || 0, pour: q.get('pour') === 'autre' ? 'autre' : 'moi', dest: q.get('pour') === 'autre' ? String(q.get('dest') || '').replace(/[<>\r\n]+/g, ' ').trim().slice(0, 60) : '', son: q.get('son') === '' || q.get('son') == null ? null : Math.min(100, Math.max(0, Math.round(Number(q.get('son')) || 0))), octets: total, cree: new Date().toISOString(),
     };
+    /* un destinataire de plus (« voulez-vous l'envoyer à quelqu'un ? ») : l'e-mail principal reste celui de l'invité */
+    if (plusEmail) m.autres = [{ email: plusEmail, dest: plusDest, mail: 'attente' }];
     /* mode choisi par l'invité (message vidéo, boîte à questions, questions piquantes) et questions posées pendant la vidéo */
     { const md = String(q.get('mode') || ''); if (md === 'questions' || md === 'piquantes') { m.mode = md; m.qs = lignes(String(q.get('qs') || '').split('|')); } }
     /* clé de récupération par QR code (aléatoire, générée sur la tablette) : permet à l'invité d'ouvrir sa propre vidéo depuis l'écran de remerciement */
@@ -392,14 +413,23 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
     await st.set('video/' + id, tout.buffer);
     for (let k = 0; k < n; k++) await st.delete(`chunk/${id}/${k}`).catch(() => {});
     /* la fiche est écrite AVANT l'e-mail : si l'envoi est interrompu, la vidéo reste visible dans le back-office */
-    m.mail = 'attente'; m.mailErreur = '';
+    m.mail = m.email ? 'attente' : 'aucun'; m.mailErreur = '';
     await st.setJSON('meta/' + id, m);
     const site = (process.env.URL || `${url.protocol}//${url.host}`).replace(/\/$/, '');
-    const mail = await envoyerMail(m, tout, site);
-    m.mail = mail.ok ? 'envoye' : 'erreur'; m.mailErreur = mail.erreur || ''; m.pj = !!mail.pj;
+    let mailOkTout = true, mailErr = '';
+    if (m.email) {
+      const mail = await envoyerMail(m, tout, site);
+      m.mail = mail.ok ? 'envoye' : 'erreur'; m.mailErreur = mail.erreur || ''; m.pj = !!mail.pj;
+      if (!mail.ok) { mailOkTout = false; mailErr = mail.erreur || ''; }
+    }
+    for (const a of m.autres || []) {
+      const r2 = await envoyerMail({ ...m, email: a.email, pour: 'autre', dest: a.dest }, tout, site);
+      a.mail = r2.ok ? 'envoye' : 'erreur'; a.mailErreur = r2.erreur || ''; a.essais = 1;
+      if (!r2.ok) { mailOkTout = false; mailErr = mailErr || r2.erreur || ''; }
+    }
     await st.setJSON('meta/' + id, m);
     await nettoyer(st);
-    return rep({ ok: true, termine: true, mail: mail.ok, mailErreur: mail.erreur || '' });
+    return rep({ ok: true, termine: true, mail: mailOkTout, mailErreur: mailErr });
   }
   return rep({ ok: false, erreur: 'Route inconnue' }, 404);
 };

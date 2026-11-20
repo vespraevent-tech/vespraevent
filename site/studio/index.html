@@ -2684,7 +2684,11 @@ const VB_QS={
   anniversaire:['Quel est votre plus beau souvenir avec la personne fêtée ?','Comment la décririez-vous en trois mots ?','Une anecdote drôle à raconter ?','Quel souhait lui adressez-vous ?','Un petit mot pour finir ?']
 };
 const VB_QP=['Quelle est la chose la plus folle que vous ayez faite en soirée ?','Quel est le pire rendez-vous galant de votre vie ?','Quel est votre plus gros fou rire gêné ?','Quel est le pire surnom qu’on vous ait donné ?','Un aveu que personne ne connaît dans cette salle ?'];
-const VB_ORGA={mariage:'Les mariés recevront toutes les vidéos de la soirée.',entreprise:'Les organisateurs recevront toutes les vidéos de l’événement.',anniversaire:'La personne fêtée recevra toutes les vidéos.',autre:''};
+const VB_SUITE=' Le QR code et l’e-mail sont uniquement pour vous, si vous souhaitez garder la vôtre.';
+const VB_ORGA={mariage:'Les mariés recevront toutes les vidéos de leur côté.'+VB_SUITE,entreprise:'Les organisateurs recevront toutes les vidéos de leur côté.'+VB_SUITE,anniversaire:'La personne fêtée recevra toutes les vidéos de son côté.'+VB_SUITE,autre:'Les organisateurs recevront toutes les vidéos.'+VB_SUITE};
+/* textes par défaut de la tablette (identiques à ceux de /videobooth/app.js) : laissés vides ici, ils s'affichent tels quels */
+const VB_DEF={go:'Commencer',m1n:'Vidéo souvenir',m1d:'Filmez un message, un vœu ou un souvenir',m2n:'Boîte à questions',m2d:'Répondez face caméra aux questions préparées pour l’événement',m3n:'Questions piquantes',m3d:'Des questions plus osées, pour les plus audacieux',m3b:'Débloqué à {heure}',pretT:'Êtes-vous prêts ?',pretB:'C’est parti !',plaitT:'La vidéo vous plaît ?',plaitNon:'Non, on recommence',plaitOui:'Oui, c’est parfait',quiB:'Continuer',livT:'Récupérer votre vidéo',livQr:'QR code',livQrT:'Scannez ce code avec l’appareil photo de votre téléphone',livMail:'Par e-mail',livMailT:'Votre adresse e-mail',livAutreQ:'Voulez-vous l’envoyer à quelqu’un ?',livOui:'Oui',livNon:'Non',livPrenom:'Prénom de la personne',livEmail2:'Son adresse e-mail',livFin:'Terminé',merciT:'Merci !',merciD:'Votre vidéo a bien été enregistrée.'};
+const VB_AMBS=[['ivoire','Ivoire et or','#FBF8F2','#B8893B'],['blanc','Blanc et noir','#FFFFFF','#262626'],['rose','Rose poudré','#FDF6F4','#B76E79'],['sauge','Sauge','#F8F9F4','#6B8560'],['nuit','Bleu nuit','#16365a','#F59E0B']];
 /* changer de type d'événement remplace la liste de questions seulement si elle n'a pas été modifiée à la main */
 function vbTypeChange(sel){
   const ta=document.getElementById('vs-qs'); if(!ta) return;
@@ -2694,40 +2698,83 @@ function vbTypeChange(sel){
 }
 const VB_CARTE='background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:14px 16px;margin-bottom:14px';
 const VB_INPUT='padding:8px 10px;border:1px solid #d9dde5;border-radius:8px;font:inherit;font-size:13.5px;color:#111';
-function vbFormSession(){
-  const ses=VBCFG.sessions||[];
-  const e=VBEDIT.i>=0?ses[VBEDIT.i]:{nom:'',date:'',mdp:'',titre:'Enregistrer un souvenir',sous:'Laissez un petit message vidéo de 30 secondes',max:30,format:'auto',noel:false,cadrage:'Vous pouvez incliner doucement la tablette pour vous cadrer',qui:'',quiSous:'',actif:true,fin:'',conserv:0,garde:14,qualite:'standard',choixFormat:true,type:'autre',modeQ:false,modeP:false,heureP:'23:00',qs:VB_QS.autre,qp:VB_QP,secQ:0,merciOrga:''};
-  const lab='font-size:12px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:3px';
-  const f=(id,l,v,ph,type)=>'<label style="'+lab+'">'+l+'<input id="vs-'+id+'" type="'+(type||'text')+'" value="'+vbEsc(v==null?'':v)+'" placeholder="'+vbEsc(ph||'')+'" style="'+VB_INPUT+'"></label>';
-  const sel=(id,l,opts,cur)=>'<label style="'+lab+'">'+l+'<select id="vs-'+id+'" style="'+VB_INPUT+'">'+opts.map(o=>'<option value="'+o[0]+'"'+(String(cur)===String(o[0])?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></label>';
-  const prot=!!e.mdp;
-  return '<div style="background:#f7f5f0;border-radius:12px;padding:14px;margin:0 0 14px">'+
-    '<div style="font:700 14px Poppins,Inter,sans-serif;color:#14304f;margin-bottom:10px">'+(VBEDIT.i>=0?'Réglages de la session':'Nouvelle session')+'</div>'+
-    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px">'+
-    f('nom','Nom de l’événement',e.nom,'Mariage Sylvie')+f('date','Date (affichée)',e.date,'21 novembre')+f('fin','Dernier jour (la session disparaît de la tablette ensuite)',e.fin,'','date')+
-    '<label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" id="vs-actif"'+(e.actif!==false?' checked':'')+'> Session ouverte sur la tablette</label>'+
-    '<label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" id="vs-prot"'+(prot?' checked':'')+' onchange="document.getElementById(\'vs-mdpbloc\').style.display=this.checked?\'\':\'none\';if(this.checked&&!document.getElementById(\'vs-mdp\').value)document.getElementById(\'vs-mdp\').value=vbMdp()"> Protéger par un mot de passe</label>'+
-    '<div id="vs-mdpbloc" style="'+(prot?'':'display:none')+'">'+f('mdp','Mot de passe de la session',e.mdp,'')+'</div>'+
-    f('titre','Titre d’accueil',e.titre,'')+f('sous','Sous-titre d’accueil',e.sous,'')+
-    f('qui','Titre du formulaire',e.qui,'Qui êtes-vous ?')+f('quiSous','Phrase sous ce titre',e.quiSous,'Pour vous envoyer votre vidéo par e-mail')+
-    f('max','Durée maximale (secondes)',e.max,'30','number')+f('cadrage','Message de cadrage',e.cadrage,'')+
-    sel('format','Format de la vidéo',[['auto','Automatique'],['16:9','Paysage 16:9'],['4:3','Paysage 4:3'],['9:16','Story 9:16'],['3:4','Portrait 3:4']],e.format)+
-    sel('qualite','Qualité de la vidéo',[['haute','Haute (≈ 26 Mo/min)'],['standard','Standard (≈ 19 Mo/min)'],['eco','Économique (≈ 13 Mo/min)']],e.qualite||'standard')+
-    f('conserv','Suppression automatique sur le site après (jours) — 0 = jamais',e.conserv||0,'0','number')+
-    '<div style="grid-column:1/-1;border-top:1px solid #e0dccf;margin-top:6px;padding-top:12px;font:700 13.5px Poppins,Inter,sans-serif;color:#14304f">Parcours de l’invité</div>'+
-    '<label style="'+lab+'">Type d’événement (change le texte de l’écran final)<select id="vs-type" onchange="vbTypeChange(this)" style="'+VB_INPUT+'">'+[['autre','Autre / soirée'],['mariage','Mariage'],['entreprise','Entreprise'],['anniversaire','Anniversaire']].map(o=>'<option value="'+o[0]+'"'+((e.type||'autre')===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></label>'+
-    f('merciOrga','Phrase de l’écran final (laisser vide = phrase du type)',e.merciOrga,VB_ORGA[e.type||'autre']||'(aucune phrase)')+
-    '<label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" id="vs-modeQ"'+(e.modeQ?' checked':'')+'> Proposer la « Boîte à questions »</label>'+
-    '<label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" id="vs-modeP"'+(e.modeP?' checked':'')+'> Proposer les « Questions piquantes »</label>'+
-    f('heureP','Questions piquantes : débloquées à partir de (heure de Paris)',e.heureP||'23:00','23:00','time')+
-    f('secQ','Secondes par question (0 = automatique selon la durée)',e.secQ||0,'0','number')+
-    '<label style="'+lab+';grid-column:1/-1">Questions de la boîte à questions (une par ligne, 5 conseillées pour 30 s, 8 au maximum)<textarea id="vs-qs" rows="6" style="'+VB_INPUT+';resize:vertical">'+vbEsc((e.qs&&e.qs.length?e.qs:VB_QS[e.type||'autre']).join('\n'))+'</textarea></label>'+
-    '<label style="'+lab+';grid-column:1/-1">Questions piquantes (une par ligne)<textarea id="vs-qp" rows="6" style="'+VB_INPUT+';resize:vertical">'+vbEsc((e.qp&&e.qp.length?e.qp:VB_QP).join('\n'))+'</textarea></label>'+
-    '<div style="grid-column:1/-1;font-size:12px;color:#6b7280;margin-top:-4px">Le mode « Message vidéo » est toujours proposé. Sans « Boîte à questions » ni « Questions piquantes » cochées, la tablette n’affiche que le bouton Commencer. Les modifications arrivent seules sur la tablette (jusqu’à 5 minutes), à l’écran d’accueil.</div>'+
-    '<label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" id="vs-choixformat"'+(e.choixFormat!==false?' checked':'')+'> Laisser l’invité choisir : vertical (story) ou horizontal</label>'+
-    '<label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" id="vs-noel"'+(e.noel?' checked':'')+'> Thème Noël</label>'+
-    '</div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" onclick="vbSessSauver()">Enregistrer la session</button><button class="btn btn-ghost" onclick="vbSessEdit(null)">Annuler</button></div></div>';
+/* ── formulaire d'une session : une section repliable par sujet (clic sur le titre pour déplier) ── */
+function vbFsCss(){
+  if(document.getElementById('vfs-css')) return;
+  const st=document.createElement('style'); st.id='vfs-css';
+  st.textContent='.vfs{border:1px solid #e6e1d6;border-radius:12px;background:#fff;margin-bottom:10px;overflow:hidden}.vfs>summary{list-style:none;display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none}.vfs>summary::-webkit-details-marker{display:none}.vfs .vt{flex:1;min-width:0}.vfs .vt b{display:block;font:700 14.5px Poppins,Inter,sans-serif;color:#14304f}.vfs .vt span{display:block;font-size:12.5px;color:#6b7280;margin-top:2px}.vfs .chev{width:9px;height:9px;border-right:2px solid #8a8f98;border-bottom:2px solid #8a8f98;transform:rotate(45deg);transition:transform .2s;margin:0 4px 3px 0;flex:none}.vfs[open] .chev{transform:rotate(-135deg);margin-bottom:-3px}.vfs[open]>summary{border-bottom:1px solid #f0ece2}.vfs .corps{padding:14px 16px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px 16px}.vfs .plein{grid-column:1/-1}.vfs label.f{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:#6b7280}.vfs input[type=text],.vfs input[type=number],.vfs input[type=time],.vfs input[type=date],.vfs select,.vfs textarea{padding:9px 11px;border:1px solid #d9dde5;border-radius:8px;font:inherit;font-size:13.5px;color:#111;background:#fff;width:100%;box-sizing:border-box}.vfs textarea{resize:vertical;line-height:1.5}.vfs ::placeholder{color:#a9aeb8}.vfs .ssT{grid-column:1/-1;font:700 11px Inter,sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#9a8f7a;margin-top:6px;padding-top:12px;border-top:1px solid #f0ece2}.vfs .ssT:first-child{margin-top:0;padding-top:0;border-top:0}.vfs .aide{grid-column:1/-1;font-size:12px;color:#8a8f98;margin:-4px 0 0}.vfs .ligne{display:flex;align-items:center;gap:10px;font-size:13.5px;color:#333}.vfs .pastille{font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 10px;background:#eef0f3;color:#6b7280;white-space:nowrap}.vfs .pastille.on{background:#e4f2df;color:#2f6b2a}.sw{position:relative;width:42px;height:24px;flex:none;display:inline-block}.sw input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:2}.sw i{position:absolute;inset:0;border-radius:999px;background:#cfd4dc;transition:background .2s}.sw i::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}.sw input:checked+i{background:#2f7d4f}.sw input:checked+i::after{transform:translateX(18px)}.ambs{display:flex;gap:10px;flex-wrap:wrap}.ambs label{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#555;cursor:pointer}.ambs input{position:absolute;opacity:0}.ambs .pt{width:56px;height:56px;border-radius:14px;border:2px solid #e2ded3;box-shadow:inset 0 0 0 4px #fff}.ambs input:checked+.pt{border-color:#14304f}.ambs input:checked~em{color:#14304f}.ambs em{font-style:normal}.vfs-pied{display:flex;gap:8px;margin:14px 0 4px;position:sticky;bottom:0;background:linear-gradient(0deg,#f7f5f0 70%,transparent);padding:10px 0}';
+  document.head.appendChild(st);
 }
+function vbFormSession(){
+  vbFsCss();
+  const ses=VBCFG.sessions||[];
+  const e=VBEDIT.i>=0?ses[VBEDIT.i]:{nom:'',date:'',mdp:'',titre:'Enregistrer un souvenir',sous:'',max:30,format:'auto',noel:false,cadrage:'Vous pouvez incliner doucement la tablette pour vous cadrer',qui:'',quiSous:'',actif:true,fin:'',conserv:0,garde:14,qualite:'standard',choixFormat:true,type:'autre',modeQ:false,modeP:false,heureP:'23:00',qs:VB_QS.autre,qp:VB_QP,secQ:0,merciOrga:'',amb:'ivoire',textes:{}};
+  const tx=e.textes||{}, nouveau=VBEDIT.i<0, prot=!!e.mdp;
+  const f=(id,l,v,ph,type,cls)=>'<label class="f'+(cls?' '+cls:'')+'">'+l+'<input id="vs-'+id+'" type="'+(type||'text')+'" value="'+vbEsc(v==null?'':v)+'" placeholder="'+vbEsc(ph||'')+'"></label>';
+  /* texte personnalisable : vide = texte par défaut (affiché en gris) */
+  const t=(k,l,cls)=>'<label class="f'+(cls?' '+cls:'')+'">'+l+'<input id="vt-'+k+'" type="text" value="'+vbEsc(tx[k]||'')+'" placeholder="'+vbEsc(VB_DEF[k])+'" maxlength="200"></label>';
+  const sel=(id,l,opts,cur)=>'<label class="f">'+l+'<select id="vs-'+id+'">'+opts.map(o=>'<option value="'+o[0]+'"'+(String(cur)===String(o[0])?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></label>';
+  const sw=(id,on,oc)=>'<span class="sw"><input type="checkbox" id="'+id+'"'+(on?' checked':'')+(oc?' onchange="'+oc+'"':'')+'><i></i></span>';
+  const sec=(titre,sous,corps,ouvert,droite)=>'<details class="vfs"'+(ouvert?' open':'')+'><summary><span class="vt"><b>'+titre+'</b><span>'+sous+'</span></span>'+(droite||'')+'<span class="chev"></span></summary><div class="corps">'+corps+'</div></details>';
+  const pastille=(id,on,txtOn,txtOff)=>'<span class="pastille'+(on?' on':'')+'" id="'+id+'">'+(on?txtOn:txtOff)+'</span>';
+  const ambs='<div class="plein"><div style="font-size:12px;font-weight:600;color:#6b7280;margin-bottom:8px">Ambiance de l’écran des invités</div><div class="ambs">'+VB_AMBS.map(a=>'<label><input type="radio" name="vs-amb" value="'+a[0]+'"'+((e.amb||'ivoire')===a[0]?' checked':'')+'><span class="pt" style="background:linear-gradient(135deg,'+a[2]+' 52%,'+a[3]+' 52%)"></span><em>'+a[1]+'</em></label>').join('')+'</div></div>';
+
+  const sEvt=sec('Événement','Nom, date, type, accès et durée de conservation',
+    f('nom','Nom de l’événement',e.nom,'Mariage Sylvie')+f('date','Date affichée',e.date,'21 novembre')+
+    '<label class="f">Type d’événement<select id="vs-type" onchange="vbTypeChange(this)">'+[['autre','Autre / soirée'],['mariage','Mariage'],['entreprise','Entreprise'],['anniversaire','Anniversaire']].map(o=>'<option value="'+o[0]+'"'+((e.type||'autre')===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></label>'+
+    f('fin','Dernier jour (la session disparaît ensuite de la tablette)',e.fin,'','date')+
+    f('conserv','Suppression automatique sur le site après… jours (0 = jamais)',e.conserv||0,'0','number')+
+    '<div class="plein ligne">'+sw('vs-actif',e.actif!==false)+'<span>Session ouverte sur la tablette</span></div>'+
+    '<div class="plein ligne">'+sw('vs-prot',prot,"document.getElementById('vs-mdpbloc').style.display=this.checked?'':'none';if(this.checked&&!document.getElementById('vs-mdp').value)document.getElementById('vs-mdp').value=vbMdp()")+'<span>Protéger cette session par un mot de passe</span></div>'+
+    '<div class="plein" id="vs-mdpbloc" style="'+(prot?'':'display:none')+'">'+f('mdp','Mot de passe de la session',e.mdp,'')+'</div>',nouveau);
+
+  const sAcc=sec('Écran d’accueil et apparence','Gros titre, sous-titre, couleurs',
+    f('titre','Gros titre',e.titre,'Joyeux Noël, Mariage de Sylvie et Paul…','text','plein')+f('sous','Sous-titre (facultatif)',e.sous,'Un petit mot pour les mariés ?','text','plein')+
+    ambs+
+    '<div class="plein ligne">'+sw('vs-noel',!!e.noel)+'<span>Décor de Noël (sapins et guirlandes)</span></div>'+
+    t('go','Texte du bouton quand il n’y a qu’un seul mode'));
+
+  const sVid=sec('Vidéo souvenir','Le mode de base, toujours proposé : textes, enregistrement',
+    '<div class="ssT">Carte sur l’écran d’accueil</div>'+t('m1n','Nom du mode')+t('m1d','Description')+
+    '<div class="ssT">Enregistrement (valable pour tous les modes)</div>'+
+    f('max','Durée maximale (secondes)',e.max,'30','number')+
+    sel('qualite','Qualité de la vidéo',[['haute','Haute (≈ 26 Mo/min)'],['standard','Standard (≈ 19 Mo/min)'],['eco','Économique (≈ 13 Mo/min)']],e.qualite||'standard')+
+    sel('format','Format de la vidéo',[['auto','Automatique'],['16:9','Paysage 16:9'],['4:3','Paysage 4:3'],['9:16','Story 9:16'],['3:4','Portrait 3:4']],e.format)+
+    '<div class="ligne" style="align-self:end;padding-bottom:8px">'+sw('vs-choixformat',e.choixFormat!==false)+'<span>L’invité peut choisir vertical ou horizontal</span></div>'+
+    '<div class="ssT">Avant d’enregistrer</div>'+t('pretT','Titre')+t('pretB','Bouton pour lancer')+f('cadrage','Message de cadrage',e.cadrage,'Vous pouvez incliner doucement la tablette pour vous cadrer','text','plein')+
+    '<div class="ssT">Après l’enregistrement</div>'+t('plaitT','Question','plein')+t('plaitNon','Bouton pour refaire')+t('plaitOui','Bouton pour valider'),false,'<span class="pastille on">Toujours proposé</span>');
+
+  const sQ=sec('Boîte à questions','Les invités répondent face caméra à des questions préparées',
+    '<div class="ssT">Carte sur l’écran d’accueil</div>'+t('m2n','Nom du mode')+t('m2d','Description')+
+    '<div class="ssT">Questions</div>'+
+    f('secQ','Secondes par question (0 = automatique selon la durée)',e.secQ||0,'0','number')+
+    '<label class="f plein">Une question par ligne (5 conseillées pour 30 secondes, 8 au maximum)<textarea id="vs-qs" rows="6">'+vbEsc((e.qs&&e.qs.length?e.qs:VB_QS[e.type||'autre']).join('\n'))+'</textarea></label>',false,
+    pastille('vfs-eq',e.modeQ,'Activé','Désactivé')+sw('vs-modeQ',e.modeQ,"vbPast('vfs-eq',this.checked)"));
+
+  const sP=sec('Questions piquantes','Un mode plus osé, verrouillé jusqu’à une heure choisie',
+    '<div class="ssT">Carte sur l’écran d’accueil</div>'+t('m3n','Nom du mode')+t('m3d','Description')+
+    '<div class="ssT">Déblocage</div>'+
+    f('heureP','Débloqué à partir de (heure de Paris)',e.heureP||'23:00','23:00','time')+t('m3b','Texte du cadenas (« {heure} » = l’heure)')+
+    '<p class="aide">Avant cette heure, la carte est grisée avec un petit cadenas. Elle reste ouverte jusqu’à 6 h du matin.</p>'+
+    '<div class="ssT">Questions</div>'+
+    '<label class="f plein">Une question par ligne<textarea id="vs-qp" rows="6">'+vbEsc((e.qp&&e.qp.length?e.qp:VB_QP).join('\n'))+'</textarea></label>',false,
+    pastille('vfs-ep',e.modeP,'Activé','Désactivé')+sw('vs-modeP',e.modeP,"vbPast('vfs-ep',this.checked)"));
+
+  const sFin=sec('Fin du parcours','Nom, récupération de la vidéo (QR code, e-mail, envoi à quelqu’un), remerciement',
+    '<div class="ssT">Nom de l’invité</div>'+f('qui','Titre',e.qui,'Qui êtes-vous ?')+f('quiSous','Phrase sous le titre',e.quiSous,'Pour que les organisateurs sachent qui a laissé ce message')+t('quiB','Bouton')+
+    '<div class="ssT">Récupérer la vidéo</div>'+t('livT','Titre','plein')+
+    '<label class="f plein">Phrase au-dessus des boutons (laisser vide = phrase du type d’événement)<input id="vs-merciOrga" type="text" value="'+vbEsc(e.merciOrga||'')+'" placeholder="'+vbEsc(VB_ORGA[e.type||'autre'])+'" maxlength="300"></label>'+
+    t('livQr','Bouton QR code')+t('livQrT','Texte sous le QR code')+t('livMail','Bouton e-mail')+t('livMailT','Libellé du champ e-mail')+
+    t('livAutreQ','Question « l’envoyer à quelqu’un ? »','plein')+t('livOui','Bouton Oui')+t('livNon','Bouton Non')+t('livPrenom','Libellé du prénom de la personne')+t('livEmail2','Libellé de son e-mail')+t('livFin','Bouton pour terminer')+
+    '<div class="ssT">Remerciement</div>'+t('merciT','Titre')+t('merciD','Texte'));
+
+  return '<div style="background:#f7f5f0;border-radius:12px;padding:14px;margin:0 0 14px">'+
+    '<div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f;margin-bottom:4px">'+(VBEDIT.i>=0?'Réglages de la session':'Nouvelle session')+'</div>'+
+    '<div style="font-size:12.5px;color:#6b7280;margin-bottom:12px">Cliquez sur une section pour la déplier. Un texte laissé vide garde le texte par défaut (affiché en gris).</div>'+
+    sEvt+sAcc+sVid+sQ+sP+sFin+
+    '<div class="vfs-pied"><button class="btn" onclick="vbSessSauver()">Enregistrer la session</button><button class="btn btn-ghost" onclick="vbSessEdit(null)">Annuler</button></div></div>';
+}
+function vbPast(id,on){ const p=document.getElementById(id); if(!p) return; p.className='pastille'+(on?' on':''); p.textContent=on?'Activé':'Désactivé'; }
 function vbConfigRendre(){
   const z=document.getElementById('vbConfig'); if(!z) return;
   let h='';
@@ -2750,10 +2797,15 @@ function vbAccesSauver(){
 }
 function vbSessSauver(){
   const v=id=>(document.getElementById('vs-'+id)||{}).value||'';
-  const prot=document.getElementById('vs-prot').checked;
-  const s={nom:v('nom').trim(),date:v('date').trim(),fin:v('fin'),actif:document.getElementById('vs-actif').checked,mdp:prot?v('mdp').trim():'',titre:v('titre').trim(),sous:v('sous').trim(),qui:v('qui').trim(),quiSous:v('quiSous').trim(),max:Number(v('max'))||30,cadrage:v('cadrage').trim(),format:v('format'),qualite:v('qualite'),conserv:Number(v('conserv'))||0,choixFormat:!!document.getElementById('vs-choixformat').checked,noel:!!document.getElementById('vs-noel').checked,type:v('type')||'autre',merciOrga:v('merciOrga').trim(),modeQ:!!document.getElementById('vs-modeQ').checked,modeP:!!document.getElementById('vs-modeP').checked,heureP:v('heureP')||'23:00',secQ:Number(v('secQ'))||0,qs:v('qs').split(/\r?\n/).map(x=>x.trim()).filter(Boolean),qp:v('qp').split(/\r?\n/).map(x=>x.trim()).filter(Boolean)};
-  if(s.modeQ&&!s.qs.length){ showToast('Ajoutez au moins une question pour la boîte à questions, ou décochez-la',true); return; }
-  if(s.modeP&&!s.qp.length){ showToast('Ajoutez au moins une question piquante, ou décochez-les',true); return; }
+  const coche=id=>!!(document.getElementById(id)||{}).checked;
+  const prot=coche('vs-prot');
+  const lignes=x=>x.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  const textes={}; Object.keys(VB_DEF).forEach(k=>{ const el=document.getElementById('vt-'+k); const val=el?el.value.trim():''; if(val) textes[k]=val; });
+  const ambEl=document.querySelector('input[name="vs-amb"]:checked');
+  const s={nom:v('nom').trim(),date:v('date').trim(),fin:v('fin'),actif:coche('vs-actif'),mdp:prot?v('mdp').trim():'',titre:v('titre').trim(),sous:v('sous').trim(),qui:v('qui').trim(),quiSous:v('quiSous').trim(),max:Number(v('max'))||30,cadrage:v('cadrage').trim(),format:v('format'),qualite:v('qualite'),conserv:Number(v('conserv'))||0,choixFormat:coche('vs-choixformat'),noel:coche('vs-noel'),
+    type:v('type')||'autre',merciOrga:v('merciOrga').trim(),modeQ:coche('vs-modeQ'),modeP:coche('vs-modeP'),heureP:v('heureP')||'23:00',secQ:Number(v('secQ'))||0,qs:lignes(v('qs')),qp:lignes(v('qp')),amb:ambEl?ambEl.value:'ivoire',textes};
+  if(s.modeQ&&!s.qs.length){ showToast('Ajoutez au moins une question pour la boîte à questions, ou désactivez-la',true); return; }
+  if(s.modeP&&!s.qp.length){ showToast('Ajoutez au moins une question piquante, ou désactivez ce mode',true); return; }
   if(!s.nom){ showToast('Indiquez le nom de la session',true); return; }
   if(prot&&!s.mdp){ showToast('Saisissez le mot de passe, ou décochez la protection',true); return; }
   const l=(VBCFG.sessions||[]).slice(); const ancien=VBEDIT.i>=0?l[VBEDIT.i]:null;
@@ -2766,6 +2818,8 @@ function vbSessSuppr(i){ const l=(VBCFG.sessions||[]).slice(); if(!confirm('Supp
 
 /* ── Vidéobooth ── */
 let VB=[], VBEVT='', VBALERTE=20, VBETAT=null;
+/* e-mail à refaire : adresse principale non envoyée (et vidéo pas déjà récupérée par QR code) ou destinataire en plus non envoyé ; « aucun » = l'invité n'a demandé aucun e-mail */
+const vbMailKo=v=>!!((v.email&&v.mail!=='envoye'&&!v.scanne)||(v.autres||[]).some(a=>a.mail!=='envoye'));
 function vbEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 const vbNomEvt=v=>v.event||'(sans nom d’événement)';
 function vbMessageEtat(d){
@@ -2867,7 +2921,7 @@ function vbRendre(){
     const tete='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px"><div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f">Événements <span style="font-weight:500;color:#6b7280;font-size:13px">· '+VB.length+' vidéo'+(VB.length>1?'s':'')+' sur le site ('+mo(total)+')</span></div><button class="btn" onclick="vbSessEdit(-1)">+ Nouvelle session</button></div>';
     if(!cartes.length){ z.innerHTML=vbCarteTablette()+vbJauge(true)+tete+'<div class="hint" style="padding:24px 0">Aucune session pour l’instant. Créez-en une : elle apparaîtra sur la tablette.</div>'; return; }
     z.innerHTML=vbCarteTablette()+vbJauge(true)+tete+'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">'+cartes.map(c=>{
-      const l=ev[c.nom]||[], ds=l.map(v=>+new Date(v.cree)), ko=l.filter(v=>v.mail!=='envoye'&&!v.scanne).length, poids=l.reduce((t,v)=>t+(v.octets||0),0);
+      const l=ev[c.nom]||[], ds=l.map(v=>+new Date(v.cree)), ko=l.filter(vbMailKo).length, poids=l.reduce((t,v)=>t+(v.octets||0),0);
       const quand=ds.length?(fd(Math.min(...ds))===fd(Math.max(...ds))?fd(Math.min(...ds)):fd(Math.min(...ds))+' → '+fd(Math.max(...ds))):'';
       const pastille=(txt,coul,fond)=>'<span style="font-size:11.5px;font-weight:700;color:'+coul+';background:'+fond+';border-radius:20px;padding:2px 9px">'+txt+'</span>';
       let ch=''; if(c.s){ ch+=vbSessTerminee(c.s)?pastille('Terminée','#6b7280','#eef0f3'):pastille('En cours sur la tablette','#2f6b2a','#e4f2df'); ch+=' '+(c.s.mdp?pastille('Mot de passe','#14304f','#e5ecf5'):pastille('Sans mot de passe','#8a5a00','#fdf0d5')); } else ch+=pastille('Session supprimée','#6b7280','#eef0f3');
@@ -2882,15 +2936,16 @@ function vbRendre(){
   }
   const l=VB.filter(v=>vbNomEvt(v)===VBEVT).sort((a,b)=>String(a.cree).localeCompare(String(b.cree)));
   document.getElementById('vbTitre').textContent=VBEVT;
-  document.getElementById('vbRelancer').hidden=!l.some(v=>v.mail!=='envoye'&&!v.scanne);
+  document.getElementById('vbRelancer').hidden=!l.some(vbMailKo);
   const poids=l.reduce((t,v)=>t+(v.octets||0),0);
   z.innerHTML=vbJauge(false)+'<div class="hint" style="margin-bottom:10px">'+l.length+' vidéo'+(l.length>1?'s':'')+' · '+mo(poids)+'</div>'+(l.length?'':'<div class="hint" style="padding:18px 0">Aucune vidéo pour cet événement pour l’instant. Elles apparaîtront ici dès que la tablette les enverra.</div>')+'<div style="display:flex;flex-direction:column;gap:10px">'+
   l.map(v=>{const d=new Date(v.cree);const ok=v.mail==='envoye';const j=Math.max(0,(Number(v.garde)||0)-Math.floor((Date.now()-d)/86400000));
     const btn='class="btn btn-ghost" style="text-decoration:none;padding:7px 12px;font-size:13px"';
     return '<div style="background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:14px 16px">'+
       '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><b style="font-size:15px">'+vbEsc(v.prenom)+' '+vbEsc(v.nom)+(v.pour==='autre'?' <span style="font-weight:500;color:#6b7280">→ pour '+vbEsc(v.dest||'une autre personne')+'</span>':'')+(v.mode?' <span style="font-weight:600;font-size:12px;color:#8a5a00;background:#fdf0d5;border-radius:999px;padding:2px 9px">'+(v.mode==='piquantes'?'Questions piquantes':'Boîte à questions')+'</span>':'')+'</b>'+(v.son!=null&&v.son<3?'<span style="color:#b03a2a;font-size:12.5px;font-weight:700">⚠ son très faible</span>':'')+
-      '<span style="color:'+((ok||v.scanne)?'#3d6e36':'#b03a2a')+';font-weight:600;font-size:13px">'+(ok?'E-mail envoyé'+(v.pj?' (vidéo jointe)':' (lien)'):(v.mail==='attente'?'E-mail en cours d’envoi':'E-mail non parti'+(v.mailErreur?' — '+vbEsc(v.mailErreur):'')))+'</span></div>'+(v.scanne?'<div style="color:#3d6e36;font-size:12.5px;font-weight:600;margin-top:2px">✓ Vidéo déjà récupérée par QR code ('+new Date(v.scanne).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+')'+(ok?'':' : l’e-mail n’est plus nécessaire')+'</div>':'')+
-      '<div style="color:#4a5565;font-size:13.5px;margin-top:2px;word-break:break-all">'+(v.pour==='autre'?'Envoyée à : ':'')+vbEsc(v.email)+'</div>'+
+      (v.email||v.mail!=='aucun'?'<span style="color:'+((ok||v.scanne)?'#3d6e36':'#b03a2a')+';font-weight:600;font-size:13px">'+(ok?'E-mail envoyé'+(v.pj?' (vidéo jointe)':' (lien)'):(v.mail==='attente'?'E-mail en cours d’envoi':'E-mail non parti'+(v.mailErreur?' — '+vbEsc(v.mailErreur):'')))+'</span>':'<span style="color:#6b7280;font-weight:600;font-size:13px">Aucun e-mail demandé</span>')+'</div>'+(v.scanne?'<div style="color:#3d6e36;font-size:12.5px;font-weight:600;margin-top:2px">✓ Vidéo déjà récupérée par QR code ('+new Date(v.scanne).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+')'+(ok?'':' : l’e-mail n’est plus nécessaire')+'</div>':'')+
+      (v.email?'<div style="color:#4a5565;font-size:13.5px;margin-top:2px;word-break:break-all">'+(v.pour==='autre'?'Envoyée à : ':'')+vbEsc(v.email)+'</div>':'<div style="color:#8a8f98;font-size:13px;margin-top:2px">L’invité n’a pas donné d’adresse : il pouvait récupérer sa vidéo par QR code, et les organisateurs reçoivent toutes les vidéos.</div>')+
+      (v.autres||[]).map(a=>'<div style="font-size:13px;margin-top:2px;word-break:break-all;color:'+(a.mail==='envoye'?'#3d6e36':'#b03a2a')+'">Aussi envoyée à '+vbEsc(a.dest||'')+' ('+vbEsc(a.email)+') — '+(a.mail==='envoye'?'envoyé':(a.mail==='attente'?'en cours':'non parti'+(a.mailErreur?' : '+vbEsc(a.mailErreur):'')))+'</div>').join('')+
       '<div style="color:#8a8f98;font-size:12.5px;margin-top:2px">'+d.toLocaleDateString('fr-FR')+' à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+' · '+mo(v.octets||0)+' · '+(Number(v.garde)>0?'supprimée du site dans '+j+' j':'conservée jusqu’à votre suppression')+'</div>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><a '+btn+' href="/api/admin/videobooth/video?id='+encodeURIComponent(v.id)+'" download>Télécharger</a><button '+btn+' onclick="vbRenvoyer(\''+v.id+'\')">Renvoyer l’e-mail</button><button '+btn+' onclick="vbSupprimer(\''+v.id+'\')">Supprimer</button></div></div>';}).join('')+'</div>';
 }
@@ -2911,14 +2966,14 @@ async function vbViderEvenement(){
 }
 async function vbRenvoyer(id){
   const v=VB.find(x=>x.id===id); if(!v) return;
-  const m=prompt('Envoyer la vidéo à quelle adresse ?',v.email); if(!m) return;
+  const m=prompt('Envoyer la vidéo à quelle adresse ?',v.email||''); if(!m) return;
   try{ const r=await api('/videobooth',{method:'POST',body:JSON.stringify({id,email:m})});
     if(r.ok){ showToast('E-mail envoyé'); } else showToast('E-mail non parti : '+(r.erreur||''),true);
     await vbCharger();
   }catch(e){ showToast('Échec : '+e.message,true); }
 }
 async function vbRelancerEchecs(){
-  const l=VB.filter(v=>vbNomEvt(v)===VBEVT&&v.mail!=='envoye'&&!v.scanne); if(!l.length) return;
+  const l=VB.filter(v=>vbNomEvt(v)===VBEVT&&vbMailKo(v)); if(!l.length) return;
   if(!confirm('Renvoyer '+l.length+' e-mail'+(l.length>1?'s':'')+' non parti'+(l.length>1?'s':'')+' ?')) return;
   let ok=0; for(const v of l){ try{ const r=await api('/videobooth',{method:'POST',body:JSON.stringify({id:v.id})}); if(r.ok) ok++; }catch(e){} }
   showToast(ok+' sur '+l.length+' e-mail'+(l.length>1?'s':'')+' envoyé'+(ok>1?'s':''), ok!==l.length);

@@ -2431,14 +2431,28 @@ const gestionnaire = async (request) => {
         const id = String(body.id || '').replace(/[^A-Za-z0-9_-]/g, '');
         const m = await st.get('meta/' + id, { type: 'json' }).catch(() => null);
         if (!m) return json({ error: 'Vidéo introuvable' }, 404);
-        if (body.email && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(body.email))) m.email = String(body.email).trim();
+        const adresseDonnee = body.email && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(body.email));
+        if (adresseDonnee) m.email = String(body.email).trim();
+        /* une vidéo peut n'avoir aucune adresse (l'invité n'a pris que le QR code) : il faut alors en saisir une */
+        if (!m.email && !(m.autres || []).length) return json({ error: 'Aucune adresse e-mail pour cette vidéo : saisissez-en une.' }, 400);
         const buf = await st.get('video/' + id, { type: 'arrayBuffer' }).catch(() => null);
         if (!buf) return json({ error: 'Fichier vidéo expiré' }, 410);
         const site = (process.env.URL || 'https://www.vespraevent.fr').replace(/\/$/, '');
-        const r = await vbEnvoyerMail(m, buf, site);
-        m.mail = r.ok ? 'envoye' : 'erreur'; m.mailErreur = r.erreur || ''; m.pj = !!r.pj; m.renvoye = new Date().toISOString();
+        let ok = true, erreur = '';
+        /* adresse saisie à la main : on l'utilise (comportement habituel) ; sinon on refait seulement les envois qui n'étaient pas partis */
+        if (adresseDonnee || (m.email && m.mail !== 'envoye')) {
+          const r = await vbEnvoyerMail(m, buf, site);
+          m.mail = r.ok ? 'envoye' : 'erreur'; m.mailErreur = r.erreur || ''; m.pj = !!r.pj; m.renvoye = new Date().toISOString();
+          if (!r.ok) { ok = false; erreur = r.erreur || ''; }
+        }
+        if (!adresseDonnee) for (const a of m.autres || []) {
+          if (a.mail === 'envoye') continue;
+          const r2 = await vbEnvoyerMail({ ...m, email: a.email, pour: 'autre', dest: a.dest }, buf, site);
+          a.mail = r2.ok ? 'envoye' : 'erreur'; a.mailErreur = r2.erreur || ''; a.essais = (Number(a.essais) || 0) + 1;
+          if (!r2.ok) { ok = false; erreur = erreur || r2.erreur || ''; }
+        }
         await st.setJSON('meta/' + id, m);
-        return json({ ok: r.ok, erreur: r.erreur || '', video: m });
+        return json({ ok, erreur, video: m });
       }
       if (request.method === 'DELETE' && url.searchParams.has('event')) {
         /* vider toutes les vidéos d'un événement (après les avoir téléchargées) */
