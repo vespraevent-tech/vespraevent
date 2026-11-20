@@ -1,0 +1,5 @@
+Polices du vidéobooth (hébergées ici pour fonctionner sans réseau), distribuées par le projet Fontsource :
+- Playfair Display (SIL Open Font License 1.1) — Claus Eggers Sørensen
+- Great Vibes (SIL Open Font License 1.1) — Robert Leuschke
+- Montserrat (SIL Open Font License 1.1) — Julieta Ulanovsky et collaborateurs
+- Mountains of Christmas (Apache License 2.0) — Tart Workshop

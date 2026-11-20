@@ -116,6 +116,8 @@ async function accesEcrire(st, mdp, libre) { if (!mdp && libre) { const a = { li
 async function sessionsLire(st) { const l = await st.get('config/sessions', { type: 'json' }).catch(() => null); return Array.isArray(l) ? l : []; }
 /* liste de questions : au plus 8, une par ligne, 140 caractères chacune ; « | » interdit (séparateur interne) */
 const AMBIANCES = ['blanc', 'ivoire', 'rose', 'sauge', 'perle', 'noir'];
+const ORIENTATIONS = ['auto', 'paysage', 'portrait'];
+const POLICES = ['elegante', 'manuscrite', 'moderne', 'festive'];
 const hexOk = (x) => (/^#[0-9a-fA-F]{6}$/.test(String(x || '')) ? String(x).toUpperCase() : '');
 const TEXTES_CLES = ['go', 'm1n', 'm1d', 'm2n', 'm2d', 'm3n', 'm3d', 'm3b', 'pretT', 'pretB', 'plaitT', 'plaitNon', 'plaitOui', 'quiB', 'livT', 'livQr', 'livQrT', 'livMail', 'livMailT', 'livAutreQ', 'livOui', 'livNon', 'livPrenom', 'livEmail2', 'livFin', 'merciT', 'merciD'];
 const textesPropres = (t) => { const o = {}; const src = t && typeof t === 'object' ? t : {}; for (const k of TEXTES_CLES) { const v = String(src[k] == null ? '' : src[k]).replace(/[\r\n]+/g, ' ').trim().slice(0, 200); if (v) o[k] = v; } return o; };
@@ -142,6 +144,8 @@ async function sessionsEcrire(st, liste) {
     /* « nuit » (bleu) n'existe plus : il devient « noir » ; sans réglage, fond blanc. Fond et boutons peuvent aussi être choisis librement (#RRGGBB). */
     amb: AMBIANCES.includes(e.amb) ? e.amb : (e.amb === 'nuit' ? 'noir' : 'blanc'),
     fond: hexOk(e.fond), accent: hexOk(e.accent),
+    /* disposition de l'écran (la tablette suit son orientation, ou on la force) et police du titre */
+    ori: ORIENTATIONS.includes(e.ori) ? e.ori : 'auto', police: POLICES.includes(e.police) ? e.police : 'elegante',
     textes: textesPropres(e.textes),
   })).filter((e) => e.nom);
   await st.setJSON('config/sessions', propre); return propre;
@@ -153,7 +157,7 @@ const visible = (e) => e.actif !== false && (!e.fin || e.fin >= aujourdhuiParis(
 const carte = (e) => ({ id: e.id, nom: e.nom, date: e.date, prot: !!e.mdp });
 /* ce que la tablette reçoit d'une session (à l'ouverture, puis régulièrement : une modification du back-office arrive seule sur la tablette) */
 const vueSession = (ses) => ({ id: ses.id, nom: ses.nom, date: ses.date, label: labelSession(ses), titre: ses.titre, sous: ses.sous, max: ses.max, format: ses.format, noel: ses.noel, cadrage: ses.cadrage, qui: ses.qui, quiSous: ses.quiSous, qualite: ses.qualite, garde: ses.garde, choixFormat: ses.choixFormat !== false,
-  type: ses.type || 'autre', modeQ: !!ses.modeQ, modeP: !!ses.modeP, heureP: ses.heureP || '23:00', qs: ses.qs || [], qp: ses.qp || [], secQ: ses.secQ || 0, merciOrga: ses.merciOrga || '', amb: AMBIANCES.includes(ses.amb) ? ses.amb : (ses.amb === 'nuit' ? 'noir' : 'blanc'), fond: ses.fond || '', accent: ses.accent || '', textes: ses.textes || {} });
+  type: ses.type || 'autre', modeQ: !!ses.modeQ, modeP: !!ses.modeP, heureP: ses.heureP || '23:00', qs: ses.qs || [], qp: ses.qp || [], secQ: ses.secQ || 0, merciOrga: ses.merciOrga || '', amb: AMBIANCES.includes(ses.amb) ? ses.amb : (ses.amb === 'nuit' ? 'noir' : 'blanc'), fond: ses.fond || '', accent: ses.accent || '', ori: ORIENTATIONS.includes(ses.ori) ? ses.ori : 'auto', police: POLICES.includes(ses.police) ? ses.police : 'elegante', textes: ses.textes || {} });
 export { envoyerMail, jeton, jetonMail, jetonEvt, GARDE_JOURS, gardeJours, visible, galLire, galEcrire, genMdp, accesLire, accesEcrire, sessionsLire, sessionsEcrire, labelSession };
 
 export default async (request) => {

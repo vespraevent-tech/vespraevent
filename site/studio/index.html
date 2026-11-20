@@ -2708,7 +2708,7 @@ function vbFsCss(){
 function vbFormSession(){
   vbFsCss();
   const ses=VBCFG.sessions||[];
-  const e=VBEDIT.i>=0?ses[VBEDIT.i]:{nom:'',date:'',mdp:'',titre:'Enregistrer un souvenir',sous:'',max:30,format:'auto',noel:false,cadrage:'Vous pouvez incliner doucement la tablette pour vous cadrer',qui:'',quiSous:'',actif:true,fin:'',conserv:0,garde:14,qualite:'standard',choixFormat:true,type:'autre',modeQ:false,modeP:false,heureP:'23:00',qs:VB_QS.autre,qp:VB_QP,secQ:0,merciOrga:'',amb:'blanc',fond:'',accent:'',textes:{}};
+  const e=VBEDIT.i>=0?ses[VBEDIT.i]:{nom:'',date:'',mdp:'',titre:'Enregistrer un souvenir',sous:'',max:30,format:'auto',noel:false,cadrage:'Vous pouvez incliner doucement la tablette pour vous cadrer',qui:'',quiSous:'',actif:true,fin:'',conserv:0,garde:14,qualite:'standard',choixFormat:true,type:'autre',modeQ:false,modeP:false,heureP:'23:00',qs:VB_QS.autre,qp:VB_QP,secQ:0,merciOrga:'',amb:'blanc',fond:'',accent:'',ori:'auto',police:'elegante',textes:{}};
   const tx=e.textes||{}, nouveau=VBEDIT.i<0, prot=!!e.mdp;
   const f=(id,l,v,ph,type,cls)=>'<label class="f'+(cls?' '+cls:'')+'">'+l+'<input id="vs-'+id+'" type="'+(type||'text')+'" value="'+vbEsc(v==null?'':v)+'" placeholder="'+vbEsc(ph||'')+'"></label>';
   /* texte personnalisable : vide = texte par défaut (affiché en gris) */
@@ -2721,7 +2721,7 @@ function vbFormSession(){
   const ambs='<div class="plein"><div style="font-size:12px;font-weight:600;color:#6b7280;margin-bottom:8px">Couleurs de l’écran des invités (fond uni)</div><div class="ambs">'+VB_AMBS.map(a=>'<label><input type="radio" name="vs-amb" value="'+a[0]+'"'+(ambCur===a[0]?' checked':'')+' onchange="vbAmbApercu()"><span class="pt" style="background:linear-gradient(135deg,'+a[2]+' 52%,'+a[3]+' 52%)"></span><em>'+a[1]+'</em></label>').join('')+'</div></div>'+
     '<div class="plein ligne">'+sw('vs-perso',perso,"document.getElementById('vs-persobloc').style.display=this.checked?'flex':'none';vbAmbApercu()")+'<span>Choisir mes propres couleurs</span></div>'+
     '<div class="plein" id="vs-persobloc" style="display:'+(perso?'flex':'none')+';gap:18px;flex-wrap:wrap;align-items:center"><label class="f" style="flex:none">Couleur du fond<input id="vs-fond" type="color" value="'+(e.fond||ambP[2])+'" oninput="vbAmbApercu()" style="width:90px;height:40px;padding:2px;cursor:pointer"></label><label class="f" style="flex:none">Couleur des boutons<input id="vs-accent" type="color" value="'+(e.accent||ambP[3])+'" oninput="vbAmbApercu()" style="width:90px;height:40px;padding:2px;cursor:pointer"></label></div>'+
-    '<div class="plein"><div id="vs-apercu" style="border-radius:12px;border:1px solid #e2ded3;padding:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap"><span id="vs-ap-t" style="font:italic 400 26px Fraunces,Georgia,serif">Aperçu</span><span id="vs-ap-b" style="padding:9px 20px;border-radius:10px;font:700 14px Inter,sans-serif">Commencer</span></div></div>';
+    '<div class="plein"><div id="vs-apercu" style="border-radius:12px;border:1px solid #e2ded3;padding:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap"><span id="vs-ap-t" style="font:700 26px Georgia,serif">Aperçu du titre</span><span id="vs-ap-b" style="padding:9px 20px;border-radius:10px;font:700 14px Inter,sans-serif">Commencer</span></div></div>';
 
   const sEvt=sec('Événement','Nom, date, type, accès et durée de conservation',
     f('nom','Nom de l’événement',e.nom,'Mariage Sylvie')+f('date','Date affichée',e.date,'21 novembre')+
@@ -2734,6 +2734,8 @@ function vbFormSession(){
 
   const sAcc=sec('Écran d’accueil et apparence','Gros titre, sous-titre, couleurs',
     f('titre','Gros titre',e.titre,'Joyeux Noël, Mariage de Sylvie et Paul…','text','plein')+f('sous','Sous-titre (facultatif)',e.sous,'Un petit mot pour les mariés ?','text','plein')+
+    '<label class="f">Police du titre<select id="vs-police" onchange="vbPoliceApercu()">'+[['elegante','Élégante (Playfair)'],['manuscrite','Manuscrite (Great Vibes)'],['moderne','Moderne (Montserrat)'],['festive','Festive (Mountains of Christmas)']].map(o=>'<option value="'+o[0]+'"'+((e.police||'elegante')===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></label>'+
+    '<label class="f">Orientation de l’écran<select id="vs-ori">'+[['auto','Automatique (suit la tablette)'],['paysage','Horizontal (paysage)'],['portrait','Vertical (portrait)']].map(o=>'<option value="'+o[0]+'"'+((e.ori||'auto')===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></label>'+
     ambs+
     '<div class="plein ligne">'+sw('vs-noel',!!e.noel)+'<span>Décor de Noël (sapins et guirlandes)</span></div>'+
     t('go','Texte du bouton quand il n’y a qu’un seul mode'));
@@ -2786,6 +2788,13 @@ function vbAmbApercu(){
   z.style.background=fond; document.getElementById('vs-ap-t').style.color=lum(fond)>0.35?'#231F1C':'#fff';
   const b=document.getElementById('vs-ap-b'); b.style.background=acc; b.style.color=lum(acc)>0.45?'#1a1612':'#fff';
 }
+function vbPoliceApercu(){
+  const t=document.getElementById('vs-ap-t'), p=document.getElementById('vs-police'); if(!t||!p) return;
+  /* les polices sont hébergées avec la tablette : on les charge ici pour l'aperçu */
+  if(!document.getElementById('vb-polices')){ const st=document.createElement('style'); st.id='vb-polices'; st.textContent="@font-face{font-family:'Playfair VB';font-weight:700;src:url('/videobooth/polices/playfair-700.woff2') format('woff2')}@font-face{font-family:'GreatVibes VB';src:url('/videobooth/polices/great-vibes-400.woff2') format('woff2')}@font-face{font-family:'Montserrat VB';font-weight:700;src:url('/videobooth/polices/montserrat-700.woff2') format('woff2')}@font-face{font-family:'Mountains VB';font-weight:700;src:url('/videobooth/polices/mountains-700.woff2') format('woff2')}"; document.head.appendChild(st); }
+  const f={elegante:["'Playfair VB',Georgia,serif",700,26],manuscrite:["'GreatVibes VB',cursive",400,34],moderne:["'Montserrat VB',Arial,sans-serif",700,22],festive:["'Mountains VB',cursive",700,30]}[p.value]||[];
+  t.style.fontFamily=f[0]; t.style.fontWeight=f[1]; t.style.fontSize=f[2]+'px';
+}
 function vbPast(id,on){ const p=document.getElementById(id); if(!p) return; p.className='pastille'+(on?' on':''); p.textContent=on?'Activé':'Désactivé'; }
 function vbConfigRendre(){
   const z=document.getElementById('vbConfig'); if(!z) return;
@@ -2798,7 +2807,7 @@ function vbConfigRendre(){
     '<div id="vbAccesBloc" style="display:'+(VBCFG.accesLibre?'none':'flex')+';gap:8px;flex-wrap:wrap"><input id="vbAcces" value="'+vbEsc(VBCFG.acces||'')+'" placeholder="Mot de passe d’accès (6 caractères minimum)" style="flex:1 1 240px;'+VB_INPUT+';font:600 14px monospace" autocomplete="off"><button class="btn btn-ghost" onclick="document.getElementById(\'vbAcces\').value=vbMdp()">Générer</button></div>'+
     '<div style="margin-top:10px"><button class="btn" onclick="vbAccesSauver()">Enregistrer</button></div>'+((VBCFG.acces||VBCFG.accesLibre)?'':'<div style="color:#b03a2a;font-size:12.5px;margin-top:8px">Rien n’est réglé : la tablette ne peut pas se connecter. Choisissez un mot de passe, ou décochez la case pour une appli sans mot de passe général.</div>')+'</details>';
   }
-  z.innerHTML=h; try{ vbAmbApercu(); }catch(e){}
+  z.innerHTML=h; try{ vbAmbApercu(); vbPoliceApercu(); }catch(e){}
 }
 function vbSessEdit(i){ VBEDIT=(i===null)?null:{i}; vbConfigRendre(); if(i!==null) { const z=document.getElementById('vbConfig'); if(z) z.scrollIntoView({block:'start',behavior:'smooth'}); } }
 async function vbConfigPoster(corps,msg){ try{ VBCFG=await api('/videobooth/config',{method:'POST',body:JSON.stringify(corps)}); showToast(msg); }catch(e){ showToast('Échec : '+e.message,true); } VBEDIT=null; vbConfigRendre(); vbRendre(); }
@@ -2815,7 +2824,7 @@ function vbSessSauver(){
   const textes={}; Object.keys(VB_DEF).forEach(k=>{ const el=document.getElementById('vt-'+k); const val=el?el.value.trim():''; if(val) textes[k]=val; });
   const ambEl=document.querySelector('input[name="vs-amb"]:checked');
   const s={nom:v('nom').trim(),date:v('date').trim(),fin:v('fin'),actif:coche('vs-actif'),mdp:prot?v('mdp').trim():'',titre:v('titre').trim(),sous:v('sous').trim(),qui:v('qui').trim(),quiSous:v('quiSous').trim(),max:Number(v('max'))||30,cadrage:v('cadrage').trim(),format:v('format'),qualite:v('qualite'),conserv:Number(v('conserv'))||0,choixFormat:coche('vs-choixformat'),noel:coche('vs-noel'),
-    type:v('type')||'autre',merciOrga:v('merciOrga').trim(),modeQ:coche('vs-modeQ'),modeP:coche('vs-modeP'),heureP:v('heureP')||'23:00',secQ:Number(v('secQ'))||0,qs:lignes(v('qs')),qp:lignes(v('qp')),amb:ambEl?ambEl.value:'blanc',fond:coche('vs-perso')?v('fond').toUpperCase():'',accent:coche('vs-perso')?v('accent').toUpperCase():'',textes};
+    type:v('type')||'autre',merciOrga:v('merciOrga').trim(),modeQ:coche('vs-modeQ'),modeP:coche('vs-modeP'),heureP:v('heureP')||'23:00',secQ:Number(v('secQ'))||0,qs:lignes(v('qs')),qp:lignes(v('qp')),amb:ambEl?ambEl.value:'blanc',ori:v('ori')||'auto',police:v('police')||'elegante',fond:coche('vs-perso')?v('fond').toUpperCase():'',accent:coche('vs-perso')?v('accent').toUpperCase():'',textes};
   if(s.modeQ&&!s.qs.length){ showToast('Ajoutez au moins une question pour la boîte à questions, ou désactivez-la',true); return; }
   if(s.modeP&&!s.qp.length){ showToast('Ajoutez au moins une question piquante, ou désactivez ce mode',true); return; }
   if(!s.nom){ showToast('Indiquez le nom de la session',true); return; }

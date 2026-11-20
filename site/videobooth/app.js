@@ -14,6 +14,12 @@
   var ORGA = { mariage: 'Les mariés recevront toutes les vidéos de leur côté.' + SUITE_ORGA, entreprise: 'Les organisateurs recevront toutes les vidéos de leur côté.' + SUITE_ORGA, anniversaire: 'La personne fêtée recevra toutes les vidéos de son côté.' + SUITE_ORGA, autre: 'Les organisateurs recevront toutes les vidéos.' + SUITE_ORGA };
   /* ── couleurs : un fond uni et une couleur pour les boutons, choisis par événement ; texte, cartes et traits s'en déduisent (clair ou foncé) ── */
   var AMB = { blanc: ['#FFFFFF', '#B8893B'], ivoire: ['#FAF6EE', '#B8893B'], rose: ['#FDF6F4', '#B76E79'], sauge: ['#F8F9F4', '#6B8560'], perle: ['#F1F1EF', '#262626'], noir: ['#161616', '#C9A24D'] };
+  /* disposition de l'écran : celle de la tablette (« auto »), ou imposée par l'événement (écran fixe, tablette posée en hauteur…) */
+  function paysage() { return cfg.ori === 'paysage' ? true : (cfg.ori === 'portrait' ? false : window.innerWidth > window.innerHeight); }
+  function appliquerOrientation() { document.documentElement.setAttribute('data-ori', paysage() ? 'paysage' : 'portrait'); }
+  window.addEventListener('resize', function () { appliquerOrientation(); });
+  /* police du titre : quatre styles, choisis par événement */
+  var POLICES = { elegante: ["'Playfair VB',Georgia,serif", 700, 1], manuscrite: ["'GreatVibes VB','Brush Script MT',cursive", 400, 1.3], moderne: ["'Montserrat VB',Inter,system-ui,sans-serif", 700, 0.8], festive: ["'Mountains VB',cursive", 700, 1.2] };
   function hexOk(x) { return /^#[0-9a-fA-F]{6}$/.test(x || '') ? x : ''; }
   function rvb(h) { return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; }
   function lum(h) { var c = rvb(h).map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
@@ -22,7 +28,8 @@
     var clair = lum(fond) > 0.35, r = rvb(acc), st = document.documentElement.style;
     var v = { '--bg1': fond, '--acc': acc, '--acc-t': lum(acc) > 0.45 ? '#1a1612' : '#ffffff', '--glow': 'rgba(' + r.join(',') + ',.18)', '--glow2': 'rgba(' + r.join(',') + ',.12)',
       '--txt': clair ? '#231F1C' : '#ffffff', '--soft': clair ? '#6F655C' : 'rgba(255,255,255,.72)', '--card': clair ? '#ffffff' : 'rgba(255,255,255,.08)', '--champ': clair ? '#ffffff' : 'rgba(255,255,255,.1)',
-      '--line': clair ? 'rgba(35,31,28,.14)' : 'rgba(255,255,255,.22)', '--ombre': clair ? 'rgba(60,45,25,.28)' : 'rgba(0,0,0,.55)', '--err': clair ? '#b3392b' : '#ffb4a8' };
+      '--line': clair ? 'rgba(35,31,28,.14)' : 'rgba(255,255,255,.22)', '--ombre': clair ? 'rgba(60,45,25,.28)' : 'rgba(0,0,0,.55)', '--err': clair ? '#b3392b' : '#ffb4a8', '--tit': clair ? '#1F3B5A' : '#ffffff' };
+    var pf = POLICES[cfg.police] || POLICES.elegante; v['--ft'] = pf[0]; v['--ftw'] = pf[1]; v['--fts'] = pf[2];
     Object.keys(v).forEach(function (k) { st.setProperty(k, v[k]); });
     var m = document.querySelector('meta[name=theme-color]'); if (m) m.setAttribute('content', fond);
   }
@@ -59,7 +66,7 @@
     if (videoEnCours) libererEnAttente();
     if (sessionMaj) { cfg.session = Object.assign({}, cfg.session, sessionMaj); sessionMaj = null; appliquerActif(); }
     if (Date.now() - dernierMaj > 60000) majSession();   /* à chaque retour à l'accueil (au plus une fois par minute) : les réglages du back-office arrivent vite */
-    appliquerTheme();
+    appliquerTheme(); appliquerOrientation();
     $('t-accueil').textContent = cfg.titre || CFG0.titre; $('p-accueil').textContent = (cfg.sous && cfg.sous !== 'Laissez un petit message vidéo de 30 secondes') ? cfg.sous : ''; $('b-commencer').textContent = T('go');
     $('t-qui').textContent = cfg.qui || 'Qui êtes-vous ?'; $('p-qui').textContent = cfg.quiSous == null ? 'Pour que les organisateurs sachent qui a laissé ce message' : cfg.quiSous; $('f-suite').textContent = T('quiB');
     if (!garder) { $('form').reset(); formatInvite = null; majFormat(); } $('f-err').textContent = ''; rendreModes(); montrer('s-accueil'); majEtat();
@@ -83,7 +90,7 @@
   function modesDispo() { var l = ['video']; if (cfg.modeQ && (cfg.qs || []).length) l.push('questions'); if (cfg.modeP && (cfg.qp || []).length) l.push('piquantes'); return l; }
   var SVG = { video: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6" width="13" height="12" rx="2.5"/><path d="M15.5 10.5 21.5 7v10l-6-3.5z"/></svg>',
     questions: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4h0A2.5 2.5 0 0 1 4 13.5z"/><path d="M9.8 8.4a2.3 2.3 0 1 1 3.3 2.1c-.7.4-1.1.8-1.1 1.5"/><circle cx="12" cy="13.6" r=".7" fill="currentColor" stroke="none"/></svg>',
-    piquantes: '<svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor" stroke="none" aria-hidden="true"><path d="M16.9 6.2c3.4.7 3.9 5.4 1 9.1-3 3.8-8.2 5.6-13.4 4.9-1.1-.2-1.1-1.1-.3-1.5 3.8-1.8 5.5-3.8 6.5-6.7 1-2.8 2.8-6.2 6.2-5.8z"/><path d="M16.9 6.2c-.4-1.5.2-3 1.8-3.7.5-.2.9.4.5.8-.8.7-.9 1.5-.6 2.5z" opacity=".75"/></svg>' };
+    piquantes: '<svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor" stroke="none" aria-hidden="true"><path d="M15.5 7.2c3.7-.3 5.2 3.5 3.2 7.5-2.3 4.6-7.7 6.8-13.9 5.8-1.2-.2-1.2-1.2-.3-1.6C8.2 17.1 10 15 11 12c.9-2.6 1.7-4.6 4.5-4.8z"/><path d="M15.5 7.2c-.5-1.6 0-3.2 1.7-4 .6-.3 1.1.4.6.9-.8.7-.9 1.6-.4 2.5z" opacity=".7"/></svg>' };
   var SVG_CADENAS = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9.5" rx="2.2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
   var CLE_MODE = { video: ['m1n', 'm1d'], questions: ['m2n', 'm2d'], piquantes: ['m3n', 'm3d'] };
   function nomMode(id) { return T(CLE_MODE[id || mode][0]); }
@@ -154,18 +161,18 @@
   /* Rendu toujours VERTICAL (3:4) : l'image de la caméra est recadrée sur un canvas, et c'est ce canvas qui est filmé. */
   /* format de la vidéo : automatique = suit l'orientation de la tablette (vertical 9:16, horizontal 16:9) */
   var formatInvite = null;   /* format choisi par l'invité (vertical / horizontal), remis à zéro pour chaque nouvel invité */
-  function formatEffectif() { var f = formatInvite || cfg.format || 'auto'; if (f === 'auto') f = window.innerWidth > window.innerHeight ? '16:9' : '9:16'; return f; }
+  function formatEffectif() { var f = formatInvite || cfg.format || 'auto'; if (f === 'auto') f = paysage() ? '16:9' : '9:16'; return f; }
   function majFormat() {
     var f = formatEffectif(), vertical = f === '9:16' || f === '3:4';
     /* image entière (bandes noires) quand le format filmé n'a pas la forme de l'écran : on voit exactement ce qui sera filmé */
-    document.body.classList.toggle('fmt34', f === '3:4' || f === '4:3' || vertical !== (window.innerHeight > window.innerWidth));
+    document.body.classList.toggle('fmt34', f === '3:4' || f === '4:3' || vertical !== !paysage());
     Array.prototype.forEach.call(document.querySelectorAll('#fmt button'), function (b) { b.classList.toggle('on', (b.dataset.f === 'v') === vertical); });
   }
   window.addEventListener('resize', majFormat);
   Array.prototype.forEach.call(document.querySelectorAll('#fmt button'), function (b) { b.onclick = function () { formatInvite = b.dataset.f === 'v' ? '9:16' : '16:9'; majFormat(); }; });
   function ratioFormat() {
     var f = formatInvite || cfg.format || 'auto';
-    if (f === 'auto') f = window.innerWidth > window.innerHeight ? '16:9' : '9:16';
+    if (f === 'auto') f = paysage() ? '16:9' : '9:16';
     return { '9:16': 0.5625, '3:4': 0.75, '4:3': 1.3333, '16:9': 1.7778 }[f] || 0.5625;
   }
   function dessiner() {
@@ -245,7 +252,7 @@
     var tr = s.getVideoTracks()[0], st = tr.getSettings ? tr.getSettings() : {}, caps = tr.getCapabilities ? tr.getCapabilities() : {}, au = s.getAudioTracks()[0];
     var l = ['Caméra : ' + (tr.label || '(nom inconnu)'), 'Image reçue : ' + st.width + ' × ' + st.height + ' à ' + Math.round(st.frameRate || 0) + ' i/s',
       'Zoom : ' + (caps.zoom ? ('min ' + caps.zoom.min + ' · max ' + caps.zoom.max + ' · actuel ' + (st.zoom || '?')) : 'non réglable par le navigateur'),
-      'Format enregistré : ' + (cfg.format === 'auto' || !cfg.format ? 'auto (' + (window.innerWidth > window.innerHeight ? '16:9' : '9:16') + ')' : cfg.format),
+      'Format enregistré : ' + (cfg.format === 'auto' || !cfg.format ? 'auto (' + (paysage() ? '16:9' : '9:16') + ')' : cfg.format),
       'Micro : ' + (au ? (au.label || '(nom inconnu)') : 'aucun')];
     navigator.mediaDevices.enumerateDevices().then(function (d) {
       l.push('Caméras disponibles : ' + d.filter(function (x) { return x.kind === 'videoinput'; }).map(function (x) { return x.label || '?'; }).join(' | '));
@@ -441,7 +448,7 @@ $('b-stop').onclick = arreterRec;
   /* ── état de la tablette, envoyé toutes les 2 minutes au back-office (batterie, vidéos en attente, caméra, micro, place) ── */
   function battement() {
     if (!(cfg.jeton || cfg.cle)) return;
-    var etat = { cam: camEtat, mic: micEtat, ver: 36, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
+    var etat = { cam: camEtat, mic: micEtat, ver: 37, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
     var fin = function () {
       toutes().then(function (l) { etat.att = l.filter(function (v) { return !v.envoye; }).length; etat.tot = l.length; }).catch(function () {}).then(function () {
         return (navigator.storage && navigator.storage.estimate) ? navigator.storage.estimate().then(function (e) { etat.usage = e.usage || 0; etat.quota = e.quota || 0; }).catch(function () {}) : null;
@@ -532,7 +539,7 @@ $('b-stop').onclick = arreterRec;
     var s = cfg.session || null;
     cfg.event = s ? (s.label || s.nom || '') : '';
     cfg.titre = (s && s.titre) || CFG0.titre; cfg.sous = s ? (s.sous || '') : CFG0.sous; cfg.max = (s && Number(s.max)) || 30;
-    cfg.amb = (s && s.amb) || 'blanc'; cfg.fond = (s && s.fond) || ''; cfg.accent = (s && s.accent) || ''; cfg.textes = (s && s.textes) || {}; appliquerTheme();
+    cfg.ori = (s && s.ori) || 'auto'; cfg.police = (s && s.police) || 'elegante'; cfg.amb = (s && s.amb) || 'blanc'; cfg.fond = (s && s.fond) || ''; cfg.accent = (s && s.accent) || ''; cfg.textes = (s && s.textes) || {}; appliquerTheme(); appliquerOrientation();
     cfg.type = (s && s.type) || 'autre'; cfg.modeQ = !!(s && s.modeQ); cfg.modeP = !!(s && s.modeP); cfg.heureP = (s && s.heureP) || '23:00'; cfg.qs = (s && s.qs) || []; cfg.qp = (s && s.qp) || []; cfg.secQ = (s && Number(s.secQ)) || 0; cfg.merciOrga = (s && s.merciOrga) || '';
     cfg.noel = !!(s && s.noel); cfg.format = (s && s.format) || 'auto';
     cfg.qui = (s && s.qui) || ''; cfg.quiSous = s ? (s.quiSous == null || s.quiSous === '' ? null : s.quiSous) : null; cfg.qualite = (s && s.qualite) || 'standard'; cfg.garde = (s && Number(s.garde)) || 14; cfg.choixFormat = !s || s.choixFormat !== false;
