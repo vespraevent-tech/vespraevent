@@ -381,3 +381,8 @@ html[data-ori="portrait"] .mode{justify-content:center}
 .mode .in{justify-content:center;height:auto;padding-top:0}
 .mode .d{min-height:calc(1.45em * 3)}
 html[data-ori="portrait"] .mode .d{min-height:calc(1.45em * 2)}
+/* relecture de l'adresse e-mail avant l'envoi */
+.conf{display:flex;flex-direction:column;gap:10px;background:var(--glow2);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-top:4px}
+.conf .question{margin:0}
+.conf-a{white-space:pre-line;text-align:center;margin:0;font:700 clamp(18px,2.4vw,24px) Inter,system-ui,sans-serif;color:var(--txt)!important;word-break:break-all}
+.inv .adm-m.alerte{color:var(--err,#b3392b);font-weight:600}

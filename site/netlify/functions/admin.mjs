@@ -2405,7 +2405,8 @@ const gestionnaire = async (request) => {
     let body = {}; try { body = await request.json(); } catch {}
     const e = String(body.e || ''); const m = String(body.mdp || '').trim();
     if (!e) return json({ error: 'Événement manquant' }, 400);
-    if (m && m.length < 4) return json({ error: 'Mot de passe : 4 caractères minimum' }, 400);
+    /* la galerie d'un événement est toujours protégée par un mot de passe */
+    if (m.length < 6) return json({ error: 'Le mot de passe de la galerie est obligatoire (6 caractères minimum)' }, 400);
     const g = await vbGalEcrire(videoStore(), e, m.slice(0, 40));
     return json({ ok: true, mdp: g ? g.mdp : '' });
   }
@@ -2443,6 +2444,8 @@ const gestionnaire = async (request) => {
         if (adresseDonnee || (m.email && m.mail !== 'envoye')) {
           const r = await vbEnvoyerMail(m, buf, site);
           m.mail = r.ok ? 'envoye' : 'erreur'; m.mailErreur = r.erreur || ''; m.pj = !!r.pj; m.renvoye = new Date().toISOString();
+          /* nouvel e-mail : l'invité peut ouvrir sa vidéo sur de nouveaux appareils (ex. il a changé de téléphone) */
+          if (r.ok) { m.appMail = []; delete m.appMailLe; }
           if (!r.ok) { ok = false; erreur = r.erreur || ''; }
         }
         if (!adresseDonnee) for (const a of m.autres || []) {

@@ -12,7 +12,7 @@
 <link rel="icon" type="image/png" sizes="48x48" href="/videobooth/icones/favicon-48.png?v=3">
 <link rel="apple-touch-icon" href="/videobooth/icones/apple-touch-icon.png">
 <link rel="stylesheet" href="/polices.css?v=1">
-<link rel="stylesheet" href="app.css?v=34">
+<link rel="stylesheet" href="app.css?v=35">
 </head>
 <body>
 <main id="app">
@@ -58,6 +58,7 @@
       <div class="seg" role="radiogroup"><button id="l-non" class="on" type="button" role="radio" aria-checked="true">Non</button><button id="l-oui" type="button" role="radio" aria-checked="false">Oui</button></div>
       <div id="p-autre" class="vol" hidden><div class="duo"><label><span id="l-prenom-d">Prénom de la personne</span><input id="l-dest" type="text" inputmode="text" autocapitalize="words"></label><label><span id="l-email2-d">Son adresse e-mail</span><input id="l-email2" type="email" inputmode="email" autocomplete="off" autocapitalize="none"></label></div></div>
       <div id="l-err" class="err" role="alert"></div>
+      <div id="l-conf" class="conf" hidden><p class="question">Vérifiez l’adresse avant l’envoi</p><p id="l-conf-a" class="conf-a"></p><div class="rang"><button id="l-conf-non" class="ghost" type="button">Corriger</button><button id="l-conf-ok" class="cta" type="button">C’est bon, envoyer</button></div></div>
       <button id="l-fin" class="cta pleine" type="button">Terminé</button>
     </div>
   </section>
@@ -122,6 +123,7 @@
       <header class="adm-h"><h2>Réglages</h2><button id="a-close" class="adm-x" type="button" aria-label="Fermer">✕</button></header>
       <div id="adm-cartes" hidden></div>
       <div class="adm-c"><h3>Session en cours</h3><div id="a-sess" class="adm-m"></div><div class="adm-l"><button id="a-chsess" class="adm-b" type="button">Changer de session</button></div></div>
+      <div class="adm-c"><h3>Code des réglages</h3><div id="a-pin-m" class="adm-m"></div><div class="adm-l"><button id="a-pin" class="adm-b" type="button">Changer le code</button></div></div>
       <div class="adm-c"><h3>Caméra et micro de cette tablette</h3><div class="adm-2"><label>Caméra<select id="a-cam"></select></label><label>Micro<select id="a-mic"></select></label></div></div>
       <div class="adm-c">
         <h3>Envoi des vidéos</h3>
@@ -171,6 +173,6 @@
   </section>
 </main>
 <script src="qr.js?v=1"></script>
-<script src="app.js?v=39"></script>
+<script src="app.js?v=40"></script>
 </body>
 </html>

@@ -34,6 +34,7 @@ const jeton = (id) => createHmac('sha256', process.env.VIDEOBOOTH_CLE || '').upd
 /* lien envoyé à l'invité par e-mail : jeton distinct de celui de la galerie, valable une semaine seulement */
 const LIEN_MAIL_JOURS = 7;
 const jetonMail = (id) => createHmac('sha256', process.env.VIDEOBOOTH_CLE || '').update('mail:' + id).digest('hex').slice(0, 32);
+const jetonQr = (id) => createHmac('sha256', process.env.VIDEOBOOTH_CLE || '').update('qr:' + id).digest('hex').slice(0, 32);
 const jetonEvt = (label) => createHmac('sha256', process.env.VIDEOBOOTH_CLE || '').update('ev:' + label).digest('hex').slice(0, 32);
 const store = () => getStore('videobooth');
 export const videoStore = store;
@@ -87,6 +88,35 @@ async function envoyerMail(m, octets, site) {
   if (!r.ok) { const t = await r.text(); console.error('Videobooth : Resend a refusé', r.status, t); return { ok: false, erreur: 'Service e-mail : ' + r.status }; }
   return { ok: true, pj };
 }
+
+/* ── une vidéo ne s'ouvre que sur les appareils de l'invité ──
+   Le lien du QR code ou de l'e-mail ne suffit pas : à la première ouverture, l'invité touche « Ouvrir ma vidéo » et son appareil reçoit
+   une clé (cookie) que rien d'autre ne connaît. Un lien transféré à quelqu'un d'autre ne montre alors plus rien.
+   QR code : au plus 2 téléphones, dans le quart d'heure qui suit la première ouverture (appli de scan puis navigateur, par exemple).
+   E-mail : au plus 2 appareils (téléphone puis ordinateur, par exemple). Un renvoi de l'e-mail depuis le back-office remet le compteur à zéro.
+   L'ouverture passe par un bouton (et non par la simple visite du lien) : les robots qui analysent les liens des messageries ne prennent pas la place de l'invité. */
+const APPAREILS = { qr: { champ: 'appQr', max: 2, fenetre: 15 * 60000 }, mail: { champ: 'appMail', max: 2, fenetre: 0 } };
+const sha = (x) => createHash('sha256').update(String(x)).digest('hex');
+const nomCookie = (id, type) => (type === 'qr' ? 'vbq_' : 'vbm_') + id;
+function lireCookie(request, nom) {
+  for (const c of (request.headers.get('cookie') || '').split(/;\s*/)) { const i = c.indexOf('='); if (i > 0 && c.slice(0, i) === nom) return c.slice(i + 1); }
+  return '';
+}
+const appareilConnu = (request, m, type) => { const sec = lireCookie(request, nomCookie(m.id, type)); return !!sec && (m[APPAREILS[type].champ] || []).includes(sha(sec)); };
+/* nouvel appareil : accepté s'il reste une place ; renvoie l'en-tête Set-Cookie à poser, ou null */
+async function lierAppareil(st, m, type) {
+  const a = APPAREILS[type], liste = Array.isArray(m[a.champ]) ? m[a.champ] : [];
+  if (liste.length >= a.max) return null;
+  if (liste.length && a.fenetre && Date.now() - Date.parse(m[a.champ + 'Le'] || 0) > a.fenetre) return null;
+  const sec = randomBytes(24).toString('hex');
+  m[a.champ] = liste.concat(sha(sec)); if (!liste.length) m[a.champ + 'Le'] = new Date().toISOString();
+  await st.setJSON('meta/' + m.id, m);
+  return `${nomCookie(m.id, type)}=${sec}; Path=/api/videobooth/; Max-Age=${(LIEN_MAIL_JOURS + 1) * 86400}; HttpOnly; Secure; SameSite=Lax`;
+}
+const ENTETE_HTML = { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' };
+const pageSimple = (titre, corps, status = 200) => new Response(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>${esc(titre)}</title><style>*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#fff;font-family:Inter,Arial,sans-serif;color:#231F1C;padding:20px;text-align:center}main{max-width:430px}h1{font-size:23px;margin:0 0 10px}p{color:#6F655C;line-height:1.55;margin:0 0 12px;font-size:15px}button{margin-top:10px;width:100%;padding:15px;border:0;border-radius:12px;background:#B8893B;color:#fff;font:700 16px Inter,Arial,sans-serif;cursor:pointer}a{color:#B8893B}</style></head><body><main><h1>${esc(titre)}</h1>${corps}</main></body></html>`, { status, headers: ENTETE_HTML });
+const pageOuvrir = (m) => pageSimple('Votre vidéo est prête', `<p>${esc(m.prenom || '')}${m.prenom ? ', v' : 'V'}otre message vidéo vous attend.</p><p>Pour protéger votre vie privée, elle ne s’ouvrira que sur cet appareil.</p><form method="post"><button type="submit">Ouvrir ma vidéo</button></form>`);
+const pageRefus = (type) => pageSimple('Vidéo protégée', `<p>Cette vidéo a déjà été ouverte sur ${type === 'qr' ? 'un autre téléphone' : 'd’autres appareils'}. Pour protéger la vie privée des invités, elle ne s’ouvre que sur les appareils de la personne qui l’a enregistrée.</p><p>C’est votre vidéo et vous avez changé d’appareil ? Écrivez-nous : <a href="mailto:contact@vespraevent.com">contact@vespraevent.com</a></p>`, 403);
 
 /* ── mot de passe de la galerie d'un événement ── */
 const galCle = (label) => createHash('sha256').update('gal:' + label).digest('hex').slice(0, 32);
@@ -228,13 +258,13 @@ async function traiter(request) {
     let d = {}; try { d = await request.json(); } catch {}
     const n = (x, a, b) => Math.min(b, Math.max(a, Math.round(Number(x) || 0)));
     const mot = (x) => String(x || '').replace(/[^a-z]/g, '').slice(0, 12);
-    await noter('tablette', { batt: d.batt == null ? null : n(d.batt, 0, 100), charge: !!d.charge, att: n(d.att, 0, 100000), tot: n(d.tot, 0, 100000), usage: n(d.usage, 0, 1e13), quota: n(d.quota, 0, 1e13), cam: mot(d.cam), mic: mot(d.mic), ver: n(d.ver, 0, 9999), enreg: !!d.enreg, reco: n(d.reco, 0, 100000), mut: n(d.mut, 0, 100000) });
+    await noter('tablette', { batt: d.batt == null ? null : n(d.batt, 0, 100), charge: !!d.charge, att: n(d.att, 0, 100000), tot: n(d.tot, 0, 100000), usage: n(d.usage, 0, 1e13), quota: n(d.quota, 0, 1e13), cam: mot(d.cam), mic: mot(d.mic), ver: n(d.ver, 0, 9999), enreg: !!d.enreg, reco: n(d.reco, 0, 100000), mut: n(d.mut, 0, 100000), pinUsine: d.pinUsine === true });
     return rep({ ok: true });
   }
 
   /* ── ouverture de sa vidéo par QR code (écran de remerciement de la tablette) ──
      La vidéo peut ne pas être encore arrivée : la page patiente et se rafraîchit seule. Sans la bonne clé : rien. */
-  if (request.method === 'GET' && /\/api\/videobooth\/mv\/[A-Za-z0-9_-]+$/.test(url.pathname)) {
+  if ((request.method === 'GET' || request.method === 'POST') && /\/api\/videobooth\/mv\/[A-Za-z0-9_-]+$/.test(url.pathname)) {
     const id = url.pathname.split('/').pop(), k = String(url.searchParams.get('k') || '').replace(/[^A-Za-z0-9]/g, '');
     if (!cle || !idOk(id) || k.length < 12) return new Response('Lien invalide', { status: 404 });
     const st = store();
@@ -249,9 +279,16 @@ async function traiter(request) {
     if (perimee(m) || Date.now() > Date.parse(m.renvoye || m.cree) + LIEN_MAIL_JOURS * 86400000) {
       return new Response(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Lien expiré</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#fff;font-family:Inter,Arial,sans-serif;color:#231F1C;padding:20px;text-align:center}main{max-width:420px}h1{font-size:22px}p{color:#6F655C;line-height:1.5}</style></head><body><main><h1>Ce lien n’est plus valable</h1><p>Les liens vers les vidéos restent actifs ${LIEN_MAIL_JOURS} jours. Si vous aviez demandé l’envoi par e-mail, votre vidéo est jointe à ce message.</p></main></body></html>`, { status: 410, headers: entete });
     }
+    const vers = `/api/videobooth/v/${id}?t=${jetonQr(id)}`;
+    /* appareil déjà reconnu : directement la vidéo */
+    if (appareilConnu(request, m, 'qr')) return new Response(null, { status: 302, headers: { Location: vers, 'Cache-Control': 'private, no-store' } });
+    /* simple visite du lien (ou robot d'aperçu) : on montre le bouton, sans rien lier */
+    if (request.method !== 'POST') return (m.appQr || []).length >= APPAREILS.qr.max ? pageRefus('qr') : pageOuvrir(m);
+    const ck = await lierAppareil(st, m, 'qr');
+    if (!ck) return pageRefus('qr');
     /* l'invité a ouvert sa vidéo par QR code : on le note (première fois seulement). Le mail part quand même ; s'il n'est pas parti, ce n'est plus un souci. */
     if (!m.scanne) { m.scanne = new Date().toISOString(); await st.setJSON('meta/' + id, m).catch(() => {}); }
-    return new Response(null, { status: 302, headers: { Location: `/api/videobooth/v/${id}?t=${jetonMail(id)}`, 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
+    return new Response(null, { status: 303, headers: { Location: vers, 'Set-Cookie': ck, 'Cache-Control': 'private, no-store' } });
   }
 
   /* ── relance douce des e-mails non partis : appelée par la tablette quand elle se rallume, jamais en boucle ──
@@ -296,16 +333,26 @@ async function traiter(request) {
     if (!cle || !label || url.searchParams.get('t') !== jetonEvt(label)) return new Response('Lien invalide', { status: 403 });
     const st = store();
     const gal = await galLire(st, label);
-    if (gal && gal.h) {
+    /* une galerie sans mot de passe ne s'ouvre pas (le mot de passe est créé au premier partage depuis le back-office) */
+    if (!gal || !gal.h) return pageSimple('Galerie pas encore prête', '<p>Cette galerie n’a pas encore de mot de passe. Demandez à Vespra Event de vous transmettre son lien et son mot de passe.</p>', 403);
+    {
       const nomCookie = 'vbg_' + galCle(label).slice(0, 12);
       const ckOk = (request.headers.get('cookie') || '').split(/;\s*/).some((c) => c === nomCookie + '=' + cookieVal(label, gal.h));
       let erreur = '';
       if (!ckOk) {
-        if (request.method === 'POST') {
+        /* au plus 8 essais de mot de passe par quart d'heure pour une galerie */
+        const cleEssais = 'etat/galerie-essais/' + galCle(label);
+        const essais = await st.get(cleEssais, { type: 'json' }).catch(() => null);
+        const bloque = essais && essais.n >= 8 && Date.now() - Date.parse(essais.depuis) < 15 * 60000;
+        if (request.method === 'POST' && bloque) { await new Promise((r) => setTimeout(r, 900)); erreur = 'Trop d’essais : réessayez dans un quart d’heure.'; }
+        else if (request.method === 'POST') {
           let mdp = ''; try { mdp = String((await request.formData()).get('mdp') || ''); } catch {}
           if (egal(mdpHash(label, mdp.trim()), gal.h)) {
+            await st.delete(cleEssais).catch(() => {});
             return new Response(null, { status: 303, headers: { Location: url.pathname + url.search, 'Set-Cookie': `${nomCookie}=${cookieVal(label, gal.h)}; Path=/api/videobooth; Max-Age=43200; HttpOnly; Secure; SameSite=Lax`, 'Cache-Control': 'no-store' } });
           }
+          const neuf = !essais || Date.now() - Date.parse(essais.depuis) >= 15 * 60000;
+          await st.setJSON(cleEssais, { n: neuf ? 1 : (essais.n || 0) + 1, depuis: neuf ? new Date().toISOString() : essais.depuis }).catch(() => {});
           await new Promise((r) => setTimeout(r, 900));
           erreur = 'Mot de passe incorrect.';
         }
@@ -344,18 +391,35 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
 
   /* ── téléchargement par lien ── */
   const mv = /\/api\/videobooth\/v\/([A-Za-z0-9_-]+)$/.exec(url.pathname);
-  if (request.method === 'GET' && mv) {
+  if ((request.method === 'GET' || request.method === 'POST') && mv) {
     const id = mv[1];
-    const tj = url.searchParams.get('t');
-    const parMail = tj === jetonMail(id);
-    if (!cle || (tj !== jeton(id) && !parMail)) return new Response('Lien invalide', { status: 403 });
+    const tj = String(url.searchParams.get('t') || '');
+    if (!cle || !idOk(id) || !tj) return new Response('Lien invalide', { status: 403 });
+    const type = egal(tj, jeton(id)) ? 'galerie' : (egal(tj, jetonMail(id)) ? 'mail' : (egal(tj, jetonQr(id)) ? 'qr' : ''));
+    if (!type) return new Response('Lien invalide', { status: 403 });
+    const parMail = type === 'mail' || type === 'qr';
     const st = store();
     const m = await st.get('meta/' + id, { type: 'json' }).catch(() => null);
+    if (!m) return new Response('Cette vidéo n’est plus disponible.', { status: 410 });
+    /* galerie des organisateurs : uniquement dans un navigateur connecté à la galerie (mot de passe saisi) */
+    if (type === 'galerie') {
+      const label = m.event || SANS_NOM, gal = await galLire(st, label);
+      if (!gal || !gal.h || lireCookie(request, 'vbg_' + galCle(label).slice(0, 12)) !== cookieVal(label, gal.h)) return pageSimple('Accès réservé', '<p>Cette vidéo fait partie d’une galerie protégée : ouvrez la galerie avec son lien et son mot de passe.</p>', 403);
+    }
     /* le lien de l'e-mail ne vaut qu'une semaine (à partir de l'envoi, ou du dernier renvoi) ; la galerie des organisateurs, elle, n'expire pas */
     if (parMail && m && Date.now() > Date.parse(m.renvoye || m.cree) + LIEN_MAIL_JOURS * 86400000) {
       return new Response(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Lien expiré</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0f2237;font-family:Inter,Arial,sans-serif;color:#fff;padding:20px;text-align:center}main{max-width:420px}h1{font-size:22px}p{color:#b9c6d8;line-height:1.5}</style></head><body><main><small style="letter-spacing:.3em;font-size:11px;color:#9fb0c6">VESPRA EVENT</small><h1>Ce lien n’est plus valable</h1><p>Les liens de téléchargement restent actifs une semaine. Votre vidéo est <strong>jointe à l’e-mail</strong> que vous avez reçu : retrouvez-la dans votre boîte mail.</p></main></body></html>`, { status: 410, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
     }
-    if (!m || perimee(m)) return new Response('Cette vidéo n’est plus disponible.', { status: 410 });
+    if (perimee(m)) return new Response('Cette vidéo n’est plus disponible.', { status: 410 });
+    /* e-mail : ouverture par bouton sur un nouvel appareil (au plus 2) ; QR code : seul un téléphone déjà lié par le QR code */
+    if (type === 'qr' && !appareilConnu(request, m, 'qr')) return pageRefus('qr');
+    if (type === 'mail' && !appareilConnu(request, m, 'mail')) {
+      if (request.method !== 'POST') return (m.appMail || []).length >= APPAREILS.mail.max ? pageRefus('mail') : pageOuvrir(m);
+      const ck = await lierAppareil(st, m, 'mail');
+      if (!ck) return pageRefus('mail');
+      return new Response(null, { status: 303, headers: { Location: url.pathname + url.search, 'Set-Cookie': ck, 'Cache-Control': 'private, no-store' } });
+    }
+    if (request.method !== 'GET') return new Response('Méthode non autorisée', { status: 405 });
     const buf = await st.get('video/' + id, { type: 'arrayBuffer' }).catch(() => null);
     if (!buf) return new Response('Vidéo introuvable', { status: 404 });
     const lecture = url.searchParams.get('lecture') === '1', dl = url.searchParams.get('dl') === '1';
@@ -367,7 +431,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
 <small>VESPRA EVENT</small><h1>${esc(m.prenom)}, voici votre message vidéo</h1><p>${esc(m.event || '')}</p>
 <video controls playsinline preload="metadata" src="/api/videobooth/v/${esc(id)}${q}&amp;lecture=1"></video>
 <a href="/api/videobooth/v/${esc(id)}${q}&amp;dl=1" download>Télécharger ma vidéo</a>
-<div class="n">Ce lien est valable une semaine : pensez à télécharger votre vidéo pour la garder.<br>Vespra Event — spécialiste de la location événementielle dans le Grand Ouest.</div></main></body></html>`;
+<div class="n">${type === 'galerie' ? '' : 'Cette vidéo ne s’ouvre que sur vos appareils, pendant une semaine : pensez à la télécharger pour la garder.<br>'}<br>Vespra Event — spécialiste de la location événementielle dans le Grand Ouest.</div></main></body></html>`;
       return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
     }
     /* lecture par morceaux (Range) : indispensable pour que la vidéo se lance sur téléphone */

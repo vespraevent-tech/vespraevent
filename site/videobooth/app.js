@@ -355,7 +355,7 @@ $('b-stop').onclick = arreterRec;
     basculer($('l-qr'), choix.qr); basculer($('l-mail'), choix.mail);
     $('l-oui').classList.toggle('on', choix.autre); $('l-non').classList.toggle('on', !choix.autre);
     $('l-oui').setAttribute('aria-checked', choix.autre ? 'true' : 'false'); $('l-non').setAttribute('aria-checked', choix.autre ? 'false' : 'true');
-    $('l-err').textContent = '';
+    $('l-err').textContent = ''; $('l-conf').hidden = true; $('l-fin').hidden = false; confirmeAdresse = false;
   }
   function ouvrirLivraison() {
     if (!blobFinal || !invite) return;
@@ -391,9 +391,16 @@ $('b-stop').onclick = arreterRec;
     if (choix.autre && !ok(e2)) return err('L’adresse e-mail de cette personne ne semble pas valide.');
     /* l'adresse de l'invité reste l'adresse principale ; s'il n'a donné que celle d'une autre personne, c'est elle qui devient principale */
     if (email) { v.email = email; v.pour = 'moi'; if (e2) { v.plusEmail = e2; v.plusDest = d2; } } else if (e2) { v.email = e2; v.pour = 'autre'; v.dest = d2; }
+    /* une adresse mal tapée enverrait la vidéo à un inconnu : on la fait relire avant d'envoyer */
+    var adresses = []; if (email) adresses.push(email); if (e2) adresses.push(e2);
+    if (adresses.length && !confirmeAdresse) { $('l-conf-a').textContent = adresses.join('\n'); $('l-conf').hidden = false; $('l-fin').hidden = true; $('l-conf-ok').focus(); return; }
+    confirmeAdresse = false; $('l-conf').hidden = true; $('l-fin').hidden = false;
     v.retenue = false; videoEnCours = null; $('l-fin').disabled = true;
     ajouter(v).then(function () { $('l-fin').disabled = false; synchro(); afficherMerci(v); }).catch(function () { $('l-fin').disabled = false; videoEnCours = v; err('Enregistrement impossible : prévenez l’équipe.'); });
   };
+  var confirmeAdresse = false;
+  $('l-conf-ok').onclick = function () { confirmeAdresse = true; $('l-fin').click(); };
+  $('l-conf-non').onclick = function () { confirmeAdresse = false; $('l-conf').hidden = true; $('l-fin').hidden = false; var c = choix.mail ? $('l-email') : $('l-email2'); setTimeout(function () { c.focus(); }, 60); };
   function afficherMerci(v) {
     $('m-titre').textContent = T('merciT'); $('m-txt').textContent = T('merciD');
     /* adresses partiellement masquées : l'écran peut être lu par la personne suivante */
@@ -449,7 +456,7 @@ $('b-stop').onclick = arreterRec;
   /* ── état de la tablette, envoyé toutes les 2 minutes au back-office (batterie, vidéos en attente, caméra, micro, place) ── */
   function battement() {
     if (!(cfg.jeton || cfg.cle)) return;
-    var etat = { cam: camEtat, mic: micEtat, ver: 39, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
+    var etat = { cam: camEtat, mic: micEtat, ver: 40, pinUsine: cfg.pin === PIN_USINE, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
     var fin = function () {
       toutes().then(function (l) { etat.att = l.filter(function (v) { return !v.envoye; }).length; etat.tot = l.length; }).catch(function () {}).then(function () {
         return (navigator.storage && navigator.storage.estimate) ? navigator.storage.estimate().then(function (e) { etat.usage = e.usage || 0; etat.quota = e.quota || 0; }).catch(function () {}) : null;
@@ -485,11 +492,30 @@ $('b-stop').onclick = arreterRec;
     modePin = 'verifier'; $('pin-t').textContent = 'Code d’accès'; $('pin-in').value = ''; $('pin-err').textContent = ''; montrer('s-pin'); setTimeout(function () { $('pin-in').focus(); }, 80);
   }
   $('pin-x').onclick = accueil;
+  /* code des réglages : il protège l'export de toutes les vidéos. Après 5 erreurs, la tablette se bloque 1 minute, puis 2, 4, 8… (jusqu'à 30 min),
+     même si on recharge la page. Le code se change dans les réglages ; le back-office signale une tablette qui garde le code d'usine. */
+  var PIN_USINE = '0104', pinNouveau = '';
+  function lirePinEssais() { try { return JSON.parse(localStorage.getItem('vb-pin-essais') || '{}') || {}; } catch (e) { return {}; } }
+  function ecrirePinEssais(o) { try { localStorage.setItem('vb-pin-essais', JSON.stringify(o)); } catch (e) {} }
   $('pin-ok').onclick = function () {
-    var v = $('pin-in').value.trim();
-    if (modePin === 'creer') { if (v.length < 4) return ($('pin-err').textContent = '4 chiffres au minimum.'); cfg.pin = v; ecrireCfg(cfg); return ouvrirAdmin(); }
-    if (v === cfg.pin) ouvrirAdmin(); else $('pin-err').textContent = 'Code incorrect.';
+    var v = $('pin-in').value.trim(), e = lirePinEssais();
+    if (modePin === 'creer') {
+      if (!/^\d{4,12}$/.test(v)) return ($('pin-err').textContent = 'De 4 à 12 chiffres.');
+      if (v === PIN_USINE) return ($('pin-err').textContent = 'Choisissez un autre code que celui d’usine.');
+      pinNouveau = v; modePin = 'confirmer'; $('pin-t').textContent = 'Confirmez le nouveau code'; $('pin-in').value = ''; $('pin-err').textContent = ''; return;
+    }
+    if (modePin === 'confirmer') {
+      if (v !== pinNouveau) { modePin = 'creer'; $('pin-t').textContent = 'Nouveau code'; $('pin-in').value = ''; return ($('pin-err').textContent = 'Les deux codes sont différents : recommencez.'); }
+      cfg.pin = v; ecrireCfg(cfg); pinNouveau = ''; battement(); return ouvrirAdmin();
+    }
+    if (e.jusqua && Date.now() < e.jusqua) return ($('pin-err').textContent = 'Trop d’erreurs : réessayez dans ' + Math.ceil((e.jusqua - Date.now()) / 60000) + ' min.');
+    if (v === cfg.pin) { ecrirePinEssais({}); return ouvrirAdmin(); }
+    e.n = (e.n || 0) + 1;
+    if (e.n >= 5) e.jusqua = Date.now() + Math.min(30, Math.pow(2, e.n - 5)) * 60000;
+    ecrirePinEssais(e); $('pin-in').value = '';
+    $('pin-err').textContent = e.jusqua && Date.now() < e.jusqua ? 'Code incorrect. Trop d’erreurs : tablette bloquée ' + Math.ceil((e.jusqua - Date.now()) / 60000) + ' min.' : 'Code incorrect.';
   };
+  $('a-pin').onclick = function () { modePin = 'creer'; pinNouveau = ''; $('pin-t').textContent = 'Nouveau code'; $('pin-in').value = ''; $('pin-err').textContent = ''; montrer('s-pin'); setTimeout(function () { $('pin-in').focus(); }, 80); };
   $('pin-in').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('pin-ok').click(); });
   /* ── décor de Noël : sapins et guirlandes fixes (rien ne bouge) ── */
   (function () {
@@ -583,6 +609,7 @@ $('b-stop').onclick = arreterRec;
   };
   function ouvrirAdmin() {
     $('a-serveur').value = cfg.serveur;
+    var usine = cfg.pin === PIN_USINE; $('a-pin-m').textContent = usine ? '⚠ La tablette utilise encore le code d’usine : changez-le avant de la laisser sans surveillance.' : 'Code personnalisé. Gardez-le pour vous.'; $('a-pin-m').classList.toggle('alerte', usine);
     $('adm-edit').hidden = true; $('adm-liste').hidden = false; rendreCartes(); majEtat(); majStock(); montrer('s-admin');
   }
   function ouvrirEdition(id) {
