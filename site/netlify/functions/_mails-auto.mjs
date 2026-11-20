@@ -114,7 +114,7 @@ export function htmlVideo({ prenom, expediteur, destinataire, pour, evenement, l
 <p style="margin:0 0 14px;font-size:13.5px">${pj ? 'La vidéo n’est pas jointe ou ne s’ouvre pas ?' : 'La vidéo était trop lourde pour être jointe à cet e-mail : téléchargez-la avec le bouton ci-dessus. Un souci pour l’ouvrir ?'} Écrivez-nous à <a href="mailto:contact@vespraevent.com" style="color:#b8893b">contact@vespraevent.com</a> : nous vous l’enverrons autrement.</p>
 <p style="margin:0 0 4px">Cordialement,</p>
 <p style="margin:0 0 2px;font-weight:600;color:#2b4a6b">L'équipe Vespra Event</p>
-<p style="margin:0 0 6px;color:#6b7280;font-size:13px">Agence événementielle.</p>
+<p style="margin:0 0 6px;color:#6b7280;font-size:13px">Agence événementielle dans le Grand Ouest.</p>
 `;
   return cadre(corps, site);
 }
