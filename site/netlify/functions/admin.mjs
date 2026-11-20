@@ -40,6 +40,7 @@ import { createHmac, timingSafeEqual, createHash, randomUUID, randomBytes, rando
    introuvable au moment de l'exécution et TOUTE modification depuis le
    back-office échouerait. */
 import { getStore, stockageActif, stats as stockStats } from './_stockage.mjs';
+import { evenementLire as pbLire, evenementEcrire as pbEcrire, evenementsLister as pbLister, evenementSupprimer as pbSupprimer, imageAjouter as pbImageAjouter, imageLire as pbImageLire, FORMATS as PB_FORMATS } from './_photobooth.mjs';
 import { lireMetas as vbLireMetas, videoStore, envoyerMail as vbEnvoyerMail, jetonEvt as vbJetonEvt, galLire as vbGalLire, galEcrire as vbGalEcrire, genMdp as vbGenMdp, accesLire as vbAccesLire, accesEcrire as vbAccesEcrire, sessionsLire as vbSessionsLire, sessionsEcrire as vbSessionsEcrire } from './videobooth.mjs';
 import * as secu from './_sauvegarde.mjs';
 /* Fabrication du PDF de facture : écrite à la main, sans dépendance,
@@ -2372,6 +2373,36 @@ const gestionnaire = async (request) => {
     let g = await vbGalLire(st, e);
     if (!g || !g.mdp) g = await vbGalEcrire(st, e, vbGenMdp());
     return json({ url: `${site}/api/videobooth/evenement?e=${encodeURIComponent(e)}&t=${vbJetonEvt(e)}`, mdp: g ? g.mdp : '' });
+  }
+  /* ── Photobooth : événements, mises en page, images ── */
+  if (path === '/photobooth' && request.method === 'GET') {
+    const l = await pbLister();
+    return json({ formats: PB_FORMATS, evenements: l.map((e) => ({ id: e.id, nom: e.nom, date: e.date, fin: e.fin, actif: e.actif, misesEnPage: (e.misesEnPage || []).length, photos: 0, imprimees: 0, scans: 0 })) });
+  }
+  if (path === '/photobooth/evt' && request.method === 'GET') {
+    const e = await pbLire(url.searchParams.get('id'));
+    return e ? json({ evenement: e, formats: PB_FORMATS }) : json({ error: 'Événement introuvable' }, 404);
+  }
+  if (path === '/photobooth/evt' && request.method === 'POST') {
+    let body = {}; try { body = await request.json(); } catch {}
+    if (body.id && !(await pbLire(body.id))) return json({ error: 'Événement introuvable' }, 404);
+    return json({ ok: true, evenement: await pbEcrire(body) });
+  }
+  if (path === '/photobooth/evt' && request.method === 'DELETE') {
+    return json({ ok: await pbSupprimer(url.searchParams.get('id')) });
+  }
+  if (path === '/photobooth/image' && request.method === 'POST') {
+    const evt = url.searchParams.get('evt') || '';
+    if (!(await pbLire(evt))) return json({ error: 'Événement introuvable' }, 404);
+    try {
+      const r = await pbImageAjouter(evt, String(request.headers.get('content-type') || '').split(';')[0].trim(), await request.arrayBuffer(), url.searchParams.get('nom') || '');
+      return json({ ok: true, ...r });
+    } catch (e) { return json({ error: e.message }, 400); }
+  }
+  if (path === '/photobooth/image' && request.method === 'GET') {
+    const r = await pbImageLire(url.searchParams.get('evt'), url.searchParams.get('id'));
+    if (!r) return json({ error: 'Image introuvable' }, 404);
+    return new Response(r.octets, { headers: { 'Content-Type': r.info.mime, 'Cache-Control': 'private, max-age=86400' } });
   }
   if (path === '/videobooth/config' && request.method === 'GET') {
     const st = videoStore(); const a = await vbAccesLire(st);

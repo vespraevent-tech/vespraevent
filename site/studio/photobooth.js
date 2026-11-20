@@ -1,0 +1,381 @@
+/* ════════════════════════════════════════════════════
+   PHOTOBOOTH — back-office
+   Liste des événements → un événement : tableau de bord, expérience (mises en page + éditeur de cadre),
+   paramètres de capture, écran d'accueil, partage, impression, galerie en ligne.
+   ════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  var PB = { liste: [], formats: {}, evt: null, section: 'tableau', edit: null, sel: -1, nouveau: false, sousImp: 'general', modeles: false };
+  var COUL = { 1: '#E5484D', 2: '#8DC63F', 3: '#4FA7A7', 4: '#F2A23A' };
+  var POLICES = { elegante: ["'Playfair VB',Georgia,serif", 700, 'Élégante'], manuscrite: ["'GreatVibes VB',cursive", 400, 'Manuscrite'], moderne: ["'Montserrat VB',Arial,sans-serif", 700, 'Moderne'], festive: ["'Mountains VB',cursive", 700, 'Festive'] };
+  /* formats de base proposés pour une nouvelle mise en page (cases en pixels à 300 dpi) */
+  var MODELES = [
+    { format: '2x6', nom: 'Bandelette · 2 poses', cases: [[30, 30, 540, 360], [30, 410, 540, 360]] },
+    { format: '2x6', nom: 'Bandelette · 3 poses', cases: [[30, 30, 540, 360], [30, 410, 540, 360], [30, 790, 540, 360]] },
+    { format: '2x6', nom: 'Bandelette · 4 poses', cases: [[30, 30, 540, 360], [30, 410, 540, 360], [30, 790, 540, 360], [30, 1170, 540, 360]] },
+    { format: '4x6p', nom: '10×15 portrait · 1 pose', cases: [[60, 60, 1080, 1440]] },
+    { format: '4x6p', nom: '10×15 portrait · 3 poses', cases: [[60, 60, 1080, 480], [60, 570, 1080, 480], [60, 1080, 1080, 480]] },
+    { format: '4x6l', nom: '10×15 paysage · 1 pose', cases: [[60, 60, 1680, 960]] },
+    { format: '4x6l', nom: '10×15 paysage · 3 poses en grille', cases: [[45, 45, 840, 540], [915, 45, 840, 540], [45, 615, 840, 540]] },
+    { format: '4x6l', nom: '10×15 paysage · 3 poses côte à côte', cases: [[45, 150, 550, 820], [625, 150, 550, 820], [1205, 150, 550, 820]] },
+    { format: 'carre', nom: 'Carré · 1 pose', cases: [[60, 60, 1680, 1680]] },
+  ];
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var $ = function (id) { return document.getElementById(id); };
+  var urlImage = function (id) { return id && PB.evt ? '/api/admin/photobooth/image?evt=' + PB.evt.id + '&id=' + id : ''; };
+  var aujourdhui = function () { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date()); };
+  var termine = function (e) { return e.actif === false || ((e.fin || e.date) && (e.fin || e.date) < aujourdhui()); };
+  var dateFr = function (d) { if (!d) return ''; var p = d.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }); };
+  var toast = function (m, err) { if (typeof showToast === 'function') showToast(m, err); };
+
+  function css() {
+    if ($('pb-css')) return;
+    var st = document.createElement('style'); st.id = 'pb-css';
+    st.textContent = '#pbZone{font-size:14px;color:#1f2733}.pb-tete{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 14px}.pb-tete h2{margin:0;font:700 19px Poppins,Inter,sans-serif;color:#14304f}'
+      + '.pb-grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}.pb-carte{background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:16px 18px;cursor:pointer;text-align:left;font:inherit}.pb-carte:hover{border-color:#c9bfa9}.pb-carte b{display:block;font:700 15.5px Poppins,Inter,sans-serif;color:#14304f}.pb-carte span{display:block;font-size:12.5px;color:#6b7280;margin-top:3px}'
+      + '.pb-titre-g{font:700 12px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8a8f98;margin:20px 0 10px}'
+      + '.pb-evt{display:grid;grid-template-columns:230px 1fr;gap:18px;align-items:start}@media(max-width:860px){.pb-evt{grid-template-columns:1fr}}'
+      + '.pb-nav{background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:8px;position:sticky;top:10px}.pb-nav button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:9px 12px;border-radius:8px;font:500 14px Inter,sans-serif;color:#1f2733;cursor:pointer}.pb-nav button.on{background:#eef2f7;color:#14304f;font-weight:700;box-shadow:inset 3px 0 0 #B8893B}.pb-nav .g{font:700 11px Inter,sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#9a8f7a;padding:12px 12px 4px}'
+      + '@media(max-width:860px){.pb-nav{position:static;display:flex;gap:4px;overflow-x:auto;padding:6px}.pb-nav button{white-space:nowrap;width:auto}.pb-nav .g{display:none}}'
+      + '.pb-bloc{background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:16px 18px;margin-bottom:14px}.pb-bloc h3{margin:0 0 4px;font:700 15px Poppins,Inter,sans-serif;color:#14304f}.pb-bloc .aide{font-size:12.5px;color:#6b7280;margin:0 0 12px}'
+      + '.pb-champs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px 14px}.pb-champs label,.pb-f{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:#6b7280}.pb-champs input,.pb-champs select,.pb-f input,.pb-f select{min-width:0;width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid #d9dde5;border-radius:8px;font:inherit;font-size:13.5px;color:#111;background:#fff}'
+      + '.pb-ligne{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-top:1px solid #f0ece2}.pb-ligne:first-of-type{border-top:0}.pb-ligne b{display:block;font-size:14px;color:#1f2733}.pb-ligne span{display:block;font-size:12.5px;color:#8a8f98;margin-top:2px}'
+      + '.pb-sw{position:relative;width:42px;height:24px;flex:none;display:inline-block}.pb-sw input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:2}.pb-sw i{position:absolute;inset:0;border-radius:999px;background:#cfd4dc;transition:background .2s}.pb-sw i::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}.pb-sw input:checked+i{background:#2f7d4f}.pb-sw input:checked+i::after{transform:translateX(18px)}'
+      + '.pb-compteurs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.pb-compteurs div{background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:16px;text-align:center}.pb-compteurs b{display:block;font:700 28px Poppins,Inter,sans-serif;color:#14304f}.pb-compteurs span{font-size:12.5px;color:#6b7280}'
+      + '.pb-actions{display:flex;gap:8px;flex-wrap:wrap}.pb-actions .btn[disabled]{opacity:.45;cursor:not-allowed}.pb-pied{display:flex;gap:8px;position:sticky;bottom:0;background:linear-gradient(0deg,#f7f5f0 70%,transparent);padding:12px 0 6px}'
+      + '.pb-mp{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}.pb-mp-c{background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}.pb-mp-c canvas{width:100%;height:170px;object-fit:contain;background:#f4f2ec;border-radius:8px}.pb-mp-c b{font-size:13.5px;color:#14304f}.pb-mp-c small{color:#8a8f98;font-size:12px}.pb-mp-c .pb-actions .btn{padding:5px 9px;font-size:12px}'
+      + '.pb-modeles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}.pb-modeles button{background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:10px;cursor:pointer;display:flex;flex-direction:column;gap:6px;align-items:center;font:600 12.5px Inter,sans-serif;color:#1f2733}.pb-modeles button:hover{border-color:#B8893B}.pb-modeles canvas{width:100%;height:120px;object-fit:contain}'
+      + '.pb-ed{display:grid;grid-template-columns:1fr 260px;gap:16px;align-items:start}@media(max-width:980px){.pb-ed{grid-template-columns:1fr}}.pb-scene-z{background:#e9e6df;border-radius:12px;padding:16px;display:flex;justify-content:center;overflow:auto}'
+      + '.pb-scene{position:relative;background:#fff;box-shadow:0 10px 30px -12px rgba(0,0,0,.35);touch-action:none;user-select:none;flex:none}.pb-case{position:absolute;display:flex;align-items:center;justify-content:center;color:#fff;font:800 28px Inter,sans-serif;cursor:move;outline:1px solid rgba(0,0,0,.15)}.pb-case.sel{outline:3px solid #14304f;z-index:3}.pb-case .poignee{position:absolute;right:-7px;bottom:-7px;width:14px;height:14px;background:#fff;border:2px solid #14304f;border-radius:3px;cursor:nwse-resize}'
+      + '.pb-calque{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}.pb-outils{display:flex;flex-direction:column;gap:12px}'
+      + '.pb-accueil{position:relative;overflow:hidden;border-radius:10px;box-shadow:0 10px 30px -12px rgba(0,0,0,.35);background-size:cover;background-position:center;touch-action:none;user-select:none}.pb-acc-el{position:absolute;transform:translate(-50%,-50%);cursor:move}.pb-acc-bt{border-radius:50%;display:flex;align-items:center;justify-content:center}.pb-acc-coin{position:absolute;top:2.5%;width:4.2%;aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35)}'
+      + '.pb-vide{text-align:center;color:#6b7280;padding:28px 10px;font-size:13.5px}.pb-sous{display:flex;gap:4px;border-bottom:1px solid #e6e1d6;margin:0 0 14px}.pb-sous button{border:0;background:transparent;padding:10px 14px;font:600 14px Inter,sans-serif;color:#6b7280;cursor:pointer;border-bottom:3px solid transparent}.pb-sous button.on{color:#14304f;border-bottom-color:#B8893B}';
+    document.head.appendChild(st);
+    if (typeof vbPolicesCss === 'function') vbPolicesCss();
+  }
+  var sw = function (id, on, oc) { return '<span class="pb-sw"><input type="checkbox" id="' + id + '"' + (on ? ' checked' : '') + (oc ? ' onchange="' + oc + '"' : '') + '><i></i></span>'; };
+  var ligne = function (titre, aide, droite) { return '<div class="pb-ligne"><div><b>' + titre + '</b>' + (aide ? '<span>' + aide + '</span>' : '') + '</div>' + droite + '</div>'; };
+  var champ = function (id, l, v, ph, type, extra) { return '<label>' + l + '<input id="' + id + '" type="' + (type || 'text') + '" value="' + esc(v == null ? '' : v) + '" placeholder="' + esc(ph || '') + '"' + (extra || '') + '></label>'; };
+  var val = function (id) { var e = $(id); return e ? e.value : ''; };
+  var coche = function (id) { var e = $(id); return !!(e && e.checked); };
+
+  /* ───────── chargement ───────── */
+  window.pbOuvrir = async function () { css(); PB.evt = null; PB.edit = null; PB.nouveau = false; await chargerListe(); rendre(); };
+  async function chargerListe() {
+    try { var r = await api('/photobooth'); PB.liste = r.evenements || []; PB.formats = r.formats || {}; }
+    catch (e) { PB.liste = []; toast('Photobooth : ' + e.message, true); }
+  }
+  function rendre() { var z = $('pbZone'); if (!z) return; if (!PB.evt) rendreListe(z); else rendreEvt(z); }
+
+  /* ───────── liste des événements ───────── */
+  function rendreListe(z) {
+    var enCours = PB.liste.filter(function (e) { return !termine(e); }), passes = PB.liste.filter(termine);
+    var carte = function (e) { return '<button type="button" class="pb-carte" onclick="pbEvt(\'' + e.id + '\')"><b>' + esc(e.nom) + '</b><span>' + (e.date ? dateFr(e.date) : 'Date à préciser') + '</span><span>' + e.misesEnPage + ' mise' + (e.misesEnPage > 1 ? 's' : '') + ' en page · ' + e.photos + ' photo' + (e.photos > 1 ? 's' : '') + '</span></button>'; };
+    z.innerHTML = '<div class="pb-tete"><h2>Photobooth</h2><button class="btn" onclick="pbNouveau()">+ Nouvel événement</button></div>'
+      + (PB.nouveau ? '<div class="pb-bloc"><h3>Nouvel événement</h3><div class="pb-champs">' + champ('pbn-nom', 'Nom de l’événement', '', 'Mariage de Sylvie & Paul') + champ('pbn-date', 'Date', '', '', 'date') + '</div><div class="pb-actions" style="margin-top:12px"><button class="btn" onclick="pbCreer()">Créer l’événement</button><button class="btn btn-ghost" onclick="pbNouveau(false)">Annuler</button></div></div>' : '')
+      + '<div class="pb-titre-g">En cours et à venir</div>' + (enCours.length ? '<div class="pb-grille">' + enCours.map(carte).join('') + '</div>' : '<div class="pb-vide">Aucun événement en cours. Créez-en un avec « Nouvel événement ».</div>')
+      + '<div class="pb-titre-g">Événements passés (encore sauvegardés)</div>' + (passes.length ? '<div class="pb-grille">' + passes.map(carte).join('') + '</div>' : '<div class="pb-vide">Aucun événement passé.</div>');
+    if (PB.nouveau) setTimeout(function () { var n = $('pbn-nom'); if (n) n.focus(); }, 50);
+  }
+  window.pbNouveau = function (on) { PB.nouveau = on !== false; rendre(); };
+  window.pbCreer = async function () {
+    var nom = val('pbn-nom').trim(), date = val('pbn-date');
+    if (!nom) return toast('Indiquez le nom de l’événement', true);
+    try { var r = await api('/photobooth/evt', { method: 'POST', body: JSON.stringify({ nom: nom, date: date, fin: date }) }); PB.nouveau = false; PB.evt = r.evenement; PB.section = 'experience'; toast('Événement créé'); rendre(); }
+    catch (e) { toast('Échec : ' + e.message, true); }
+  };
+  window.pbEvt = async function (id) {
+    try { var r = await api('/photobooth/evt?id=' + encodeURIComponent(id)); PB.evt = r.evenement; PB.formats = r.formats || PB.formats; PB.section = 'tableau'; PB.edit = null; rendre(); window.scrollTo(0, 0); }
+    catch (e) { toast('Échec : ' + e.message, true); }
+  };
+  window.pbRetour = async function () { PB.evt = null; PB.edit = null; await chargerListe(); rendre(); };
+  async function enregistrer(msg) {
+    try { var r = await api('/photobooth/evt', { method: 'POST', body: JSON.stringify(PB.evt) }); PB.evt = r.evenement; toast(msg || 'Enregistré'); return true; }
+    catch (e) { toast('Échec : ' + e.message, true); return false; }
+  }
+
+  /* ───────── un événement ───────── */
+  var SECTIONS = [['tableau', 'Tableau de bord', ''], ['experience', 'Expérience photobooth', 'Basique'], ['capture', 'Paramètres de capture', ''], ['accueil', 'Écran d’accueil', 'Avancé'], ['partage', 'Paramètres de partage', 'Impression et partage'], ['impression', 'Paramètres d’impression', ''], ['galerie', 'Galerie en ligne', '']];
+  function rendreEvt(z) {
+    var nav = SECTIONS.map(function (s) { return (s[2] ? '<div class="g">' + s[2] + '</div>' : '') + '<button type="button" class="' + (PB.section === s[0] ? 'on' : '') + '" onclick="pbSection(\'' + s[0] + '\')">' + s[1] + '</button>'; }).join('');
+    z.innerHTML = '<div class="pb-tete"><div><button class="btn btn-ghost" style="padding:5px 11px;font-size:12.5px;margin-bottom:6px" onclick="pbRetour()">‹ Retour aux événements</button><h2>' + esc(PB.evt.nom) + '</h2></div></div><div class="pb-evt"><nav class="pb-nav">' + nav + '</nav><div id="pbContenu"></div></div>';
+    var c = $('pbContenu');
+    ({ tableau: secTableau, experience: secExperience, capture: secCapture, accueil: secAccueil, partage: secPartage, impression: secImpression, galerie: secGalerie })[PB.section](c);
+  }
+  window.pbSection = function (s) { PB.section = s; PB.edit = null; PB.modeles = false; rendre(); };
+
+  /* tableau de bord */
+  function secTableau(c) {
+    var e = PB.evt;
+    c.innerHTML = '<div class="pb-compteurs"><div><b>0</b><span>Photos prises</span></div><div><b>0</b><span>Photos imprimées</span></div><div><b>0</b><span>QR codes scannés</span></div></div>'
+      + '<div class="pb-bloc" style="margin-top:14px"><h3>Informations</h3><div class="pb-champs">' + champ('pbi-nom', 'Nom de l’événement', e.nom) + champ('pbi-date', 'Date', e.date, '', 'date') + champ('pbi-fin', 'Dernier jour', e.fin, '', 'date') + champ('pbi-mdp', 'Mot de passe des photobooths (facultatif)', e.mdp, 'Pour ouvrir l’événement sur un photobooth') + '</div>'
+      + ligne('Événement ouvert sur les photobooths', 'Décochez pour le retirer des photobooths sans le supprimer', sw('pbi-actif', e.actif !== false))
+      + '<div class="pb-actions" style="margin-top:8px"><button class="btn" onclick="pbInfosSauver()">Enregistrer</button></div></div>'
+      + '<div class="pb-bloc"><h3>Partager avec un lien</h3>' + ligne('Lien de l’événement', 'Toute personne qui a le lien voit la galerie (réglable dans « Galerie en ligne »)', sw('pbi-lien', e.galerie.lien, 'pbLienBasculer(this.checked)'))
+      + '<div class="pb-champs"><label>Lien<input readonly value="Le lien sera actif dès la mise en service de l’appli des photobooths" style="color:#8a8f98"></label></div></div>'
+      + '<div class="pb-bloc"><div class="pb-actions"><button class="btn btn-ghost" disabled title="Disponible dès que les photos arrivent">Télécharger</button><button class="btn btn-ghost" disabled title="Disponible dès que les photos arrivent">Tout télécharger</button><button class="btn btn-ghost" disabled title="Disponible avec la galerie en ligne">Partager</button><button class="btn btn-ghost" style="color:#b03a2a" onclick="pbSupprimer()">Supprimer l’événement</button></div></div>'
+      + '<div class="pb-bloc"><h3>Photos</h3><div class="pb-vide">Les photos apparaîtront ici en direct, dès que les photobooths seront en service.</div></div>';
+  }
+  window.pbInfosSauver = function () {
+    var e = PB.evt; e.nom = val('pbi-nom').trim() || e.nom; e.date = val('pbi-date'); e.fin = val('pbi-fin'); e.mdp = val('pbi-mdp').trim(); e.actif = coche('pbi-actif');
+    enregistrer('Informations enregistrées').then(rendre);
+  };
+  window.pbLienBasculer = function (on) { PB.evt.galerie.lien = on; enregistrer(on ? 'Lien activé' : 'Lien désactivé'); };
+  window.pbSupprimer = async function () {
+    if (!confirm('Supprimer l’événement « ' + PB.evt.nom + ' », ses mises en page et ses images ?\n\nIl n’y a pas de retour en arrière.')) return;
+    try { await api('/photobooth/evt?id=' + PB.evt.id, { method: 'DELETE' }); toast('Événement supprimé'); pbRetour(); } catch (e) { toast('Échec : ' + e.message, true); }
+  };
+
+  /* ───────── expérience : mises en page ───────── */
+  function dessiner(cv, m, img, petit) {
+    var f = PB.formats[m.format] || { w: m.w, h: m.h };
+    cv.width = f.w; cv.height = f.h; var g = cv.getContext('2d');
+    g.fillStyle = m.fond || '#fff'; g.fillRect(0, 0, f.w, f.h);
+    (m.cases || []).forEach(function (k) {
+      g.save(); g.translate(k.x + k.w / 2, k.y + k.h / 2); g.rotate((k.r || 0) * Math.PI / 180);
+      g.fillStyle = COUL[k.n] || '#999'; g.fillRect(-k.w / 2, -k.h / 2, k.w, k.h);
+      g.fillStyle = '#fff'; g.font = '800 ' + Math.round(Math.min(k.w, k.h) * (petit ? 0.45 : 0.3)) + 'px Inter,Arial'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(k.n), 0, 0);
+      g.restore();
+    });
+    if (img) g.drawImage(img, 0, 0, f.w, f.h);
+  }
+  function chargerImage(id, cb) { if (!id) return cb(null); var i = new Image(); i.onload = function () { cb(i); }; i.onerror = function () { cb(null); }; i.src = urlImage(id); }
+  function secExperience(c) {
+    if (PB.edit) return editeur(c);
+    var l = PB.evt.misesEnPage || [];
+    c.innerHTML = '<div class="pb-sous"><button class="on">Mises en page</button></div><p class="aide" style="color:#6b7280;font-size:13px;margin:0 0 12px">Utilisées pour les prises de vue et l’impression. L’invité choisit sa mise en page sur l’écran (s’il n’y en a qu’une, la prise de vue démarre directement).</p>'
+      + '<div class="pb-actions" style="margin-bottom:14px"><button class="btn" onclick="pbModeles()">+ Nouvelle mise en page</button></div>'
+      + (PB.modeles ? '<div class="pb-bloc"><h3>Choisir un format de base</h3><p class="aide">Posez ensuite votre calque (votre design PNG) par-dessus et ajustez les cases 1, 2, 3, 4 dans ses trous.</p><div class="pb-modeles" id="pbModeles"></div></div>' : '')
+      + (l.length ? '<div class="pb-mp" id="pbMpListe"></div>' : '<div class="pb-bloc"><div class="pb-vide">Aucune mise en page pour l’instant.</div></div>');
+    if (PB.modeles) {
+      var zm = $('pbModeles');
+      MODELES.forEach(function (mo, i) {
+        var b = document.createElement('button'); b.type = 'button'; var cv = document.createElement('canvas');
+        dessiner(cv, { format: mo.format, fond: '#f0eee8', cases: mo.cases.map(function (q, j) { return { n: j + 1, x: q[0], y: q[1], w: q[2], h: q[3], r: 0 }; }) }, null, true);
+        b.appendChild(cv); b.appendChild(document.createTextNode(mo.nom)); b.onclick = function () { pbCreerMp(i); }; zm.appendChild(b);
+      });
+    }
+    var zl = $('pbMpListe'); if (!zl) return;
+    l.forEach(function (m, i) {
+      var d = document.createElement('div'); d.className = 'pb-mp-c'; var cv = document.createElement('canvas'); d.appendChild(cv);
+      d.insertAdjacentHTML('beforeend', '<div><b>' + esc(m.nom) + '</b><br><small>' + esc((PB.formats[m.format] || {}).nom || m.format) + ' · ' + m.cases.length + ' case' + (m.cases.length > 1 ? 's' : '') + (m.cadre ? '' : ' · sans calque') + '</small></div><div class="pb-actions"><button class="btn btn-ghost" onclick="pbModifierMp(' + i + ')">Modifier</button><button class="btn btn-ghost" onclick="pbDupliquerMp(' + i + ')">Dupliquer</button><button class="btn btn-ghost" title="Monter" onclick="pbDeplacerMp(' + i + ',-1)"' + (i ? '' : ' disabled') + '>↑</button><button class="btn btn-ghost" title="Descendre" onclick="pbDeplacerMp(' + i + ',1)"' + (i < l.length - 1 ? '' : ' disabled') + '>↓</button><button class="btn btn-ghost" style="color:#b03a2a" onclick="pbSupprimerMp(' + i + ')">Supprimer</button></div>');
+      zl.appendChild(d); dessiner(cv, m, null, true); chargerImage(m.cadre, function (img) { if (img) dessiner(cv, m, img, true); });
+    });
+  }
+  window.pbModeles = function () { PB.modeles = !PB.modeles; rendre(); };
+  window.pbCreerMp = function (i) {
+    var mo = MODELES[i], f = PB.formats[mo.format];
+    PB.edit = { i: -1, m: { nom: mo.nom, format: mo.format, w: f.w, h: f.h, cadre: '', fond: '#FFFFFF', cases: mo.cases.map(function (q, j) { return { n: j + 1, x: q[0], y: q[1], w: q[2], h: q[3], r: 0 }; }) } };
+    PB.sel = 0; PB.modeles = false; rendre();
+  };
+  window.pbModifierMp = function (i) { PB.edit = { i: i, m: JSON.parse(JSON.stringify(PB.evt.misesEnPage[i])) }; PB.sel = 0; rendre(); };
+  window.pbDupliquerMp = function (i) { var m = JSON.parse(JSON.stringify(PB.evt.misesEnPage[i])); delete m.id; m.nom = m.nom + ' (copie)'; PB.evt.misesEnPage.splice(i + 1, 0, m); enregistrer('Mise en page dupliquée').then(rendre); };
+  window.pbDeplacerMp = function (i, d) { var l = PB.evt.misesEnPage, j = i + d; if (j < 0 || j >= l.length) return; var t = l[i]; l[i] = l[j]; l[j] = t; enregistrer('Ordre enregistré').then(rendre); };
+  window.pbSupprimerMp = function (i) { if (!confirm('Supprimer la mise en page « ' + PB.evt.misesEnPage[i].nom + ' » ?')) return; PB.evt.misesEnPage.splice(i, 1); enregistrer('Mise en page supprimée').then(rendre); };
+
+  /* ── éditeur : calque PNG + cases numérotées à glisser / redimensionner ── */
+  var echelle = 1;
+  function editeur(c) {
+    var m = PB.edit.m, f = PB.formats[m.format];
+    var largeurDispo = Math.min(c.clientWidth || 700, 900) - 300; if (largeurDispo < 280) largeurDispo = Math.min(c.clientWidth || 700, 700) - 40;
+    echelle = Math.min(largeurDispo / f.w, 620 / f.h); if (echelle > 1) echelle = 1;
+    c.innerHTML = '<div class="pb-tete"><div class="pb-f" style="flex:1;min-width:220px"><span>Nom de la mise en page</span><input id="pbe-nom" value="' + esc(m.nom) + '"></div><div class="pb-actions"><button class="btn" onclick="pbSauverMp()">Enregistrer la mise en page</button><button class="btn btn-ghost" onclick="pbAnnulerMp()">Annuler</button></div></div>'
+      + '<div class="pb-ed"><div class="pb-scene-z"><div class="pb-scene" id="pbScene" style="width:' + Math.round(f.w * echelle) + 'px;height:' + Math.round(f.h * echelle) + 'px;background:' + esc(m.fond) + '"></div></div>'
+      + '<div class="pb-outils">'
+      + '<div class="pb-bloc" style="margin:0"><h3>Calque</h3><p class="aide">Votre design PNG au format ' + esc(f.nom) + ' (' + f.w + ' × ' + f.h + ' px), avec les emplacements des photos transparents.</p><div class="pb-actions"><label class="btn btn-ghost" style="cursor:pointer">' + (m.cadre ? 'Remplacer' : 'Choisir le PNG') + '<input type="file" accept="image/png" hidden onchange="pbCalque(this)"></label>' + (m.cadre ? '<button class="btn btn-ghost" onclick="pbCalqueRetirer()">Retirer</button>' : '') + '</div>'
+      + (m.cadre ? '<div class="pb-actions" style="margin-top:8px"><button class="btn" onclick="pbDetecter()">Détecter les trous du calque</button></div><label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#6b7280;margin-top:10px"><input type="range" id="pbe-op" min="15" max="100" value="100" oninput="pbOpacite(this.value)"> Transparence du calque (pour ajuster)</label>' : '') + '</div>'
+      + '<div class="pb-bloc" style="margin:0"><h3>Cases des photos</h3><p class="aide">Faites glisser les cases dans les trous ; le coin en bas à droite les redimensionne. Flèches du clavier : 1 px (Maj : 10 px).</p><div class="pb-actions"><button class="btn btn-ghost" onclick="pbAjouterCase()">+ Ajouter une case</button></div><div id="pbCaseReg" style="margin-top:10px"></div></div>'
+      + '<div class="pb-bloc" style="margin:0"><h3>Fond</h3><div class="pb-champs"><label>Couleur sous le calque<input type="color" id="pbe-fond" value="' + esc(m.fond) + '" oninput="pbFond(this.value)" style="height:38px;padding:2px"></label></div></div>'
+      + '</div></div>';
+    dessinerScene();
+  }
+  function dessinerScene() {
+    var m = PB.edit.m, sc = $('pbScene'); if (!sc) return;
+    sc.innerHTML = '';
+    m.cases.forEach(function (k, i) {
+      var d = document.createElement('div'); d.className = 'pb-case' + (i === PB.sel ? ' sel' : ''); d.dataset.i = i;
+      d.style.cssText += 'left:' + k.x * echelle + 'px;top:' + k.y * echelle + 'px;width:' + k.w * echelle + 'px;height:' + k.h * echelle + 'px;background:' + (COUL[k.n] || '#999') + ';transform:rotate(' + (k.r || 0) + 'deg);font-size:' + Math.max(14, Math.min(k.w, k.h) * echelle * 0.35) + 'px';
+      d.textContent = k.n; var p = document.createElement('i'); p.className = 'poignee'; d.appendChild(p);
+      d.addEventListener('pointerdown', function (ev) { glisser(ev, i, ev.target === p); });
+      sc.appendChild(d);
+    });
+    if (m.cadre) { var im = document.createElement('img'); im.className = 'pb-calque'; im.id = 'pbCalqueImg'; im.alt = ''; im.src = urlImage(m.cadre); var op = $('pbe-op'); if (op) im.style.opacity = op.value / 100; sc.appendChild(im); }
+    reglagesCase();
+  }
+  function glisser(ev, i, redim) {
+    ev.preventDefault(); PB.sel = i; var k = PB.edit.m.cases[i], x0 = ev.clientX, y0 = ev.clientY, d = { x: k.x, y: k.y, w: k.w, h: k.h };
+    var el = ev.currentTarget; el.setPointerCapture && el.setPointerCapture(ev.pointerId);
+    document.querySelectorAll('.pb-case').forEach(function (n) { n.classList.toggle('sel', +n.dataset.i === i); });
+    var bouger = function (e) {
+      var dx = (e.clientX - x0) / echelle, dy = (e.clientY - y0) / echelle;
+      if (redim) { k.w = Math.max(30, Math.round(d.w + dx)); k.h = Math.max(30, Math.round(d.h + dy)); } else { k.x = Math.round(d.x + dx); k.y = Math.round(d.y + dy); }
+      el.style.left = k.x * echelle + 'px'; el.style.top = k.y * echelle + 'px'; el.style.width = k.w * echelle + 'px'; el.style.height = k.h * echelle + 'px';
+    };
+    var fin = function () { el.removeEventListener('pointermove', bouger); el.removeEventListener('pointerup', fin); el.removeEventListener('pointercancel', fin); reglagesCase(); };
+    el.addEventListener('pointermove', bouger); el.addEventListener('pointerup', fin); el.addEventListener('pointercancel', fin);
+    reglagesCase();
+  }
+  function reglagesCase() {
+    var z = $('pbCaseReg'); if (!z) return; var k = PB.edit.m.cases[PB.sel];
+    if (!k) { z.innerHTML = '<div style="font-size:12.5px;color:#8a8f98">Touchez une case pour la régler.</div>'; return; }
+    var n = function (id, l, v) { return '<label>' + l + '<input type="number" id="' + id + '" value="' + v + '" oninput="pbCaseChamp()"></label>'; };
+    z.innerHTML = '<div class="pb-champs" style="grid-template-columns:1fr 1fr">'
+      + '<label>Pose<select id="pbc-n" onchange="pbCaseChamp()">' + [1, 2, 3, 4].map(function (x) { return '<option' + (x === k.n ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select></label>' + n('pbc-r', 'Rotation (°)', k.r || 0)
+      + n('pbc-x', 'Gauche (px)', k.x) + n('pbc-y', 'Haut (px)', k.y) + n('pbc-w', 'Largeur', k.w) + n('pbc-h', 'Hauteur', k.h) + '</div>'
+      + '<div class="pb-actions" style="margin-top:8px"><button class="btn btn-ghost" style="color:#b03a2a" onclick="pbSupprimerCase()">Supprimer cette case</button></div>';
+  }
+  window.pbCaseChamp = function () {
+    var k = PB.edit.m.cases[PB.sel]; if (!k) return;
+    k.n = +val('pbc-n') || 1; k.r = Math.max(-45, Math.min(45, +val('pbc-r') || 0)); k.x = Math.round(+val('pbc-x') || 0); k.y = Math.round(+val('pbc-y') || 0); k.w = Math.max(30, Math.round(+val('pbc-w') || 30)); k.h = Math.max(30, Math.round(+val('pbc-h') || 30));
+    var foc = document.activeElement && document.activeElement.id; dessinerScene(); if (foc && $(foc)) { $(foc).focus(); }
+  };
+  window.pbAjouterCase = function () {
+    var m = PB.edit.m, f = PB.formats[m.format], n = Math.min(4, (m.cases.reduce(function (a, k) { return Math.max(a, k.n); }, 0)) + 1);
+    m.cases.push({ n: n, x: Math.round(f.w * 0.3), y: Math.round(f.h * 0.3), w: Math.round(f.w * 0.4), h: Math.round(f.h * 0.25), r: 0 }); PB.sel = m.cases.length - 1; dessinerScene();
+  };
+  window.pbSupprimerCase = function () { PB.edit.m.cases.splice(PB.sel, 1); PB.sel = -1; dessinerScene(); };
+  window.pbFond = function (v) { PB.edit.m.fond = v; var sc = $('pbScene'); if (sc) sc.style.background = v; };
+  window.pbOpacite = function (v) { var im = $('pbCalqueImg'); if (im) im.style.opacity = v / 100; };
+  document.addEventListener('keydown', function (e) {
+    if (!PB.edit || PB.sel < 0 || !$('pbScene') || /INPUT|SELECT|TEXTAREA/.test((document.activeElement || {}).tagName || '')) return;
+    var k = PB.edit.m.cases[PB.sel], p = e.shiftKey ? 10 : 1, ok = true;
+    if (e.key === 'ArrowLeft') k.x -= p; else if (e.key === 'ArrowRight') k.x += p; else if (e.key === 'ArrowUp') k.y -= p; else if (e.key === 'ArrowDown') k.y += p; else ok = false;
+    if (ok) { e.preventDefault(); dessinerScene(); }
+  });
+  async function envoyerImage(fichier) {
+    var r = await fetch('/api/admin/photobooth/image?evt=' + PB.evt.id + '&nom=' + encodeURIComponent(fichier.name || ''), { method: 'POST', credentials: 'same-origin', headers: { 'content-type': fichier.type || 'application/octet-stream' }, body: fichier });
+    var j = {}; try { j = await r.json(); } catch (e) {}
+    if (!r.ok) throw new Error(j.error || ('Erreur ' + r.status));
+    return j.id;
+  }
+  window.pbCalque = async function (inp) {
+    var f = inp.files && inp.files[0]; if (!f) return; var m = PB.edit.m, fo = PB.formats[m.format];
+    var dims = await new Promise(function (ok) { var i = new Image(); i.onload = function () { ok([i.naturalWidth, i.naturalHeight]); }; i.onerror = function () { ok([0, 0]); }; i.src = URL.createObjectURL(f); });
+    if (dims[0] && Math.abs(dims[0] / dims[1] - fo.w / fo.h) > 0.02) toast('Attention : ce PNG fait ' + dims[0] + ' × ' + dims[1] + ' px, pas les proportions du format ' + fo.nom + ' (' + fo.w + ' × ' + fo.h + ')', true);
+    try { m.cadre = await envoyerImage(f); toast('Calque ajouté'); editeur($('pbContenu')); } catch (e) { toast('Échec : ' + e.message, true); }
+  };
+  window.pbCalqueRetirer = function () { PB.edit.m.cadre = ''; editeur($('pbContenu')); };
+  /* repère les zones transparentes du calque et y place une case par trou (de haut en bas, puis de gauche à droite) */
+  window.pbDetecter = function () {
+    var m = PB.edit.m, f = PB.formats[m.format];
+    chargerImage(m.cadre, function (img) {
+      if (!img) return toast('Calque illisible', true);
+      var r = 6, W = Math.ceil(f.w / r), H = Math.ceil(f.h / r), cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+      var g = cv.getContext('2d'); g.drawImage(img, 0, 0, W, H); var a = g.getImageData(0, 0, W, H).data, vu = new Uint8Array(W * H), trous = [];
+      for (var p = 0; p < W * H; p++) {
+        if (vu[p] || a[p * 4 + 3] > 40) continue;
+        var pile = [p], x0 = W, y0 = H, x1 = 0, y1 = 0, n = 0; vu[p] = 1;
+        while (pile.length) { var q = pile.pop(), x = q % W, y = (q - x) / W; n++; if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y;
+          [q - 1, q + 1, q - W, q + W].forEach(function (v, j) { if (v < 0 || v >= W * H || vu[v] || a[v * 4 + 3] > 40) return; if ((j === 0 && x === 0) || (j === 1 && x === W - 1)) return; vu[v] = 1; pile.push(v); }); }
+        if (n > W * H * 0.01) trous.push({ x: x0 * r, y: y0 * r, w: (x1 - x0 + 1) * r, h: (y1 - y0 + 1) * r });
+      }
+      if (!trous.length) return toast('Aucun trou transparent trouvé dans ce calque', true);
+      trous.sort(function (u, v) { return Math.abs(u.y - v.y) > 40 ? u.y - v.y : u.x - v.x; });
+      /* léger débord sous le calque, pour qu'aucun liseré blanc n'apparaisse au bord du trou */
+      m.cases = trous.slice(0, 8).map(function (t, i) { return { n: Math.min(4, i + 1), x: Math.max(0, t.x - 6), y: Math.max(0, t.y - 6), w: t.w + 12, h: t.h + 12, r: 0 }; });
+      PB.sel = 0; dessinerScene(); toast(trous.length + ' emplacement' + (trous.length > 1 ? 's trouvés' : ' trouvé') + ' : vérifiez les numéros des poses');
+    });
+  };
+  window.pbSauverMp = function () {
+    var m = PB.edit.m; m.nom = val('pbe-nom').trim() || m.nom;
+    if (!m.cases.length) return toast('Ajoutez au moins une case photo', true);
+    if (PB.edit.i >= 0) PB.evt.misesEnPage[PB.edit.i] = m; else PB.evt.misesEnPage.push(m);
+    enregistrer('Mise en page enregistrée').then(function (ok) { if (ok) { PB.edit = null; rendre(); } });
+  };
+  window.pbAnnulerMp = function () { PB.edit = null; rendre(); };
+
+  /* ───────── paramètres de capture ───────── */
+  function secCapture(c) {
+    var k = PB.evt.capture;
+    c.innerHTML = '<div class="pb-bloc"><h3>Compte à rebours</h3><p class="aide">Après le choix de la mise en page : un compte à rebours avant la première photo, puis un plus court entre les poses suivantes.</p><div class="pb-champs">'
+      + champ('pbk-1', 'Avant la 1re photo (secondes)', k.premier, '7', 'number', ' min="1" max="30"') + champ('pbk-n', 'Entre les poses suivantes (secondes)', k.suivants, '3', 'number', ' min="1" max="30"') + '</div></div>'
+      + '<div class="pb-bloc"><h3>Appareil photo</h3><p class="aide" style="margin:0">Les réglages du Canon à distance (ISO, ouverture, vitesse, balance des blancs) arriveront à l’étape 2, une fois l’appli installée sur le mini-PC avec l’appareil branché.</p></div>'
+      + '<div class="pb-pied"><button class="btn" onclick="pbCaptureSauver()">Enregistrer</button></div>';
+  }
+  window.pbCaptureSauver = function () { PB.evt.capture = { premier: +val('pbk-1') || 7, suivants: +val('pbk-n') || 3 }; enregistrer('Compte à rebours enregistré').then(rendre); };
+
+  /* ───────── écran d'accueil (1920 × 1080) ───────── */
+  var eAcc = 1;
+  function secAccueil(c) {
+    var a = PB.evt.accueil, l = Math.min((c.clientWidth || 800), 900); eAcc = l / 1920;
+    var pol = POLICES[a.texte.police] || POLICES.elegante;
+    c.innerHTML = '<div class="pb-bloc"><h3>Écran d’accueil</h3><p class="aide">Aperçu de l’écran du photobooth (1920 × 1080). Faites glisser le bouton, le texte et le logo. Le cadenas (en haut à droite) donne accès aux réglages du photobooth.</p>'
+      + '<div class="pb-accueil" id="pbAcc" style="width:' + Math.round(1920 * eAcc) + 'px;height:' + Math.round(1080 * eAcc) + 'px;background-color:' + esc(a.couleur) + ';' + (a.fond ? 'background-image:url(' + urlImage(a.fond) + ')' : '') + '">'
+      + (a.galerie ? '<div class="pb-acc-coin" style="left:1.5%"><svg viewBox="0 0 24 24" width="55%" height="55%" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 17l-5-5-9 8"/></svg></div>' : '')
+      + '<div class="pb-acc-coin" style="right:1.5%;background:transparent"><svg viewBox="0 0 24 24" width="55%" height="55%" fill="none" stroke="#8a8f98" stroke-width="2" opacity=".8"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>'
+      + (a.texte.contenu ? '<div class="pb-acc-el" data-el="texte" style="left:' + a.texte.x * eAcc + 'px;top:' + a.texte.y * eAcc + 'px;white-space:nowrap;color:' + esc(a.texte.couleur) + ';font-family:' + pol[0] + ';font-weight:' + pol[1] + ';font-size:' + a.texte.taille * eAcc + 'px">' + esc(a.texte.contenu) + '</div>' : '')
+      + (a.logo.image ? '<img class="pb-acc-el" data-el="logo" alt="" draggable="false" src="' + urlImage(a.logo.image) + '" style="left:' + a.logo.x * eAcc + 'px;top:' + a.logo.y * eAcc + 'px;width:' + a.logo.largeur * eAcc + 'px">' : '')
+      + '<div class="pb-acc-el pb-acc-bt" data-el="bouton" style="left:' + a.bouton.x * eAcc + 'px;top:' + a.bouton.y * eAcc + 'px;width:' + a.bouton.taille * eAcc + 'px;height:' + a.bouton.taille * eAcc + 'px;background:' + esc(a.bouton.couleur) + '"><svg viewBox="0 0 24 24" width="52%" height="52%" fill="none" stroke="' + esc(a.bouton.icone) + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="4"/></svg></div>'
+      + '</div></div>'
+      + '<div class="pb-bloc"><h3>Arrière-plan</h3><div class="pb-actions"><label class="btn btn-ghost" style="cursor:pointer">' + (a.fond ? 'Remplacer l’image' : 'Choisir une image (1920 × 1080)') + '<input type="file" accept="image/png,image/jpeg,image/webp" hidden onchange="pbAccImage(this,\'fond\')"></label>' + (a.fond ? '<button class="btn btn-ghost" onclick="pbAccRetirer(\'fond\')">Retirer</button>' : '') + '</div><div class="pb-champs" style="margin-top:10px"><label>Couleur de fond (sans image)<input type="color" id="pba-couleur" value="' + esc(a.couleur) + '" style="height:38px;padding:2px"></label></div></div>'
+      + '<div class="pb-bloc"><h3>Bouton appareil photo</h3><div class="pb-champs"><label>Couleur du bouton<input type="color" id="pba-bc" value="' + esc(a.bouton.couleur) + '" style="height:38px;padding:2px"></label><label>Couleur de l’icône<input type="color" id="pba-bi" value="' + esc(a.bouton.icone) + '" style="height:38px;padding:2px"></label><label>Taille (' + a.bouton.taille + ' px)<input type="range" id="pba-bt" min="80" max="600" value="' + a.bouton.taille + '"></label></div>'
+      + ligne('Bouton galerie', 'Petit bouton en haut à gauche : les invités voient la galerie de l’événement', sw('pba-gal', a.galerie)) + '</div>'
+      + '<div class="pb-bloc"><h3>Texte</h3><div class="pb-champs">' + champ('pba-tx', 'Texte (facultatif)', a.texte.contenu, 'Joyeux Noël') + '<label>Police<select id="pba-tp">' + Object.keys(POLICES).map(function (k) { return '<option value="' + k + '"' + (k === a.texte.police ? ' selected' : '') + '>' + POLICES[k][2] + '</option>'; }).join('') + '</select></label><label>Couleur<input type="color" id="pba-tc" value="' + esc(a.texte.couleur) + '" style="height:38px;padding:2px"></label><label>Taille (' + a.texte.taille + ' px)<input type="range" id="pba-tt" min="24" max="260" value="' + a.texte.taille + '"></label></div></div>'
+      + '<div class="pb-bloc"><h3>Logo</h3><div class="pb-actions"><label class="btn btn-ghost" style="cursor:pointer">' + (a.logo.image ? 'Remplacer le logo' : 'Choisir un logo (PNG)') + '<input type="file" accept="image/png,image/jpeg,image/webp" hidden onchange="pbAccImage(this,\'logo\')"></label>' + (a.logo.image ? '<button class="btn btn-ghost" onclick="pbAccRetirer(\'logo\')">Retirer</button>' : '') + '</div>' + (a.logo.image ? '<div class="pb-champs" style="margin-top:10px"><label>Largeur (' + a.logo.largeur + ' px)<input type="range" id="pba-ll" min="40" max="1920" value="' + a.logo.largeur + '"></label></div>' : '') + '</div>'
+      + '<div class="pb-pied"><button class="btn" onclick="pbAccSauver()">Enregistrer l’écran d’accueil</button></div>';
+    /* modifications en direct dans l'aperçu */
+    ['pba-couleur', 'pba-bc', 'pba-bi', 'pba-bt', 'pba-gal', 'pba-tx', 'pba-tp', 'pba-tc', 'pba-tt', 'pba-ll'].forEach(function (id) { var el = $(id); if (el) el.addEventListener(el.type === 'checkbox' || el.tagName === 'SELECT' ? 'change' : 'input', function () { lireAccueil(); secAccueil(c); }); });
+    document.querySelectorAll('#pbAcc .pb-acc-el').forEach(function (el) {
+      el.addEventListener('pointerdown', function (ev) {
+        ev.preventDefault(); var cle = el.dataset.el, o = cle === 'bouton' ? a.bouton : (cle === 'texte' ? a.texte : a.logo), x0 = ev.clientX, y0 = ev.clientY, d = { x: o.x, y: o.y };
+        el.setPointerCapture && el.setPointerCapture(ev.pointerId);
+        var bouger = function (e) { o.x = Math.max(0, Math.min(1920, Math.round(d.x + (e.clientX - x0) / eAcc))); o.y = Math.max(0, Math.min(1080, Math.round(d.y + (e.clientY - y0) / eAcc))); el.style.left = o.x * eAcc + 'px'; el.style.top = o.y * eAcc + 'px'; };
+        var fin = function () { el.removeEventListener('pointermove', bouger); el.removeEventListener('pointerup', fin); };
+        el.addEventListener('pointermove', bouger); el.addEventListener('pointerup', fin);
+      });
+    });
+  }
+  function lireAccueil() {
+    var a = PB.evt.accueil;
+    a.couleur = val('pba-couleur') || a.couleur; a.bouton.couleur = val('pba-bc') || a.bouton.couleur; a.bouton.icone = val('pba-bi') || a.bouton.icone; a.bouton.taille = +val('pba-bt') || a.bouton.taille; a.galerie = coche('pba-gal');
+    a.texte.contenu = val('pba-tx'); a.texte.police = val('pba-tp') || a.texte.police; a.texte.couleur = val('pba-tc') || a.texte.couleur; a.texte.taille = +val('pba-tt') || a.texte.taille; if ($('pba-ll')) a.logo.largeur = +val('pba-ll') || a.logo.largeur;
+  }
+  window.pbAccImage = async function (inp, cle) {
+    var f = inp.files && inp.files[0]; if (!f) return; lireAccueil();
+    try { var id = await envoyerImage(f); if (cle === 'fond') PB.evt.accueil.fond = id; else PB.evt.accueil.logo.image = id; toast('Image ajoutée'); secAccueil($('pbContenu')); } catch (e) { toast('Échec : ' + e.message, true); }
+  };
+  window.pbAccRetirer = function (cle) { lireAccueil(); if (cle === 'fond') PB.evt.accueil.fond = ''; else PB.evt.accueil.logo.image = ''; secAccueil($('pbContenu')); };
+  window.pbAccSauver = function () { lireAccueil(); enregistrer('Écran d’accueil enregistré').then(rendre); };
+
+  /* ───────── partage ───────── */
+  function secPartage(c) {
+    var p = PB.evt.partage;
+    c.innerHTML = '<div class="pb-bloc"><h3>QR code</h3>' + ligne('Afficher le QR code', 'Tous les amis présents peuvent le scanner (10 téléphones au plus, dans le quart d’heure) ; un lien transféré plus tard ne s’ouvre pas', sw('pbp-qr', p.qr))
+      + ligne('Inclure les photos brutes', 'En plus de la photo encadrée, chaque pose sans cadre', sw('pbp-bruts', p.bruts)) + '</div>'
+      + '<div class="pb-bloc"><h3>Écran de partage</h3><div class="pb-champs">' + champ('pbp-titre', 'Titre', p.titre, 'Scannez pour récupérer vos photos') + champ('pbp-duree', 'Durée d’affichage (secondes)', p.duree, '45', 'number', ' min="10" max="600"')
+      + champ('pbp-rec', 'Bouton « Recommencer »', p.recommencer, 'Recommencer') + champ('pbp-ter', 'Bouton « Terminer »', p.terminer, 'Terminer') + '</div></div>'
+      + '<div class="pb-pied"><button class="btn" onclick="pbPartageSauver()">Enregistrer</button></div>';
+  }
+  window.pbPartageSauver = function () { PB.evt.partage = { qr: coche('pbp-qr'), bruts: coche('pbp-bruts'), titre: val('pbp-titre').trim(), duree: +val('pbp-duree') || 45, recommencer: val('pbp-rec').trim(), terminer: val('pbp-ter').trim() }; enregistrer('Partage enregistré').then(rendre); };
+
+  /* ───────── impression ───────── */
+  function secImpression(c) {
+    var im = PB.evt.impression, gen = PB.sousImp !== 'limites';
+    c.innerHTML = '<div class="pb-sous"><button class="' + (gen ? 'on' : '') + '" onclick="pbSousImp(\'general\')">Général</button><button class="' + (gen ? '' : 'on') + '" onclick="pbSousImp(\'limites\')">Limites d’impression</button></div>'
+      + (gen ? '<div class="pb-bloc">' + ligne('Impression automatique', 'Chaque prise est imprimée sans rien toucher', sw('pbm-auto', im.auto)) + ligne('Afficher le bouton d’impression', 'Sur l’écran de partage, pour imprimer une ou plusieurs copies', sw('pbm-bt', im.bouton))
+        + '<div class="pb-champs" style="margin-top:8px">' + champ('pbm-t1', 'Bouton « Imprimer »', im.txtImprimer, 'Imprimer') + champ('pbm-t2', 'Pendant l’impression', im.txtImpression, 'Impression…') + champ('pbm-t3', 'Question du nombre de copies', im.txtCopies, 'Combien de copies ?') + champ('pbm-cm', 'Copies au maximum par impression', im.copiesMax, '2', 'number', ' min="1" max="10"') + '</div></div>'
+        : '<div class="pb-bloc">' + ligne('Définir une limite pour les impressions autorisées', '', sw('pbm-lim', im.limites.on)) + '<div class="pb-champs">' + champ('pbm-le', 'Limite par événement (impressions)', im.limites.parEvenement, '200', 'number', ' min="1"') + champ('pbm-ls', 'Limite par prise (impressions)', im.limites.parSession, '1', 'number', ' min="1" max="50"') + '</div></div>')
+      + '<div class="pb-pied"><button class="btn" onclick="pbImpSauver()">Enregistrer</button></div>';
+  }
+  window.pbSousImp = function (s) { lireImpression(); PB.sousImp = s; rendre(); };
+  function lireImpression() {
+    var im = PB.evt.impression;
+    if ($('pbm-auto')) { im.auto = coche('pbm-auto'); im.bouton = coche('pbm-bt'); im.txtImprimer = val('pbm-t1').trim(); im.txtImpression = val('pbm-t2').trim(); im.txtCopies = val('pbm-t3').trim(); im.copiesMax = +val('pbm-cm') || 2; }
+    if ($('pbm-lim')) { im.limites = { on: coche('pbm-lim'), parEvenement: +val('pbm-le') || 200, parSession: +val('pbm-ls') || 1 }; }
+  }
+  window.pbImpSauver = function () { lireImpression(); enregistrer('Impression enregistrée').then(rendre); };
+
+  /* ───────── galerie en ligne ───────── */
+  function secGalerie(c) {
+    var g = PB.evt.galerie;
+    c.innerHTML = '<div class="pb-bloc"><h3>Couverture</h3><div style="height:170px;border-radius:10px;background:#eceae4 center/cover no-repeat;' + (g.couverture ? 'background-image:url(' + urlImage(g.couverture) + ')' : '') + ';display:flex;align-items:center;justify-content:center;color:#9a958a;font-size:13px">' + (g.couverture ? '' : 'Aucune image de couverture') + '</div>'
+      + '<div class="pb-actions" style="margin-top:10px"><label class="btn btn-ghost" style="cursor:pointer">' + (g.couverture ? 'Modifier' : 'Choisir une image') + '<input type="file" accept="image/png,image/jpeg,image/webp" hidden onchange="pbCouverture(this)"></label><button class="btn ' + (g.ouverte ? '' : 'btn-ghost') + '" onclick="pbGalOuverte()">' + (g.ouverte ? 'Galerie ouverte' : 'Galerie fermée') + '</button></div></div>'
+      + '<div class="pb-bloc">' + ligne('Partager avec un lien', 'Toute personne disposant du lien de l’événement voit la galerie', sw('pbg-lien', g.lien)) + ligne('Accès des invités', 'Un invité voit aussi les photos des autres invités. Décochez pour un événement public : chacun ne voit que les siennes (QR code)', sw('pbg-inv', g.invites)) + ligne('Tout télécharger', 'Les visiteurs peuvent télécharger tout le contenu de l’événement', sw('pbg-tout', g.toutTelecharger))
+      + '<div class="pb-champs" style="margin-top:8px"><label>Mot de passe de la galerie (facultatif)<input id="pbg-mdp" value="' + esc(g.mdp) + '" placeholder="Sans mot de passe"></label></div><div class="pb-actions" style="margin-top:8px"><button class="btn btn-ghost" onclick="document.getElementById(\'pbg-mdp\').value=(typeof vbMdp===\'function\'?vbMdp():\'\')">Générer un mot de passe</button></div></div>'
+      + '<div class="pb-pied"><button class="btn" onclick="pbGalSauver()">Enregistrer</button></div>';
+  }
+  function lireGalerie() { var g = PB.evt.galerie; if (!$('pbg-lien')) return; g.lien = coche('pbg-lien'); g.invites = coche('pbg-inv'); g.toutTelecharger = coche('pbg-tout'); g.mdp = val('pbg-mdp').trim(); }
+  window.pbGalOuverte = function () { lireGalerie(); PB.evt.galerie.ouverte = !PB.evt.galerie.ouverte; enregistrer(PB.evt.galerie.ouverte ? 'Galerie ouverte' : 'Galerie fermée').then(rendre); };
+  window.pbCouverture = async function (inp) { var f = inp.files && inp.files[0]; if (!f) return; lireGalerie(); try { PB.evt.galerie.couverture = await envoyerImage(f); await enregistrer('Couverture enregistrée'); rendre(); } catch (e) { toast('Échec : ' + e.message, true); } };
+  window.pbGalSauver = function () { lireGalerie(); enregistrer('Galerie enregistrée').then(rendre); };
+})();

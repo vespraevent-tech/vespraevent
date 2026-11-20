@@ -1164,6 +1164,7 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
       </div>
     </div>
     <button class="tab" data-tab="videobooth" onclick="switchTab('videobooth')">Vidéobooth</button>
+    <button class="tab" data-tab="photobooth" onclick="switchTab('photobooth')">Photobooth</button>
     <button class="tab" data-tab="notesfrais" onclick="switchTab('notesfrais')">Frais</button>
     <button class="tab" data-tab="resa-ca" onclick="switchTab('resa-ca')">Chiffre d'affaires</button>
 
@@ -1925,6 +1926,7 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
       </div>
     </div>
 
+    <div class="panel" id="panel-photobooth"><div id="pbZone"></div></div>
     <div class="panel" id="panel-videobooth">
       <div class="toolbar">
         <div>
@@ -2447,7 +2449,7 @@ const NOMS_PAGES = {
   apparence:'Apparence', ambiance:'Ambiance', images:'Images', demandes:'Liste des réservations',
   logistique:'Départs & retours', auto:'Automatisation', 'resa-planning':'Planning',
   'resa-ca':"Chiffre d'affaires", 'resa-documents':'Documents', notesfrais:'Frais',
-  parrainage:'Parrainage', videobooth:'Vidéobooth', espace:'Espace client', settings:'Paramètres'
+  parrainage:'Parrainage', videobooth:'Vidéobooth', photobooth:'Photobooth', espace:'Espace client', settings:'Paramètres'
 };
 
 /* ── actualiser, sans bouton sur chaque page ──────────────────────────
@@ -3147,6 +3149,7 @@ function switchTabBase(name){
   }
   if(name==='espace') espCharger();
   if(name==='videobooth'){ VBEVT=''; vbCharger(); }
+  if(name==='photobooth' && typeof pbOuvrir==='function') pbOuvrir();
   if(name==='demandes' && typeof chargerModifs==='function') chargerModifs();
   if(name==='logistique') loadLogistique();
   if(name==='auto') raCharger();
@@ -10228,6 +10231,7 @@ checkSession();
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/studio/sw.js',{scope:'/studio/'}).catch(function(){})})}</script>
 <script src="nbsp-euro.js"></script>
+<script src="/studio/photobooth.js?v=2"></script>
 
 <script>
 /* ══ Témoin « Sauvegarde en cours » ══
