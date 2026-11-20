@@ -448,7 +448,7 @@ $('b-stop').onclick = arreterRec;
   /* ── état de la tablette, envoyé toutes les 2 minutes au back-office (batterie, vidéos en attente, caméra, micro, place) ── */
   function battement() {
     if (!(cfg.jeton || cfg.cle)) return;
-    var etat = { cam: camEtat, mic: micEtat, ver: 37, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
+    var etat = { cam: camEtat, mic: micEtat, ver: 38, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
     var fin = function () {
       toutes().then(function (l) { etat.att = l.filter(function (v) { return !v.envoye; }).length; etat.tot = l.length; }).catch(function () {}).then(function () {
         return (navigator.storage && navigator.storage.estimate) ? navigator.storage.estimate().then(function (e) { etat.usage = e.usage || 0; etat.quota = e.quota || 0; }).catch(function () {}) : null;

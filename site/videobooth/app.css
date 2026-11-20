@@ -230,9 +230,11 @@ html,body,#app{height:100dvh}
 html,body{background:var(--bg1)}
 .ecran.inv{color:var(--txt);background:var(--bg1);gap:20px}
 .inv p{color:var(--soft)}
-.inv h1,.inv h2{text-transform:none;letter-spacing:0;color:var(--txt);font-family:var(--ft);font-style:normal;font-weight:var(--ftw)}
+.inv h1,.inv h2{text-transform:none;letter-spacing:0;color:var(--txt);font-style:normal}
+.inv h1{font-family:var(--ft);font-weight:var(--ftw)}
+.inv h2{font-family:Inter,system-ui,sans-serif;font-weight:700;letter-spacing:-.01em}
 .inv h1{font-size:calc(clamp(48px,8.6vw,108px) * var(--fts));line-height:1.06}
-.inv h2{font-size:calc(clamp(32px,5vw,54px) * var(--fts));line-height:1.12}
+.inv h2{font-size:clamp(30px,4.4vw,48px);line-height:1.15}
 .hero{display:flex;flex-direction:column;align-items:center;gap:0;max-width:960px}
 .filet{display:block;width:68px;height:2px;border-radius:2px;background:var(--acc);margin:18px auto 16px}
 .hero p{font-size:clamp(17px,2.3vw,24px);max-width:720px}
@@ -294,14 +296,14 @@ html,body{background:var(--bg1)}
 .pret{position:absolute;left:50%;top:calc(9vh + 18px);transform:translateX(-50%);z-index:4;width:min(92vw,780px);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;color:#fff;text-shadow:0 2px 24px rgba(0,0,0,.75)}
 .pret small{font:700 clamp(12px,1.6vw,15px) Inter,system-ui,sans-serif;letter-spacing:.24em;text-transform:uppercase;color:#fff;opacity:.92}
 .pret small:empty{display:none}
-.pret b{font-family:var(--ft);font-style:normal;font-weight:var(--ftw);font-size:calc(clamp(36px,6.4vw,68px) * var(--fts));line-height:1.1}
+.pret b{font-family:Inter,system-ui,sans-serif;font-style:normal;font-weight:700;font-size:clamp(32px,5.4vw,60px);line-height:1.12}
 .pret span{font:500 clamp(15px,2vw,20px) Inter,system-ui,sans-serif;opacity:.95}
 .pret span:empty{display:none}
 .pret[hidden]{display:none}
 #s-cam .go{background:var(--acc);color:var(--acc-t);text-transform:none;letter-spacing:.02em;font-weight:700;padding:14px 38px;font-size:clamp(16px,2vw,19px);border-radius:14px}
 .rang.bas .cta{padding:13px 30px;font-size:clamp(15px,1.9vw,18px)}
 .rang.bas .ghost{padding:12px 24px;font-size:clamp(15px,1.9vw,18px)}
-.rv-q{font-family:var(--ft);font-style:normal;font-weight:var(--ftw);font-size:calc(clamp(26px,4vw,40px) * var(--fts));bottom:calc(4vh + 78px)}
+.rv-q{font-family:Inter,system-ui,sans-serif;font-style:normal;font-weight:700;font-size:clamp(24px,3.6vw,36px);bottom:calc(4vh + 78px)}
 /* remerciement */
 .coche-ok{display:grid;place-items:center;width:104px;height:104px;border-radius:50%;background:var(--acc);color:var(--acc-t);font:inherit;line-height:1}
 #s-merci h2{font-size:clamp(44px,7vw,80px)}
@@ -355,9 +357,9 @@ html,body{background:var(--bg1)}
 #s-accueil #b-commencer:not([hidden]){padding:clamp(26px,4.2vh,40px) clamp(80px,14vw,170px);font-size:clamp(26px,3.6vw,40px);border-radius:22px;box-shadow:0 22px 44px -22px var(--ombre)}
 .inv .adm-c h3{color:var(--acc)}
 
-/* écrans de connexion et de réglages : police fixe, quelle que soit celle choisie pour l'événement */
-#s-pin h2,#s-acces h2,#s-sess-mdp h2,#s-sessions h2,#s-admin h2{font-family:var(--ft0);font-weight:700;font-size:clamp(30px,4.4vw,46px)}
-#s-merci h2{font-size:calc(clamp(44px,7vw,80px) * var(--fts))}
+/* seul le gros titre de l'accueil prend la police choisie pour l'événement ; tout le reste (autres titres, réglages, connexion) garde la police standard */
+#s-pin h2,#s-acces h2,#s-sess-mdp h2,#s-sessions h2,#s-admin h2{font-size:clamp(28px,4vw,42px)}
+#s-merci h2{font-size:clamp(40px,6vw,68px)}
 /* petits titres des réglages : bleu foncé lisible (jamais la couleur claire des boutons) */
 .inv .adm-c h3{color:var(--tit,#1F3B5A)}
 /* cartes : ombre marquée, contenu aligné par le haut (icône, titre et texte à la même hauteur d'une carte à l'autre) */
