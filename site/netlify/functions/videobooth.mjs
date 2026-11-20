@@ -160,7 +160,19 @@ const vueSession = (ses) => ({ id: ses.id, nom: ses.nom, date: ses.date, label: 
   type: ses.type || 'autre', modeQ: !!ses.modeQ, modeP: !!ses.modeP, heureP: ses.heureP || '23:00', qs: ses.qs || [], qp: ses.qp || [], secQ: ses.secQ || 0, merciOrga: ses.merciOrga || '', amb: AMBIANCES.includes(ses.amb) ? ses.amb : (ses.amb === 'nuit' ? 'noir' : 'blanc'), fond: ses.fond || '', accent: ses.accent || '', ori: ORIENTATIONS.includes(ses.ori) ? ses.ori : 'auto', police: POLICES.includes(ses.police) ? ses.police : 'elegante', textes: ses.textes || {} });
 export { envoyerMail, jeton, jetonMail, jetonEvt, GARDE_JOURS, gardeJours, visible, galLire, galEcrire, genMdp, accesLire, accesEcrire, sessionsLire, sessionsEcrire, labelSession };
 
+const SECURITE = {
+  'Referrer-Policy': 'no-referrer',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; font-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'; object-src 'none'",
+};
 export default async (request) => {
+  const reponse = await traiter(request);
+  try { for (const [k, v] of Object.entries(SECURITE)) if (!reponse.headers.has(k)) reponse.headers.set(k, v); } catch (e) { /* en-têtes figés : on renvoie tel quel */ }
+  return reponse;
+};
+
+async function traiter(request) {
   if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
   const url = new URL(request.url);
   const cle = process.env.VIDEOBOOTH_CLE;
@@ -229,10 +241,14 @@ export default async (request) => {
     const m = await st.get('meta/' + id, { type: 'json' }).catch(() => null);
     const entete = { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' };
     if (!m) {
-      const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta http-equiv="refresh" content="6"><title>Votre vidéo arrive</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0f2237;font-family:Inter,Arial,sans-serif;color:#fff;text-align:center;padding:24px}main{max-width:380px}small{letter-spacing:.3em;font-size:11px;color:#9fb0c6}h1{font-size:22px;margin:12px 0 8px}p{color:#9fb0c6;font-size:14px;line-height:1.6;margin:0 0 10px}.r{width:34px;height:34px;border:4px solid #2c4766;border-top-color:#f59e0b;border-radius:50%;margin:18px auto;animation:t 1s linear infinite}@keyframes t{to{transform:rotate(360deg)}}</style></head><body><main><small>VESPRA EVENT</small><h1>Votre vidéo arrive</h1><div class="r"></div><p>Elle est en cours d’envoi depuis la tablette. Cette page se met à jour toute seule : quelques secondes à quelques minutes.</p><p>Vous la recevrez aussi par e-mail.</p><p>Toujours rien au bout de 72 heures ? Contactez notre support : <a href="mailto:contact@vespraevent.com" style="color:#f59e0b">contact@vespraevent.com</a></p></main></body></html>`;
+      const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta http-equiv="refresh" content="6"><title>Votre vidéo arrive</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0f2237;font-family:Inter,Arial,sans-serif;color:#fff;text-align:center;padding:24px}main{max-width:380px}small{letter-spacing:.3em;font-size:11px;color:#9fb0c6}h1{font-size:22px;margin:12px 0 8px}p{color:#9fb0c6;font-size:14px;line-height:1.6;margin:0 0 10px}.r{width:34px;height:34px;border:4px solid #2c4766;border-top-color:#f59e0b;border-radius:50%;margin:18px auto;animation:t 1s linear infinite}@keyframes t{to{transform:rotate(360deg)}}</style></head><body><main><small>VESPRA EVENT</small><h1>Votre vidéo arrive</h1><div class="r"></div><p>Elle est en cours d’envoi depuis la tablette. Cette page se met à jour toute seule : quelques secondes à quelques minutes.</p><p>Si vous avez demandé l’envoi par e-mail, vous la recevrez aussi dans votre boîte.</p><p>Toujours rien au bout de 72 heures ? Contactez notre support : <a href="mailto:contact@vespraevent.com" style="color:#f59e0b">contact@vespraevent.com</a></p></main></body></html>`;
       return new Response(html, { status: 202, headers: entete });
     }
-    if (!m.rk || !egal(m.rk, k)) return new Response('Lien invalide', { status: 404 });
+    if (!m.rk || !egal(m.rk, k)) { await new Promise((r) => setTimeout(r, 900)); return new Response('Lien invalide', { status: 404 }); }
+    /* même durée de validité que le lien de l'e-mail (7 jours), et rien si la vidéo a été supprimée */
+    if (perimee(m) || Date.now() > Date.parse(m.renvoye || m.cree) + LIEN_MAIL_JOURS * 86400000) {
+      return new Response(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Lien expiré</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#fff;font-family:Inter,Arial,sans-serif;color:#231F1C;padding:20px;text-align:center}main{max-width:420px}h1{font-size:22px}p{color:#6F655C;line-height:1.5}</style></head><body><main><h1>Ce lien n’est plus valable</h1><p>Les liens vers les vidéos restent actifs ${LIEN_MAIL_JOURS} jours. Si vous aviez demandé l’envoi par e-mail, votre vidéo est jointe à ce message.</p></main></body></html>`, { status: 410, headers: entete });
+    }
     /* l'invité a ouvert sa vidéo par QR code : on le note (première fois seulement). Le mail part quand même ; s'il n'est pas parti, ce n'est plus un souci. */
     if (!m.scanne) { m.scanne = new Date().toISOString(); await st.setJSON('meta/' + id, m).catch(() => {}); }
     return new Response(null, { status: 302, headers: { Location: `/api/videobooth/v/${id}?t=${jetonMail(id)}`, 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
@@ -439,4 +455,4 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
     return rep({ ok: true, termine: true, mail: mailOkTout, mailErreur: mailErr });
   }
   return rep({ ok: false, erreur: 'Route inconnue' }, 404);
-};
+}
