@@ -67,7 +67,9 @@ export function evenementPropre(e, ancien) {
       txtImprimer: txt(im.txtImprimer, 40), txtImpression: txt(im.txtImpression, 40), txtCopies: txt(im.txtCopies, 60),
       limites: { on: oui(lim.on, true), parEvenement: nb(lim.parEvenement, 1, 100000, 200), parSession: nb(lim.parSession, 1, 50, 1) },
     },
-    galerie: { couverture: idOk(ga.couverture, 'im'), ouverte: oui(ga.ouverte, true), lien: oui(ga.lien, false), invites: oui(ga.invites, true), toutTelecharger: oui(ga.toutTelecharger, false), mdp: txt(ga.mdp, 40) },
+    galerie: { couverture: idOk(ga.couverture, 'im'), ouverte: oui(ga.ouverte, true), lien: oui(ga.lien, false), invites: oui(ga.invites, true), toutTelecharger: oui(ga.toutTelecharger, false), mdp: txt(ga.mdp, 40),
+      /* apparence de la page des invités (QR code, galerie) : aux couleurs du thème de l'événement */
+      theme: { titre: txt(ga.theme && ga.theme.titre, 80), fond: hex(ga.theme && ga.theme.fond, '#FFFFFF'), accent: hex(ga.theme && ga.theme.accent, '#B8893B'), image: idOk(ga.theme && ga.theme.image, 'im'), police: ['elegante', 'manuscrite', 'moderne', 'festive'].includes(ga.theme && ga.theme.police) ? ga.theme.police : 'elegante' } },
   };
 }
 

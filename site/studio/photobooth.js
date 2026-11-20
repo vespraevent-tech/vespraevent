@@ -49,7 +49,7 @@
       + '.pb-scene{position:relative;background:#fff;box-shadow:0 10px 30px -12px rgba(0,0,0,.35);touch-action:none;user-select:none;flex:none}.pb-case{position:absolute;display:flex;align-items:center;justify-content:center;color:#fff;font:800 28px Inter,sans-serif;cursor:move;outline:1px solid rgba(0,0,0,.15)}.pb-case.sel{outline:3px solid #14304f;z-index:3}.pb-case .poignee{position:absolute;right:-7px;bottom:-7px;width:14px;height:14px;background:#fff;border:2px solid #14304f;border-radius:3px;cursor:nwse-resize}'
       + '.pb-calque{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}.pb-outils{display:flex;flex-direction:column;gap:12px}'
       + '.pb-accueil{position:relative;overflow:hidden;border-radius:10px;box-shadow:0 10px 30px -12px rgba(0,0,0,.35);background-size:cover;background-position:center;touch-action:none;user-select:none}.pb-acc-el{position:absolute;transform:translate(-50%,-50%);cursor:move}.pb-acc-bt{border-radius:50%;display:flex;align-items:center;justify-content:center}.pb-acc-coin{position:absolute;top:2.5%;width:4.2%;aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35)}'
-      + '.pb-vide{text-align:center;color:#6b7280;padding:28px 10px;font-size:13.5px}.pb-sous{display:flex;gap:4px;border-bottom:1px solid #e6e1d6;margin:0 0 14px}.pb-sous button{border:0;background:transparent;padding:10px 14px;font:600 14px Inter,sans-serif;color:#6b7280;cursor:pointer;border-bottom:3px solid transparent}.pb-sous button.on{color:#14304f;border-bottom-color:#B8893B}';
+      + '.pb-vide{text-align:center;color:#6b7280;padding:28px 10px;font-size:13.5px}.pb-theme{}@media(max-width:700px){.pb-theme{grid-template-columns:1fr!important}}.pb-sous{display:flex;gap:4px;border-bottom:1px solid #e6e1d6;margin:0 0 14px}.pb-sous button{border:0;background:transparent;padding:10px 14px;font:600 14px Inter,sans-serif;color:#6b7280;cursor:pointer;border-bottom:3px solid transparent}.pb-sous button.on{color:#14304f;border-bottom-color:#B8893B}';
     document.head.appendChild(st);
     if (typeof vbPolicesCss === 'function') vbPolicesCss();
   }
@@ -372,9 +372,55 @@
       + '<div class="pb-actions" style="margin-top:10px"><label class="btn btn-ghost" style="cursor:pointer">' + (g.couverture ? 'Modifier' : 'Choisir une image') + '<input type="file" accept="image/png,image/jpeg,image/webp" hidden onchange="pbCouverture(this)"></label><button class="btn ' + (g.ouverte ? '' : 'btn-ghost') + '" onclick="pbGalOuverte()">' + (g.ouverte ? 'Galerie ouverte' : 'Galerie fermée') + '</button></div></div>'
       + '<div class="pb-bloc">' + ligne('Partager avec un lien', 'Toute personne disposant du lien de l’événement voit la galerie', sw('pbg-lien', g.lien)) + ligne('Accès des invités', 'Un invité voit aussi les photos des autres invités. Décochez pour un événement public : chacun ne voit que les siennes (QR code)', sw('pbg-inv', g.invites)) + ligne('Tout télécharger', 'Les visiteurs peuvent télécharger tout le contenu de l’événement', sw('pbg-tout', g.toutTelecharger))
       + '<div class="pb-champs" style="margin-top:8px"><label>Mot de passe de la galerie (facultatif)<input id="pbg-mdp" value="' + esc(g.mdp) + '" placeholder="Sans mot de passe"></label></div><div class="pb-actions" style="margin-top:8px"><button class="btn btn-ghost" onclick="document.getElementById(\'pbg-mdp\').value=(typeof vbMdp===\'function\'?vbMdp():\'\')">Générer un mot de passe</button></div></div>'
+      + blocTheme(g.theme)
       + '<div class="pb-pied"><button class="btn" onclick="pbGalSauver()">Enregistrer</button></div>';
+    apercuTheme();
+    ['pbt-titre', 'pbt-fond', 'pbt-accent', 'pbt-police'].forEach(function (id) { var el = $(id); if (el) el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', function () { lireTheme(); apercuTheme(); }); });
   }
-  function lireGalerie() { var g = PB.evt.galerie; if (!$('pbg-lien')) return; g.lien = coche('pbg-lien'); g.invites = coche('pbg-inv'); g.toutTelecharger = coche('pbg-tout'); g.mdp = val('pbg-mdp').trim(); }
+  /* ── apparence de la page que voient les invités (QR code) : couleurs, image de fond, police du titre ── */
+  function luminance(h) { var c = [1, 3, 5].map(function (i) { var v = parseInt(h.substr(i, 2), 16) / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
+  function blocTheme(t) {
+    return '<div class="pb-bloc"><h3>Apparence de la page des invités</h3><p class="aide">La page qui s’ouvre quand un invité scanne le QR code : la photo encadrée, puis les photos brutes en glissant. Mettez-la aux couleurs de l’événement (Halloween, club de foot…).</p>'
+      + '<div style="display:grid;grid-template-columns:1fr 230px;gap:16px;align-items:start" class="pb-theme">'
+      + '<div><div class="pb-champs">' + champ('pbt-titre', 'Titre de la page', t.titre, PB.evt.nom) + '<label>Police du titre<select id="pbt-police">' + Object.keys(POLICES).map(function (k) { return '<option value="' + k + '"' + (k === t.police ? ' selected' : '') + '>' + POLICES[k][2] + '</option>'; }).join('') + '</select></label>'
+      + '<label>Couleur de fond<input type="color" id="pbt-fond" value="' + esc(t.fond) + '" style="height:38px;padding:2px"></label><label>Couleur des boutons<input type="color" id="pbt-accent" value="' + esc(t.accent) + '" style="height:38px;padding:2px"></label></div>'
+      + '<div class="pb-actions" style="margin-top:12px"><button class="btn" onclick="pbCouleursCadre()">Reprendre les couleurs du cadre</button><label class="btn btn-ghost" style="cursor:pointer">' + (t.image ? 'Changer l’image de fond' : 'Image de fond (facultatif)') + '<input type="file" accept="image/png,image/jpeg,image/webp" hidden onchange="pbThemeImage(this)"></label>' + (t.image ? '<button class="btn btn-ghost" onclick="pbThemeImageRetirer()">Retirer l’image</button>' : '') + '</div></div>'
+      + '<div id="pbtApercu" style="width:230px;height:430px;border-radius:26px;border:6px solid #1f2733;overflow:hidden;position:relative;background-size:cover;background-position:center"></div></div></div>';
+  }
+  function lireTheme() { var t = PB.evt.galerie.theme; if (!$('pbt-fond')) return; t.titre = val('pbt-titre').trim(); t.fond = val('pbt-fond'); t.accent = val('pbt-accent'); t.police = val('pbt-police'); }
+  function apercuTheme() {
+    var z = $('pbtApercu'); if (!z) return; var t = PB.evt.galerie.theme, pol = POLICES[t.police] || POLICES.elegante, clair = luminance(t.fond) > 0.35, tx = clair ? '#231F1C' : '#fff', doux = clair ? '#6F655C' : 'rgba(255,255,255,.75)', btx = luminance(t.accent) > 0.45 ? '#1a1612' : '#fff';
+    z.style.backgroundColor = t.fond; z.style.backgroundImage = t.image ? 'url(' + urlImage(t.image) + ')' : 'none';
+    var m = (PB.evt.misesEnPage || [])[0];
+    z.innerHTML = '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding:26px 14px 10px;text-align:center;color:' + tx + '">'
+      + '<div style="font-family:' + pol[0] + ';font-weight:' + pol[1] + ';font-size:' + (t.police === 'manuscrite' ? 30 : 22) + 'px;line-height:1.1">' + esc(t.titre || PB.evt.nom) + '</div>'
+      + '<div style="width:34px;height:2px;background:' + esc(t.accent) + ';margin:8px 0 12px;border-radius:2px"></div>'
+      + '<div style="position:relative;width:100%;flex:1;display:flex;align-items:center;justify-content:center"><canvas id="pbtCv" style="max-width:82%;max-height:200px;box-shadow:0 10px 24px -10px rgba(0,0,0,.5);border-radius:4px;background:#ddd"></canvas><span style="position:absolute;right:0;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.85);color:#231F1C;display:flex;align-items:center;justify-content:center;font-size:15px">›</span></div>'
+      + '<div style="display:flex;gap:5px;margin:8px 0"><i style="width:6px;height:6px;border-radius:50%;background:' + esc(t.accent) + '"></i><i style="width:6px;height:6px;border-radius:50%;background:' + doux + ';opacity:.5"></i><i style="width:6px;height:6px;border-radius:50%;background:' + doux + ';opacity:.5"></i></div>'
+      + '<div style="width:100%;padding:9px;border-radius:9px;background:' + esc(t.accent) + ';color:' + btx + ';font:700 11.5px Inter,Arial,sans-serif">Télécharger</div>'
+      + '<div style="margin-top:auto;padding-top:10px;border-top:1px solid ' + (clair ? 'rgba(0,0,0,.12)' : 'rgba(255,255,255,.25)') + ';width:100%;font:600 8.5px Inter,Arial,sans-serif;color:' + doux + '">Service proposé par Vespra Event<br><span style="font-weight:500">Vous aussi, vous voulez louer du matériel ? <u>Vespra Event</u></span></div></div>';
+    if (m) { var cv = $('pbtCv'); dessiner(cv, m, null, true); chargerImage(m.cadre, function (img) { if (img) dessiner(cv, m, img, true); }); }
+  }
+  /* couleurs dominantes du calque de la première mise en page : fond (la plus présente) et boutons (la plus présente des couleurs bien différentes) */
+  window.pbCouleursCadre = function () {
+    lireTheme(); var m = (PB.evt.misesEnPage || []).filter(function (x) { return x.cadre; })[0];
+    if (!m) return toast('Ajoutez d’abord un calque à une mise en page (Expérience photobooth)', true);
+    chargerImage(m.cadre, function (img) {
+      if (!img) return toast('Calque illisible', true);
+      var cv = document.createElement('canvas'), W = 80, H = Math.round(80 * img.naturalHeight / img.naturalWidth); cv.width = W; cv.height = H; var g = cv.getContext('2d'); g.drawImage(img, 0, 0, W, H);
+      var d = g.getImageData(0, 0, W, H).data, comptes = {};
+      for (var i = 0; i < d.length; i += 4) { if (d[i + 3] < 200) continue; var k = [d[i] >> 4, d[i + 1] >> 4, d[i + 2] >> 4].join(','); comptes[k] = (comptes[k] || 0) + 1; }
+      var l = Object.keys(comptes).sort(function (a, b) { return comptes[b] - comptes[a]; }).map(function (k) { return k.split(',').map(function (v) { return (+v << 4) + 8; }); });
+      if (!l.length) return toast('Pas de couleur trouvée dans le calque', true);
+      var hx = function (c) { return '#' + c.map(function (v) { return ('0' + Math.min(255, v).toString(16)).slice(-2); }).join('').toUpperCase(); };
+      var dist = function (a, b) { return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]) + Math.abs(a[2] - b[2]); };
+      var fond = l[0], accent = l.filter(function (c) { return dist(c, fond) > 160; })[0] || (luminance(hx(fond)) > 0.4 ? [35, 31, 28] : [255, 255, 255]);
+      var t = PB.evt.galerie.theme; t.fond = hx(fond); t.accent = hx(accent); $('pbt-fond').value = t.fond; $('pbt-accent').value = t.accent; apercuTheme(); toast('Couleurs reprises du cadre : pensez à enregistrer');
+    });
+  };
+  window.pbThemeImage = async function (inp) { var f = inp.files && inp.files[0]; if (!f) return; lireGalerie(); try { PB.evt.galerie.theme.image = await envoyerImage(f); toast('Image ajoutée'); secGalerie($('pbContenu')); } catch (e) { toast('Échec : ' + e.message, true); } };
+  window.pbThemeImageRetirer = function () { lireGalerie(); PB.evt.galerie.theme.image = ''; secGalerie($('pbContenu')); };
+  function lireGalerie() { var g = PB.evt.galerie; lireTheme(); if (!$('pbg-lien')) return; g.lien = coche('pbg-lien'); g.invites = coche('pbg-inv'); g.toutTelecharger = coche('pbg-tout'); g.mdp = val('pbg-mdp').trim(); }
   window.pbGalOuverte = function () { lireGalerie(); PB.evt.galerie.ouverte = !PB.evt.galerie.ouverte; enregistrer(PB.evt.galerie.ouverte ? 'Galerie ouverte' : 'Galerie fermée').then(rendre); };
   window.pbCouverture = async function (inp) { var f = inp.files && inp.files[0]; if (!f) return; lireGalerie(); try { PB.evt.galerie.couverture = await envoyerImage(f); await enregistrer('Couverture enregistrée'); rendre(); } catch (e) { toast('Échec : ' + e.message, true); } };
   window.pbGalSauver = function () { lireGalerie(); enregistrer('Galerie enregistrée').then(rendre); };
