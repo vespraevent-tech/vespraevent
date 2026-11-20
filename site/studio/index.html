@@ -2688,7 +2688,7 @@ const VB_SUITE=' Le QR code et l’e-mail sont uniquement pour vous, si vous sou
 const VB_ORGA={mariage:'Les mariés recevront toutes les vidéos de leur côté.'+VB_SUITE,entreprise:'Les organisateurs recevront toutes les vidéos de leur côté.'+VB_SUITE,anniversaire:'La personne fêtée recevra toutes les vidéos de son côté.'+VB_SUITE,autre:'Les organisateurs recevront toutes les vidéos.'+VB_SUITE};
 /* textes par défaut de la tablette (identiques à ceux de /videobooth/app.js) : laissés vides ici, ils s'affichent tels quels */
 const VB_DEF={go:'Commencer',m1n:'Vidéo souvenir',m1d:'Filmez un message, un vœu ou un souvenir',m2n:'Boîte à questions',m2d:'Répondez face caméra aux questions préparées pour l’événement',m3n:'Questions piquantes',m3d:'Des questions plus osées, pour les plus audacieux',m3b:'Débloqué à {heure}',pretT:'Êtes-vous prêts ?',pretB:'C’est parti !',plaitT:'La vidéo vous plaît ?',plaitNon:'Non, on recommence',plaitOui:'Oui, c’est parfait',quiB:'Continuer',livT:'Récupérer votre vidéo',livQr:'QR code',livQrT:'Scannez ce code avec l’appareil photo de votre téléphone',livMail:'Par e-mail',livMailT:'Votre adresse e-mail',livAutreQ:'Voulez-vous l’envoyer à quelqu’un ?',livOui:'Oui',livNon:'Non',livPrenom:'Prénom de la personne',livEmail2:'Son adresse e-mail',livFin:'Terminé',merciT:'Merci !',merciD:'Votre vidéo a bien été enregistrée.'};
-const VB_AMBS=[['ivoire','Ivoire et or','#FBF8F2','#B8893B'],['blanc','Blanc et noir','#FFFFFF','#262626'],['rose','Rose poudré','#FDF6F4','#B76E79'],['sauge','Sauge','#F8F9F4','#6B8560'],['nuit','Bleu nuit','#16365a','#F59E0B']];
+const VB_AMBS=[['blanc','Blanc et or','#FFFFFF','#B8893B'],['ivoire','Ivoire et or','#FAF6EE','#B8893B'],['rose','Rose poudré','#FDF6F4','#B76E79'],['sauge','Sauge','#F8F9F4','#6B8560'],['perle','Gris perle','#F1F1EF','#262626'],['noir','Noir et or','#161616','#C9A24D']];
 /* changer de type d'événement remplace la liste de questions seulement si elle n'a pas été modifiée à la main */
 function vbTypeChange(sel){
   const ta=document.getElementById('vs-qs'); if(!ta) return;
@@ -2708,7 +2708,7 @@ function vbFsCss(){
 function vbFormSession(){
   vbFsCss();
   const ses=VBCFG.sessions||[];
-  const e=VBEDIT.i>=0?ses[VBEDIT.i]:{nom:'',date:'',mdp:'',titre:'Enregistrer un souvenir',sous:'',max:30,format:'auto',noel:false,cadrage:'Vous pouvez incliner doucement la tablette pour vous cadrer',qui:'',quiSous:'',actif:true,fin:'',conserv:0,garde:14,qualite:'standard',choixFormat:true,type:'autre',modeQ:false,modeP:false,heureP:'23:00',qs:VB_QS.autre,qp:VB_QP,secQ:0,merciOrga:'',amb:'ivoire',textes:{}};
+  const e=VBEDIT.i>=0?ses[VBEDIT.i]:{nom:'',date:'',mdp:'',titre:'Enregistrer un souvenir',sous:'',max:30,format:'auto',noel:false,cadrage:'Vous pouvez incliner doucement la tablette pour vous cadrer',qui:'',quiSous:'',actif:true,fin:'',conserv:0,garde:14,qualite:'standard',choixFormat:true,type:'autre',modeQ:false,modeP:false,heureP:'23:00',qs:VB_QS.autre,qp:VB_QP,secQ:0,merciOrga:'',amb:'blanc',fond:'',accent:'',textes:{}};
   const tx=e.textes||{}, nouveau=VBEDIT.i<0, prot=!!e.mdp;
   const f=(id,l,v,ph,type,cls)=>'<label class="f'+(cls?' '+cls:'')+'">'+l+'<input id="vs-'+id+'" type="'+(type||'text')+'" value="'+vbEsc(v==null?'':v)+'" placeholder="'+vbEsc(ph||'')+'"></label>';
   /* texte personnalisable : vide = texte par défaut (affiché en gris) */
@@ -2717,7 +2717,11 @@ function vbFormSession(){
   const sw=(id,on,oc)=>'<span class="sw"><input type="checkbox" id="'+id+'"'+(on?' checked':'')+(oc?' onchange="'+oc+'"':'')+'><i></i></span>';
   const sec=(titre,sous,corps,ouvert,droite)=>'<details class="vfs"'+(ouvert?' open':'')+'><summary><span class="vt"><b>'+titre+'</b><span>'+sous+'</span></span>'+(droite||'')+'<span class="chev"></span></summary><div class="corps">'+corps+'</div></details>';
   const pastille=(id,on,txtOn,txtOff)=>'<span class="pastille'+(on?' on':'')+'" id="'+id+'">'+(on?txtOn:txtOff)+'</span>';
-  const ambs='<div class="plein"><div style="font-size:12px;font-weight:600;color:#6b7280;margin-bottom:8px">Ambiance de l’écran des invités</div><div class="ambs">'+VB_AMBS.map(a=>'<label><input type="radio" name="vs-amb" value="'+a[0]+'"'+((e.amb||'ivoire')===a[0]?' checked':'')+'><span class="pt" style="background:linear-gradient(135deg,'+a[2]+' 52%,'+a[3]+' 52%)"></span><em>'+a[1]+'</em></label>').join('')+'</div></div>';
+  const ambCur=(e.amb==='nuit'?'noir':(e.amb||'blanc')), ambP=VB_AMBS.find(a=>a[0]===ambCur)||VB_AMBS[0], perso=!!(e.fond||e.accent);
+  const ambs='<div class="plein"><div style="font-size:12px;font-weight:600;color:#6b7280;margin-bottom:8px">Couleurs de l’écran des invités (fond uni)</div><div class="ambs">'+VB_AMBS.map(a=>'<label><input type="radio" name="vs-amb" value="'+a[0]+'"'+(ambCur===a[0]?' checked':'')+' onchange="vbAmbApercu()"><span class="pt" style="background:linear-gradient(135deg,'+a[2]+' 52%,'+a[3]+' 52%)"></span><em>'+a[1]+'</em></label>').join('')+'</div></div>'+
+    '<div class="plein ligne">'+sw('vs-perso',perso,"document.getElementById('vs-persobloc').style.display=this.checked?'flex':'none';vbAmbApercu()")+'<span>Choisir mes propres couleurs</span></div>'+
+    '<div class="plein" id="vs-persobloc" style="display:'+(perso?'flex':'none')+';gap:18px;flex-wrap:wrap;align-items:center"><label class="f" style="flex:none">Couleur du fond<input id="vs-fond" type="color" value="'+(e.fond||ambP[2])+'" oninput="vbAmbApercu()" style="width:90px;height:40px;padding:2px;cursor:pointer"></label><label class="f" style="flex:none">Couleur des boutons<input id="vs-accent" type="color" value="'+(e.accent||ambP[3])+'" oninput="vbAmbApercu()" style="width:90px;height:40px;padding:2px;cursor:pointer"></label></div>'+
+    '<div class="plein"><div id="vs-apercu" style="border-radius:12px;border:1px solid #e2ded3;padding:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap"><span id="vs-ap-t" style="font:italic 400 26px Fraunces,Georgia,serif">Aperçu</span><span id="vs-ap-b" style="padding:9px 20px;border-radius:10px;font:700 14px Inter,sans-serif">Commencer</span></div></div>';
 
   const sEvt=sec('Événement','Nom, date, type, accès et durée de conservation',
     f('nom','Nom de l’événement',e.nom,'Mariage Sylvie')+f('date','Date affichée',e.date,'21 novembre')+
@@ -2774,6 +2778,14 @@ function vbFormSession(){
     sEvt+sAcc+sVid+sQ+sP+sFin+
     '<div class="vfs-pied"><button class="btn" onclick="vbSessSauver()">Enregistrer la session</button><button class="btn btn-ghost" onclick="vbSessEdit(null)">Annuler</button></div></div>';
 }
+function vbAmbApercu(){
+  const z=document.getElementById('vs-apercu'); if(!z) return;
+  const perso=document.getElementById('vs-perso').checked, r=document.querySelector('input[name="vs-amb"]:checked'), p=VB_AMBS.find(a=>r&&a[0]===r.value)||VB_AMBS[0];
+  const fond=perso?document.getElementById('vs-fond').value:p[2], acc=perso?document.getElementById('vs-accent').value:p[3];
+  const lum=h=>{const c=[1,3,5].map(i=>parseInt(h.substr(i,2),16)/255).map(v=>v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4));return 0.2126*c[0]+0.7152*c[1]+0.0722*c[2];};
+  z.style.background=fond; document.getElementById('vs-ap-t').style.color=lum(fond)>0.35?'#231F1C':'#fff';
+  const b=document.getElementById('vs-ap-b'); b.style.background=acc; b.style.color=lum(acc)>0.45?'#1a1612':'#fff';
+}
 function vbPast(id,on){ const p=document.getElementById(id); if(!p) return; p.className='pastille'+(on?' on':''); p.textContent=on?'Activé':'Désactivé'; }
 function vbConfigRendre(){
   const z=document.getElementById('vbConfig'); if(!z) return;
@@ -2786,7 +2798,7 @@ function vbConfigRendre(){
     '<div id="vbAccesBloc" style="display:'+(VBCFG.accesLibre?'none':'flex')+';gap:8px;flex-wrap:wrap"><input id="vbAcces" value="'+vbEsc(VBCFG.acces||'')+'" placeholder="Mot de passe d’accès (6 caractères minimum)" style="flex:1 1 240px;'+VB_INPUT+';font:600 14px monospace" autocomplete="off"><button class="btn btn-ghost" onclick="document.getElementById(\'vbAcces\').value=vbMdp()">Générer</button></div>'+
     '<div style="margin-top:10px"><button class="btn" onclick="vbAccesSauver()">Enregistrer</button></div>'+((VBCFG.acces||VBCFG.accesLibre)?'':'<div style="color:#b03a2a;font-size:12.5px;margin-top:8px">Rien n’est réglé : la tablette ne peut pas se connecter. Choisissez un mot de passe, ou décochez la case pour une appli sans mot de passe général.</div>')+'</details>';
   }
-  z.innerHTML=h;
+  z.innerHTML=h; try{ vbAmbApercu(); }catch(e){}
 }
 function vbSessEdit(i){ VBEDIT=(i===null)?null:{i}; vbConfigRendre(); if(i!==null) { const z=document.getElementById('vbConfig'); if(z) z.scrollIntoView({block:'start',behavior:'smooth'}); } }
 async function vbConfigPoster(corps,msg){ try{ VBCFG=await api('/videobooth/config',{method:'POST',body:JSON.stringify(corps)}); showToast(msg); }catch(e){ showToast('Échec : '+e.message,true); } VBEDIT=null; vbConfigRendre(); vbRendre(); }
@@ -2803,7 +2815,7 @@ function vbSessSauver(){
   const textes={}; Object.keys(VB_DEF).forEach(k=>{ const el=document.getElementById('vt-'+k); const val=el?el.value.trim():''; if(val) textes[k]=val; });
   const ambEl=document.querySelector('input[name="vs-amb"]:checked');
   const s={nom:v('nom').trim(),date:v('date').trim(),fin:v('fin'),actif:coche('vs-actif'),mdp:prot?v('mdp').trim():'',titre:v('titre').trim(),sous:v('sous').trim(),qui:v('qui').trim(),quiSous:v('quiSous').trim(),max:Number(v('max'))||30,cadrage:v('cadrage').trim(),format:v('format'),qualite:v('qualite'),conserv:Number(v('conserv'))||0,choixFormat:coche('vs-choixformat'),noel:coche('vs-noel'),
-    type:v('type')||'autre',merciOrga:v('merciOrga').trim(),modeQ:coche('vs-modeQ'),modeP:coche('vs-modeP'),heureP:v('heureP')||'23:00',secQ:Number(v('secQ'))||0,qs:lignes(v('qs')),qp:lignes(v('qp')),amb:ambEl?ambEl.value:'ivoire',textes};
+    type:v('type')||'autre',merciOrga:v('merciOrga').trim(),modeQ:coche('vs-modeQ'),modeP:coche('vs-modeP'),heureP:v('heureP')||'23:00',secQ:Number(v('secQ'))||0,qs:lignes(v('qs')),qp:lignes(v('qp')),amb:ambEl?ambEl.value:'blanc',fond:coche('vs-perso')?v('fond').toUpperCase():'',accent:coche('vs-perso')?v('accent').toUpperCase():'',textes};
   if(s.modeQ&&!s.qs.length){ showToast('Ajoutez au moins une question pour la boîte à questions, ou désactivez-la',true); return; }
   if(s.modeP&&!s.qp.length){ showToast('Ajoutez au moins une question piquante, ou désactivez ce mode',true); return; }
   if(!s.nom){ showToast('Indiquez le nom de la session',true); return; }

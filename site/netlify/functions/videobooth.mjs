@@ -115,7 +115,8 @@ async function accesLire(st) { return st.get('config/acces', { type: 'json' }).c
 async function accesEcrire(st, mdp, libre) { if (!mdp && libre) { const a = { libre: true, maj: new Date().toISOString() }; await st.setJSON('config/acces', a); return a; } if (!mdp) { await st.delete('config/acces').catch(() => {}); return null; } const a = { mdp, h: hMdp('acces', mdp), maj: new Date().toISOString() }; await st.setJSON('config/acces', a); return a; }
 async function sessionsLire(st) { const l = await st.get('config/sessions', { type: 'json' }).catch(() => null); return Array.isArray(l) ? l : []; }
 /* liste de questions : au plus 8, une par ligne, 140 caractères chacune ; « | » interdit (séparateur interne) */
-const AMBIANCES = ['ivoire', 'blanc', 'rose', 'sauge', 'nuit'];
+const AMBIANCES = ['blanc', 'ivoire', 'rose', 'sauge', 'perle', 'noir'];
+const hexOk = (x) => (/^#[0-9a-fA-F]{6}$/.test(String(x || '')) ? String(x).toUpperCase() : '');
 const TEXTES_CLES = ['go', 'm1n', 'm1d', 'm2n', 'm2d', 'm3n', 'm3d', 'm3b', 'pretT', 'pretB', 'plaitT', 'plaitNon', 'plaitOui', 'quiB', 'livT', 'livQr', 'livQrT', 'livMail', 'livMailT', 'livAutreQ', 'livOui', 'livNon', 'livPrenom', 'livEmail2', 'livFin', 'merciT', 'merciD'];
 const textesPropres = (t) => { const o = {}; const src = t && typeof t === 'object' ? t : {}; for (const k of TEXTES_CLES) { const v = String(src[k] == null ? '' : src[k]).replace(/[\r\n]+/g, ' ').trim().slice(0, 200); if (v) o[k] = v; } return o; };
 const lignes = (a, n = 8, m = 140) => (Array.isArray(a) ? a : String(a || '').split(/\r?\n/)).map((x) => String(x == null ? '' : x).replace(/[\s|]+/g, ' ').trim().slice(0, m)).filter(Boolean).slice(0, n);
@@ -138,7 +139,9 @@ async function sessionsEcrire(st, liste) {
     secQ: Math.min(20, Math.max(0, Math.round(Number(e.secQ)) || 0)),
     merciOrga: String(e.merciOrga || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 300),
     /* apparence de l'écran des invités et textes de chaque bouton / écran (vide = texte par défaut de la tablette) */
-    amb: AMBIANCES.includes(e.amb) ? e.amb : 'ivoire',
+    /* « nuit » (bleu) n'existe plus : il devient « noir » ; sans réglage, fond blanc. Fond et boutons peuvent aussi être choisis librement (#RRGGBB). */
+    amb: AMBIANCES.includes(e.amb) ? e.amb : (e.amb === 'nuit' ? 'noir' : 'blanc'),
+    fond: hexOk(e.fond), accent: hexOk(e.accent),
     textes: textesPropres(e.textes),
   })).filter((e) => e.nom);
   await st.setJSON('config/sessions', propre); return propre;
@@ -150,7 +153,7 @@ const visible = (e) => e.actif !== false && (!e.fin || e.fin >= aujourdhuiParis(
 const carte = (e) => ({ id: e.id, nom: e.nom, date: e.date, prot: !!e.mdp });
 /* ce que la tablette reçoit d'une session (à l'ouverture, puis régulièrement : une modification du back-office arrive seule sur la tablette) */
 const vueSession = (ses) => ({ id: ses.id, nom: ses.nom, date: ses.date, label: labelSession(ses), titre: ses.titre, sous: ses.sous, max: ses.max, format: ses.format, noel: ses.noel, cadrage: ses.cadrage, qui: ses.qui, quiSous: ses.quiSous, qualite: ses.qualite, garde: ses.garde, choixFormat: ses.choixFormat !== false,
-  type: ses.type || 'autre', modeQ: !!ses.modeQ, modeP: !!ses.modeP, heureP: ses.heureP || '23:00', qs: ses.qs || [], qp: ses.qp || [], secQ: ses.secQ || 0, merciOrga: ses.merciOrga || '', amb: ses.amb || 'ivoire', textes: ses.textes || {} });
+  type: ses.type || 'autre', modeQ: !!ses.modeQ, modeP: !!ses.modeP, heureP: ses.heureP || '23:00', qs: ses.qs || [], qp: ses.qp || [], secQ: ses.secQ || 0, merciOrga: ses.merciOrga || '', amb: AMBIANCES.includes(ses.amb) ? ses.amb : (ses.amb === 'nuit' ? 'noir' : 'blanc'), fond: ses.fond || '', accent: ses.accent || '', textes: ses.textes || {} });
 export { envoyerMail, jeton, jetonMail, jetonEvt, GARDE_JOURS, gardeJours, visible, galLire, galEcrire, genMdp, accesLire, accesEcrire, sessionsLire, sessionsEcrire, labelSession };
 
 export default async (request) => {

@@ -12,6 +12,20 @@
     livT: 'Récupérer votre vidéo', livQr: 'QR code', livQrT: 'Scannez ce code avec l’appareil photo de votre téléphone', livMail: 'Par e-mail', livMailT: 'Votre adresse e-mail', livAutreQ: 'Voulez-vous l’envoyer à quelqu’un ?', livOui: 'Oui', livNon: 'Non', livPrenom: 'Prénom de la personne', livEmail2: 'Son adresse e-mail', livFin: 'Terminé', merciT: 'Merci !', merciD: 'Votre vidéo a bien été enregistrée.' };
   var SUITE_ORGA = ' Le QR code et l’e-mail sont uniquement pour vous, si vous souhaitez garder la vôtre.';
   var ORGA = { mariage: 'Les mariés recevront toutes les vidéos de leur côté.' + SUITE_ORGA, entreprise: 'Les organisateurs recevront toutes les vidéos de leur côté.' + SUITE_ORGA, anniversaire: 'La personne fêtée recevra toutes les vidéos de son côté.' + SUITE_ORGA, autre: 'Les organisateurs recevront toutes les vidéos.' + SUITE_ORGA };
+  /* ── couleurs : un fond uni et une couleur pour les boutons, choisis par événement ; texte, cartes et traits s'en déduisent (clair ou foncé) ── */
+  var AMB = { blanc: ['#FFFFFF', '#B8893B'], ivoire: ['#FAF6EE', '#B8893B'], rose: ['#FDF6F4', '#B76E79'], sauge: ['#F8F9F4', '#6B8560'], perle: ['#F1F1EF', '#262626'], noir: ['#161616', '#C9A24D'] };
+  function hexOk(x) { return /^#[0-9a-fA-F]{6}$/.test(x || '') ? x : ''; }
+  function rvb(h) { return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; }
+  function lum(h) { var c = rvb(h).map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
+  function appliquerTheme() {
+    var p = AMB[cfg.amb] || AMB.blanc, fond = hexOk(cfg.fond) || p[0], acc = hexOk(cfg.accent) || p[1];
+    var clair = lum(fond) > 0.35, r = rvb(acc), st = document.documentElement.style;
+    var v = { '--bg1': fond, '--acc': acc, '--acc-t': lum(acc) > 0.45 ? '#1a1612' : '#ffffff', '--glow': 'rgba(' + r.join(',') + ',.18)', '--glow2': 'rgba(' + r.join(',') + ',.12)',
+      '--txt': clair ? '#231F1C' : '#ffffff', '--soft': clair ? '#6F655C' : 'rgba(255,255,255,.72)', '--card': clair ? '#ffffff' : 'rgba(255,255,255,.08)', '--champ': clair ? '#ffffff' : 'rgba(255,255,255,.1)',
+      '--line': clair ? 'rgba(35,31,28,.14)' : 'rgba(255,255,255,.22)', '--ombre': clair ? 'rgba(60,45,25,.28)' : 'rgba(0,0,0,.55)', '--err': clair ? '#b3392b' : '#ffb4a8' };
+    Object.keys(v).forEach(function (k) { st.setProperty(k, v[k]); });
+    var m = document.querySelector('meta[name=theme-color]'); if (m) m.setAttribute('content', fond);
+  }
   function T(k, heure) { var t = (cfg.textes && cfg.textes[k]) || DEF[k] || ''; return heure == null ? t : t.replace(/\{heure\}/g, heure); }
   var cfg = lireCfg(); if (!cfg.pin) cfg.pin = '0104'; if (!cfg.cle) cfg.cle = CFG0.cle;
   /* appairage rapide : ouvrir /videobooth/#cle=VOTRE_CLE une seule fois enregistre la clé sur la tablette */
@@ -45,8 +59,8 @@
     if (videoEnCours) libererEnAttente();
     if (sessionMaj) { cfg.session = Object.assign({}, cfg.session, sessionMaj); sessionMaj = null; appliquerActif(); }
     if (Date.now() - dernierMaj > 60000) majSession();   /* à chaque retour à l'accueil (au plus une fois par minute) : les réglages du back-office arrivent vite */
-    document.body.setAttribute('data-amb', cfg.amb || 'ivoire');
-    $('t-accueil').textContent = cfg.titre || CFG0.titre; $('p-accueil').textContent = cfg.sous || ''; $('b-commencer').textContent = T('go');
+    appliquerTheme();
+    $('t-accueil').textContent = cfg.titre || CFG0.titre; $('p-accueil').textContent = (cfg.sous && cfg.sous !== 'Laissez un petit message vidéo de 30 secondes') ? cfg.sous : ''; $('b-commencer').textContent = T('go');
     $('t-qui').textContent = cfg.qui || 'Qui êtes-vous ?'; $('p-qui').textContent = cfg.quiSous == null ? 'Pour que les organisateurs sachent qui a laissé ce message' : cfg.quiSous; $('f-suite').textContent = T('quiB');
     if (!garder) { $('form').reset(); formatInvite = null; majFormat(); } $('f-err').textContent = ''; rendreModes(); montrer('s-accueil'); majEtat();
   }
@@ -69,13 +83,13 @@
   function modesDispo() { var l = ['video']; if (cfg.modeQ && (cfg.qs || []).length) l.push('questions'); if (cfg.modeP && (cfg.qp || []).length) l.push('piquantes'); return l; }
   var SVG = { video: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6" width="13" height="12" rx="2.5"/><path d="M15.5 10.5 21.5 7v10l-6-3.5z"/></svg>',
     questions: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4h0A2.5 2.5 0 0 1 4 13.5z"/><path d="M9.8 8.4a2.3 2.3 0 1 1 3.3 2.1c-.7.4-1.1.8-1.1 1.5"/><circle cx="12" cy="13.6" r=".7" fill="currentColor" stroke="none"/></svg>',
-    piquantes: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c.5 3.2 4.2 5 4.2 9.2a4.2 4.2 0 0 1-8.4 0c0-1.7.7-2.8 1.6-3.8C10.2 7.2 11.6 5.7 12 3z"/><path d="M12 20.2a2.1 2.1 0 0 0 2.1-2.1c0-1.4-1.2-1.9-2.1-3.1-.9 1.2-2.1 1.7-2.1 3.1a2.1 2.1 0 0 0 2.1 2.1z"/></svg>' };
+    piquantes: '<svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor" stroke="none" aria-hidden="true"><path d="M16.9 6.2c3.4.7 3.9 5.4 1 9.1-3 3.8-8.2 5.6-13.4 4.9-1.1-.2-1.1-1.1-.3-1.5 3.8-1.8 5.5-3.8 6.5-6.7 1-2.8 2.8-6.2 6.2-5.8z"/><path d="M16.9 6.2c-.4-1.5.2-3 1.8-3.7.5-.2.9.4.5.8-.8.7-.9 1.5-.6 2.5z" opacity=".75"/></svg>' };
   var SVG_CADENAS = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9.5" rx="2.2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
   var CLE_MODE = { video: ['m1n', 'm1d'], questions: ['m2n', 'm2d'], piquantes: ['m3n', 'm3d'] };
   function nomMode(id) { return T(CLE_MODE[id || mode][0]); }
   function rendreModes() {
     var z = $('modes'), l = modesDispo(), seul = l.length === 1;
-    $('b-commencer').hidden = !seul; z.hidden = seul; z.innerHTML = ''; if (seul) return;
+    $('b-commencer').hidden = !seul; z.hidden = seul; z.innerHTML = ''; if (seul) return; z.style.setProperty('--n', l.length);
     l.forEach(function (id) {
       var b = document.createElement('button'), ferme = id === 'piquantes' && !piquantesOuvertes();
       b.type = 'button'; b.className = 'mode ' + id;
@@ -374,8 +388,10 @@ $('b-stop').onclick = arreterRec;
   };
   function afficherMerci(v) {
     $('m-titre').textContent = T('merciT'); $('m-txt').textContent = T('merciD');
-    var l = []; if (v.email && v.pour === 'moi') l.push('Envoyée à ' + v.email); if (v.plusEmail) l.push('Envoyée aussi à ' + (v.plusDest || v.plusEmail)); if (v.email && v.pour === 'autre') l.push('Envoyée à ' + (v.dest || v.email));
-    $('m-mails').textContent = l.join('\n'); $('m-mails').hidden = !l.length; $('m-sup').hidden = !l.length;
+    /* adresses partiellement masquées : l'écran peut être lu par la personne suivante */
+    var cache = function (e) { var i = e.indexOf('@'); return i > 2 ? e.slice(0, 2) + '•••' + e.slice(i) : e; };
+    var l = []; if (v.email && v.pour === 'moi') l.push('Vous : ' + cache(v.email)); if (v.plusEmail) l.push((v.plusDest || 'Autre personne') + ' : ' + cache(v.plusEmail)); if (v.email && v.pour === 'autre') l.push((v.dest || 'Autre personne') + ' : ' + cache(v.email));
+    $('m-mails').textContent = l.length ? 'La vidéo est envoyée par e-mail à :\n' + l.join('\n') : ''; $('m-mails').hidden = !l.length; $('m-sup').hidden = !l.length;
     montrer('s-merci'); clearTimeout(minuteurMerci); minuteurMerci = setTimeout(retourAccueilMerci, 9000);
   }
 
@@ -425,7 +441,7 @@ $('b-stop').onclick = arreterRec;
   /* ── état de la tablette, envoyé toutes les 2 minutes au back-office (batterie, vidéos en attente, caméra, micro, place) ── */
   function battement() {
     if (!(cfg.jeton || cfg.cle)) return;
-    var etat = { cam: camEtat, mic: micEtat, ver: 35, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
+    var etat = { cam: camEtat, mic: micEtat, ver: 36, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
     var fin = function () {
       toutes().then(function (l) { etat.att = l.filter(function (v) { return !v.envoye; }).length; etat.tot = l.length; }).catch(function () {}).then(function () {
         return (navigator.storage && navigator.storage.estimate) ? navigator.storage.estimate().then(function (e) { etat.usage = e.usage || 0; etat.quota = e.quota || 0; }).catch(function () {}) : null;
@@ -516,7 +532,7 @@ $('b-stop').onclick = arreterRec;
     var s = cfg.session || null;
     cfg.event = s ? (s.label || s.nom || '') : '';
     cfg.titre = (s && s.titre) || CFG0.titre; cfg.sous = s ? (s.sous || '') : CFG0.sous; cfg.max = (s && Number(s.max)) || 30;
-    cfg.amb = (s && s.amb) || 'ivoire'; cfg.textes = (s && s.textes) || {}; document.body.setAttribute('data-amb', cfg.amb);
+    cfg.amb = (s && s.amb) || 'blanc'; cfg.fond = (s && s.fond) || ''; cfg.accent = (s && s.accent) || ''; cfg.textes = (s && s.textes) || {}; appliquerTheme();
     cfg.type = (s && s.type) || 'autre'; cfg.modeQ = !!(s && s.modeQ); cfg.modeP = !!(s && s.modeP); cfg.heureP = (s && s.heureP) || '23:00'; cfg.qs = (s && s.qs) || []; cfg.qp = (s && s.qp) || []; cfg.secQ = (s && Number(s.secQ)) || 0; cfg.merciOrga = (s && s.merciOrga) || '';
     cfg.noel = !!(s && s.noel); cfg.format = (s && s.format) || 'auto';
     cfg.qui = (s && s.qui) || ''; cfg.quiSous = s ? (s.quiSous == null || s.quiSous === '' ? null : s.quiSous) : null; cfg.qualite = (s && s.qualite) || 'standard'; cfg.garde = (s && Number(s.garde)) || 14; cfg.choixFormat = !s || s.choixFormat !== false;
