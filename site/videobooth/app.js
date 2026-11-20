@@ -367,6 +367,8 @@ $('b-stop').onclick = arreterRec;
       videoEnCours = v; choix = { qr: false, mail: false, autre: false };
       $('l-email').value = ''; $('l-dest').value = ''; $('l-email2').value = '';
       $('l-titre').textContent = T('livT'); $('l-info').textContent = cfg.merciOrga || ORGA[cfg.type] || ORGA.autre;
+      /* phrase « les organisateurs recevront toutes les vidéos » : réglable par événement ; sans réglage, absente pour un événement d'entreprise */
+      $('l-info').hidden = !(cfg.orgaOn == null ? cfg.type !== 'entreprise' : cfg.orgaOn);
       $('l-qr-t').textContent = T('livQr'); $('l-qr-d').textContent = T('livQrT'); $('l-mail-t').textContent = T('livMail'); $('l-mail-d').textContent = T('livMailT');
       $('l-autre-q').textContent = T('livAutreQ'); $('l-oui').textContent = T('livOui'); $('l-non').textContent = T('livNon'); $('l-prenom-d').textContent = T('livPrenom'); $('l-email2-d').textContent = T('livEmail2'); $('l-fin').textContent = T('livFin');
       var svg = qrSvg(v); $('l-qr-img').innerHTML = svg; $('l-qr').hidden = !svg; $('l-mail').parentNode.style.gridTemplateColumns = svg ? '' : '1fr';
@@ -456,7 +458,7 @@ $('b-stop').onclick = arreterRec;
   /* ── état de la tablette, envoyé toutes les 2 minutes au back-office (batterie, vidéos en attente, caméra, micro, place) ── */
   function battement() {
     if (!(cfg.jeton || cfg.cle)) return;
-    var etat = { cam: camEtat, mic: micEtat, ver: 40, pinUsine: cfg.pin === PIN_USINE, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
+    var etat = { cam: camEtat, mic: micEtat, ver: 41, pinUsine: cfg.pin === PIN_USINE, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
     var fin = function () {
       toutes().then(function (l) { etat.att = l.filter(function (v) { return !v.envoye; }).length; etat.tot = l.length; }).catch(function () {}).then(function () {
         return (navigator.storage && navigator.storage.estimate) ? navigator.storage.estimate().then(function (e) { etat.usage = e.usage || 0; etat.quota = e.quota || 0; }).catch(function () {}) : null;
@@ -567,7 +569,7 @@ $('b-stop').onclick = arreterRec;
     cfg.event = s ? (s.label || s.nom || '') : '';
     cfg.titre = (s && s.titre) || CFG0.titre; cfg.sous = s ? (s.sous || '') : CFG0.sous; cfg.max = (s && Number(s.max)) || 30;
     cfg.ori = (s && s.ori) || 'auto'; cfg.police = (s && s.police) || 'elegante'; cfg.amb = (s && s.amb) || 'blanc'; cfg.fond = (s && s.fond) || ''; cfg.accent = (s && s.accent) || ''; cfg.textes = (s && s.textes) || {}; appliquerTheme(); appliquerOrientation();
-    cfg.type = (s && s.type) || 'autre'; cfg.modeQ = !!(s && s.modeQ); cfg.modeP = !!(s && s.modeP); cfg.heureP = (s && s.heureP) || '23:00'; cfg.qs = (s && s.qs) || []; cfg.qp = (s && s.qp) || []; cfg.secQ = (s && Number(s.secQ)) || 0; cfg.merciOrga = (s && s.merciOrga) || '';
+    cfg.type = (s && s.type) || 'autre'; cfg.modeQ = !!(s && s.modeQ); cfg.modeP = !!(s && s.modeP); cfg.heureP = (s && s.heureP) || '23:00'; cfg.qs = (s && s.qs) || []; cfg.qp = (s && s.qp) || []; cfg.secQ = (s && Number(s.secQ)) || 0; cfg.merciOrga = (s && s.merciOrga) || ''; cfg.orgaOn = s && (s.orgaOn === true || s.orgaOn === false) ? s.orgaOn : null;
     cfg.noel = !!(s && s.noel); cfg.format = (s && s.format) || 'auto';
     cfg.qui = (s && s.qui) || ''; cfg.quiSous = s ? (s.quiSous == null || s.quiSous === '' ? null : s.quiSous) : null; cfg.qualite = (s && s.qualite) || 'standard'; cfg.garde = (s && Number(s.garde)) || 14; cfg.choixFormat = !s || s.choixFormat !== false;
     cfg.cadrage = (s && s.cadrage != null && s.cadrage !== '') ? s.cadrage : (s ? '' : 'Vous pouvez incliner doucement la tablette pour vous cadrer');

@@ -2695,6 +2695,8 @@ function vbTypeChange(sel){
   const txt=ta.value.trim(), preset=Object.values(VB_QS).some(l=>l.join('\n')===txt);
   if(!txt||preset) ta.value=(VB_QS[sel.value]||VB_QS.autre).join('\n');
   const o=document.getElementById('vs-merciOrga'); if(o) o.placeholder=VB_ORGA[sel.value]||'(aucune phrase)';
+  /* tant qu'on n'a pas touché à l'interrupteur : phrase activée pour les particuliers, désactivée pour un événement pro */
+  const sw=document.getElementById('vs-orgaOn'); if(sw&&!sw.dataset.touche){ sw.checked=sel.value!=='entreprise'; const b=document.getElementById('vs-orgabloc'); if(b) b.style.display=sw.checked?'':'none'; }
 }
 const VB_CARTE='background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:14px 16px;margin-bottom:14px';
 const VB_INPUT='padding:8px 10px;border:1px solid #d9dde5;border-radius:8px;font:inherit;font-size:13.5px;color:#111';
@@ -2768,7 +2770,8 @@ function vbFormSession(){
   const sFin=sec('Fin du parcours','Nom, récupération de la vidéo (QR code, e-mail, envoi à quelqu’un), remerciement',
     '<div class="ssT">Nom de l’invité</div>'+f('qui','Titre',e.qui,'Qui êtes-vous ?')+f('quiSous','Phrase sous le titre',e.quiSous,'Pour que les organisateurs sachent qui a laissé ce message')+t('quiB','Bouton')+
     '<div class="ssT">Récupérer la vidéo</div>'+t('livT','Titre','plein')+
-    '<label class="f plein">Phrase au-dessus des boutons (laisser vide = phrase du type d’événement)<input id="vs-merciOrga" type="text" value="'+vbEsc(e.merciOrga||'')+'" placeholder="'+vbEsc(VB_ORGA[e.type||'autre'])+'" maxlength="300"></label>'+
+    '<div class="plein ligne">'+sw('vs-orgaOn',(e.orgaOn==null?(e.type||'autre')!=='entreprise':e.orgaOn),"this.dataset.touche='1';document.getElementById('vs-orgabloc').style.display=this.checked?'':'none'")+'<span>Afficher une phrase au-dessus des boutons (ex. « les mariés recevront toutes les vidéos ») — conseillé pour un mariage ou un anniversaire, inutile pour un événement pro</span></div>'+
+    '<label class="f plein" id="vs-orgabloc" style="'+((e.orgaOn==null?(e.type||'autre')!=='entreprise':e.orgaOn)?'':'display:none')+'">Phrase (laisser vide = phrase proposée pour ce type d’événement)<input id="vs-merciOrga" type="text" value="'+vbEsc(e.merciOrga||'')+'" placeholder="'+vbEsc(VB_ORGA[e.type||'autre'])+'" maxlength="300"></label>'+
     t('livQr','Bouton QR code')+t('livQrT','Texte sous le QR code')+t('livMail','Bouton e-mail')+t('livMailT','Libellé du champ e-mail')+
     t('livAutreQ','Question « l’envoyer à quelqu’un ? »','plein')+t('livOui','Bouton Oui')+t('livNon','Bouton Non')+t('livPrenom','Libellé du prénom de la personne')+t('livEmail2','Libellé de son e-mail')+t('livFin','Bouton pour terminer')+
     '<div class="ssT">Remerciement</div>'+t('merciT','Titre')+t('merciD','Texte'));
@@ -2852,7 +2855,7 @@ function vbSessSauver(){
   const textes={}; Object.keys(VB_DEF).forEach(k=>{ const el=document.getElementById('vt-'+k); const val=el?el.value.trim():''; if(val) textes[k]=val; });
   const ambEl=document.querySelector('input[name="vs-amb"]:checked');
   const s={nom:v('nom').trim(),date:v('date').trim(),fin:v('fin'),actif:coche('vs-actif'),mdp:prot?v('mdp').trim():'',titre:v('titre').trim(),sous:v('sous').trim(),qui:v('qui').trim(),quiSous:v('quiSous').trim(),max:Number(v('max'))||30,cadrage:v('cadrage').trim(),format:v('format'),qualite:v('qualite'),conserv:Number(v('conserv'))||0,choixFormat:coche('vs-choixformat'),noel:coche('vs-noel'),
-    type:v('type')||'autre',merciOrga:v('merciOrga').trim(),modeQ:coche('vs-modeQ'),modeP:coche('vs-modeP'),heureP:v('heureP')||'23:00',secQ:Number(v('secQ'))||0,qs:lignes(v('qs')),qp:lignes(v('qp')),amb:ambEl?ambEl.value:'blanc',ori:v('ori')||'auto',police:v('police')||'elegante',fond:coche('vs-perso')?v('fond').toUpperCase():'',accent:coche('vs-perso')?v('accent').toUpperCase():'',textes};
+    type:v('type')||'autre',merciOrga:v('merciOrga').trim(),orgaOn:coche('vs-orgaOn'),modeQ:coche('vs-modeQ'),modeP:coche('vs-modeP'),heureP:v('heureP')||'23:00',secQ:Number(v('secQ'))||0,qs:lignes(v('qs')),qp:lignes(v('qp')),amb:ambEl?ambEl.value:'blanc',ori:v('ori')||'auto',police:v('police')||'elegante',fond:coche('vs-perso')?v('fond').toUpperCase():'',accent:coche('vs-perso')?v('accent').toUpperCase():'',textes};
   if(s.modeQ&&!s.qs.length){ showToast('Ajoutez au moins une question pour la boîte à questions, ou désactivez-la',true); return; }
   if(s.modeP&&!s.qp.length){ showToast('Ajoutez au moins une question piquante, ou désactivez ce mode',true); return; }
   if(!s.nom){ showToast('Indiquez le nom de la session',true); return; }
@@ -3065,6 +3068,9 @@ async function vbLienPartage(){
     '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="vbPartCopie" type="button">Copier le lien</button><button class="btn btn-ghost" id="vbPartCopieM" type="button">Copier le mot de passe</button><a class="btn btn-ghost" id="vbPartWa" style="text-decoration:none" target="_blank" rel="noopener">WhatsApp (lien)</a><a class="btn btn-ghost" id="vbPartMail" style="text-decoration:none">E-mail (lien)</a><a class="btn btn-ghost" style="text-decoration:none" target="_blank" rel="noopener" href="'+r.url.replace(/"/g,'&quot;')+'">Aperçu</a><button class="btn btn-ghost" id="vbPartX" type="button" style="margin-left:auto">Fermer</button></div></div>';
     document.body.appendChild(d);
     const inp=d.querySelector('#vbPartLien'), mi=d.querySelector('#vbPartMdp'); inp.value=r.url; mi.value=r.mdp||'';
+    /* même mot de passe que la session de la tablette, si on préfère n'en retenir qu'un */
+    const sesP=(VBCFG.sessions||[]).find(e=>vbLabel(e)===VBEVT);
+    if(sesP&&sesP.mdp){ const bS=document.createElement('button'); bS.type='button'; bS.className='btn btn-ghost'; bS.style.cssText='margin:0 0 10px;padding:6px 12px;font-size:12.5px'; bS.textContent='Reprendre le mot de passe de la session'; bS.onclick=()=>{ mi.value=sesP.mdp; showToast(sesP.mdp.length<6?'Ce mot de passe est trop court pour la galerie (6 caractères minimum)':'Cliquez sur « Enregistrer » pour l’utiliser',sesP.mdp.length<6); }; mi.parentNode.insertAdjacentElement('afterend',bS); }
     const liens=()=>{ d.querySelector('#vbPartWa').href='https://wa.me/?text='+encodeURIComponent(msg('')); d.querySelector('#vbPartMail').href='mailto:?subject='+encodeURIComponent('Les vidéos de votre événement — '+VBEVT)+'&body='+encodeURIComponent(msg('')); }; liens();
     const copier=async t=>{ try{ await navigator.clipboard.writeText(t); }catch(e){ const x=document.createElement('input'); x.value=t; document.body.appendChild(x); x.select(); document.execCommand('copy'); x.remove(); } showToast('Copié'); };
     d.querySelector('#vbPartX').onclick=()=>d.remove(); d.onclick=e=>{ if(e.target===d) d.remove(); };
