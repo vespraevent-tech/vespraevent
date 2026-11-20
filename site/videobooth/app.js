@@ -35,15 +35,71 @@
   function veille() { clearTimeout(inactif); inactif = setTimeout(function () { if (!$('s-accueil').classList.contains('on') && !$('s-admin').classList.contains('on') && !$('s-pin').classList.contains('on') && !enregistrement) { arreterCam(); accueil(); } }, 120000); }
   ['pointerdown', 'keydown'].forEach(function (t) { document.addEventListener(t, veille, { passive: true }); });
   function accueil(garder) {
+    if (sessionMaj) { cfg.session = Object.assign({}, cfg.session, sessionMaj); sessionMaj = null; appliquerActif(); }
+    if (Date.now() - dernierMaj > 60000) majSession();   /* à chaque retour à l'accueil (au plus une fois par minute) : les réglages du back-office arrivent vite */
     $('t-accueil').textContent = cfg.titre || CFG0.titre; $('p-accueil').textContent = cfg.sous || '';
     $('t-qui').textContent = cfg.qui || 'Qui êtes-vous ?'; $('p-qui').textContent = cfg.quiSous == null ? 'Pour vous envoyer votre vidéo par e-mail' : cfg.quiSous;
-    if (!garder) { $('form').reset(); formatInvite = null; majFormat(); choisirPour('moi'); } $('f-err').textContent = ''; montrer('s-accueil'); majEtat();
+    if (!garder) { $('form').reset(); formatInvite = null; majFormat(); choisirPour('moi'); } $('f-err').textContent = ''; rendreModes(); montrer('s-accueil'); majEtat();
+  }
+  var sessionMaj = null;
+
+  /* ───────── modes : message vidéo, boîte à questions, questions piquantes ─────────
+     S'il n'y a que le message vidéo : un seul bouton « Commencer ». Sinon, une carte par mode ;
+     les questions piquantes restent grisées jusqu'à l'heure choisie dans le back-office (heure de Paris). */
+  var mode = 'video', questionsMode = [];
+  function minutesParis() {
+    try {
+      var h = 0, m = 0; new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date()).forEach(function (x) { if (x.type === 'hour') h = +x.value; if (x.type === 'minute') m = +x.value; });
+      return h * 60 + m;
+    } catch (e) { var d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
+  }
+  function hMin(t) { var m = /^(\d{1,2}):(\d{2})$/.exec(t || ''); return m ? (+m[1]) * 60 + (+m[2]) : 23 * 60; }
+  function hLib(t) { var u = hMin(t), h = Math.floor(u / 60), m = u % 60; return h + 'h' + (m ? ('0' + m).slice(-2) : ''); }
+  /* ouvertes à partir de l'heure choisie, et jusqu'à 6 h du matin quand cette heure est le soir ou l'après-midi */
+  function piquantesOuvertes() { var u = hMin(cfg.heureP), n = minutesParis(); return n >= u || (u >= 12 * 60 && n < 6 * 60); }
+  function modesDispo() { var l = ['video']; if (cfg.modeQ && (cfg.qs || []).length) l.push('questions'); if (cfg.modeP && (cfg.qp || []).length) l.push('piquantes'); return l; }
+  function rendreModes() {
+    var z = $('modes'), l = modesDispo(), seul = l.length === 1;
+    $('b-commencer').hidden = !seul; z.hidden = seul; z.innerHTML = ''; if (seul) return;
+    var T = { video: ['Message vidéo', 'Filmez le message de votre choix, ' + (Number(cfg.max) || 30) + ' secondes maximum'], questions: ['Boîte à questions', 'Répondez à nos questions face à la caméra'], piquantes: ['Questions piquantes', 'Des questions un peu plus osées'] };
+    l.forEach(function (id) {
+      var b = document.createElement('button'), ferme = id === 'piquantes' && !piquantesOuvertes();
+      b.type = 'button'; b.className = 'mode ' + (id === 'video' ? 'vid' : (id === 'piquantes' ? 'pi' : '')); b.innerHTML = '<b></b><span></span>';
+      b.firstChild.textContent = T[id][0]; b.lastChild.textContent = ferme ? 'Disponible à partir de ' + hLib(cfg.heureP) : T[id][1];
+      if (ferme) b.disabled = true; else b.onclick = function () { choisirMode(id); };
+      z.appendChild(b);
+    });
+  }
+  setInterval(function () { if ($('s-accueil').classList.contains('on')) rendreModes(); }, 20000);
+  function choisirMode(m) {
+    mode = m; questionsMode = m === 'questions' ? (cfg.qs || []).slice() : (m === 'piquantes' ? (cfg.qp || []).slice() : []);
+    formatInvite = null; majFormat(); invite = null; ouvrirCam();
+  }
+  /* durée de l'enregistrement : celle de la session, allongée si les questions demandent plus de temps (secondes par question réglées dans le back-office) */
+  function dureeMax() {
+    var m = Math.max(5, Number(cfg.max) || 30);
+    if (questionsMode.length && Number(cfg.secQ) > 0) m = Math.max(m, Math.min(120, questionsMode.length * Number(cfg.secQ)));
+    return m;
+  }
+  function secParQuestion() { var n = questionsMode.length; return n ? (Number(cfg.secQ) > 0 ? Number(cfg.secQ) : Math.max(3, dureeMax() / n)) : 0; }
+  function libMode() { return mode === 'piquantes' ? 'Questions piquantes' : 'Boîte à questions'; }
+  function introQuestions() {
+    var z = $('qbox'); if (mode === 'video' || !questionsMode.length) { z.hidden = true; return; }
+    z.classList.toggle('pi', mode === 'piquantes'); $('q-lib').textContent = libMode();
+    $('q-txt').textContent = questionsMode.length + ' question' + (questionsMode.length > 1 ? 's vont' : ' va') + ' défiler : répondez en regardant la caméra'; $('q-n').style.setProperty('--qp', '0%'); z.hidden = false;
+  }
+  function majQuestion(s) {
+    var n = questionsMode.length; if (!n) return;
+    var par = secParQuestion(), i = Math.min(n - 1, Math.floor(s / par)), reste = Math.min(1, Math.max(0, (s - i * par) / par));
+    $('q-lib').textContent = libMode() + ' · ' + (i + 1) + ' / ' + n; $('q-txt').textContent = questionsMode[i]; $('q-n').style.setProperty('--qp', Math.round(reste * 100) + '%');
+    $('qbox').classList.toggle('pi', mode === 'piquantes'); $('qbox').hidden = false;
   }
   function fmt(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
 
   /* ───────── formulaire ───────── */
-  $('b-commencer').onclick = function () { montrer('s-form'); setTimeout(function () { $('f-nom').focus(); }, 80); };
-  $('f-retour').onclick = function () { accueil(); };
+  $('b-commencer').onclick = function () { choisirMode('video'); };
+  /* le formulaire vient APRÈS la vidéo : « Retour » ramène à la vidéo, que l'invité peut revoir ou refaire */
+  $('f-retour').onclick = function () { if (blobFinal) revoir(); else accueil(); };
   /* envoyer la vidéo à soi-même ou à quelqu'un d'autre */
   var pour = 'moi';
   var CONSENT_MOI = 'J’accepte que Vespra Event conserve ma vidéo et mon adresse e-mail pour m’envoyer ma vidéo et la remettre aux organisateurs de l’événement. Elles sont supprimées peu après la fin de l’événement. Mes données ne sont pas utilisées autrement.';
@@ -65,7 +121,7 @@
     if (pour === 'autre' && !dp) return ($('f-err').textContent = 'Merci d’indiquer le prénom de la personne.');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(m)) return ($('f-err').textContent = 'Cette adresse e-mail ne semble pas valide.');
     if (!$('f-ok').checked) return ($('f-err').textContent = 'Merci de cocher la case pour recevoir votre vidéo.');
-    $('f-err').textContent = ''; invite = { prenom: p, nom: n, email: m, pour: pour, dest: pour === 'autre' ? dp : '' }; ouvrirCam();
+    $('f-err').textContent = ''; invite = { prenom: p, nom: n, email: m, pour: pour, dest: pour === 'autre' ? dp : '' }; enregistrerVideo();
   };
   var invite = null;
 
@@ -146,14 +202,14 @@
     minuteurReco = setTimeout(function () { minuteurReco = null; if ($('s-cam').classList.contains('on') && !enregistrement) ouvrirCam(); }, delai);
   }
   function arreterCam() {
-    analyseur = null; $('mic').hidden = true; if (boucle) { cancelAnimationFrame(boucle); boucle = 0; } if (flux) { flux.getTracks().forEach(function (t) { t.stop(); }); flux = null; } $('v-src').srcObject = null; }
+    analyseur = null; $('mic').hidden = true; $('qbox').hidden = true; if (boucle) { cancelAnimationFrame(boucle); boucle = 0; } if (flux) { flux.getTracks().forEach(function (t) { t.stop(); }); flux = null; } $('v-src').srcObject = null; }
   function ouvrirCam() {
     montrer('s-cam'); $('s-cam').classList.remove('flou'); $('cam-err').hidden = true; $('compte').hidden = true; $('rec').hidden = true; $('barre').hidden = true;
     $('b-go').hidden = true; $('b-stop').hidden = true; $('fmt').hidden = true; enregistrement = false;
     var contraintes = { audio: Object.assign({ echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1, sampleRate: 48000 }, cfg.mic ? { deviceId: { exact: cfg.mic } } : {}), video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, { width: { ideal: 1920 }, height: { ideal: 1080 } }) };
     arreterCam();
     navigator.mediaDevices.getUserMedia(contraintes).then(function (s) {
-      flux = s; $('b-go').hidden = false; $('fmt').hidden = !(cfg.choixFormat !== false) || testCam; majFormat(); $('cadrage').textContent = cfg.cadrage || ''; $('cadrage').hidden = !cfg.cadrage; $('v-src').srcObject = s; $('v-src').play().catch(function () {}); boucle = requestAnimationFrame(dessiner);
+      flux = s; $('b-go').hidden = false; if (!testCam) introQuestions(); $('fmt').hidden = !(cfg.choixFormat !== false) || testCam; majFormat(); $('cadrage').textContent = cfg.cadrage || ''; $('cadrage').hidden = !cfg.cadrage; $('v-src').srcObject = s; $('v-src').play().catch(function () {}); boucle = requestAnimationFrame(dessiner);
       grandAngle(s);
       camEtat = 'ok'; tFige = Date.now(); brancherMicro(s); $('mic').hidden = false;
       clearTimeout(minuteurStable); minuteurStable = setTimeout(function () { essaisCam = 0; }, 30000);
@@ -198,7 +254,7 @@
   }
   $('b-go').onclick = function () {
     if (!flux) return; $('fmt').hidden = true; $('cadrage').hidden = true; $('b-go').hidden = true; $('compte').hidden = false; $('s-cam').classList.add('flou');
-    $('compte-msg').textContent = 'Vous avez ' + (Number(cfg.max) || 30) + ' secondes maximum';
+    $('compte-msg').textContent = 'Vous avez ' + dureeMax() + ' secondes maximum';
     var n = 3; $('compte-n').textContent = n; decompte = setInterval(function () { n--; if (n > 0) { $('compte-n').textContent = n; } else { clearInterval(decompte); decompte = null; $('compte').hidden = true; $('s-cam').classList.remove('flou'); demarrer(); } }, 1000);
   };
   /* qualité choisie sur la session : haute 3,5 Mbit/s, standard 2,5, économique 1,8 (vidéos plus légères, moins de stockage et de données mobiles) */
@@ -214,13 +270,13 @@
       blobFinal = new Blob(morceaux, { type: mime.split(';')[0] });
       sonNiveau = Math.round(niveauMax * 100); var faible = sonNiveau < 3;
       $('son-alerte').hidden = !faible; $('son-alerte').textContent = faible ? 'On ne vous entend pas bien. Parlez un peu plus fort, plus près de la tablette, puis recommencez.' : ''; if (faible) nbSilence++;
-      arreterCam(); $('v-revoir').src = URL.createObjectURL(blobFinal); montrer('s-revoir'); $('v-revoir').play().catch(function () {});
+      arreterCam(); revoir();
     };
     rec.start(1000); enregistrement = true; t0 = Date.now();
-    var max = Math.max(5, Number(cfg.max) || 30);
+    var max = dureeMax(); if (questionsMode.length) majQuestion(0);
     $('rec').hidden = false; $('barre').hidden = false; $('b-stop').hidden = false; $('rec-max').textContent = '/ ' + fmt(max);
     minuteur = setInterval(function () {
-      var s = (Date.now() - t0) / 1000; $('rec-t').textContent = fmt(s); $('barre-i').style.width = Math.min(100, s / max * 100) + '%';
+      var s = (Date.now() - t0) / 1000; $('rec-t').textContent = fmt(s); $('barre-i').style.width = Math.min(100, s / max * 100) + '%'; if (questionsMode.length) majQuestion(s);
       if (s >= max) arreterRec();
     }, 200);
   }
@@ -233,11 +289,18 @@ $('b-stop').onclick = arreterRec;
     clearInterval(minuteur);
     if (rec && rec.state !== 'inactive') { rec.onstop = null; try { rec.stop(); } catch (e) {} }
     enregistrement = false; arreterCam(); morceaux = []; blobFinal = null; $('s-cam').classList.remove('flou');
-    montrer('s-form');
+    accueil();
   };
 
   /* ───────── revoir / terminer ───────── */
-  $('b-refaire').onclick = function () { try { URL.revokeObjectURL($('v-revoir').src); } catch (e) {} blobFinal = null; ouvrirCam(); };
+  var urlRevoir = null;
+  function revoir() {
+    try { if (urlRevoir) URL.revokeObjectURL(urlRevoir); } catch (e) {}
+    urlRevoir = URL.createObjectURL(blobFinal); $('v-revoir').src = urlRevoir; montrer('s-revoir'); $('v-revoir').play().catch(function () {});
+  }
+  $('b-refaire').onclick = function () { try { if (urlRevoir) URL.revokeObjectURL(urlRevoir); } catch (e) {} urlRevoir = null; blobFinal = null; ouvrirCam(); };
+  /* « Oui, c'est parfait » : on demande alors les coordonnées */
+  $('b-fin').onclick = function () { if (!blobFinal) return; montrer('s-form'); setTimeout(function () { $('f-nom').focus(); }, 80); };
   function nomFichier() {
     var net = function (x) { return x.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); };
     var d = new Date(), j = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2) + '_' + ('0' + d.getHours()).slice(-2) + 'h' + ('0' + d.getMinutes()).slice(-2);
@@ -266,17 +329,20 @@ $('b-stop').onclick = arreterRec;
   }
   $('m-fin').onclick = retourAccueilMerci;
 
-  $('b-fin').onclick = function () {
+  /* phrase de l'écran final selon le type d'événement (modifiable dans le back-office) */
+  var ORGA = { mariage: 'Les mariés recevront toutes les vidéos de la soirée.', entreprise: 'Les organisateurs recevront toutes les vidéos de l’événement.', anniversaire: 'La personne fêtée recevra toutes les vidéos.' };
+  function enregistrerVideo() {
     if (!blobFinal || !invite) return;
-    $('b-fin').disabled = true;
+    var bt = $('form').querySelector('button[type=submit]'); bt.disabled = true;
     var v = { id: 'v' + Date.now() + Math.random().toString(36).slice(2, 7), rk: cleRecup(), event: cfg.event, nom: invite.nom, prenom: invite.prenom, email: invite.email, consent: true,
-      son: sonNiveau, pour: invite.pour || 'moi', dest: invite.dest || '', fichier: nomFichier(), type: blobFinal.type, duree: Math.round((Date.now() - t0) / 1000), cree: new Date().toISOString(), essais: 0, blob: blobFinal };
+      son: sonNiveau, pour: invite.pour || 'moi', dest: invite.dest || '', fichier: nomFichier(), type: blobFinal.type, duree: Math.round((Date.now() - t0) / 1000), cree: new Date().toISOString(), essais: 0, mode: mode, qs: questionsMode.slice(), blob: blobFinal };
     ajouter(v).then(function () {
-      try { URL.revokeObjectURL($('v-revoir').src); } catch (e) {} blobFinal = null; invite = null; $('b-fin').disabled = false;
+      try { if (urlRevoir) URL.revokeObjectURL(urlRevoir); } catch (e) {} urlRevoir = null; blobFinal = null; invite = null; bt.disabled = false;
       $('m-txt').textContent = v.pour === 'autre' ? 'Votre vidéo sera envoyée à ' + v.dest + ' par e-mail.' : 'Votre vidéo vous sera envoyée par e-mail.';
+      var o = cfg.merciOrga || ORGA[cfg.type] || ''; $('m-orga').textContent = o; $('m-orga').hidden = !o;
       montrer('s-merci'); synchro(); afficherQr(v);
-    }).catch(function () { $('b-fin').disabled = false; alert('La vidéo n’a pas pu être enregistrée : la mémoire de la tablette est pleine. Prévenez l’équipe.'); });
-  };
+    }).catch(function () { bt.disabled = false; alert('La vidéo n’a pas pu être enregistrée : la mémoire de la tablette est pleine. Prévenez l’équipe.'); });
+  }
 
   /* ───────── envoi au serveur ───────── */
   var envoiEnCours = false, dernierMsg = ''; try { dernierMsg = localStorage.getItem('vb-err') || ''; } catch (e) {}
@@ -297,7 +363,7 @@ $('b-stop').onclick = arreterRec;
     var base = (cfg.serveur || location.origin).replace(/\/+$/, '');
     var n = Math.max(1, Math.ceil(v.blob.size / TAILLE)), i = 0, dernier = {};
     function suite() {
-      var q = new URLSearchParams({ id: v.id, i: i, n: n, fichier: v.fichier, type: v.type || '', nom: v.nom, prenom: v.prenom, email: v.email, event: v.event || '', duree: v.duree || 0, son: (v.son == null ? '' : v.son), pour: v.pour || 'moi', dest: v.dest || '', rk: v.rk || '' });
+      var q = new URLSearchParams({ id: v.id, i: i, n: n, fichier: v.fichier, type: v.type || '', nom: v.nom, prenom: v.prenom, email: v.email, event: v.event || '', duree: v.duree || 0, son: (v.son == null ? '' : v.son), pour: v.pour || 'moi', dest: v.dest || '', rk: v.rk || '', mode: v.mode || 'video', qs: (v.qs || []).join('|') });
       return fetch(base + '/api/videobooth/chunk?' + q.toString(), { method: 'POST', headers: { 'x-appareil': (cfg.jeton || cfg.cle), 'content-type': 'application/octet-stream' }, body: v.blob.slice(i * TAILLE, (i + 1) * TAILLE) }).then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (j) {
           if (!r.ok || j.ok === false) throw new Error(j.erreur || ('Serveur : ' + r.status));
@@ -324,7 +390,7 @@ $('b-stop').onclick = arreterRec;
   /* ── état de la tablette, envoyé toutes les 2 minutes au back-office (batterie, vidéos en attente, caméra, micro, place) ── */
   function battement() {
     if (!(cfg.jeton || cfg.cle)) return;
-    var etat = { cam: camEtat, mic: micEtat, ver: 27, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
+    var etat = { cam: camEtat, mic: micEtat, ver: 34, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
     var fin = function () {
       toutes().then(function (l) { etat.att = l.filter(function (v) { return !v.envoye; }).length; etat.tot = l.length; }).catch(function () {}).then(function () {
         return (navigator.storage && navigator.storage.estimate) ? navigator.storage.estimate().then(function (e) { etat.usage = e.usage || 0; etat.quota = e.quota || 0; }).catch(function () {}) : null;
@@ -415,6 +481,7 @@ $('b-stop').onclick = arreterRec;
     var s = cfg.session || null;
     cfg.event = s ? (s.label || s.nom || '') : '';
     cfg.titre = (s && s.titre) || CFG0.titre; cfg.sous = s ? (s.sous || '') : CFG0.sous; cfg.max = (s && Number(s.max)) || 30;
+    cfg.type = (s && s.type) || 'autre'; cfg.modeQ = !!(s && s.modeQ); cfg.modeP = !!(s && s.modeP); cfg.heureP = (s && s.heureP) || '23:00'; cfg.qs = (s && s.qs) || []; cfg.qp = (s && s.qp) || []; cfg.secQ = (s && Number(s.secQ)) || 0; cfg.merciOrga = (s && s.merciOrga) || '';
     cfg.noel = !!(s && s.noel); cfg.format = (s && s.format) || 'auto';
     cfg.qui = (s && s.qui) || ''; cfg.quiSous = s ? (s.quiSous == null || s.quiSous === '' ? null : s.quiSous) : null; cfg.qualite = (s && s.qualite) || 'standard'; cfg.garde = (s && Number(s.garde)) || 14; cfg.choixFormat = !s || s.choixFormat !== false;
     cfg.cadrage = (s && s.cadrage != null && s.cadrage !== '') ? s.cadrage : (s ? '' : 'Vous pouvez incliner doucement la tablette pour vous cadrer');
@@ -513,7 +580,7 @@ $('b-stop').onclick = arreterRec;
     window.addEventListener('popstate', function () {
       history.pushState({ vb: 1 }, '', location.href);
       var on = document.querySelector('.ecran.on'); var id = on ? on.id : '';
-      if (id === 's-form' || id === 's-pin') accueil();
+      if (id === 's-form') { if (blobFinal) revoir(); else accueil(); } else if (id === 's-pin') accueil();
       else if (id === 's-admin') { if (!$('adm-edit').hidden) $('e-retour').click(); else $('a-close').click(); }
       else if (id === 's-sess-mdp') $('sm-retour').click();
       else if (id === 's-cam' && !enregistrement && !decompte) $('b-x').click();
@@ -605,6 +672,18 @@ $('b-stop').onclick = arreterRec;
   setInterval(function () {
     if (Date.now() - debutPage > 8 * 3600e3 && navigator.onLine && !enregistrement && $('s-accueil').classList.contains('on')) { try { location.reload(); } catch (e) {} }
   }, 10 * 60e3);
+  /* réglages de la session (modes, questions, textes) relus au démarrage puis toutes les 5 minutes : une modification du back-office arrive seule sur la tablette,
+     et ne s'applique qu'à l'écran d'accueil, jamais pendant qu'un invité est en train de filmer */
+  var dernierMaj = 0;
+  function majSession() {
+    if (!cfg.jeton || !navigator.onLine || enregistrement) return;
+    dernierMaj = Date.now();
+    fetch(baseApi() + '/api/videobooth/ma-session', { headers: { 'x-appareil': cfg.jeton } }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (!j || !j.ok || !j.session) return;
+      sessionMaj = j.session; if ($('s-accueil').classList.contains('on')) accueil(true);
+    }).catch(function () {});
+  }
+  setInterval(majSession, 5 * 60e3); window.addEventListener('online', function () { setTimeout(majSession, 1500); }); setTimeout(majSession, 6000);
   function demarrerAppli() { var s = sessionStockee(); if (s) ouvrirSession(s); else versAcces(); }
   ouvrirDb().then(function () { demarrerAppli(); }).catch(function () { demarrerAppli(); $('etat').hidden = false; $('etat').textContent = 'Stockage de la tablette indisponible'; $('etat').classList.add('alerte'); });
 })();

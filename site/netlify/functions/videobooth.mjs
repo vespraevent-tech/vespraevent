@@ -114,6 +114,8 @@ const hMdp = (kind, v) => createHmac('sha256', process.env.VIDEOBOOTH_CLE || '')
 async function accesLire(st) { return st.get('config/acces', { type: 'json' }).catch(() => null); }
 async function accesEcrire(st, mdp, libre) { if (!mdp && libre) { const a = { libre: true, maj: new Date().toISOString() }; await st.setJSON('config/acces', a); return a; } if (!mdp) { await st.delete('config/acces').catch(() => {}); return null; } const a = { mdp, h: hMdp('acces', mdp), maj: new Date().toISOString() }; await st.setJSON('config/acces', a); return a; }
 async function sessionsLire(st) { const l = await st.get('config/sessions', { type: 'json' }).catch(() => null); return Array.isArray(l) ? l : []; }
+/* liste de questions : au plus 8, une par ligne, 140 caractères chacune ; « | » interdit (séparateur interne) */
+const lignes = (a, n = 8, m = 140) => (Array.isArray(a) ? a : String(a || '').split(/\r?\n/)).map((x) => String(x == null ? '' : x).replace(/[\s|]+/g, ' ').trim().slice(0, m)).filter(Boolean).slice(0, n);
 async function sessionsEcrire(st, liste) {
   const propre = liste.slice(0, 200).map((e) => ({
     id: String(e.id || ('s' + randomBytes(4).toString('hex'))).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40),
@@ -125,6 +127,13 @@ async function sessionsEcrire(st, liste) {
     conserv: (Number(e.conserv) > 0) ? Math.min(730, Math.max(7, Math.round(Number(e.conserv)))) : 0, garde: Math.min(365, Math.max(1, Math.round(Number(e.garde)) || 14)),
     qualite: ['haute', 'standard', 'eco'].includes(e.qualite) ? e.qualite : 'standard',
     choixFormat: e.choixFormat !== false,
+    /* parcours de l'invité : type d'événement (texte de l'écran final), modes supplémentaires et leurs questions */
+    type: ['mariage', 'entreprise', 'anniversaire', 'autre'].includes(e.type) ? e.type : 'autre',
+    modeQ: !!e.modeQ, modeP: !!e.modeP,
+    heureP: /^([01]\d|2[0-3]):[0-5]\d$/.test(String(e.heureP || '')) ? String(e.heureP) : '23:00',
+    qs: lignes(e.qs), qp: lignes(e.qp),
+    secQ: Math.min(20, Math.max(0, Math.round(Number(e.secQ)) || 0)),
+    merciOrga: String(e.merciOrga || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 200),
   })).filter((e) => e.nom);
   await st.setJSON('config/sessions', propre); return propre;
 }
@@ -133,6 +142,9 @@ const labelSession = (e) => e.nom + (e.date ? ' — ' + e.date : '');
 const aujourdhuiParis = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 const visible = (e) => e.actif !== false && (!e.fin || e.fin >= aujourdhuiParis());
 const carte = (e) => ({ id: e.id, nom: e.nom, date: e.date, prot: !!e.mdp });
+/* ce que la tablette reçoit d'une session (à l'ouverture, puis régulièrement : une modification du back-office arrive seule sur la tablette) */
+const vueSession = (ses) => ({ id: ses.id, nom: ses.nom, date: ses.date, label: labelSession(ses), titre: ses.titre, sous: ses.sous, max: ses.max, format: ses.format, noel: ses.noel, cadrage: ses.cadrage, qui: ses.qui, quiSous: ses.quiSous, qualite: ses.qualite, garde: ses.garde, choixFormat: ses.choixFormat !== false,
+  type: ses.type || 'autre', modeQ: !!ses.modeQ, modeP: !!ses.modeP, heureP: ses.heureP || '23:00', qs: ses.qs || [], qp: ses.qp || [], secQ: ses.secQ || 0, merciOrga: ses.merciOrga || '' });
 export { envoyerMail, jeton, jetonMail, jetonEvt, GARDE_JOURS, gardeJours, visible, galLire, galEcrire, genMdp, accesLire, accesEcrire, sessionsLire, sessionsEcrire, labelSession };
 
 export default async (request) => {
@@ -165,7 +177,16 @@ export default async (request) => {
     await noter('contact', 'session ouverte : ' + ses.nom);
     /* une tablette installée pour un événement de plusieurs semaines garde sa session 60 jours */
     const exp = Date.now() + 60 * 86400e3;
-    return rep({ ok: true, jeton: signer({ t: 'session', id: ses.id, exp }), exp, session: { id: ses.id, nom: ses.nom, date: ses.date, label: labelSession(ses), titre: ses.titre, sous: ses.sous, max: ses.max, format: ses.format, noel: ses.noel, cadrage: ses.cadrage, qui: ses.qui, quiSous: ses.quiSous, qualite: ses.qualite, garde: ses.garde, choixFormat: ses.choixFormat !== false } });
+    return rep({ ok: true, jeton: signer({ t: 'session', id: ses.id, exp }), exp, session: vueSession(ses) });
+  }
+
+  /* ── réglages à jour de la session ouverte sur la tablette (modes, questions, textes…) : lue au démarrage puis toutes les 10 minutes ── */
+  if (request.method === 'GET' && /\/api\/videobooth\/ma-session$/.test(url.pathname)) {
+    const jt = lireJeton(request.headers.get('x-appareil'), 'session');
+    if (!cle || !jt) return rep({ ok: false, erreur: 'Session expirée' }, 403);
+    const ses = (await sessionsLire(store())).find((e) => e.id === jt.id);
+    if (!ses || !visible(ses)) return rep({ ok: false, erreur: 'Session introuvable ou terminée.' }, 404);
+    return rep({ ok: true, session: vueSession(ses) });
   }
 
   /* ── test de connexion depuis les réglages de la tablette ── */
@@ -258,16 +279,16 @@ export default async (request) => {
     if (request.method !== 'GET') return new Response('Méthode non autorisée', { status: 405 });
     const liste = await lireMetas(st, (m) => (m.event || SANS_NOM) === label && !perimee(m));
     liste.sort((a, b) => String(a.cree).localeCompare(String(b.cree)));
-    const lignes = liste.map((m) => ({ nom: `${m.prenom} ${m.nom}`.trim(), fichier: m.fichier, date: m.cree, mo: Math.round((m.octets || 0) / 104857.6) / 10, href: `/api/videobooth/v/${m.id}?t=${jeton(m.id)}` }));
-    const rows = lignes.map((l, i) => `<div class="c"><button class="pl" type="button" data-i="${i}" aria-label="Voir la vidéo de ${esc(l.nom)}"><svg viewBox="0 0 24 24" width="30" height="30" fill="#fff"><path d="M8 5v14l11-7z"/></svg></button><div class="n"><b>${esc(l.nom)}</b><span>${esc(new Date(l.date).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }))}</span></div><a href="${esc(l.href)}&amp;dl=1" download>Télécharger</a></div>`).join('');
+    const lignesV = liste.map((m) => ({ nom: `${m.prenom} ${m.nom}`.trim(), mode: m.mode === 'piquantes' ? 'Questions piquantes' : (m.mode === 'questions' ? 'Boîte à questions' : ''), qs: Array.isArray(m.qs) ? m.qs : [], fichier: m.fichier, date: m.cree, mo: Math.round((m.octets || 0) / 104857.6) / 10, href: `/api/videobooth/v/${m.id}?t=${jeton(m.id)}` }));
+    const rows = lignesV.map((l, i) => `<div class="c"><button class="pl" type="button" data-i="${i}" aria-label="Voir la vidéo de ${esc(l.nom)}"><svg viewBox="0 0 24 24" width="30" height="30" fill="#fff"><path d="M8 5v14l11-7z"/></svg></button><div class="n"><b>${esc(l.nom)}</b><span>${esc(new Date(l.date).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }))}</span>${l.mode ? `<details class="qd"><summary>${esc(l.mode)}</summary><ol>${l.qs.map((x) => `<li>${esc(x)}</li>`).join('')}</ol></details>` : ''}</div><a href="${esc(l.href)}&amp;dl=1" download>Télécharger</a></div>`).join('');
     const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Souvenirs — ${esc(label)}</title>
-<style>*{box-sizing:border-box}body{margin:0;background:#0f2237;font-family:Inter,Arial,sans-serif;color:#fff}header{padding:34px 18px 18px;text-align:center;background:radial-gradient(700px 300px at 85% 0,rgba(245,158,11,.2),transparent 70%)}header small{letter-spacing:.3em;font-size:11px;color:#9fb0c6}h1{font-size:26px;margin:8px 0 4px}header p{margin:0;color:#9fb0c6;font-size:14px}main{max-width:760px;margin:0 auto;padding:6px 14px 60px}.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:14px}.c{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}.pl{height:92px;border:0;border-radius:10px;background:linear-gradient(135deg,#2B4A6B,#16365a);display:flex;align-items:center;justify-content:center;cursor:pointer}.n b{display:block;font-size:15px}.n span{font-size:12px;color:#9fb0c6}.c a{background:#F59E0B;color:#1a1205;border-radius:8px;padding:9px;text-align:center;text-decoration:none;font:700 13px Arial,sans-serif}#zip{display:block;width:100%;margin-top:6px;background:#F59E0B;color:#1a1205;border:0;border-radius:10px;padding:14px;font:700 15px Arial,sans-serif;cursor:pointer}#st{font-size:13px;color:#9fb0c6;text-align:center;margin-top:8px;min-height:16px}#m{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;z-index:5;padding:14px}#m.on{display:flex}#m video{max-width:100%;max-height:78vh;border-radius:12px;background:#000}#m button{background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:9px;padding:10px 22px;font:600 14px Arial,sans-serif}.note{text-align:center;color:#9fb0c6;font-size:12.5px;margin-top:22px}.vide{text-align:center;color:#9fb0c6;padding:40px 0}</style></head><body>
-<header><small>VESPRA EVENT</small><h1>${esc(label)}</h1><p>${lignes.length} message${lignes.length > 1 ? 's' : ''} vidéo de vos invités</p></header>
-<main>${lignes.length ? '<button id="zip" type="button">Tout télécharger (.zip)</button><div id="st"></div>' : ''}<div class="g">${rows || '<div class="vide">Aucune vidéo disponible.</div>'}</div>
+<style>*{box-sizing:border-box}body{margin:0;background:#0f2237;font-family:Inter,Arial,sans-serif;color:#fff}header{padding:34px 18px 18px;text-align:center;background:radial-gradient(700px 300px at 85% 0,rgba(245,158,11,.2),transparent 70%)}header small{letter-spacing:.3em;font-size:11px;color:#9fb0c6}h1{font-size:26px;margin:8px 0 4px}header p{margin:0;color:#9fb0c6;font-size:14px}main{max-width:760px;margin:0 auto;padding:6px 14px 60px}.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:14px}.c{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}.pl{height:92px;border:0;border-radius:10px;background:linear-gradient(135deg,#2B4A6B,#16365a);display:flex;align-items:center;justify-content:center;cursor:pointer}.n b{display:block;font-size:15px}.n span{font-size:12px;color:#9fb0c6}.qd{margin-top:6px;font-size:12px;color:#cdd8e6}.qd summary{cursor:pointer;color:#F59E0B}.qd ol{margin:6px 0 0;padding-left:18px;line-height:1.4}.c a{background:#F59E0B;color:#1a1205;border-radius:8px;padding:9px;text-align:center;text-decoration:none;font:700 13px Arial,sans-serif}#zip{display:block;width:100%;margin-top:6px;background:#F59E0B;color:#1a1205;border:0;border-radius:10px;padding:14px;font:700 15px Arial,sans-serif;cursor:pointer}#st{font-size:13px;color:#9fb0c6;text-align:center;margin-top:8px;min-height:16px}#m{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;z-index:5;padding:14px}#m.on{display:flex}#m video{max-width:100%;max-height:78vh;border-radius:12px;background:#000}#m button{background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:9px;padding:10px 22px;font:600 14px Arial,sans-serif}.note{text-align:center;color:#9fb0c6;font-size:12.5px;margin-top:22px}.vide{text-align:center;color:#9fb0c6;padding:40px 0}</style></head><body>
+<header><small>VESPRA EVENT</small><h1>${esc(label)}</h1><p>${lignesV.length} message${lignesV.length > 1 ? 's' : ''} vidéo de vos invités</p></header>
+<main>${lignesV.length ? '<button id="zip" type="button">Tout télécharger (.zip)</button><div id="st"></div>' : ''}<div class="g">${rows || '<div class="vide">Aucune vidéo disponible.</div>'}</div>
 <p class="note">Les vidéos restent disponibles plusieurs semaines après l’enregistrement : pensez à les télécharger pour les garder.<br>Vespra Event — spécialiste de la location événementielle dans le Grand Ouest.</p></main>
 <div id="m"><video id="mv" controls playsinline></video><button id="mx" type="button">Fermer</button></div>
 <script src="/videobooth/zip.js"></script><script>
-var L=${JSON.stringify(lignes).replace(/</g, '\\u003c')};
+var L=${JSON.stringify(lignesV).replace(/</g, '\\u003c')};
 var m=document.getElementById('m'),mv=document.getElementById('mv');
 Array.prototype.forEach.call(document.querySelectorAll('.pl'),function(b){b.onclick=function(){mv.src=L[+b.dataset.i].href+'&lecture=1';m.classList.add('on');mv.play().catch(function(){});};});
 document.getElementById('mx').onclick=function(){mv.pause();mv.removeAttribute('src');mv.load();m.classList.remove('on');};
@@ -362,6 +383,8 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
       fichier: String(q.get('fichier') || 'video.mp4').replace(/[\\/:*?"<>|\r\n]+/g, ' ').trim().slice(0, 150) || 'video.mp4',
       type: String(q.get('type') || 'video/mp4').slice(0, 40), duree: Number(q.get('duree')) || 0, pour: q.get('pour') === 'autre' ? 'autre' : 'moi', dest: q.get('pour') === 'autre' ? String(q.get('dest') || '').replace(/[<>\r\n]+/g, ' ').trim().slice(0, 60) : '', son: q.get('son') === '' || q.get('son') == null ? null : Math.min(100, Math.max(0, Math.round(Number(q.get('son')) || 0))), octets: total, cree: new Date().toISOString(),
     };
+    /* mode choisi par l'invité (message vidéo, boîte à questions, questions piquantes) et questions posées pendant la vidéo */
+    { const md = String(q.get('mode') || ''); if (md === 'questions' || md === 'piquantes') { m.mode = md; m.qs = lignes(String(q.get('qs') || '').split('|')); } }
     /* clé de récupération par QR code (aléatoire, générée sur la tablette) : permet à l'invité d'ouvrir sa propre vidéo depuis l'écran de remerciement */
     { const rk = String(q.get('rk') || '').replace(/[^A-Za-z0-9]/g, '').slice(0, 40); if (rk.length >= 12) m.rk = rk; }
     /* durée de conservation propre à la session de cette vidéo */
