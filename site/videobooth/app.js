@@ -503,7 +503,6 @@ $('b-stop').onclick = arreterRec;
     var v = $('pin-in').value.trim(), e = lirePinEssais();
     if (modePin === 'creer') {
       if (!/^\d{4,12}$/.test(v)) return ($('pin-err').textContent = 'De 4 à 12 chiffres.');
-      if (v === PIN_USINE) return ($('pin-err').textContent = 'Choisissez un autre code que celui d’usine.');
       pinNouveau = v; modePin = 'confirmer'; $('pin-t').textContent = 'Confirmez le nouveau code'; $('pin-in').value = ''; $('pin-err').textContent = ''; return;
     }
     if (modePin === 'confirmer') {
@@ -611,7 +610,7 @@ $('b-stop').onclick = arreterRec;
   };
   function ouvrirAdmin() {
     $('a-serveur').value = cfg.serveur;
-    var usine = cfg.pin === PIN_USINE; $('a-pin-m').textContent = usine ? '⚠ La tablette utilise encore le code d’usine : changez-le avant de la laisser sans surveillance.' : 'Code personnalisé. Gardez-le pour vous.'; $('a-pin-m').classList.toggle('alerte', usine);
+    $('a-pin-m').textContent = 'Ce code protège les réglages et l’export des vidéos. Après 5 erreurs, la tablette se bloque quelques minutes.';
     $('adm-edit').hidden = true; $('adm-liste').hidden = false; rendreCartes(); majEtat(); majStock(); montrer('s-admin');
   }
   function ouvrirEdition(id) {
