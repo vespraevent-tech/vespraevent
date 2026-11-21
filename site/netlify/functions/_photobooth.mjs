@@ -62,7 +62,7 @@ export function evenementPropre(e, ancien) {
       texte: { contenu: txt(ac.texte && ac.texte.contenu, 80), police: ['elegante', 'manuscrite', 'moderne', 'festive'].includes(ac.texte && ac.texte.police) ? ac.texte.police : 'elegante', couleur: hex(ac.texte && ac.texte.couleur, '#231F1C'), taille: nb(ac.texte && ac.texte.taille, 24, 260, 110), x: nb(ac.texte && ac.texte.x, 0, 1920, 960), y: nb(ac.texte && ac.texte.y, 0, 1080, 200) },
       logo: { image: idOk(ac.logo && ac.logo.image, 'im'), x: nb(ac.logo && ac.logo.x, 0, 1920, 960), y: nb(ac.logo && ac.logo.y, 0, 1080, 900), largeur: nb(ac.logo && ac.logo.largeur, 40, 1920, 360) },
     },
-    capture: { premier: nb(cap.premier, 1, 30, 7), suivants: nb(cap.suivants, 1, 30, 3) },
+    capture: { premier: nb(cap.premier, 1, 30, 7), suivants: nb(cap.suivants, 1, 30, 3), texteAvant: txt(cap.texteAvant, 80) },
     partage: { qr: oui(pa.qr, true), bruts: oui(pa.bruts, true), duree: nb(pa.duree, 10, 600, 45), titre: txt(pa.titre, 120), recommencer: txt(pa.recommencer, 40), terminer: txt(pa.terminer, 40) },
     impression: {
       auto: oui(im.auto, false), bouton: oui(im.bouton, true), copiesMax: nb(im.copiesMax, 1, 10, 2),

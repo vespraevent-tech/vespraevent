@@ -222,12 +222,15 @@
       + '</div></div>';
     dessinerScene();
   }
+  /* aperçu : une photo type 3:2 (celle du reflex) recadrée dans la case, sans déformation, comme sur la borne */
+  var EXEMPLE = 'url("data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" preserveAspectRatio="none"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfe3f5"/><stop offset="1" stop-color="#f1e4d3"/></linearGradient></defs><rect width="300" height="200" fill="url(#g)"/><g fill="#6b7a8f"><circle cx="105" cy="78" r="22"/><path d="M62 200c0-42 18-68 43-68s43 26 43 68z"/></g><g fill="#8a6a5a"><circle cx="190" cy="84" r="20"/><path d="M150 200c0-40 17-64 40-64s40 24 40 64z"/></g><rect x="1" y="1" width="298" height="198" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2"/></svg>') + '") center/cover no-repeat';
+  var fondCase = function (k) { var c = COUL[k.n] || '#999'; return 'linear-gradient(' + c + '55,' + c + '55),' + EXEMPLE; };
   function dessinerScene() {
     var m = PB.edit.m, sc = $('pbScene'); if (!sc) return;
     sc.innerHTML = '';
     m.cases.forEach(function (k, i) {
       var d = document.createElement('div'); d.className = 'pb-case' + (i === PB.sel ? ' sel' : ''); d.dataset.i = i;
-      d.style.cssText += 'left:' + k.x * echelle + 'px;top:' + k.y * echelle + 'px;width:' + k.w * echelle + 'px;height:' + k.h * echelle + 'px;background:' + (COUL[k.n] || '#999') + ';transform:rotate(' + (k.r || 0) + 'deg);font-size:' + Math.max(14, Math.min(k.w, k.h) * echelle * 0.35) + 'px';
+      d.style.cssText += 'left:' + k.x * echelle + 'px;top:' + k.y * echelle + 'px;width:' + k.w * echelle + 'px;height:' + k.h * echelle + 'px;background:' + fondCase(k) + ';transform:rotate(' + (k.r || 0) + 'deg);font-size:' + Math.max(14, Math.min(k.w, k.h) * echelle * 0.35) + 'px';
       d.textContent = k.n; var p = document.createElement('i'); p.className = 'poignee'; d.appendChild(p);
       d.addEventListener('pointerdown', function (ev) { glisser(ev, i, ev.target === p); });
       sc.appendChild(d);
@@ -241,12 +244,18 @@
     document.querySelectorAll('.pb-case').forEach(function (n) { n.classList.toggle('sel', +n.dataset.i === i); });
     var bouger = function (e) {
       var dx = (e.clientX - x0) / echelle, dy = (e.clientY - y0) / echelle;
-      if (redim) { k.w = Math.max(30, Math.round(d.w + dx)); k.h = Math.max(30, Math.round(d.h + dy)); } else { k.x = Math.round(d.x + dx); k.y = Math.round(d.y + dy); }
+      if (redim) { k.w = Math.max(30, Math.round(d.w + dx)); k.h = e.shiftKey ? Math.max(30, Math.round(k.w * d.h / d.w)) : Math.max(30, Math.round(d.h + dy)); } else { k.x = Math.round(d.x + dx); k.y = Math.round(d.y + dy); }
       el.style.left = k.x * echelle + 'px'; el.style.top = k.y * echelle + 'px'; el.style.width = k.w * echelle + 'px'; el.style.height = k.h * echelle + 'px';
+      var ind = $('pbRecadre'); if (ind) ind.innerHTML = recadrage(k);
     };
     var fin = function () { el.removeEventListener('pointermove', bouger); el.removeEventListener('pointerup', fin); el.removeEventListener('pointercancel', fin); reglagesCase(); };
     el.addEventListener('pointermove', bouger); el.addEventListener('pointerup', fin); el.addEventListener('pointercancel', fin);
     reglagesCase();
+  }
+  function recadrage(k) {
+    var r = k.w / k.h, ideal = 1.5, vis = r > ideal ? ideal / r : r / ideal, coupe = Math.round((1 - vis) * 100);
+    return coupe <= 3 ? '<span style="color:#2a7a4b">✓ Proportions du reflex (3:2) : toute l’image est utilisée.</span>'
+      : '<span style="color:' + (coupe > 30 ? '#b03a2a' : '#8a6a1a') + '">' + coupe + ' % de l’image du reflex est coupé (' + (r > ideal ? 'en haut et en bas' : 'sur les côtés') + '). Jamais déformée.</span>';
   }
   function reglagesCase() {
     var z = $('pbCaseReg'); if (!z) return; var k = PB.edit.m.cases[PB.sel];
@@ -255,6 +264,7 @@
     z.innerHTML = '<div class="pb-champs" style="grid-template-columns:1fr 1fr">'
       + '<label>Pose<select id="pbc-n" onchange="pbCaseChamp()">' + [1, 2, 3, 4].map(function (x) { return '<option' + (x === k.n ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select></label>' + n('pbc-r', 'Rotation (°)', k.r || 0)
       + n('pbc-x', 'Gauche (px)', k.x) + n('pbc-y', 'Haut (px)', k.y) + n('pbc-w', 'Largeur', k.w) + n('pbc-h', 'Hauteur', k.h) + '</div>'
+      + '<p id="pbRecadre" class="aide" style="font-size:12.5px;margin:8px 0 0">' + recadrage(k) + '</p><p class="aide" style="font-size:12px;color:#6b7280;margin:4px 0 0">Maj + coin en bas à droite : agrandir en gardant les proportions.</p>'
       + '<div class="pb-actions" style="margin-top:8px"><button class="btn btn-ghost" style="color:#b03a2a" onclick="pbSupprimerCase()">Supprimer cette case</button></div>';
   }
   window.pbCaseChamp = function () {
@@ -322,10 +332,11 @@
     var k = PB.evt.capture;
     c.innerHTML = '<div class="pb-bloc"><h3>Compte à rebours</h3><p class="aide">Après le choix de la mise en page : un compte à rebours avant la première photo, puis un plus court entre les poses suivantes.</p><div class="pb-champs">'
       + champ('pbk-1', 'Avant la 1re photo (secondes)', k.premier, '7', 'number', ' min="1" max="30"') + champ('pbk-n', 'Entre les poses suivantes (secondes)', k.suivants, '3', 'number', ' min="1" max="30"') + '</div></div>'
+      + '<div class="pb-bloc"><h3>Message avant la première photo</h3><p class="aide">Affiché pendant que l’invité se voit en direct dans la case, avant le compte à rebours.</p><div class="pb-champs">' + champ('pbk-txt', 'Message', k.texteAvant, 'Placez-vous dans le cadre') + '</div></div>'
       + '<div class="pb-bloc"><h3>Appareil photo</h3><p class="aide" style="margin:0">Les réglages du Canon à distance (ISO, ouverture, vitesse, balance des blancs) arriveront à l’étape 2, une fois l’appli installée sur le mini-PC avec l’appareil branché.</p></div>'
       + '<div class="pb-pied"><button class="btn" onclick="pbCaptureSauver()">Enregistrer</button></div>';
   }
-  window.pbCaptureSauver = function () { PB.evt.capture = { premier: +val('pbk-1') || 7, suivants: +val('pbk-n') || 3 }; enregistrer('Compte à rebours enregistré').then(rendre); };
+  window.pbCaptureSauver = function () { PB.evt.capture = { premier: +val('pbk-1') || 7, suivants: +val('pbk-n') || 3, texteAvant: val('pbk-txt').trim() }; enregistrer('Compte à rebours enregistré').then(rendre); };
 
   /* ───────── écran d'accueil (1920 × 1080) ───────── */
   var eAcc = 1;

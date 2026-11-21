@@ -269,7 +269,7 @@
     })();
     var suite = Camera.demarrer().catch(function () { toast('Appareil photo introuvable'); throw new Error('cam'); });
     var une = function (i) {
-      actif = i + 1; $('p-pose').textContent = poses > 1 ? 'Photo ' + (i + 1) + ' / ' + poses : '';
+      actif = i + 1; $('p-pose').textContent = i === 0 ? (cap.texteAvant || 'Placez-vous dans le cadre') : 'Photo ' + (i + 1) + ' / ' + poses;
       var o = (sc.cvs[actif] || [])[0], cp = $('p-compte');
       if (o) { cp.style.left = (o.cs.x + o.cs.w / 2) * sc.k + 'px'; cp.style.top = (o.cs.y + o.cs.h / 2) * sc.k + 'px'; cp.style.fontSize = Math.max(60, Math.min(o.cs.w, o.cs.h) * sc.k * 0.55) + 'px'; }
       return compteARebours(i === 0 ? cap.premier : cap.suivants).then(function () {
