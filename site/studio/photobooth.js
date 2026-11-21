@@ -18,7 +18,6 @@
     { format: '4x6l', nom: '10×15 paysage · 1 pose', cases: [[60, 60, 1680, 960]] },
     { format: '4x6l', nom: '10×15 paysage · 3 poses en grille', cases: [[45, 45, 840, 540], [915, 45, 840, 540], [45, 615, 840, 540]] },
     { format: '4x6l', nom: '10×15 paysage · 3 poses côte à côte', cases: [[45, 150, 550, 820], [625, 150, 550, 820], [1205, 150, 550, 820]] },
-    { format: 'carre', nom: 'Carré · 1 pose', cases: [[60, 60, 1680, 1680]] },
   ];
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
   var $ = function (id) { return document.getElementById(id); };
@@ -179,8 +178,11 @@
       + (PB.modeles ? '<div class="pb-bloc"><h3>Choisir un format de base</h3><p class="aide">Posez ensuite votre calque (votre design PNG) par-dessus et ajustez les cases 1, 2, 3, 4 dans ses trous.</p><div class="pb-modeles" id="pbModeles"></div></div>' : '')
       + (l.length ? '<div class="pb-mp" id="pbMpListe"></div>' : '<div class="pb-bloc"><div class="pb-vide">Aucune mise en page pour l’instant.</div></div>');
     if (PB.modeles) {
-      var zm = $('pbModeles');
+      var zm = $('pbModeles'), fam = function (f) { return f === '2x6' ? 'b' : 'p'; }, actuelle = l.length ? fam(l[0].format) : '';
+      /* un événement est soit en 10×15, soit en bandelettes 5×15 : jamais les deux */
+      if (actuelle) zm.insertAdjacentHTML('beforebegin', '<p class="aide" style="color:#6b7280;font-size:13px;margin:0 0 10px">Cet événement est en <b>' + (actuelle === 'b' ? 'bandelettes 5×15' : '10×15') + '</b> : seuls ces formats sont proposés. Pour changer, supprimez d’abord ses mises en page.</p>');
       MODELES.forEach(function (mo, i) {
+        if (actuelle && fam(mo.format) !== actuelle) return;
         var b = document.createElement('button'); b.type = 'button'; var cv = document.createElement('canvas');
         dessiner(cv, { format: mo.format, fond: '#f0eee8', cases: mo.cases.map(function (q, j) { return { n: j + 1, x: q[0], y: q[1], w: q[2], h: q[3], r: 0 }; }) }, null, true);
         b.appendChild(cv); b.appendChild(document.createTextNode(mo.nom)); b.onclick = function () { pbCreerMp(i); }; zm.appendChild(b);

@@ -53,7 +53,8 @@ export function evenementPropre(e, ancien) {
     mdp: txt(e.mdp, 40),
     cree: a.cree || new Date().toISOString(),
     maj: new Date().toISOString(),
-    misesEnPage: (Array.isArray(e.misesEnPage) ? e.misesEnPage : []).slice(0, 20).map(miseEnPagePropre),
+    /* un événement est soit en 10×15, soit en bandelettes 5×15 : on garde la famille de la première mise en page */
+    misesEnPage: (Array.isArray(e.misesEnPage) ? e.misesEnPage : []).slice(0, 20).map(miseEnPagePropre).filter((m, i, l) => (m.format === '2x6') === (l[0].format === '2x6')),
     accueil: {
       fond: idOk(ac.fond, 'im'), couleur: hex(ac.couleur, '#FFFFFF'),
       bouton: { x: nb(ac.bouton && ac.bouton.x, 0, 1920, 960), y: nb(ac.bouton && ac.bouton.y, 0, 1080, 540), taille: nb(ac.bouton && ac.bouton.taille, 80, 600, 230), couleur: hex(ac.bouton && ac.bouton.couleur, '#1F3B5A'), icone: hex(ac.bouton && ac.bouton.icone, '#FFFFFF') },
