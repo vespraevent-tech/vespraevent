@@ -59,6 +59,13 @@ async function detecter() {
   if (avant !== appareil && fen) fen.webContents.send('etat', etat());
 }
 setInterval(detecter, 5000);
+/* digiCamControl lancé tout seul, réduit, si l'appli le trouve sur le PC et qu'il ne tourne pas */
+async function lancerDcc() {
+  if (process.platform !== 'win32' || (await dcc('/?slc=get&param1=camera&param2=', 'text', 1500)) != null) return;
+  const l = [process.env['ProgramFiles(x86)'], process.env.ProgramFiles].filter(Boolean).map((d) => path.join(d, 'digiCamControl', 'CameraControl.exe'));
+  const exe = l.find((f) => fs.existsSync(f)); if (!exe) return;
+  try { require('node:child_process').spawn(exe, [], { detached: true, stdio: 'ignore', windowsHide: true }).unref(); } catch {}
+}
 
 ipcMain.on('etat', (e) => { e.returnValue = etat(); });
 ipcMain.handle('visee', async (_e, on) => { await dcc(on ? '/?CMD=LiveViewWnd_Show' : '/?CMD=LiveViewWnd_Hide'); return true; });
@@ -130,7 +137,7 @@ app.whenReady().then(() => {
   /* sortie de secours pour le personnel : Ctrl+Maj+Q quitte, Ctrl+Maj+K bascule le plein écran */
   globalShortcut.register('CommandOrControl+Shift+Q', () => app.quit());
   globalShortcut.register('CommandOrControl+Shift+K', () => { if (fen) { const v = !fen.isKiosk(); fen.setKiosk(v); fen.setFullScreen(v); } });
-  creerFenetre(); detecter();
+  lancerDcc(); creerFenetre(); detecter();
   fen.webContents.once('did-finish-load', async () => {          /* imprimante DNP choisie d'office */
     try { const l = (await fen.webContents.getPrintersAsync()).map((p) => p.name); if (!R.imprimante) { R.imprimante = l.find((n) => /dnp|ds620|rx1/i.test(n)) || ''; sauver(); fen.webContents.send('etat', etat()); } } catch {}
   });
