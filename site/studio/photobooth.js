@@ -507,18 +507,21 @@
 
   /* ───────── écran de partage (1920 × 1080) ───────── */
   var eEc = 0.45;
-  var EC_NOMS = { photo: 'Photo', titre: 'Titre', qr: 'QR code', legende: 'Texte sous le QR code', imprimer: 'Bouton Imprimer', recommencer: 'Bouton Recommencer', terminer: 'Bouton Terminer' };
-  function ecPos() { return PB.evt.partage.ecran[PB.ecVar || 'avec']; }
+  var EC_NOMS = { photo: 'Photo prise', titre: 'Titre', qr: 'QR code', legende: 'Texte sous le QR code', imprimer: 'Bouton Imprimer', recommencer: 'Bouton Recommencer', suivant: 'Bouton Suivant', terminer: 'Bouton Terminer' };
+  function ecPos() { return PB.evt.partage.ecran[PB.ecVar || 'valid']; }
   function ecTexte(k) {
     var pa = PB.evt.partage, im = PB.evt.impression;
-    return { titre: pa.titre || 'Votre photo est prête !', legende: pa.legende || 'Scannez pour récupérer votre photo', imprimer: im.txtImprimer || 'Imprimer', recommencer: pa.recommencer || 'Recommencer', terminer: pa.terminer || 'Terminer' }[k];
+    return { titre: PB.ecVar === 'valid' ? (pa.titreValid || 'Cette photo vous plaît ?') : (pa.titre || 'Votre photo est prête !'), legende: pa.legende || 'Scannez pour récupérer votre photo', imprimer: im.txtImprimer || 'Imprimer', recommencer: pa.recommencer || 'Recommencer', suivant: pa.suivant || 'Suivant', terminer: pa.terminer || 'Terminer' }[k];
   }
+  var EC_DEFAUT = { titre: 'Votre photo est prête !', legende: 'Scannez pour récupérer votre photo', imprimer: 'Imprimer', recommencer: 'Recommencer', suivant: 'Suivant', terminer: 'Terminer' };
+  var ecDefaut = function (k) { return k === 'titre' && PB.ecVar === 'valid' ? 'Cette photo vous plaît ?' : EC_DEFAUT[k]; };
+  var ecOrdre = function () { return PB.ecVar === 'valid' ? ['photo', 'titre', 'recommencer', 'suivant'] : ['titre', 'qr', 'legende'].concat(PB.ecVar === 'avec' ? ['imprimer'] : []).concat(['terminer']); };
   function secEcran(c) {
-    var ec = PB.evt.partage.ecran; PB.ecVar = PB.ecVar || 'avec'; PB.ecSel = PB.ecSel || 'qr'; if (!PB.ecSels) PB.ecSels = [PB.ecSel];
+    var ec = PB.evt.partage.ecran; PB.ecVar = PB.ecVar || 'valid'; PB.ecSel = ecOrdre().indexOf(PB.ecSel) >= 0 ? PB.ecSel : ecOrdre()[0]; if (!PB.ecSels) PB.ecSels = [PB.ecSel];
     eEc = Math.min((c.clientWidth || 800), 920) / 1920;
-    c.innerHTML = '<div class="pb-bloc"><h3>Écran de partage</h3><p class="aide">Ce que voit l’invité après sa photo (1920 × 1080, comme l’écran d’accueil). Cliquez sur un élément puis faites-le glisser ; la poignée en bas à droite le redimensionne. Des repères rouges apparaissent quand il est aligné avec le centre de l’écran ou un autre élément.</p>'
-      + '<div class="pb-sous"><button class="' + (PB.ecVar === 'avec' ? 'on' : '') + '" onclick="pbEcVar(\'avec\')">Avec impression</button><button class="' + (PB.ecVar === 'sans' ? 'on' : '') + '" onclick="pbEcVar(\'sans\')">Sans impression (numérique)</button></div>'
-      + '<p class="aide" style="font-size:12.5px;margin:0 0 8px">' + (PB.ecVar === 'sans' ? 'Cette disposition s’affiche quand le bouton Imprimer est désactivé : le QR code peut alors se mettre au milieu.' : 'Cette disposition s’affiche quand l’impression est proposée.') + '</p>'
+    c.innerHTML = '<div class="pb-bloc"><h3>Écrans après la photo</h3><p class="aide">Deux écrans, 1920 × 1080 comme l’accueil : d’abord « Cette photo vous plaît ? » (la photo qui vient d’être prise, Recommencer ou Suivant), puis « Votre photo est prête ! » (QR code et impression). Cliquez sur un élément puis faites-le glisser ; la poignée en bas à droite le redimensionne. Des repères rouges apparaissent quand il est aligné.</p>'
+      + '<div class="pb-sous"><button class="' + (PB.ecVar === 'valid' ? 'on' : '') + '" onclick="pbEcVar(\'valid\')">1. Validation de la photo</button><button class="' + (PB.ecVar === 'avec' ? 'on' : '') + '" onclick="pbEcVar(\'avec\')">2. Partage avec impression</button><button class="' + (PB.ecVar === 'sans' ? 'on' : '') + '" onclick="pbEcVar(\'sans\')">2. Partage numérique (sans impression)</button></div>'
+      + '<p class="aide" style="font-size:12.5px;margin:0 0 8px">' + (PB.ecVar === 'valid' ? 'L’invité voit sa photo, puis choisit Recommencer ou Suivant.' : (PB.ecVar === 'sans' ? 'Affiché quand le bouton Imprimer est désactivé : le QR code peut alors se mettre au milieu.' : 'Affiché quand l’impression est proposée : QR code à gauche, bouton Imprimer à droite.')) + '</p>'
       + '<div id="pbEcBarre"></div><div id="pbEcAvec" class="pb-align" style="margin-top:6px"></div>'
       + '<div id="pbEcZone" style="position:relative;margin-top:10px;width:' + Math.round(1920 * eEc) + 'px;height:' + Math.round(1080 * eEc) + 'px;overflow:hidden;box-shadow:0 10px 30px -12px rgba(0,0,0,.35);touch-action:none;user-select:none;background-color:' + esc(ec.couleur) + ';background-size:cover;background-position:center' + (ec.fond ? ';background-image:url(' + urlImage(ec.fond) + ')' : '') + '"></div></div>'
       + '<div class="pb-bloc" id="pbEcProp"></div>'
@@ -529,23 +532,27 @@
   function ecScene() {
     var z = $('pbEcZone'); if (!z) return; z.innerHTML = '';
     var ec = PB.evt.partage.ecran, pos = ecPos(), st = ec.styles, k = eEc, m = (PB.evt.misesEnPage || [])[0], f = m && PB.formats[m.format];
-    var ordre = ['photo', 'titre', 'qr', 'legende'].concat(PB.ecVar === 'avec' ? ['imprimer'] : []).concat(['recommencer', 'terminer']);
+    var ordre = ecOrdre();
     ordre.forEach(function (cle) {
       var o = pos[cle], el = document.createElement('div'); el.dataset.k = cle; el.className = 'pb-ec-el' + ((PB.ecSels || [PB.ecSel]).indexOf(cle) >= 0 ? ' sel' : '');
       el.style.left = o.x * k + 'px'; el.style.top = o.y * k + 'px';
       if (cle === 'photo') {
-        var cv = document.createElement('canvas'), rat = (m && f) ? f.h / f.w : 2 / 3; el.style.width = Math.min(o.w, 760 / rat) * k + 'px';
+        var cv = document.createElement('canvas'), rat = (m && f) ? f.h / f.w : 2 / 3; el.style.width = Math.min(o.w, 640 / rat) * k + 'px';
         if (m && f) { dessiner(cv, m, null, true, true); chargerImage(m.cadre, function (img) { if (img) dessiner(cv, m, img, true, true); }); cv.style.cssText = 'width:100%;display:block;box-shadow:0 4px 18px rgba(0,0,0,.25)'; }
         else { cv.width = 1800; cv.height = 1200; cv.getContext('2d').fillStyle = '#d9dde3'; cv.getContext('2d').fillRect(0, 0, 1800, 1200); cv.style.cssText = 'width:100%;display:block'; }
         el.appendChild(cv);
       } else if (cle === 'qr') {
         var q = o.taille * k; el.style.width = q + 'px'; el.style.height = q + 'px'; el.style.background = '#fff'; el.style.padding = q * 0.05 + 'px'; el.style.boxSizing = 'border-box'; el.style.borderRadius = q * 0.04 + 'px';
         el.innerHTML = '<svg viewBox="0 0 21 21" width="100%" height="100%" shape-rendering="crispEdges"><path fill="#111" d="M0 0h7v7H0zM14 0h7v7h-7zM0 14h7v7H0zM1 1v5h5V1zM15 1v5h5V1zM1 15v5h5v-5zM2 2h3v3H2zM16 2h3v3h-3zM2 16h3v3H2zM8 0h2v2H8zM11 1h2v2h-2zM8 4h3v2H8zM12 5h1v3h-1zM8 8h2v2H8zM11 8h3v2h-3zM15 8h2v2h-2zM18 9h3v2h-3zM8 12h2v2H8zM12 11h2v3h-2zM15 12h3v2h-3zM19 12h2v2h-2zM8 16h3v2H8zM12 15h2v3h-2zM15 16h2v2h-2zM18 17h3v3h-3zM9 19h3v2H9zM14 19h2v2h-2z"/></svg>';
+      } else if (cle === 'imprimer') {
+        var si = st.imprimer, q2 = o.taille * k; el.style.width = q2 + 'px'; el.style.height = q2 + 'px';
+        el.style.cssText += ';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:' + q2 * 0.05 + 'px;box-sizing:border-box;border-radius:' + q2 * 0.09 + 'px;background:' + si.fond + ';color:' + si.texte + ';border:' + Math.max(1, 3 * k) + 'px solid ' + si.bord + ';font:700 ' + si.taille * k + 'px Inter,Arial,sans-serif;box-shadow:0 ' + 10 * k + 'px ' + 36 * k + 'px rgba(31,59,90,.12)';
+        el.innerHTML = '<svg viewBox="0 0 24 24" width="38%" height="38%" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-4a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v4a2 2 0 0 1-2 2h-2"/><rect x="7" y="14" width="10" height="7" rx="1"/></svg><span>' + esc(ecTexte('imprimer')) + '</span>';
       } else if (cle === 'titre' || cle === 'legende') {
         var sy = st[cle], pol = POLICES[sy.police] || POLICES.elegante;
         el.textContent = ecTexte(cle); el.style.cssText += ';white-space:nowrap;color:' + sy.couleur + ';font-size:' + sy.taille * k + 'px;font-family:' + (cle === 'titre' ? pol[0] : 'Inter,Arial,sans-serif') + ';font-weight:' + (cle === 'titre' ? pol[1] : 500) + ';line-height:1.15';
       } else {
-        var sb = st[cle]; el.textContent = ecTexte(cle); el.style.width = o.w * k + 'px'; el.style.height = o.h * k + 'px'; el.style.cssText += ';display:flex;align-items:center;justify-content:center;box-sizing:border-box;border-radius:' + o.h * k * 0.22 + 'px;background:' + sb.fond + ';color:' + sb.texte + ';font:700 ' + sb.taille * k + 'px Inter,Arial,sans-serif;border:' + Math.max(1, 2 * k) + 'px solid rgba(20,48,79,.18)';
+        var sb = st[cle]; el.textContent = ecTexte(cle); el.style.width = o.w * k + 'px'; el.style.height = o.h * k + 'px'; el.style.cssText += ';display:flex;align-items:center;justify-content:center;box-sizing:border-box;border-radius:' + o.h * k * 0.24 + 'px;background:' + sb.fond + ';color:' + sb.texte + ';font:700 ' + sb.taille * k + 'px Inter,Arial,sans-serif;border:' + Math.max(1, 2 * k) + 'px solid rgba(20,48,79,.18)';
       }
       if ((PB.ecSels || [PB.ecSel]).length === 1 && PB.ecSel === cle) { var po = document.createElement('i'); po.className = 'poignee-ec'; el.appendChild(po); }
       el.addEventListener('pointerdown', function (ev) { ecGlisser(ev, cle, ev.target.classList.contains('poignee-ec')); });
@@ -576,7 +583,7 @@
       var dx = (e.clientX - x0) / k, dy = (e.clientY - y0) / k;
       if (redim) {
         if (cle === 'photo') o.w = Math.max(150, Math.round(d.w + 2 * dx));
-        else if (cle === 'qr') o.taille = Math.max(100, Math.round(d.taille + 2 * dx));
+        else if (cle === 'qr' || cle === 'imprimer') o.taille = Math.max(100, Math.round(d.taille + 2 * dx));
         else if (cle === 'titre' || cle === 'legende') st[cle].taille = Math.max(10, Math.round(s0 + dx * 0.25));
         else { o.w = Math.max(120, Math.round(d.w + 2 * dx)); o.h = Math.max(50, Math.round(d.h + 2 * dy)); }
         ecScene();
@@ -591,22 +598,22 @@
     var p = $('pbEcProp'); if (!p) return; var cle = PB.ecSel, st = PB.evt.partage.ecran.styles[cle], o = ecPos()[cle], pa = PB.evt.partage, im = PB.evt.impression;
     var col = function (id, l, v) { return '<label>' + l + '<input type="color" id="' + id + '" value="' + esc(v) + '" style="height:38px;padding:2px" oninput="pbEcProp()"></label>'; };
     var h = '<h3>' + EC_NOMS[cle] + '</h3><div class="pb-champs">';
-    if (cle === 'titre' || cle === 'legende') h += champ('pbep-txt', 'Texte', ecTexte(cle) === (cle === 'titre' ? 'Votre photo est prête !' : 'Scannez pour récupérer votre photo') ? '' : ecTexte(cle), cle === 'titre' ? 'Votre photo est prête !' : 'Scannez pour récupérer votre photo', 'text', ' oninput="pbEcProp()"') + col('pbep-c', 'Couleur', st.couleur) + champ('pbep-t', 'Taille', st.taille, '', 'number', ' min="10" max="300" oninput="pbEcProp()"') + (cle === 'titre' ? '<label>Police<select id="pbep-p" onchange="pbEcProp()">' + Object.keys(POLICES).map(function (x) { return '<option value="' + x + '"' + (x === st.police ? ' selected' : '') + '>' + POLICES[x][2] + '</option>'; }).join('') + '</select></label>' : '');
+    if (cle === 'titre' || cle === 'legende') h += champ('pbep-txt', 'Texte', ecTexte(cle) === ecDefaut(cle) ? '' : ecTexte(cle), ecDefaut(cle), 'text', ' oninput="pbEcProp()"') + col('pbep-c', 'Couleur', st.couleur) + champ('pbep-t', 'Taille', st.taille, '', 'number', ' min="10" max="300" oninput="pbEcProp()"') + (cle === 'titre' ? '<label>Police<select id="pbep-p" onchange="pbEcProp()">' + Object.keys(POLICES).map(function (x) { return '<option value="' + x + '"' + (x === st.police ? ' selected' : '') + '>' + POLICES[x][2] + '</option>'; }).join('') + '</select></label><p class="aide" style="grid-column:1/-1;margin:0;font-size:12.5px">Le style du titre est le même sur les deux écrans ; le texte est propre à chaque écran.</p>' : '');
     else if (cle === 'qr') h += champ('pbep-q', 'Taille du QR code', o.taille, '', 'number', ' min="100" max="900" oninput="pbEcProp()"') + '<p class="aide" style="grid-column:1/-1;margin:0;font-size:12.5px">Affiché seulement si « Afficher le QR code » est activé dans Paramètres de partage.</p>';
     else if (cle === 'photo') h += champ('pbep-w', 'Largeur de la photo', o.w, '', 'number', ' min="150" max="2400" oninput="pbEcProp()"');
-    else h += champ('pbep-txt', 'Texte du bouton', ecTexte(cle) === { imprimer: 'Imprimer', recommencer: 'Recommencer', terminer: 'Terminer' }[cle] ? '' : ecTexte(cle), { imprimer: 'Imprimer', recommencer: 'Recommencer', terminer: 'Terminer' }[cle], 'text', ' oninput="pbEcProp()"') + col('pbep-f', 'Couleur du bouton', st.fond) + col('pbep-x', 'Couleur du texte', st.texte) + champ('pbep-t', 'Taille du texte', st.taille, '', 'number', ' min="10" max="120" oninput="pbEcProp()"') + champ('pbep-w', 'Largeur', o.w, '', 'number', ' min="120" max="1200" oninput="pbEcProp()"') + champ('pbep-h', 'Hauteur', o.h, '', 'number', ' min="50" max="400" oninput="pbEcProp()"');
+    else { var carre = cle === 'imprimer'; h += champ('pbep-txt', 'Texte du bouton', ecTexte(cle) === ecDefaut(cle) ? '' : ecTexte(cle), ecDefaut(cle), 'text', ' oninput="pbEcProp()"') + col('pbep-f', 'Couleur du bouton', st.fond) + col('pbep-x', carre ? 'Icône et texte' : 'Couleur du texte', st.texte) + (carre ? col('pbep-b', 'Couleur du contour', st.bord) : '') + champ('pbep-t', 'Taille du texte', st.taille, '', 'number', ' min="10" max="120" oninput="pbEcProp()"') + (carre ? champ('pbep-w', 'Taille du bouton (carré)', o.taille, '', 'number', ' min="150" max="900" oninput="pbEcProp()"') : champ('pbep-w', 'Largeur', o.w, '', 'number', ' min="120" max="1200" oninput="pbEcProp()"') + champ('pbep-h', 'Hauteur', o.h, '', 'number', ' min="50" max="400" oninput="pbEcProp()"')); }
     p.innerHTML = h + '</div>';
   }
   window.pbEcProp = function () {
     var cle = PB.ecSel, st = PB.evt.partage.ecran.styles[cle], o = ecPos()[cle], pa = PB.evt.partage, im = PB.evt.impression, n = function (id) { return $(id) ? +$(id).value : null; }, t = function (id) { return $(id) ? $(id).value : null; };
-    if (cle === 'titre') { pa.titre = t('pbep-txt').trim(); st.couleur = t('pbep-c'); st.taille = n('pbep-t') || st.taille; st.police = t('pbep-p') || st.police; }
+    if (cle === 'titre') { if (PB.ecVar === 'valid') pa.titreValid = t('pbep-txt').trim(); else pa.titre = t('pbep-txt').trim(); st.couleur = t('pbep-c'); st.taille = n('pbep-t') || st.taille; st.police = t('pbep-p') || st.police; }
     else if (cle === 'legende') { pa.legende = t('pbep-txt').trim(); st.couleur = t('pbep-c'); st.taille = n('pbep-t') || st.taille; }
     else if (cle === 'qr') { o.taille = n('pbep-q') || o.taille; }
     else if (cle === 'photo') { o.w = n('pbep-w') || o.w; }
-    else { var tx = t('pbep-txt').trim(); if (cle === 'imprimer') im.txtImprimer = tx; else pa[cle] = tx; st.fond = t('pbep-f'); st.texte = t('pbep-x'); st.taille = n('pbep-t') || st.taille; o.w = n('pbep-w') || o.w; o.h = n('pbep-h') || o.h; }
+    else { var tx = t('pbep-txt').trim(); if (cle === 'imprimer') im.txtImprimer = tx; else pa[cle] = tx; st.fond = t('pbep-f'); st.texte = t('pbep-x'); if (cle === 'imprimer') st.bord = t('pbep-b') || st.bord; st.taille = n('pbep-t') || st.taille; if (cle === 'imprimer') o.taille = n('pbep-w') || o.taille; else { o.w = n('pbep-w') || o.w; o.h = n('pbep-h') || o.h; } }
     ecScene();
   };
-  window.pbEcVar = function (v) { PB.ecVar = v; PB.ecSels = null; if (v === 'sans' && PB.ecSel === 'imprimer') PB.ecSel = 'qr'; secEcran($('pbContenu')); };
+  window.pbEcVar = function (v) { PB.ecVar = v; PB.ecSels = null; if (ecOrdre().indexOf(PB.ecSel) < 0) PB.ecSel = ecOrdre()[0]; secEcran($('pbContenu')); };
   function ecBoites() { return (PB.ecSels || []).map(function (c) { var el = document.querySelector('#pbEcZone [data-k="' + c + '"]'), o = ecPos()[c]; return el && o ? { o: o, w: el.offsetWidth / eEc, h: el.offsetHeight / eEc } : null; }).filter(Boolean); }
   window.pbEcRepartir = function (axe) {
     var l = ecBoites(); if (l.length < 3) return toast('Sélectionnez au moins 3 éléments pour les répartir', true);

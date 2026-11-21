@@ -34,32 +34,26 @@ function casesPropres(cases, f) {
 }
 /* ── écran de partage (1920 × 1080), entièrement personnalisable : positions du centre de chaque élément, avec ou sans bouton d'impression ── */
 const ECRAN_DEF = {
-  styles: { titre: { couleur: '#1F3B5A', police: 'elegante', taille: 58 }, legende: { couleur: '#6B665F', taille: 28 },
-    imprimer: { fond: '#1F3B5A', texte: '#FFFFFF', taille: 36 }, recommencer: { fond: '#FFFFFF', texte: '#1F3B5A', taille: 30 }, terminer: { fond: '#1F3B5A', texte: '#FFFFFF', taille: 30 } },
-  /* colonne de gauche : la photo, avec Recommencer / Terminer dessous ; colonne de droite : titre, QR code, texte, Imprimer (photo : largeur maximale, hauteur plafonnée à 760 px) */
-  avec: { photo: { x: 560, y: 450, w: 820 }, titre: { x: 1440, y: 190 }, qr: { x: 1440, y: 470, taille: 320 }, legende: { x: 1440, y: 685 },
-    imprimer: { x: 1440, y: 810, w: 440, h: 96 }, recommencer: { x: 405, y: 930, w: 300, h: 88 }, terminer: { x: 715, y: 930, w: 300, h: 88 } },
-  sans: { photo: { x: 560, y: 450, w: 820 }, titre: { x: 1440, y: 230 }, qr: { x: 1440, y: 540, taille: 400 }, legende: { x: 1440, y: 790 },
-    imprimer: { x: 1440, y: 810, w: 440, h: 96 }, recommencer: { x: 405, y: 930, w: 300, h: 88 }, terminer: { x: 715, y: 930, w: 300, h: 88 } },
+  styles: { titre: { couleur: '#1F3B5A', police: 'elegante', taille: 62 }, legende: { couleur: '#6B665F', taille: 28 },
+    imprimer: { fond: '#FFFFFF', texte: '#1F3B5A', bord: '#D9D4CA', taille: 34 }, terminer: { fond: '#1F3B5A', texte: '#FFFFFF', taille: 32 },
+    recommencer: { fond: '#FFFFFF', texte: '#1F3B5A', taille: 32 }, suivant: { fond: '#1F3B5A', texte: '#FFFFFF', taille: 32 } },
+  /* écran « Cette photo vous plaît ? » : la photo qui vient d'être prise (hauteur plafonnée à 640 px), Recommencer / Suivant */
+  valid: { photo: { x: 960, y: 480, w: 1000 }, titre: { x: 960, y: 100 }, recommencer: { x: 690, y: 940, w: 400, h: 100 }, suivant: { x: 1230, y: 940, w: 400, h: 100 } },
+  /* écran « Votre photo est prête ! » : QR code à gauche, bouton Imprimer carré à droite (même taille), Terminer en bas */
+  avec: { titre: { x: 960, y: 150 }, qr: { x: 620, y: 520, taille: 400 }, legende: { x: 620, y: 770 }, imprimer: { x: 1300, y: 520, taille: 400 }, terminer: { x: 960, y: 930, w: 380, h: 100 } },
+  sans: { titre: { x: 960, y: 150 }, qr: { x: 960, y: 520, taille: 440 }, legende: { x: 960, y: 800 }, imprimer: { x: 1300, y: 520, taille: 400 }, terminer: { x: 960, y: 930, w: 380, h: 100 } },
 };
-/* disposition d'origine de la v1476 : remplacée automatiquement si l'événement ne l'a pas personnalisée */
-const ECRAN_V1 = { avec: { photo: { x: 620, y: 540, w: 1000 }, titre: { x: 1440, y: 150 }, qr: { x: 1440, y: 430, taille: 290 }, legende: { x: 1440, y: 625 }, imprimer: { x: 1440, y: 745, w: 440, h: 100 }, recommencer: { x: 1290, y: 925, w: 290, h: 84 }, terminer: { x: 1590, y: 925, w: 290, h: 84 } },
-  sans: { photo: { x: 620, y: 540, w: 1000 }, titre: { x: 1440, y: 170 }, qr: { x: 1440, y: 540, taille: 380 }, legende: { x: 1440, y: 790 }, imprimer: { x: 1440, y: 745, w: 440, h: 100 }, recommencer: { x: 1290, y: 925, w: 290, h: 84 }, terminer: { x: 1590, y: 925, w: 290, h: 84 } },
-  titre: { taille: 64 }, legende: { taille: 26 } };
 const POLICES_OK = ['elegante', 'manuscrite', 'moderne', 'festive'];
 function ecranPropre(o) {
   o = o && typeof o === 'object' ? o : {};
-  if (o.v !== 2 && (o.avec || o.sans)) {                       /* ancienne disposition d'origine, jamais modifiée : on passe à la nouvelle */
-    const egal = (a, b) => JSON.stringify(a) === JSON.stringify(b), ok1 = (o.avec && egal(o.avec, ECRAN_V1.avec)) || !o.avec, ok2 = (o.sans && egal(o.sans, ECRAN_V1.sans)) || !o.sans;
-    if (ok1 && ok2) { o = { ...o, avec: undefined, sans: undefined, styles: o.styles && ((o.styles.titre || {}).taille === 64 || (o.styles.legende || {}).taille === 26) ? undefined : o.styles }; }
-  }
-  const out = { v: 2, fond: idOk(o.fond, 'im'), couleur: hex(o.couleur, '#FFFFFF'), styles: {}, avec: {}, sans: {} };
+  if (o.v !== 3) o = { fond: o.fond, couleur: o.couleur };                      /* anciennes dispositions (écran unique) : on repart des nouvelles */
+  const out = { v: 3, fond: idOk(o.fond, 'im'), couleur: hex(o.couleur, '#FFFFFF'), styles: {}, valid: {}, avec: {}, sans: {} };
   for (const k of Object.keys(ECRAN_DEF.styles)) {
     const d = ECRAN_DEF.styles[k], s = (o.styles && o.styles[k]) || {}, r = {};
     for (const f of Object.keys(d)) r[f] = f === 'police' ? (POLICES_OK.includes(s[f]) ? s[f] : d[f]) : (typeof d[f] === 'string' ? hex(s[f], d[f]) : nb(s[f], 8, 300, d[f]));
     out.styles[k] = r;
   }
-  for (const v of ['avec', 'sans']) for (const k of Object.keys(ECRAN_DEF[v])) {
+  for (const v of ['valid', 'avec', 'sans']) for (const k of Object.keys(ECRAN_DEF[v])) {
     const d = ECRAN_DEF[v][k], s = (o[v] && o[v][k]) || {}, r = {};
     for (const f of Object.keys(d)) r[f] = f === 'x' ? nb(s[f], -400, 2320, d[f]) : (f === 'y' ? nb(s[f], -400, 1480, d[f]) : nb(s[f], 20, 2400, d[f]));
     out[v][k] = r;
@@ -98,7 +92,7 @@ export function evenementPropre(e, ancien) {
       logo: { image: idOk(ac.logo && ac.logo.image, 'im'), x: nb(ac.logo && ac.logo.x, 0, 1920, 960), y: nb(ac.logo && ac.logo.y, 0, 1080, 900), largeur: nb(ac.logo && ac.logo.largeur, 40, 1920, 360) },
     },
     capture: { premier: nb(cap.premier, 1, 30, 7), suivants: nb(cap.suivants, 1, 30, 3), texteAvant: txt(cap.texteAvant, 80) },
-    partage: { qr: oui(pa.qr, true), bruts: oui(pa.bruts, true), duree: nb(pa.duree, 10, 600, 45), titre: txt(pa.titre, 120), recommencer: txt(pa.recommencer, 40), terminer: txt(pa.terminer, 40), legende: txt(pa.legende, 80), ecran: ecranPropre(pa.ecran) },
+    partage: { qr: oui(pa.qr, true), bruts: oui(pa.bruts, true), duree: nb(pa.duree, 10, 600, 45), titre: txt(pa.titre, 120), recommencer: txt(pa.recommencer, 40), terminer: txt(pa.terminer, 40), legende: txt(pa.legende, 80), titreValid: txt(pa.titreValid, 120), suivant: txt(pa.suivant, 40), ecran: ecranPropre(pa.ecran) },
     impression: {
       auto: oui(im.auto, false), bouton: oui(im.bouton, true), decoupe: (im.decoupe === true || im.decoupe === false) ? im.decoupe : null, copiesMax: nb(im.copiesMax, 1, 10, 2),
       txtImprimer: txt(im.txtImprimer, 40), txtImpression: txt(im.txtImpression, 40), txtCopies: txt(im.txtCopies, 60),
