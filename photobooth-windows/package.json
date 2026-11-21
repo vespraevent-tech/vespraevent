@@ -1,7 +1,7 @@
 {
   "name": "vespra-event-photobooth",
   "productName": "Vespra Event Photobooth",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Application des bornes photobooth Vespra Event",
   "author": "Vespra Event",
   "main": "main.js",

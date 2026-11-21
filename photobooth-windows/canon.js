@@ -67,6 +67,7 @@ function jpegDe(b) {                                      /* l'image de visée e
 class Canon {
   constructor(ouvrirTransport) { this.ouvrir = ouvrirTransport; this.ptp = null; this.modele = ''; this.file = Promise.resolve(); this.visee = false; this.fermer = null; }
   nom() { return this.ptp ? this.modele : ''; }
+  presente() { try { return require('usb').getDeviceList().some((d) => d.deviceDescriptor.idVendor === CANON); } catch { return false; } }
   seq(f) { const p = this.file.then(f, f); this.file = p.catch(() => {}); return p; }   /* une seule commande USB à la fois */
   async connecter() {
     if (this.ptp) return true;

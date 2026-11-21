@@ -12,7 +12,7 @@ const DCC = 'http://localhost:5513';
 if (!app.requestSingleInstanceLock()) { app.quit(); process.exit(0); }
 
 const fichierReglages = () => path.join(app.getPath('userData'), 'reglages.json');
-let R = { url: URL_BORNE, dossier: 'C:\\VespraEvent\\Photobooth', demarrageAuto: true, imprimante: '', imprimanteBandes: '', pleinEcran: true };
+let R = { url: URL_BORNE, dossier: 'C:\\VespraEvent\\Photobooth', demarrageAuto: true, imprimante: '', pleinEcran: true };
 try { R = { ...R, ...JSON.parse(fs.readFileSync(fichierReglages(), 'utf8')) }; } catch {}
 const sauver = () => { try { fs.mkdirSync(path.dirname(fichierReglages()), { recursive: true }); fs.writeFileSync(fichierReglages(), JSON.stringify(R, null, 2)); } catch {} };
 
@@ -21,7 +21,7 @@ let fen = null, appareil = '', imprimantes = [];
 let canon = null; try { canon = require('./canon.js').creer(); } catch (e) { console.error('canon.js', e.message); }
 let canonMsg = '';
 const propre = (s) => String(s || 'Evenement').replace(/[<>:"/\\|?*\x00-\x1f]/g, '').replace(/\s+/g, ' ').trim().slice(0, 80) || 'Evenement';
-const etat = () => ({ version: app.getVersion(), appareil, imprimante: R.imprimante, imprimanteBandes: R.imprimanteBandes, erreurCanon: canonMsg || (canon ? require('./canon.js').derniereErreur() : ''), dossier: R.dossier, demarrageAuto: R.demarrageAuto });
+const etat = () => ({ version: app.getVersion(), appareil, imprimante: R.imprimante, canonPresent: canon ? canon.presente() : false, erreurCanon: canonMsg || (canon ? require('./canon.js').derniereErreur() : ''), dossier: R.dossier, demarrageAuto: R.demarrageAuto });
 const pause = (ms) => new Promise((r) => setTimeout(r, ms));
 async function dcc(q, type = 'text', ms = 4000) {
   const c = new AbortController(), t = setTimeout(() => c.abort(), ms);
@@ -118,7 +118,7 @@ ipcMain.handle('enregistrer', async (_e, evt, nom, octets) => {
 ipcMain.handle('preparer-appareil', async () => { await shell.openExternal('https://zadig.akeo.ie/'); return 'ok'; });   /* outil libre Zadig : accès USB direct au Canon, une fois par PC */
 ipcMain.handle('ouvrir-dossier', async (_e, evt) => { const d = path.join(R.dossier, propre(evt)); fs.mkdirSync(d, { recursive: true }); return shell.openPath(d); });
 ipcMain.handle('reglage', async (_e, k, v) => {
-  if (!['dossier', 'demarrageAuto', 'imprimante', 'imprimanteBandes', 'pleinEcran'].includes(k)) return false;
+  if (!['dossier', 'demarrageAuto', 'imprimante', 'pleinEcran'].includes(k)) return false;
   R[k] = v; sauver(); if (k === 'demarrageAuto') appliquerDemarrage(); return true;
 });
 ipcMain.handle('plein-ecran', async (_e, v) => { if (fen) { fen.setKiosk(!!v); fen.setFullScreen(!!v); } return true; });
@@ -136,7 +136,7 @@ ipcMain.handle('imprimer', async (_e, octets, o) => {
   await w.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(html));
   const paysage = o && o.format === '4x6l';
   return new Promise((ok) => {
-    w.webContents.print({ silent: true, printBackground: true, deviceName: ((o && o.format === '2x6' && R.imprimanteBandes) || R.imprimante) || undefined, copies: Math.max(1, Math.min(10, Number(o && o.copies) || 1)),
+    w.webContents.print({ silent: true, printBackground: true, deviceName: R.imprimante || undefined, copies: Math.max(1, Math.min(10, Number(o && o.copies) || 1)),
       landscape: paysage, margins: { marginType: 'none' }, pageSize: { width: 101600, height: 152400 } },
     (reussi, raison) => { w.destroy(); ok({ ok: reussi, erreur: reussi ? '' : raison }); });
   });

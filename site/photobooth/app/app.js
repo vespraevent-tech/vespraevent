@@ -82,7 +82,7 @@
     });
   }
   function majCamera() {
-    var n = Camera.nom(), t = n ? n : (Pont ? 'Appareil photo non détecté' : 'Webcam (essai) — reflex : appli Windows');
+    var n = Camera.nom(), t = n ? n : (Pont ? (Pont.canonPresent && Pont.canonPresent() ? 'Canon détecté : activation USB requise' : 'Aucun appareil photo') : 'Webcam (essai) — reflex : appli Windows');
     ['l-cam', 'm-cam'].forEach(function (id) { var e = $(id); e.textContent = t; e.className = 'puce ' + (n ? 'ok' : 'ko'); });
   }
 
@@ -339,10 +339,14 @@
   }
   /* bandelette 5×15 : deux bandelettes côte à côte sur une feuille 10×15, coupée en deux par l'imprimante DNP */
   function imprimer(m, final, copies) {
-    var feuille = final;
-    if (m.format === '2x6') { feuille = document.createElement('canvas'); feuille.width = 1200; feuille.height = 1800; var x = feuille.getContext('2d'); x.drawImage(final, 0, 0, 600, 1800); x.drawImage(final, 600, 0, 600, 1800); }
+    var feuille = final, im = (etat.evt && etat.evt.impression) || {};
+    var decoupe = im.decoupe == null ? m.format === '2x6' : im.decoupe;
+    if (m.format === '2x6') {        /* bandelette : deux exemplaires côte à côte si découpe, sinon une seule, centrée, jamais étirée */
+      feuille = document.createElement('canvas'); feuille.width = 1200; feuille.height = 1800; var x = feuille.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, 1200, 1800);
+      if (decoupe) { x.drawImage(final, 0, 0, 600, 1800); x.drawImage(final, 600, 0, 600, 1800); } else x.drawImage(final, 300, 0, 600, 1800);
+    }
     var paysage = feuille.width > feuille.height;
-    if (Pont && Pont.imprimer) return versBlob(feuille, 0.95).then(function (b) { return Pont.imprimer(b, { copies: copies, format: m.format }); });
+    if (Pont && Pont.imprimer) return versBlob(feuille, 0.95).then(function (b) { return Pont.imprimer(b, { copies: copies, format: m.format, decoupe: decoupe }); });
     var url = feuille.toDataURL('image/jpeg', 0.95), f = $('impr'), d = f.contentDocument;
     d.open(); d.write('<!doctype html><style>@page{size:' + (paysage ? '6in 4in' : '4in 6in') + ';margin:0}html,body{margin:0}img{width:100%;height:100%;display:block;page-break-after:always;object-fit:cover}</style>' + new Array(copies + 1).join('<img src="' + url + '">')); d.close();
     return new Promise(function (ok) { setTimeout(function () { try { f.contentWindow.print(); } catch (e) {} ok(); }, 300); });
@@ -497,9 +501,11 @@
     } else if (p === 'impression') {
       var im = e.impression || {}, li = im.limites || {};
       P.innerHTML = '<h2>Paramètres d’impression</h2><div class="bloc">' + bascule('i-auto', im.auto, 'Impression automatique') + bascule('i-bouton', im.bouton !== false, 'Afficher le bouton Imprimer') + nombre('i-max', im.copiesMax || 2, 'Nombre de copies maximum', '', 1, 10) + '</div>' +
+        '<div class="bloc"><b>Imprimante de ce PC</b>' + (Pont && Pont.imprimantes ? '<p><select id="i-prn"></select></p>' : '<p class="aide">Navigateur : imprimante par défaut de Windows (Chrome en mode --kiosk-printing).</p>') + bascule('i-dec', im.decoupe == null ? (e.misesEnPage || [])[0] && e.misesEnPage[0].format === '2x6' : im.decoupe, 'Découpe en deux (bandelettes 5×15)', 'Activé : deux bandelettes par feuille 10×15, coupée en deux. Désactivé : la photo sort entière. <b>Activez aussi la découpe dans les paramètres de l’imprimante Windows avant l’événement.</b>') + '</div>' +
         '<div class="bloc">' + bascule('i-lim', li.on !== false, 'Limiter les impressions') + nombre('i-evt', li.parEvenement || 200, 'Par événement', 'impressions', 1, 100000) + nombre('i-ses', li.parSession || 1, 'Par session', 'impressions', 1, 50) + '<p class="aide">Imprimées jusqu’ici : <b>' + ((etat.stats && etat.stats.imprimees) || 0) + '</b></p></div>' +
-        '<div class="bloc"><p class="aide">' + (Pont ? 'Imprimante : ' + esc(Pont.imprimante ? Pont.imprimante() : '') : 'Impression sans fenêtre : Chrome lancé avec l’option --kiosk-printing, imprimante DNP par défaut.') + ' Les bandelettes 5×15 sont imprimées par deux sur une feuille 10×15 (coupe 2 pouces activée sur la DNP).</p><button class="btn" id="i-test">Imprimer une page test</button></div><button class="btn plein" id="i-enr">Enregistrer</button>';
-      $('i-enr').onclick = function () { enregistrer('impression', { auto: $('i-auto').checked, bouton: $('i-bouton').checked, copiesMax: +$('i-max').value, limites: { on: $('i-lim').checked, parEvenement: +$('i-evt').value, parSession: +$('i-ses').value } }); };
+        '<div class="bloc"><p class="aide">' + (Pont ? 'Imprimante : ' + esc(Pont.imprimante ? Pont.imprimante() : '') : 'Impression sans fenêtre : Chrome lancé avec l’option --kiosk-printing, imprimante DNP par défaut.') + ' </p><button class="btn" id="i-test">Imprimer une page test</button></div><button class="btn plein" id="i-enr">Enregistrer</button>';
+      $('i-enr').onclick = function () { enregistrer('impression', { decoupe: $('i-dec').checked, auto: $('i-auto').checked, bouton: $('i-bouton').checked, copiesMax: +$('i-max').value, limites: { on: $('i-lim').checked, parEvenement: +$('i-evt').value, parSession: +$('i-ses').value } }); };
+      if (Pont && Pont.imprimantes) Pont.imprimantes().then(function (l) { var z = $('i-prn'); if (!z) return; z.innerHTML = l.map(function (n) { return '<option' + (n === Pont.imprimante() ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join(''); z.onchange = function () { Pont.choisirImprimante(z.value); toast('Imprimante : ' + z.value); }; });
       $('i-test').onclick = function () { var m = (e.misesEnPage || [])[0]; if (!m) { toast('Aucun cadre'); return; } vignetteCadre(e, m, false).then(function (v) { var c = document.createElement('canvas'); c.width = m.w; c.height = m.h; c.getContext('2d').drawImage(v, 0, 0, m.w, m.h); imprimer(m, c, 1); }); };
     } else if (p === 'dossier') {
       P.innerHTML = '<h2>Dossier d’événement</h2><div class="bloc"><p>Photos de « ' + esc(e.nom) + ' » sur ce PC :</p><p><code>' + esc(opts.dossier + '\\' + e.nom) + '</code></p>' + (Pont && Pont.ouvrirDossier ? '<button class="btn plein" id="d-ouvrir">Ouvrir le dossier</button>' : '<p class="aide">L’ouverture du dossier Windows se fait depuis l’appli « Vespra Event Photobooth ». Toutes les photos sont aussi dans le back-office, onglet Photobooth → Tableau de bord.</p>') + '<p class="aide" id="d-file"></p></div>';
@@ -544,6 +550,7 @@
     if (dernier && opts.autoDernier && !forcer) { lancer(dernier); chargerListe().catch(function () {}); return; }
     chargerListe().then(afficherListe).catch(function () { afficherListe(); });
   }
+  setInterval(function () { if (etat.ecran === 's-liste' || etat.ecran === 's-menu') majCamera(); }, 3000);   /* le nom de l'appareil apparaît dès qu'il est branché */
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
   File.vider();
   demarrer();

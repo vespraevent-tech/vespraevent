@@ -396,7 +396,7 @@
   function secImpression(c) {
     var im = PB.evt.impression, gen = PB.sousImp !== 'limites';
     c.innerHTML = '<div class="pb-sous"><button class="' + (gen ? 'on' : '') + '" onclick="pbSousImp(\'general\')">Général</button><button class="' + (gen ? '' : 'on') + '" onclick="pbSousImp(\'limites\')">Limites d’impression</button></div>'
-      + (gen ? '<div class="pb-bloc">' + ligne('Impression automatique', 'Chaque prise est imprimée sans rien toucher', sw('pbm-auto', im.auto)) + ligne('Afficher le bouton d’impression', 'Sur l’écran de partage, pour imprimer une ou plusieurs copies', sw('pbm-bt', im.bouton))
+      + (gen ? '<div class="pb-bloc">' + ligne('Découpe en deux (bandelettes 5×15)', 'Activé : deux bandelettes sur une feuille 10×15, coupée en deux par l’imprimante. Désactivé : la photo sort entière. Par défaut : activé pour un événement en bandelettes. Pensez aussi à activer la découpe dans les paramètres de l’imprimante.', sw('pbm-dec', im.decoupe == null ? (((PB.evt.misesEnPage || [])[0] || {}).format === '2x6') : im.decoupe)) + ligne('Impression automatique', 'Chaque prise est imprimée sans rien toucher', sw('pbm-auto', im.auto)) + ligne('Afficher le bouton d’impression', 'Sur l’écran de partage, pour imprimer une ou plusieurs copies', sw('pbm-bt', im.bouton))
         + '<div class="pb-champs" style="margin-top:8px">' + champ('pbm-t1', 'Bouton « Imprimer »', im.txtImprimer, 'Imprimer') + champ('pbm-t2', 'Pendant l’impression', im.txtImpression, 'Impression…') + champ('pbm-t3', 'Question du nombre de copies', im.txtCopies, 'Combien de copies ?') + champ('pbm-cm', 'Copies au maximum par impression', im.copiesMax, '2', 'number', ' min="1" max="10"') + '</div></div>'
         : '<div class="pb-bloc">' + ligne('Définir une limite pour les impressions autorisées', '', sw('pbm-lim', im.limites.on)) + '<div class="pb-champs">' + champ('pbm-le', 'Limite par événement (impressions)', im.limites.parEvenement, '200', 'number', ' min="1"') + champ('pbm-ls', 'Limite par prise (impressions)', im.limites.parSession, '1', 'number', ' min="1" max="50"') + '</div></div>')
       + '<div class="pb-pied"><button class="btn" onclick="pbImpSauver()">Enregistrer</button></div>';
@@ -404,7 +404,7 @@
   window.pbSousImp = function (s) { lireImpression(); PB.sousImp = s; rendre(); };
   function lireImpression() {
     var im = PB.evt.impression;
-    if ($('pbm-auto')) { im.auto = coche('pbm-auto'); im.bouton = coche('pbm-bt'); im.txtImprimer = val('pbm-t1').trim(); im.txtImpression = val('pbm-t2').trim(); im.txtCopies = val('pbm-t3').trim(); im.copiesMax = +val('pbm-cm') || 2; }
+    if ($('pbm-auto')) { im.auto = coche('pbm-auto'); im.decoupe = coche('pbm-dec'); im.bouton = coche('pbm-bt'); im.txtImprimer = val('pbm-t1').trim(); im.txtImpression = val('pbm-t2').trim(); im.txtCopies = val('pbm-t3').trim(); im.copiesMax = +val('pbm-cm') || 2; }
     if ($('pbm-lim')) { im.limites = { on: coche('pbm-lim'), parEvenement: +val('pbm-le') || 200, parSession: +val('pbm-ls') || 1 }; }
   }
   window.pbImpSauver = function () { lireImpression(); enregistrer('Impression enregistrée').then(rendre); };

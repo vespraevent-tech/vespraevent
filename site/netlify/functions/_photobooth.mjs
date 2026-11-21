@@ -65,7 +65,7 @@ export function evenementPropre(e, ancien) {
     capture: { premier: nb(cap.premier, 1, 30, 7), suivants: nb(cap.suivants, 1, 30, 3), texteAvant: txt(cap.texteAvant, 80) },
     partage: { qr: oui(pa.qr, true), bruts: oui(pa.bruts, true), duree: nb(pa.duree, 10, 600, 45), titre: txt(pa.titre, 120), recommencer: txt(pa.recommencer, 40), terminer: txt(pa.terminer, 40) },
     impression: {
-      auto: oui(im.auto, false), bouton: oui(im.bouton, true), copiesMax: nb(im.copiesMax, 1, 10, 2),
+      auto: oui(im.auto, false), bouton: oui(im.bouton, true), decoupe: (im.decoupe === true || im.decoupe === false) ? im.decoupe : null, copiesMax: nb(im.copiesMax, 1, 10, 2),
       txtImprimer: txt(im.txtImprimer, 40), txtImpression: txt(im.txtImpression, 40), txtCopies: txt(im.txtCopies, 60),
       limites: { on: oui(lim.on, true), parEvenement: nb(lim.parEvenement, 1, 100000, 200), parSession: nb(lim.parSession, 1, 50, 1) },
     },

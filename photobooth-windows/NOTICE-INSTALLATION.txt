@@ -4,7 +4,7 @@ VESPRA EVENT PHOTOBOOTH — INSTALLATION SUR UN MINI-PC (Windows 10/11)
 À faire une seule fois par photobooth (environ 20 minutes).
 
 1. L'APPLI
-   - Décompressez « Vespra-Event-Photobooth-Windows-1.1.0.zip » dans C:\VespraEvent\App
+   - Décompressez « Vespra-Event-Photobooth-Windows-1.2.0.zip » dans C:\VespraEvent\App
      (clic droit > Extraire tout).
    - Double-cliquez sur « Vespra Event Photobooth.exe ».
      Windows peut afficher « Windows a protégé votre ordinateur » (l'appli n'est pas
@@ -16,33 +16,42 @@ VESPRA EVENT PHOTOBOOTH — INSTALLATION SUR UN MINI-PC (Windows 10/11)
    - Conseillé : ouverture de session Windows automatique (sans mot de passe) et
      mises à jour Windows réglées hors des heures d'événement.
 
-2. L'APPAREIL PHOTO CANON EOS 1300D (pilote intégré : aucun logiciel Canon ni digiCamControl)
+2. L'APPAREIL PHOTO CANON EOS 1300D
    - Sur le Canon : mode M (réglez ouverture, vitesse, ISO une fois pour toutes), mise au
      point AF, extinction automatique désactivée (menu > Arrêt auto > Désactivé), batterie
      factice branchée, boîtier allumé, câble USB branché au PC.
-   - UNE SEULE FOIS PAR PC (1 minute) : Windows donne le Canon à son propre pilote, que
-     l'appli ne peut pas utiliser. Il faut lui donner le pilote USB libre « WinUSB » :
-       a) Dans l'appli : menu > Paramètres de l'appareil photo > « Préparer l'appareil
-          photo » (ouvre la page de l'outil libre Zadig). Téléchargez et lancez Zadig.
+   - Au lancement, l'appli cherche l'appareil toute seule. Son nom (« Canon EOS 1300D »)
+     s'affiche en haut à droite, dans la liste des événements et dans les paramètres d'un
+     événement. Rien à configurer.
+   - UNE SEULE FOIS PAR PC, la 1re fois (1 minute) : si l'appli affiche
+     « Canon détecté : activation USB requise », Windows garde l'appareil pour son propre
+     pilote. Il faut lui donner le pilote USB libre « WinUSB » avec l'outil libre Zadig :
+       a) Menu > Paramètres de l'appareil photo > « Activer l'accès USB » (ouvre la page
+          de Zadig). Téléchargez et lancez Zadig.
        b) Zadig : menu Options > « List All Devices ». Choisissez « Canon Digital Camera »
-          (ou « EOS 1300D ») dans la liste. Choisissez « WinUSB » dans la case de droite.
-          Cliquez « Replace Driver » (ou « Install Driver »), acceptez, attendez la fin.
-       c) Éteignez puis rallumez le boîtier. Le nom « Canon EOS 1300D » doit s'afficher en vert.
-     Remarque : après cette étape, les logiciels Canon (EOS Utility) ne voient plus
-     l'appareil sur ce PC. Ce n'est pas un problème pour le photobooth.
-   - Vérification : « Prendre une photo test » dans le même menu.
-   - Repli : si vous préférez digiCamControl (webserver activé, port 5513), l'appli
-     l'utilise automatiquement quand le pilote intégré n'a pas pu se connecter.
+          (ou « EOS 1300D »). Choisissez « WinUSB ». Cliquez « Replace Driver », attendez.
+       c) Éteignez puis rallumez le boîtier : le nom apparaît.
+     Ensuite plus jamais, même après redémarrage. Les logiciels Canon (EOS Utility) ne voient
+     plus l'appareil sur ce PC, ce qui ne gêne pas le photobooth.
+   - Repli : digiCamControl (webserver activé, port 5513), utilisé automatiquement si le
+     pilote intégré n'a pas pu se connecter.
 
-3. L'IMPRIMANTE DNP (DS620 ou RX1HS)
-   - Installez le pilote DNP. Réglez l'imprimante en papier 10×15 (6x4).
-   - Pour les bandelettes 5×15 : ajoutez la même imprimante une 2e fois dans Windows
-     (Paramètres > Imprimantes > Ajouter, même port USB), renommez-la
-     « DNP bandelettes » et réglez dans ses préférences la coupe 2 pouces
-     (option « 2inch cut » ou format « 6x4 x2 » selon le pilote).
-     L'appli imprime alors deux bandelettes sur une feuille 10×15, coupée en deux.
-   - Dans l'appli : menu > Paramètres de l'appareil photo > choisir
-     « Imprimante des photos 10×15 » et « Imprimante des bandelettes 5×15 ».
+3. L'IMPRIMANTE (DNP DS620, RX1HS ou autre)
+   - Installez le pilote de l'imprimante comme d'habitude (une seule imprimante par modèle).
+   - Dans l'appli : menu de l'événement > Paramètres d'impression > choisissez l'imprimante
+     de ce PC dans la liste. Elle est mémorisée.
+   - Découpe : un événement est soit en 10×15, soit en bandelettes 5×15 (choix du client
+     avant l'événement). Pour une soirée en bandelettes :
+       a) Activez la découpe dans les paramètres de l'imprimante Windows
+          (Panneau de configuration > Imprimantes > Options d'impression de la DNP :
+          option « 2 inch cut » / coupe 2 pouces).
+       b) Dans l'appli, Paramètres d'impression : interrupteur « Découpe en deux » activé
+          (il l'est d'office pour un événement en bandelettes). L'appli envoie alors deux
+          bandelettes par feuille 10×15 et l'imprimante coupe en deux.
+     Pour une soirée en 10×15 : découpe désactivée à la fois dans l'imprimante et dans
+     l'appli, la photo sort entière.
+     L'appli ne peut pas changer l'option du pilote Windows elle-même : pensez à la régler
+     avant l'événement.
 
 4. MENU DE LA BORNE
    - 5 appuis rapides (ou appui long de 3 s) dans le coin en haut à droite de l'écran
