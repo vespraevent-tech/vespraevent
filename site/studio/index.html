@@ -2782,7 +2782,7 @@ function vbFormSession(){
     '<div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f;margin-bottom:4px">'+(VBEDIT.i>=0?'Réglages de la session':'Nouvelle session')+'</div>'+
     '<div style="font-size:12.5px;color:#6b7280;margin-bottom:12px">Cliquez sur une section pour la déplier. Un texte laissé vide garde le texte par défaut (affiché en gris).</div>'+
     sEvt+sAcc+sVid+sQ+sP+sFin+
-    '<div class="vfs-pied"><button class="btn" onclick="vbSessSauver()">Enregistrer la session</button><button class="btn btn-ghost" onclick="vbSessEdit(null)">Annuler</button></div></div>';
+    '<div class="vfs-pied"><button class="btn" onclick="vbSessSauver()">Enregistrer la session</button><button class="btn btn-ghost" onclick="vbSessEdit(null)">Annuler</button>'+(VBEDIT.i>=0?'<button class="btn btn-ghost" style="color:#b03a2a;margin-left:auto" onclick="vbSessSuppr('+VBEDIT.i+')">Supprimer la session</button>':'')+'</div></div>';
 }
 function vbAmbApercu(){
   const z=document.getElementById('vs-apercu'); if(!z) return;
@@ -2868,7 +2868,9 @@ function vbSessSauver(){
   vbConfigPoster({sessions:l},'Session enregistrée');
   if(ancien&&vbLabel(ancien)!==vbLabel(s)&&VBEVT===vbLabel(ancien)) VBEVT=vbLabel(s);
 }
-function vbSessSuppr(i){ const l=(VBCFG.sessions||[]).slice(); if(!confirm('Supprimer la session « '+l[i].nom+' » ? Les vidéos déjà reçues ne sont pas supprimées.')) return; l.splice(i,1); vbConfigPoster({sessions:l},'Session supprimée'); if(VBEVT) vbOuvrir(''); }
+function vbSessSuppr(i){ const l=(VBCFG.sessions||[]).slice(); if(!confirm('Supprimer la session « '+l[i].nom+' » ? Les vidéos déjà reçues ne sont pas supprimées.')) return; l.splice(i,1); VBEDIT=null; vbConfigPoster({sessions:l},'Session supprimée').then(()=>{ vbOuvrir(''); }); }
+
+async function vbSessAutoSuppr(){ const l=(VBCFG.sessions||[]); const k=l.filter(s=>/^a[0-9a-f]{11}$/.test(String(s.id||''))); if(!k.length){ showToast('Aucune session créée automatiquement'); return; } if(!confirm('Supprimer '+k.length+' session(s) créée(s) automatiquement depuis le planning ?\n\nLes vidéos déjà reçues ne sont pas supprimées.')) return; await vbConfigPoster({sessions:l.filter(s=>!k.includes(s))},k.length+' session(s) supprimée(s)'); vbOuvrir(''); }
 
 /* ── Vidéobooth ── */
 let VB=[], VBEVT='', VBALERTE=20, VBETAT=null;
@@ -2985,7 +2987,7 @@ function vbRendre(){
         '<div style="color:#6b7280;font-size:13px;margin:0 0 10px">'+(quand||'Aucune vidéo pour l’instant')+'</div>'+
         '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:15px">'+l.length+' vidéo'+(l.length>1?'s':'')+(l.length?' <span style="font-weight:500;color:#8a8f98;font-size:12.5px">· '+mo(poids)+'</span>':'')+'</b>'+
         (l.length?(ko?'<span style="color:#b03a2a;font-size:12.5px;font-weight:600">'+ko+' e-mail non parti</span>':'<span style="color:#3d6e36;font-size:12.5px;font-weight:600">E-mails partis</span>'):'')+'</div>'+
-        (c.s?'<div style="margin-top:10px"><button class="btn btn-ghost" style="padding:5px 12px;font-size:12.5px" onclick="event.stopPropagation();vbSessEdit('+c.i+')">Réglages</button></div>':'')+'</div>';}).join('')+'</div>';
+        (c.s?'<div style="margin-top:10px"><button class="btn btn-ghost" style="padding:5px 12px;font-size:12.5px" onclick="event.stopPropagation();vbSessEdit('+c.i+')">Réglages</button> <button class="btn btn-ghost" style="padding:5px 12px;font-size:12.5px;color:#b03a2a" onclick="event.stopPropagation();vbSessSuppr('+c.i+')">Supprimer</button></div>':'')+'</div>';}).join('')+'</div>';
     return;
   }
   const l=VB.filter(v=>vbNomEvt(v)===VBEVT).sort((a,b)=>String(a.cree).localeCompare(String(b.cree)));
@@ -10231,7 +10233,7 @@ checkSession();
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/studio/sw.js',{scope:'/studio/'}).catch(function(){})})}</script>
 <script src="nbsp-euro.js"></script>
-<script src="/studio/photobooth.js?v=7"></script>
+<script src="/studio/photobooth.js?v=8"></script>
 
 <script>
 /* ══ Témoin « Sauvegarde en cours » ══

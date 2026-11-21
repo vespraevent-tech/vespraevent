@@ -49,7 +49,8 @@ export function evenementPropre(e, ancien) {
     date: /^\d{4}-\d{2}-\d{2}$/.test(String(e.date || '')) ? e.date : '',
     fin: /^\d{4}-\d{2}-\d{2}$/.test(String(e.fin || '')) ? e.fin : '',
     actif: oui(e.actif, true),
-    auto: (e.auto && e.auto.resa) ? { resa: String(e.auto.resa).slice(0, 80) } : ((ancien && ancien.auto) || null),
+    auto: (ancien && ancien.auto) || null,                      /* anciens événements créés automatiquement (supprimables en un clic) */
+    resa: txt(e.resa || a.resa, 80),                           /* réservation du planning choisie à la création */
     mdp: txt(e.mdp, 40),
     cree: a.cree || new Date().toISOString(),
     maj: new Date().toISOString(),

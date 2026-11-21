@@ -373,52 +373,6 @@ async function deleteBlobItem(collection, id) {
 }
 
 
-/* ── création automatique : chaque réservation du planning qui contient un photobooth
-   (ou un vidéobooth) crée son événement Photobooth (ou sa session Vidéobooth). Une seule fois par réservation. ── */
-function resaObjet(item) { try { return typeof item.d === 'string' ? { ...JSON.parse(item.d), id: item.id } : item; } catch { return item; } }
-function resaBooths(r) {
-  const norm = (x) => String(x || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-  const l = (Array.isArray(r && r.products) ? r.products : []).map((p) => norm([p.name, p.short, p.cat, p.variant].join(' ')));
-  return { video: l.some((t) => /video ?booth/.test(t)), photo: l.some((t) => /photo ?booth|photomaton/.test(t) && !/video ?booth/.test(t)) };
-}
-async function autoEvenements(item) {
-  const r = resaObjet(item); if (!r || !r.id || r.annulee || r.statut === 'annulee') return null;
-  const b = resaBooths(r); if (!b.photo && !b.video) return null;
-  const date = /^\d{4}-\d{2}-\d{2}$/.test(String(r.dateStart || '')) ? r.dateStart : '';
-  const fin = /^\d{4}-\d{2}-\d{2}$/.test(String(r.dateEnd || '')) ? r.dateEnd : date;
-  const nom = String(r.client || r.nom || 'Client').trim().slice(0, 60);
-  const mariage = /mariage/i.test(JSON.stringify([r.notes, r.type, r.evenement, r.products]));
-  const fait = {};
-  if (b.photo) {
-    const pst = (await import('./_photobooth.mjs')).pbStore(), cle = 'auto/' + createHash('sha256').update(String(r.id)).digest('hex').slice(0, 32);
-    const deja = await pst.get(cle, { type: 'json' }).catch(() => null);
-    if (!deja || !(await pbLire(deja.evt))) {
-      const e = await pbEcrire({ nom: (mariage ? 'Mariage ' : '') + nom, date, fin: fin ? new Date(Date.parse(fin) + 30 * 86400e3).toISOString().slice(0, 10) : '', auto: { resa: String(r.id).slice(0, 80) },
-        galerie: { invites: mariage, ouverte: true, lien: true } });
-      await pst.setJSON(cle, { evt: e.id, resa: r.id, le: new Date().toISOString() }); fait.photo = e.id;
-    }
-  }
-  if (b.video) {
-    const st = videoStore(), id = 'a' + createHash('sha256').update(String(r.id)).digest('hex').slice(0, 11);
-    const l = await vbSessionsLire(st);
-    if (!l.some((x) => x.id === id)) { await vbSessionsEcrire(st, l.concat({ id, nom: (mariage ? 'Mariage ' : '') + nom, date, type: mariage ? 'mariage' : 'autre', mdp: vbGenMdp ? vbGenMdp() : '', actif: true })); fait.video = id; }
-  }
-  return fait;
-}
-async function autoRattrapage() { /* réservations déjà au planning (à venir) : rattrapage, au plus une fois toutes les 10 min */
-  const pst = (await import('./_photobooth.mjs')).pbStore();
-  const t = await pst.get('auto-dernier', { type: 'json' }).catch(() => null);
-  if (t && Date.now() - t.le < 10 * 60e3) return;
-  await pst.setJSON('auto-dernier', { le: Date.now() });
-  const store = await blobStore(), auj = new Date().toISOString().slice(0, 10);
-  const { blobs } = await store.list({ prefix: 'reservations/' });
-  for (const bl of blobs.slice(0, 2000)) {
-    const it = await store.get(bl.key, { type: 'json' }).catch(() => null); if (!it) continue;
-    const r = resaObjet(it); if (String(r.dateEnd || r.dateStart || '') < auj) continue;
-    if (!resaBooths(r).photo && !resaBooths(r).video) continue;
-    await autoEvenements(it).catch(() => {});
-  }
-}
 async function verifyBlobItem(collection, id, secret) {
   const store = await blobStore();
   const key = blobKey(collection, id);
@@ -2424,7 +2378,6 @@ const gestionnaire = async (request) => {
   }
   /* ── Photobooth : événements, mises en page, images ── */
   if (path === '/photobooth' && request.method === 'GET') {
-    await autoRattrapage().catch(() => {});
     const l = await pbLister();
     const cs = await Promise.all(l.map((e) => pbCompteurs(e.id).catch(() => ({ photos: 0, imprimees: 0, scans: 0 }))));
     return json({ formats: PB_FORMATS, evenements: l.map((e, i) => ({ id: e.id, nom: e.nom, date: e.date, fin: e.fin, actif: e.actif, auto: e.auto || null, misesEnPage: (e.misesEnPage || []).length, ...cs[i] })) });
@@ -2913,8 +2866,7 @@ const gestionnaire = async (request) => {
       }
       /* une réservation n'apparaît pas sur le site public : inutile de vider le cache */
       const cache = collection === 'reservations' ? 'inutile' : await viderCache();
-      let auto = null; if (collection === 'reservations') auto = await autoEvenements(item).catch(() => null);
-      return json({ ok: true, verified, cache, published: true, savedAt: new Date().toISOString(), ...(auto && Object.keys(auto).length ? { auto } : {}) });
+      return json({ ok: true, verified, cache, published: true, savedAt: new Date().toISOString() });
     } catch (e) { return json({ ok: false, error: e.message, verified: false }, 500); }
   }
 

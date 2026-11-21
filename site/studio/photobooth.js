@@ -59,7 +59,7 @@
   var coche = function (id) { var e = $(id); return !!(e && e.checked); };
 
   /* ───────── chargement ───────── */
-  window.pbOuvrir = async function () { css(); PB.evt = null; PB.edit = null; PB.nouveau = false; await chargerListe(); rendre(); };
+  window.pbOuvrir = async function () { css(); PB.evt = null; PB.edit = null; PB.nouveau = false; var z = $('pbZone'); if (z) z.innerHTML = '<div class="pb-vide">Chargement…</div>'; try { await chargerListe(); rendre(); } catch (e) { if (z) z.innerHTML = '<div class="pb-vide">Impossible d’afficher le Photobooth : ' + esc(e.message) + '</div>'; } };
   async function chargerListe() {
     try { var r = await api('/photobooth'); PB.liste = r.evenements || []; PB.formats = r.formats || {}; }
     catch (e) { PB.liste = []; toast('Photobooth : ' + e.message, true); }
@@ -71,16 +71,40 @@
     var enCours = PB.liste.filter(function (e) { return !termine(e); }), passes = PB.liste.filter(termine);
     var carte = function (e) { return '<button type="button" class="pb-carte" onclick="pbEvt(\'' + e.id + '\')"><b>' + esc(e.nom) + '</b><span>' + (e.date ? dateFr(e.date) : 'Date à préciser') + '</span><span>' + e.misesEnPage + ' mise' + (e.misesEnPage > 1 ? 's' : '') + ' en page · ' + e.photos + ' photo' + (e.photos > 1 ? 's' : '') + '</span></button>'; };
     z.innerHTML = '<div class="pb-tete"><h2>Photobooth</h2><span style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn btn-ghost" href="/photobooth/app/?liste" target="_blank" rel="noopener">Ouvrir l’appli des bornes</a><button class="btn" onclick="pbNouveau()">+ Nouvel événement</button></span></div>'
-      + (PB.nouveau ? '<div class="pb-bloc"><h3>Nouvel événement</h3><div class="pb-champs">' + champ('pbn-nom', 'Nom de l’événement', '', 'Mariage de Sylvie & Paul') + champ('pbn-date', 'Date', '', '', 'date') + '</div><div class="pb-actions" style="margin-top:12px"><button class="btn" onclick="pbCreer()">Créer l’événement</button><button class="btn btn-ghost" onclick="pbNouveau(false)">Annuler</button></div></div>' : '')
-      + '<div class="pb-titre-g">En cours et à venir</div>' + (enCours.length ? '<div class="pb-grille">' + enCours.map(carte).join('') + '</div>' : '<div class="pb-vide">Aucun événement en cours. Créez-en un avec « Nouvel événement ».</div>')
+      + (PB.nouveau ? '<div class="pb-bloc"><h3>Nouvel événement</h3><div class="pb-champs">' + '<label style="grid-column:1/-1">Cliente (réservation du planning, facultatif)<select id="pbn-cl" onchange="pbChoisirCliente(this.value)"><option value="">— choisir une cliente —</option>' + (PB.clientes || []).map(function (c, i) { return '<option value="' + i + '">' + esc(c.client) + (c.dateStart ? ' · ' + dateFr(c.dateStart) : '') + (c.produits ? ' · ' + esc(c.produits) : '') + '</option>'; }).join('') + '</select></label>' + champ('pbn-nom', 'Nom de l’événement', '', 'Mariage de Sylvie & Paul') + champ('pbn-date', 'Date', '', '', 'date') + '</div><div class="pb-actions" style="margin-top:12px"><button class="btn" onclick="pbCreer()">Créer l’événement</button><button class="btn btn-ghost" onclick="pbNouveau(false)">Annuler</button></div></div>' : '')
+      + (PB.liste.some(function (e) { return e.auto; }) ? '<div class="pb-actions" style="margin:0 0 10px"><button class="btn btn-ghost" style="color:#b03a2a" onclick="pbAutoSuppr()">Supprimer les événements créés automatiquement (' + PB.liste.filter(function (e) { return e.auto; }).length + ')</button></div>' : '') + '<div class="pb-titre-g">En cours et à venir</div>' + (enCours.length ? '<div class="pb-grille">' + enCours.map(carte).join('') + '</div>' : '<div class="pb-vide">Aucun événement en cours. Créez-en un avec « Nouvel événement ».</div>')
       + '<div class="pb-titre-g">Événements passés (encore sauvegardés)</div>' + (passes.length ? '<div class="pb-grille">' + passes.map(carte).join('') + '</div>' : '<div class="pb-vide">Aucun événement passé.</div>');
     if (PB.nouveau) setTimeout(function () { var n = $('pbn-nom'); if (n) n.focus(); }, 50);
   }
-  window.pbNouveau = function (on) { PB.nouveau = on !== false; rendre(); };
+  /* liste des clientes du planning, pour pré-remplir un nouvel événement */
+  async function chargerClientes() {
+    try {
+      var brut = await api('/data?collection=reservations'), auj = aujourdhui(), l = [];
+      (brut || []).forEach(function (x) {
+        try {
+          var r = typeof x.d === 'string' ? JSON.parse(x.d) : x; if (!r || !r.client) return;
+          l.push({ id: String(x.id || r.id), client: String(r.client), dateStart: r.dateStart || '', dateEnd: r.dateEnd || r.dateStart || '', produits: (r.products || []).map(function (p) { return p.name; }).filter(function (n) { return /photobooth|vid[ée]obooth|photomaton/i.test(n || ''); }).slice(0, 2).join(', ') });
+        } catch (e) {}
+      });
+      l.sort(function (a, b) { var fa = a.dateStart >= auj, fb = b.dateStart >= auj; return fa !== fb ? (fa ? -1 : 1) : (fa ? a.dateStart.localeCompare(b.dateStart) : b.dateStart.localeCompare(a.dateStart)); });
+      PB.clientes = l;
+    } catch (e) { PB.clientes = []; }
+  }
+  window.pbChoisirCliente = function (i) {
+    var c = (PB.clientes || [])[+i]; if (!c) return;
+    $('pbn-nom').value = c.client; if (c.dateStart) $('pbn-date').value = c.dateStart; PB.resa = c.id; PB.resaFin = c.dateEnd;
+  };
+  window.pbNouveau = async function (on) { PB.nouveau = on !== false; PB.resa = ''; if (PB.nouveau && !PB.clientes) await chargerClientes(); rendre(); };
+  window.pbAutoSuppr = async function () {
+    var k = PB.liste.filter(function (e) { return e.auto; }); if (!k.length) return toast('Aucun événement créé automatiquement');
+    if (!confirm('Supprimer ' + k.length + ' événement(s) créé(s) automatiquement depuis le planning, avec leurs photos ?\n\nIl n’y a pas de retour en arrière.')) return;
+    for (var i = 0; i < k.length; i++) { try { await api('/photobooth/evt?id=' + k[i].id, { method: 'DELETE' }); } catch (e) {} }
+    toast(k.length + ' événement(s) supprimé(s)'); await chargerListe(); rendre();
+  };
   window.pbCreer = async function () {
     var nom = val('pbn-nom').trim(), date = val('pbn-date');
     if (!nom) return toast('Indiquez le nom de l’événement', true);
-    try { var r = await api('/photobooth/evt', { method: 'POST', body: JSON.stringify({ nom: nom, date: date, fin: date }) }); PB.nouveau = false; PB.evt = r.evenement; PB.section = 'experience'; toast('Événement créé'); rendre(); }
+    try { var r = await api('/photobooth/evt', { method: 'POST', body: JSON.stringify({ nom: nom, date: date, fin: PB.resaFin || date, resa: PB.resa || '' }) }); PB.nouveau = false; PB.evt = r.evenement; PB.section = 'experience'; toast('Événement créé'); rendre(); }
     catch (e) { toast('Échec : ' + e.message, true); }
   };
   window.pbEvt = async function (id) {
