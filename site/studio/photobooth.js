@@ -341,7 +341,11 @@
     var f = inp.files && inp.files[0]; if (!f) return; var m = PB.edit.m, fo = PB.formats[m.format];
     var dims = await new Promise(function (ok) { var i = new Image(); i.onload = function () { ok([i.naturalWidth, i.naturalHeight]); }; i.onerror = function () { ok([0, 0]); }; i.src = URL.createObjectURL(f); });
     if (dims[0] && Math.abs(dims[0] / dims[1] - fo.w / fo.h) > 0.02) toast('Attention : ce PNG fait ' + dims[0] + ' × ' + dims[1] + ' px, pas les proportions du format ' + fo.nom + ' (' + fo.w + ' × ' + fo.h + ')', true);
-    try { m.cadre = await envoyerImage(f); toast('Calque ajouté'); editeur($('pbContenu')); } catch (e) { toast('Échec : ' + e.message, true); }
+    try {
+      var r = await calqueAutoTransparent(f); m.cadre = await envoyerImage(r.fichier);
+      toast(r.auto ? 'Calque ajouté : la zone pleine du milieu a été rendue transparente automatiquement (' + Math.round(r.auto * 100) + ' %)' : (r.dejaOk ? 'Calque ajouté (transparence conservée)' : 'Calque ajouté : aucun trou transparent détecté, utilisez « Gommer une zone »'), !r.auto && !r.dejaOk);
+      editeur($('pbContenu'));
+    } catch (e) { toast('Échec : ' + e.message, true); }
   };
   window.pbCalqueTf = function () {
     var m = PB.edit.m; m.calque = { z: +$('pbz').value, x: +$('pbx').value, y: +$('pby').value };
@@ -354,33 +358,56 @@
     var b = $('pbGomme'); if (b) b.textContent = PB.gomme ? 'Cliquez dans la zone à gommer… (annuler)' : 'Gommer une zone';
     if (PB.gomme) toast('Cliquez sur la zone du calque à rendre transparente');
   };
-  /* gomme : remplit à partir du point cliqué toutes les couleurs voisines et les rend transparentes (le PNG corrigé remplace le calque) */
+  /* remplit à partir d'un point toutes les couleurs voisines et les rend transparentes (+1 pixel de liseré).
+     interieur : la zone ne doit pas toucher le bord de l'image (c'est un trou, pas le fond du cadre). Renvoie la part de l'image gommée, ou 0. */
+  function gommerZone(d, W, H, sx, sy, tol, interieur) {
+    var p0 = (sy * W + sx) * 4, R = d[p0], G = d[p0 + 1], B = d[p0 + 2];
+    var pareil = function (q, t) { var o = q * 4; return d[o + 3] < 12 || (Math.abs(d[o] - R) <= t && Math.abs(d[o + 1] - G) <= t && Math.abs(d[o + 2] - B) <= t); };
+    var vu = new Uint8Array(W * H), pile = new Int32Array(W * H), n = 0, top = 0, bord = false; pile[top++] = sy * W + sx; vu[sy * W + sx] = 1;
+    while (top) { var q = pile[--top], x = q % W, y = (q - x) / W; n++; if (x === 0 || y === 0 || x === W - 1 || y === H - 1) bord = true;
+      if (x > 0 && !vu[q - 1] && pareil(q - 1, tol)) { vu[q - 1] = 1; pile[top++] = q - 1; }
+      if (x < W - 1 && !vu[q + 1] && pareil(q + 1, tol)) { vu[q + 1] = 1; pile[top++] = q + 1; }
+      if (q >= W && !vu[q - W] && pareil(q - W, tol)) { vu[q - W] = 1; pile[top++] = q - W; }
+      if (q < W * H - W && !vu[q + W] && pareil(q + W, tol)) { vu[q + W] = 1; pile[top++] = q + W; } }
+    if (n < 50 || (interieur && (bord || n < W * H * 0.04 || n > W * H * 0.85))) return 0;
+    var halo = new Uint8Array(W * H);
+    for (var q2 = 0; q2 < W * H; q2++) if (vu[q2]) { var x2 = q2 % W; [x2 > 0 ? q2 - 1 : -1, x2 < W - 1 ? q2 + 1 : -1, q2 >= W ? q2 - W : -1, q2 < W * H - W ? q2 + W : -1].forEach(function (v) { if (v >= 0 && !vu[v] && pareil(v, tol * 2)) halo[v] = 1; }); }
+    for (var q3 = 0; q3 < W * H; q3++) if (vu[q3] || halo[q3]) d[q3 * 4 + 3] = 0;
+    return n / (W * H);
+  }
+  var versPng = function (cv) { return new Promise(function (ok) { cv.toBlob(ok, 'image/png'); }); };
   window.pbGommer = function (ev) {
     var m = PB.edit.m, f = PB.formats[m.format], sc = $('pbScene'), rect = sc.getBoundingClientRect(), tol = +$('pbg').value || 40;
     var fx = (ev.clientX - rect.left) / rect.width * f.w, fy = (ev.clientY - rect.top) / rect.height * f.h, rc = rectCalque(m, f);
     chargerImage(m.cadre, async function (img) {
       if (!img) return toast('Calque illisible', true);
       var W = img.naturalWidth, H = img.naturalHeight, cv = document.createElement('canvas'); cv.width = W; cv.height = H; var g = cv.getContext('2d'); g.drawImage(img, 0, 0);
-      var id = g.getImageData(0, 0, W, H), d = id.data, sx = Math.floor((fx - rc.x) / rc.w * W), sy = Math.floor((fy - rc.y) / rc.h * H);
+      var id = g.getImageData(0, 0, W, H), sx = Math.floor((fx - rc.x) / rc.w * W), sy = Math.floor((fy - rc.y) / rc.h * H);
       if (sx < 0 || sy < 0 || sx >= W || sy >= H) { PB.gomme = false; return toast('Cliquez sur le calque', true); }
-      var p0 = (sy * W + sx) * 4, R = d[p0], G = d[p0 + 1], B = d[p0 + 2], A = d[p0 + 3];
-      var pareil = function (q, t) { var o = q * 4; return d[o + 3] < 12 || (Math.abs(d[o] - R) <= t && Math.abs(d[o + 1] - G) <= t && Math.abs(d[o + 2] - B) <= t); };
-      var vu = new Uint8Array(W * H), pile = new Int32Array(W * H), n = 0, top = 0; pile[top++] = sy * W + sx; vu[sy * W + sx] = 1;
-      while (top) { var q = pile[--top], x = q % W; n++;
-        if (x > 0 && !vu[q - 1] && pareil(q - 1, tol)) { vu[q - 1] = 1; pile[top++] = q - 1; }
-        if (x < W - 1 && !vu[q + 1] && pareil(q + 1, tol)) { vu[q + 1] = 1; pile[top++] = q + 1; }
-        if (q >= W && !vu[q - W] && pareil(q - W, tol)) { vu[q - W] = 1; pile[top++] = q - W; }
-        if (q < W * H - W && !vu[q + W] && pareil(q + W, tol)) { vu[q + W] = 1; pile[top++] = q + W; } }
-      if (n < 50) { PB.gomme = false; $('pbScene').classList.remove('pb-gomme'); return toast('Zone trop petite : cliquez au milieu de la zone à gommer', true); }
-      var halo = new Uint8Array(W * H);                                       /* liseré : 1 pixel de plus autour de la zone gommée */
-      for (var q2 = 0; q2 < W * H; q2++) if (vu[q2]) { var x2 = q2 % W; [x2 > 0 ? q2 - 1 : -1, x2 < W - 1 ? q2 + 1 : -1, q2 >= W ? q2 - W : -1, q2 < W * H - W ? q2 + W : -1].forEach(function (v) { if (v >= 0 && !vu[v] && pareil(v, tol * 2)) halo[v] = 1; }); }
-      for (var q3 = 0; q3 < W * H; q3++) if (vu[q3] || halo[q3]) d[q3 * 4 + 3] = 0;
+      var part = gommerZone(id.data, W, H, sx, sy, tol, false);
+      if (!part) { PB.gomme = false; $('pbScene').classList.remove('pb-gomme'); return toast('Zone trop petite : cliquez au milieu de la zone à gommer', true); }
       g.putImageData(id, 0, 0);
-      var blob = await new Promise(function (ok) { cv.toBlob(ok, 'image/png'); });
-      try { var fichier = new File([blob], 'calque-transparent.png', { type: 'image/png' }); m.cadre = await envoyerImage(fichier); PB.gomme = false; toast(Math.round(n / (W * H) * 100) + ' % du calque rendu transparent'); editeur($('pbContenu')); }
+      try { m.cadre = await envoyerImage(new File([await versPng(cv)], 'calque-transparent.png', { type: 'image/png' })); PB.gomme = false; toast(Math.round(part * 100) + ' % du calque rendu transparent'); editeur($('pbContenu')); }
       catch (e) { toast('Échec : ' + e.message, true); }
     });
   };
+  /* à l'ajout d'un PNG : si les trous ne sont pas transparents (zone pleine), la zone du milieu est rendue transparente automatiquement */
+  async function calqueAutoTransparent(fichier) {
+    try {
+      var img = await new Promise(function (ok, ko) { var i = new Image(); i.onload = function () { ok(i); }; i.onerror = ko; i.src = URL.createObjectURL(fichier); });
+      var W = img.naturalWidth, H = img.naturalHeight, cv = document.createElement('canvas'); cv.width = W; cv.height = H; var g = cv.getContext('2d'); g.drawImage(img, 0, 0);
+      var id = g.getImageData(0, 0, W, H), d = id.data, clair = 0;
+      for (var i = 3; i < d.length; i += 4) if (d[i] < 12) clair++;
+      if (clair >= W * H * 0.01) return { fichier: fichier, auto: 0, dejaOk: true };            /* déjà transparent : rien à faire */
+      var part = 0, pts = [[0.5, 0.5], [0.5, 0.4], [0.5, 0.6], [0.35, 0.5], [0.65, 0.5], [0.5, 0.3], [0.5, 0.7]];
+      [5, 14, 30, 45].forEach(function (tol) {                                           /* d'abord très strict (un blanc pur ne déborde pas sur la neige), puis plus tolérant */
+        for (var k = 0; k < pts.length && !part; k++) { var tmp = new Uint8ClampedArray(d); part = gommerZone(tmp, W, H, Math.floor(W * pts[k][0]), Math.floor(H * pts[k][1]), tol, true); if (part) d.set(tmp); }
+      });
+      if (!part) return { fichier: fichier, auto: 0 };
+      g.putImageData(id, 0, 0);
+      return { fichier: new File([await versPng(cv)], fichier.name || 'calque.png', { type: 'image/png' }), auto: part };
+    } catch (e) { return { fichier: fichier, auto: 0 }; }
+  }
   window.pbCalqueRetirer = function () { PB.edit.m.cadre = ''; editeur($('pbContenu')); };
   /* repère les zones transparentes du calque et y place une case par trou (de haut en bas, puis de gauche à droite) */
   window.pbDetecter = function () {
