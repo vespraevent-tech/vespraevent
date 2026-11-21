@@ -34,7 +34,7 @@ function casesPropres(cases, f) {
 }
 function miseEnPagePropre(m) {
   const format = FORMATS[m && m.format] ? m.format : '4x6p', f = FORMATS[format];
-  return { id: idOk(m && m.id, 'mp') || nouvelId('mp'), nom: txt(m && m.nom, 60) || f.nom, format, w: f.w, h: f.h, cadre: idOk(m && m.cadre, 'im'), fond: hex(m && m.fond, '#FFFFFF'), cases: casesPropres(m && m.cases, f) };
+  return { id: idOk(m && m.id, 'mp') || nouvelId('mp'), nom: txt(m && m.nom, 60) || f.nom, format, w: f.w, h: f.h, cadre: idOk(m && m.cadre, 'im'), calque: { z: nb(m && m.calque && m.calque.z, 20, 400, 100), x: nb(m && m.calque && m.calque.x, -3000, 3000, 0), y: nb(m && m.calque && m.calque.y, -3000, 3000, 0) }, fond: hex(m && m.fond, '#FFFFFF'), cases: casesPropres(m && m.cases, f) };
 }
 
 /* nettoyage complet d'un événement : on ne garde que les réglages connus, avec des valeurs par défaut */

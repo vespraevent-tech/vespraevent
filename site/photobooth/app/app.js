@@ -141,12 +141,14 @@
     var ajuster = function () { sc.style.transform = 'scale(' + (boite.clientWidth / 1920) + ')'; };
     ajuster(); new ResizeObserver(ajuster).observe(boite); dessin(sc);
   }
+  /* position et taille du calque (PNG du cadre) dans la feuille : réglables dans le back-office */
+  function rectCalque(m) { var c = m.calque || {}, z = (c.z || 100) / 100; return { x: m.w * (1 - z) / 2 + (c.x || 0), y: m.h * (1 - z) / 2 + (c.y || 0), w: m.w * z, h: m.h * z }; }
   /* vignette : le cadre posé sur des cases grises numérotées */
   function vignetteCadre(e, m, viaBorne) {
     var c = document.createElement('canvas'); c.width = m.w / 4; c.height = m.h / 4; var x = c.getContext('2d'), k = 0.25;
     x.fillStyle = m.fond || '#fff'; x.fillRect(0, 0, c.width, c.height);
     (m.cases || []).forEach(function (cs) { x.save(); x.translate((cs.x + cs.w / 2) * k, (cs.y + cs.h / 2) * k); x.rotate((cs.r || 0) * Math.PI / 180); x.fillStyle = '#C9CED6'; x.fillRect(-cs.w * k / 2, -cs.h * k / 2, cs.w * k, cs.h * k); x.fillStyle = '#fff'; x.font = '700 ' + Math.round(cs.h * k / 3) + 'px system-ui'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(cs.n, 0, 0); x.restore(); });
-    return chargerImage(e.id, m.cadre, viaBorne).then(function (im) { if (im) x.drawImage(im, 0, 0, c.width, c.height); return c; });
+    return chargerImage(e.id, m.cadre, viaBorne).then(function (im) { if (im) { var rc = rectCalque(m); x.drawImage(im, rc.x * k, rc.y * k, rc.w * k, rc.h * k); } return c; });
   }
 
   /* ── 3. écran d'accueil (même rendu que l'aperçu du back-office) ── */
@@ -252,6 +254,7 @@
       var c = document.createElement('canvas'); c.width = Math.round(cs.w * k * 1.5); c.height = Math.round(cs.h * k * 1.5); d.appendChild(c); st.appendChild(d); (cvs[cs.n] = cvs[cs.n] || []).push({ cv: c, cs: cs });
     });
     var cadre = document.createElement('img'); cadre.className = 'pcadre'; cadre.alt = ''; st.appendChild(cadre);   /* cadre PNG par-dessus */
+    var rc = rectCalque(m); cadre.style.cssText = 'inset:auto;left:' + rc.x * k + 'px;top:' + rc.y * k + 'px;width:' + rc.w * k + 'px;height:' + rc.h * k + 'px';
     chargerImage(etat.evt.id, m.cadre, false).then(function (im) { if (im) cadre.src = im.src; });
     st.appendChild(cp0); st.appendChild(fl0);
     return { cvs: cvs, k: k };
@@ -296,7 +299,7 @@
       x.save(); x.translate(cs.x + cs.w / 2, cs.y + cs.h / 2); x.rotate((cs.r || 0) * Math.PI / 180);
       x.drawImage(p, (p.width - sw) / 2, (p.height - sh) / 2, sw, sh, -cs.w / 2, -cs.h / 2, cs.w, cs.h); x.restore();
     });
-    return chargerImage(etat.evt.id, m.cadre, false).then(function (im) { if (im) x.drawImage(im, 0, 0, m.w, m.h); return c; });
+    return chargerImage(etat.evt.id, m.cadre, false).then(function (im) { if (im) { var rc = rectCalque(m); x.drawImage(im, rc.x, rc.y, rc.w, rc.h); } return c; });
   }
   var versBlob = function (c, q) { return new Promise(function (ok) { c.toBlob(ok, 'image/jpeg', q || 0.92); }); };
 

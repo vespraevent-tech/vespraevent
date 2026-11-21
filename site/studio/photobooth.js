@@ -46,7 +46,7 @@
       + '.pb-modeles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}.pb-modeles button{background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:10px;cursor:pointer;display:flex;flex-direction:column;gap:6px;align-items:center;font:600 12.5px Inter,sans-serif;color:#1f2733}.pb-modeles button:hover{border-color:#B8893B}.pb-modeles canvas{width:100%;height:120px;object-fit:contain}'
       + '.pb-ed{display:grid;grid-template-columns:1fr 260px;gap:16px;align-items:start}@media(max-width:980px){.pb-ed{grid-template-columns:1fr}}.pb-scene-z{background:#e9e6df;border-radius:12px;padding:16px;display:flex;justify-content:center;overflow:auto}'
       + '.pb-scene{position:relative;background:#fff;box-shadow:0 10px 30px -12px rgba(0,0,0,.35);touch-action:none;user-select:none;flex:none}.pb-case{position:absolute;display:flex;align-items:center;justify-content:center;color:#fff;font:800 28px Inter,sans-serif;cursor:move;outline:1px solid rgba(0,0,0,.15)}.pb-case.sel{outline:3px solid #14304f;z-index:3}.pb-case .poignee{position:absolute;right:-7px;bottom:-7px;width:14px;height:14px;background:#fff;border:2px solid #14304f;border-radius:3px;cursor:nwse-resize}'
-      + '.pb-calque{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}.pb-outils{display:flex;flex-direction:column;gap:12px}'
+      + '.pb-calque{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}.pb-gomme{cursor:crosshair}.pb-gomme .pb-case{pointer-events:none}.pb-outils{display:flex;flex-direction:column;gap:12px}'
       + '.pb-accueil{position:relative;overflow:hidden;border-radius:10px;box-shadow:0 10px 30px -12px rgba(0,0,0,.35);background-size:cover;background-position:center;touch-action:none;user-select:none}.pb-acc-el{position:absolute;transform:translate(-50%,-50%);cursor:move}.pb-acc-bt{border-radius:50%;display:flex;align-items:center;justify-content:center}.pb-acc-coin{position:absolute;top:2.5%;width:4.2%;aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35)}'
       + '.pb-photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}.pb-photos figure{margin:0;background:#faf8f4;border:1px solid #e6e1d6;border-radius:10px;padding:8px}.pb-photos img{width:100%;max-height:240px;object-fit:contain;border-radius:6px;display:block}.pb-photos figcaption{font-size:12px;color:#6b7280;margin-top:6px}.pb-photos figcaption span{display:block;margin-top:3px}.pb-photos a{color:#14304f}.pb-champs input:focus,.pb-champs select:focus{outline:none!important;border-color:#14304f!important;box-shadow:0 0 0 3px rgba(20,48,79,.12)!important}.pb-vide{text-align:center;color:#6b7280;padding:28px 10px;font-size:13.5px}.pb-theme{}@media(max-width:700px){.pb-theme{grid-template-columns:1fr!important}}.pb-sous{display:flex;gap:4px;border-bottom:1px solid #e6e1d6;margin:0 0 14px}.pb-sous button{border:0;background:transparent;padding:10px 14px;font:600 14px Inter,sans-serif;color:#6b7280;cursor:pointer;border-bottom:3px solid transparent}.pb-sous button.on{color:#14304f;border-bottom-color:#B8893B}';
     document.head.appendChild(st);
@@ -191,6 +191,8 @@
   };
 
   /* ───────── expérience : mises en page ───────── */
+  /* position et taille du calque dans la feuille */
+  function rectCalque(m, f) { var c = m.calque || {}, z = (c.z || 100) / 100; return { x: f.w * (1 - z) / 2 + (c.x || 0), y: f.h * (1 - z) / 2 + (c.y || 0), w: f.w * z, h: f.h * z }; }
   function dessiner(cv, m, img, petit) {
     var f = PB.formats[m.format] || { w: m.w, h: m.h };
     cv.width = f.w; cv.height = f.h; var g = cv.getContext('2d');
@@ -201,7 +203,7 @@
       g.fillStyle = '#fff'; g.font = '800 ' + Math.round(Math.min(k.w, k.h) * (petit ? 0.45 : 0.3)) + 'px Inter,Arial'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(k.n), 0, 0);
       g.restore();
     });
-    if (img) g.drawImage(img, 0, 0, f.w, f.h);
+    if (img) { var rc = rectCalque(m, f); g.drawImage(img, rc.x, rc.y, rc.w, rc.h); }
   }
   function chargerImage(id, cb) { if (!id) return cb(null); var i = new Image(); i.onload = function () { cb(i); }; i.onerror = function () { cb(null); }; i.src = urlImage(id); }
   function secExperience(c) {
@@ -250,7 +252,15 @@
       + '<div class="pb-ed"><div class="pb-scene-z"><div class="pb-scene" id="pbScene" style="width:' + Math.round(f.w * echelle) + 'px;height:' + Math.round(f.h * echelle) + 'px;background:' + esc(m.fond) + '"></div></div>'
       + '<div class="pb-outils">'
       + '<div class="pb-bloc" style="margin:0"><h3>Calque</h3><p class="aide">Votre design PNG au format ' + esc(f.nom) + ' (' + f.w + ' × ' + f.h + ' px), avec les emplacements des photos transparents.</p><div class="pb-actions"><label class="btn btn-ghost" style="cursor:pointer">' + (m.cadre ? 'Remplacer' : 'Choisir le PNG') + '<input type="file" accept="image/png" hidden onchange="pbCalque(this)"></label>' + (m.cadre ? '<button class="btn btn-ghost" onclick="pbCalqueRetirer()">Retirer</button>' : '') + '</div>'
-      + (m.cadre ? '<div class="pb-actions" style="margin-top:8px"><button class="btn" onclick="pbDetecter()">Détecter les trous du calque</button></div><label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#6b7280;margin-top:10px"><input type="range" id="pbe-op" min="15" max="100" value="100" oninput="pbOpacite(this.value)"> Transparence du calque (pour ajuster)</label>' : '') + '</div>'
+      + (m.cadre ? '<div class="pb-actions" style="margin-top:8px"><button class="btn" onclick="pbDetecter()">Détecter les trous du calque</button></div><label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#6b7280;margin-top:10px"><input type="range" id="pbe-op" min="15" max="100" value="100" oninput="pbOpacite(this.value)"> Transparence du calque (pour ajuster)</label>'
+        + '<div style="border-top:1px solid #eee;margin-top:12px;padding-top:10px"><b style="font-size:13px">Taille et position du calque</b>'
+        + '<label style="display:block;font-size:12.5px;color:#6b7280;margin-top:8px">Taille : <span id="pbz-v">' + Math.round((m.calque || {}).z || 100) + '</span> %<input type="range" id="pbz" min="30" max="250" value="' + Math.round((m.calque || {}).z || 100) + '" oninput="pbCalqueTf()" style="width:100%"></label>'
+        + '<label style="display:block;font-size:12.5px;color:#6b7280;margin-top:6px">Horizontal : <span id="pbx-v">' + Math.round((m.calque || {}).x || 0) + '</span> px<input type="range" id="pbx" min="-900" max="900" value="' + Math.round((m.calque || {}).x || 0) + '" oninput="pbCalqueTf()" style="width:100%"></label>'
+        + '<label style="display:block;font-size:12.5px;color:#6b7280;margin-top:6px">Vertical : <span id="pby-v">' + Math.round((m.calque || {}).y || 0) + '</span> px<input type="range" id="pby" min="-900" max="900" value="' + Math.round((m.calque || {}).y || 0) + '" oninput="pbCalqueTf()" style="width:100%"></label>'
+        + '<div class="pb-actions" style="margin-top:6px"><button class="btn btn-ghost" onclick="pbCalqueRaz()">Remettre à la taille du format</button></div></div>'
+        + '<div style="border-top:1px solid #eee;margin-top:12px;padding-top:10px"><b style="font-size:13px">Le fond n’est pas transparent ?</b><p class="aide" style="margin:4px 0 8px">Cliquez sur « Gommer », puis sur la zone du calque à rendre transparente (par exemple la zone bleue). Réglez la tolérance si des bords restent.</p>'
+        + '<label style="display:block;font-size:12.5px;color:#6b7280">Tolérance : <span id="pbg-v">40</span><input type="range" id="pbg" min="5" max="120" value="40" oninput="document.getElementById(\'pbg-v\').textContent=this.value" style="width:100%"></label>'
+        + '<div class="pb-actions" style="margin-top:6px"><button class="btn" id="pbGomme" onclick="pbGommeMode()">Gommer une zone</button></div></div>' : '') + '</div>'
       + '<div class="pb-bloc" style="margin:0"><h3>Cases des photos</h3><p class="aide">Faites glisser les cases dans les trous ; le coin en bas à droite les redimensionne. Flèches du clavier : 1 px (Maj : 10 px).</p><div class="pb-actions"><button class="btn btn-ghost" onclick="pbAjouterCase()">+ Ajouter une case</button></div><div id="pbCaseReg" style="margin-top:10px"></div></div>'
       + '<div class="pb-bloc" style="margin:0"><h3>Fond</h3><div class="pb-champs"><label>Couleur sous le calque<input type="color" id="pbe-fond" value="' + esc(m.fond) + '" oninput="pbFond(this.value)" style="height:38px;padding:2px"></label></div></div>'
       + '</div></div>';
@@ -259,6 +269,7 @@
   /* aperçu : une photo type 3:2 (celle du reflex) recadrée dans la case, sans déformation, comme sur la borne */
   var EXEMPLE = 'url("data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" preserveAspectRatio="none"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfe3f5"/><stop offset="1" stop-color="#f1e4d3"/></linearGradient></defs><rect width="300" height="200" fill="url(#g)"/><g fill="#6b7a8f"><circle cx="105" cy="78" r="22"/><path d="M62 200c0-42 18-68 43-68s43 26 43 68z"/></g><g fill="#8a6a5a"><circle cx="190" cy="84" r="20"/><path d="M150 200c0-40 17-64 40-64s40 24 40 64z"/></g><rect x="1" y="1" width="298" height="198" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2"/></svg>') + '") center/cover no-repeat';
   var fondCase = function (k) { var c = COUL[k.n] || '#999'; return 'linear-gradient(' + c + '55,' + c + '55),' + EXEMPLE; };
+  function posCalque(im) { var m = PB.edit.m, f = PB.formats[m.format], r = rectCalque(m, f); im.style.cssText += ';inset:auto;left:' + r.x / f.w * 100 + '%;top:' + r.y / f.h * 100 + '%;width:' + r.w / f.w * 100 + '%;height:' + r.h / f.h * 100 + '%'; }
   function dessinerScene() {
     var m = PB.edit.m, sc = $('pbScene'); if (!sc) return;
     sc.innerHTML = '';
@@ -269,7 +280,8 @@
       d.addEventListener('pointerdown', function (ev) { glisser(ev, i, ev.target === p); });
       sc.appendChild(d);
     });
-    if (m.cadre) { var im = document.createElement('img'); im.className = 'pb-calque'; im.id = 'pbCalqueImg'; im.alt = ''; im.src = urlImage(m.cadre); var op = $('pbe-op'); if (op) im.style.opacity = op.value / 100; sc.appendChild(im); }
+    if (m.cadre) { var im = document.createElement('img'); im.className = 'pb-calque'; im.id = 'pbCalqueImg'; im.alt = ''; im.src = urlImage(m.cadre); posCalque(im); var op = $('pbe-op'); if (op) im.style.opacity = op.value / 100; sc.appendChild(im); }
+    sc.onclick = function (ev) { if (PB.gomme) pbGommer(ev); };
     reglagesCase();
   }
   function glisser(ev, i, redim) {
@@ -330,6 +342,44 @@
     var dims = await new Promise(function (ok) { var i = new Image(); i.onload = function () { ok([i.naturalWidth, i.naturalHeight]); }; i.onerror = function () { ok([0, 0]); }; i.src = URL.createObjectURL(f); });
     if (dims[0] && Math.abs(dims[0] / dims[1] - fo.w / fo.h) > 0.02) toast('Attention : ce PNG fait ' + dims[0] + ' × ' + dims[1] + ' px, pas les proportions du format ' + fo.nom + ' (' + fo.w + ' × ' + fo.h + ')', true);
     try { m.cadre = await envoyerImage(f); toast('Calque ajouté'); editeur($('pbContenu')); } catch (e) { toast('Échec : ' + e.message, true); }
+  };
+  window.pbCalqueTf = function () {
+    var m = PB.edit.m; m.calque = { z: +$('pbz').value, x: +$('pbx').value, y: +$('pby').value };
+    $('pbz-v').textContent = m.calque.z; $('pbx-v').textContent = m.calque.x; $('pby-v').textContent = m.calque.y;
+    var im = $('pbCalqueImg'); if (im) posCalque(im);
+  };
+  window.pbCalqueRaz = function () { PB.edit.m.calque = { z: 100, x: 0, y: 0 }; editeur($('pbContenu')); };
+  window.pbGommeMode = function () {
+    PB.gomme = !PB.gomme; var sc = $('pbScene'); if (sc) sc.classList.toggle('pb-gomme', PB.gomme);
+    var b = $('pbGomme'); if (b) b.textContent = PB.gomme ? 'Cliquez dans la zone à gommer… (annuler)' : 'Gommer une zone';
+    if (PB.gomme) toast('Cliquez sur la zone du calque à rendre transparente');
+  };
+  /* gomme : remplit à partir du point cliqué toutes les couleurs voisines et les rend transparentes (le PNG corrigé remplace le calque) */
+  window.pbGommer = function (ev) {
+    var m = PB.edit.m, f = PB.formats[m.format], sc = $('pbScene'), rect = sc.getBoundingClientRect(), tol = +$('pbg').value || 40;
+    var fx = (ev.clientX - rect.left) / rect.width * f.w, fy = (ev.clientY - rect.top) / rect.height * f.h, rc = rectCalque(m, f);
+    chargerImage(m.cadre, async function (img) {
+      if (!img) return toast('Calque illisible', true);
+      var W = img.naturalWidth, H = img.naturalHeight, cv = document.createElement('canvas'); cv.width = W; cv.height = H; var g = cv.getContext('2d'); g.drawImage(img, 0, 0);
+      var id = g.getImageData(0, 0, W, H), d = id.data, sx = Math.floor((fx - rc.x) / rc.w * W), sy = Math.floor((fy - rc.y) / rc.h * H);
+      if (sx < 0 || sy < 0 || sx >= W || sy >= H) { PB.gomme = false; return toast('Cliquez sur le calque', true); }
+      var p0 = (sy * W + sx) * 4, R = d[p0], G = d[p0 + 1], B = d[p0 + 2], A = d[p0 + 3];
+      var pareil = function (q, t) { var o = q * 4; return d[o + 3] < 12 || (Math.abs(d[o] - R) <= t && Math.abs(d[o + 1] - G) <= t && Math.abs(d[o + 2] - B) <= t); };
+      var vu = new Uint8Array(W * H), pile = new Int32Array(W * H), n = 0, top = 0; pile[top++] = sy * W + sx; vu[sy * W + sx] = 1;
+      while (top) { var q = pile[--top], x = q % W; n++;
+        if (x > 0 && !vu[q - 1] && pareil(q - 1, tol)) { vu[q - 1] = 1; pile[top++] = q - 1; }
+        if (x < W - 1 && !vu[q + 1] && pareil(q + 1, tol)) { vu[q + 1] = 1; pile[top++] = q + 1; }
+        if (q >= W && !vu[q - W] && pareil(q - W, tol)) { vu[q - W] = 1; pile[top++] = q - W; }
+        if (q < W * H - W && !vu[q + W] && pareil(q + W, tol)) { vu[q + W] = 1; pile[top++] = q + W; } }
+      if (n < 50) { PB.gomme = false; $('pbScene').classList.remove('pb-gomme'); return toast('Zone trop petite : cliquez au milieu de la zone à gommer', true); }
+      var halo = new Uint8Array(W * H);                                       /* liseré : 1 pixel de plus autour de la zone gommée */
+      for (var q2 = 0; q2 < W * H; q2++) if (vu[q2]) { var x2 = q2 % W; [x2 > 0 ? q2 - 1 : -1, x2 < W - 1 ? q2 + 1 : -1, q2 >= W ? q2 - W : -1, q2 < W * H - W ? q2 + W : -1].forEach(function (v) { if (v >= 0 && !vu[v] && pareil(v, tol * 2)) halo[v] = 1; }); }
+      for (var q3 = 0; q3 < W * H; q3++) if (vu[q3] || halo[q3]) d[q3 * 4 + 3] = 0;
+      g.putImageData(id, 0, 0);
+      var blob = await new Promise(function (ok) { cv.toBlob(ok, 'image/png'); });
+      try { var fichier = new File([blob], 'calque-transparent.png', { type: 'image/png' }); m.cadre = await envoyerImage(fichier); PB.gomme = false; toast(Math.round(n / (W * H) * 100) + ' % du calque rendu transparent'); editeur($('pbContenu')); }
+      catch (e) { toast('Échec : ' + e.message, true); }
+    });
   };
   window.pbCalqueRetirer = function () { PB.edit.m.cadre = ''; editeur($('pbContenu')); };
   /* repère les zones transparentes du calque et y place une case par trou (de haut en bas, puis de gauche à droite) */
