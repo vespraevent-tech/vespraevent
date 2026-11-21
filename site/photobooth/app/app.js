@@ -128,13 +128,32 @@
     var mps = e.misesEnPage || [];
     $('l-apercu').innerHTML = '<div class="ap-titre"><div><h2>' + esc(e.nom) + '</h2><p class="aide">' + esc(dateFr(e.date)) + '</p></div><button class="btn plein grand" id="ap-lancer">Lancer l’événement</button></div>' +
       '<div class="apercus"><div class="apercu"><h3>Écran d’accueil</h3><div class="mini-scene" id="ap-acc"></div></div>' +
-      '<div class="apercu"><h3>Écran de partage</h3><div class="mini-scene" id="ap-par" style="background:#fff"></div></div>' +
+      '<div class="apercu"><h3>Écran de partage</h3><div class="mini-scene" id="ap-par"></div></div>' +
       '<div class="apercu large"><h3>Cadres (' + mps.length + ')</h3><div class="mini-cadres" id="ap-cad">' + (mps.length ? '' : '<p class="aide">Aucun cadre : ajoutez-en dans le back-office.</p>') + '</div></div></div>';
     $('ap-lancer').onclick = function () { lancer(e.id); };
     miniScene($('ap-acc'), function (sc) { return dessinerAccueil(sc, e, true); });
     mps.forEach(function (m) { var b = document.createElement('div'); b.className = 'mini-cadre'; $('ap-cad').appendChild(b); vignetteCadre(e, m, true).then(function (c) { b.appendChild(c); }); });
-    var p = $('ap-par'); p.innerHTML = '<div style="position:absolute;inset:8% 6%;display:grid;grid-template-columns:1.2fr 1fr;gap:6%;align-items:center"><div id="ap-par-img" style="height:100%;display:flex;align-items:center;justify-content:center"></div><div style="text-align:center;font:700 14px Georgia;color:#1F3B5A">' + esc((e.partage && e.partage.titre) || 'Vos photos sont prêtes !') + '<div style="margin:8px auto;width:58px;height:58px;background:repeating-linear-gradient(90deg,#1F3B5A 0 4px,#fff 4px 8px),#fff;border:4px solid #fff;outline:1px solid #ddd"></div><div style="font:500 10px system-ui;color:#6B665F">' + (e.impression && e.impression.bouton ? esc(e.impression.txtImprimer || 'Imprimer') + ' · ' : '') + esc((e.partage && e.partage.terminer) || 'Terminer') + '</div></div></div>';
-    if (mps[0]) vignetteCadre(e, mps[0], true).then(function (c) { c.style.maxHeight = '100%'; c.style.maxWidth = '100%'; $('ap-par-img') && $('ap-par-img').appendChild(c); });
+    miniScene($('ap-par'), function (sc) { sc.style.background = 'transparent'; return apercuPartage(sc, e, mps[0]); });
+  }
+  /* aperçu de l'écran de partage dans la liste des événements (mêmes positions que sur la borne) */
+  function apercuPartage(sc, e, m) {
+    var ec = e.partage && e.partage.ecran; if (!ec || !ec.avec) return;
+    var avecImp = !(e.impression && e.impression.bouton === false), pos = avecImp ? ec.avec : ec.sans, st = ec.styles, pa = e.partage || {}, im = e.impression || {};
+    sc.innerHTML = ''; sc.style.backgroundColor = ec.couleur || '#fff'; sc.style.backgroundSize = 'cover'; sc.style.backgroundPosition = 'center';
+    if (ec.fond) chargerImage(e.id, ec.fond, true).then(function (i) { if (i) sc.style.backgroundImage = 'url(' + i.src + ')'; });
+    var el = function (o, css, html) { var d = document.createElement('div'); d.style.cssText = 'position:absolute;transform:translate(-50%,-50%);left:' + o.x + 'px;top:' + o.y + 'px;' + css; if (html != null) d.textContent = html; sc.appendChild(d); return d; };
+    var ph = el(pos.photo, 'width:' + pos.photo.w + 'px;box-shadow:0 14px 50px rgba(0,0,0,.2)');
+    if (m) vignetteCadre(e, m, true).then(function (c) { c.style.cssText = 'width:100%;height:auto;display:block'; ph.appendChild(c); }); else ph.style.cssText += ';height:' + pos.photo.w * 0.66 + 'px;background:#d9dde3';
+    var pol = POLICES[st.titre.police] || POLICES.elegante;
+    el(pos.titre, 'white-space:nowrap;font-family:' + pol + ';font-size:' + st.titre.taille + 'px;color:' + st.titre.couleur + ';line-height:1.15', pa.titre || 'Vos photos sont prêtes !');
+    if (pa.qr !== false) {
+      el(pos.qr, 'width:' + pos.qr.taille + 'px;height:' + pos.qr.taille + 'px;background:repeating-conic-gradient(#111 0 25%,#fff 0 50%) 0 0/16% 16%;border:14px solid #fff;box-sizing:border-box');
+      el(pos.legende, 'white-space:nowrap;font:500 ' + st.legende.taille + 'px Inter,sans-serif;color:' + st.legende.couleur, pa.legende || 'Scannez pour récupérer vos photos');
+    }
+    [['imprimer', im.txtImprimer || 'Imprimer'], ['recommencer', pa.recommencer || 'Recommencer'], ['terminer', pa.terminer || 'Terminer']].forEach(function (c) {
+      if (c[0] === 'imprimer' && !avecImp) return; var o = pos[c[0]], s2 = st[c[0]];
+      el(o, 'width:' + o.w + 'px;height:' + o.h + 'px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;border-radius:' + Math.round(o.h * 0.22) + 'px;background:' + s2.fond + ';color:' + s2.texte + ';font:700 ' + s2.taille + 'px Inter,sans-serif;border:2px solid rgba(20,48,79,.18)', c[1]);
+    });
   }
   function miniScene(boite, dessin) {
     var sc = document.createElement('div'); sc.className = 'scene'; sc.style.left = '0'; sc.style.top = '0'; boite.appendChild(sc);
@@ -307,7 +326,7 @@
   var minuterie = null;
   function partage(m, final, photos) {
     var e = etat.evt, pa = e.partage || {}, im = e.impression || {}, prise = 'pr' + hex(8), rk = hex(16), quand = new Date().toISOString();
-    ecran('s-partage'); $('r-titre').textContent = pa.titre || 'Vos photos sont prêtes !';
+    ecran('s-partage'); $('r-titre').textContent = pa.titre || 'Vos photos sont prêtes !'; $('r-legende').textContent = pa.legende || 'Scannez pour récupérer vos photos';
     $('r-final').src = final.toDataURL('image/jpeg', 0.85);
     $('r-recommencer').textContent = pa.recommencer || 'Recommencer'; $('r-terminer').textContent = pa.terminer || 'Terminer';
     $('r-qr-bloc').hidden = pa.qr === false; $('r-qr').innerHTML = '';
@@ -326,6 +345,7 @@
     var limite = im.limites && im.limites.on, resteEvt = limite ? Math.max(0, im.limites.parEvenement - ((etat.stats && etat.stats.imprimees) || 0)) : 99, resteSess = limite ? Math.max(0, im.limites.parSession - etat.imprSession) : 99;
     var max = Math.min(im.copiesMax || 1, resteEvt, resteSess), copies = 1;
     $('r-imp').hidden = !(im.bouton !== false && max > 0) && !im.auto; $('r-imp-msg').textContent = '';
+    placerPartage(e, im.bouton !== false && max > 0);
     $('r-copies').innerHTML = '';
     if (max > 1) { for (var i = 1; i <= max; i++) { var bt = document.createElement('button'); bt.textContent = i; bt.className = i === 1 ? 'sel' : ''; bt.onclick = (function (i, bt) { return function () { copies = i; $('r-copies').querySelectorAll('button').forEach(function (z) { z.className = z === bt ? 'sel' : ''; }); }; })(i, bt); $('r-copies').appendChild(bt); } }
     var bImp = $('r-imprimer'); bImp.textContent = im.txtImprimer || 'Imprimer'; bImp.disabled = max <= 0; bImp.hidden = im.bouton === false;
@@ -340,6 +360,24 @@
     $('r-terminer').onclick = fin;
     $('r-recommencer').onclick = function () { clearInterval(minuterie); $('r-qr').innerHTML = ''; prendre(m); };
   }
+  /* place chaque élément de l'écran de partage selon la disposition réglée dans le back-office (avec ou sans bouton Imprimer) */
+  function placerPartage(e, avecImp) {
+    var ec = e.partage && e.partage.ecran; if (!ec || !ec.avec) return;
+    var pos = avecImp ? ec.avec : ec.sans, st = ec.styles, sc = $('p-scene'), pa = e.partage || {};
+    sc.style.backgroundColor = ec.couleur || '#fff'; $('s-partage').style.background = ec.couleur || '#fff'; sc.style.backgroundImage = '';
+    if (ec.fond) chargerImage(e.id, ec.fond, false).then(function (im) { if (im) sc.style.backgroundImage = 'url(' + im.src + ')'; });
+    var poser = function (id, o, w, h) { var el = $(id); el.style.left = o.x + 'px'; el.style.top = o.y + 'px'; if (w) el.style.width = w + 'px'; if (h) el.style.height = h + 'px'; };
+    poser('r-final', pos.photo, pos.photo.w);
+    var t = $('r-titre'), pol = POLICES[st.titre.police] || POLICES.elegante; poser('r-titre', pos.titre); t.style.cssText += ';font-family:' + pol + ';font-size:' + st.titre.taille + 'px;color:' + st.titre.couleur;
+    poser('r-qr-bloc', pos.qr, pos.qr.taille, pos.qr.taille); $('r-qr-bloc').hidden = pa.qr === false;
+    poser('r-legende', pos.legende); $('r-legende').style.cssText += ';font-size:' + st.legende.taille + 'px;color:' + st.legende.couleur + ';font-family:Inter,system-ui,sans-serif;font-weight:500'; $('r-legende').hidden = pa.qr === false;
+    poser('r-imp', pos.imprimer, pos.imprimer.w, pos.imprimer.h);
+    [['r-imprimer', 'imprimer'], ['r-recommencer', 'recommencer'], ['r-terminer', 'terminer']].forEach(function (c) { var b = $(c[0]), s = st[c[1]]; b.style.background = s.fond; b.style.color = s.texte; b.style.fontSize = s.taille + 'px'; b.style.borderRadius = Math.round((c[1] === 'imprimer' ? pos.imprimer.h : pos[c[1]].h) * 0.22) + 'px'; });
+    poser('r-recommencer', pos.recommencer, pos.recommencer.w, pos.recommencer.h); poser('r-terminer', pos.terminer, pos.terminer.w, pos.terminer.h);
+    ajusterEchelle(sc);
+  }
+  function ajusterEchelle(sc) { var k = Math.min(innerWidth / 1920, innerHeight / 1080); sc.style.transform = 'translate(-50%,-50%) scale(' + k + ')'; }
+  addEventListener('resize', function () { var sc = $('p-scene'); if (sc) ajusterEchelle(sc); });
   /* bandelette 5×15 : deux bandelettes côte à côte sur une feuille 10×15, coupée en deux par l'imprimante DNP */
   function imprimer(m, final, copies) {
     var feuille = final, im = (etat.evt && etat.evt.impression) || {};

@@ -32,6 +32,31 @@ function casesPropres(cases, f) {
     return { n: nb(c && c.n, 1, 4, 1), x: nb(c && c.x, -f.w, f.w * 2, 0), y: nb(c && c.y, -f.h, f.h * 2, 0), w, h, r: nb(c && c.r, -45, 45, 0) };
   });
 }
+/* ── écran de partage (1920 × 1080), entièrement personnalisable : positions du centre de chaque élément, avec ou sans bouton d'impression ── */
+const ECRAN_DEF = {
+  styles: { titre: { couleur: '#1F3B5A', police: 'elegante', taille: 64 }, legende: { couleur: '#6B665F', taille: 26 },
+    imprimer: { fond: '#1F3B5A', texte: '#FFFFFF', taille: 36 }, recommencer: { fond: '#FFFFFF', texte: '#1F3B5A', taille: 30 }, terminer: { fond: '#1F3B5A', texte: '#FFFFFF', taille: 30 } },
+  avec: { photo: { x: 620, y: 540, w: 1000 }, titre: { x: 1440, y: 150 }, qr: { x: 1440, y: 430, taille: 290 }, legende: { x: 1440, y: 625 },
+    imprimer: { x: 1440, y: 745, w: 440, h: 100 }, recommencer: { x: 1290, y: 925, w: 290, h: 84 }, terminer: { x: 1590, y: 925, w: 290, h: 84 } },
+  sans: { photo: { x: 620, y: 540, w: 1000 }, titre: { x: 1440, y: 170 }, qr: { x: 1440, y: 540, taille: 380 }, legende: { x: 1440, y: 790 },
+    imprimer: { x: 1440, y: 745, w: 440, h: 100 }, recommencer: { x: 1290, y: 925, w: 290, h: 84 }, terminer: { x: 1590, y: 925, w: 290, h: 84 } },
+};
+const POLICES_OK = ['elegante', 'manuscrite', 'moderne', 'festive'];
+function ecranPropre(o) {
+  o = o && typeof o === 'object' ? o : {};
+  const out = { fond: idOk(o.fond, 'im'), couleur: hex(o.couleur, '#FFFFFF'), styles: {}, avec: {}, sans: {} };
+  for (const k of Object.keys(ECRAN_DEF.styles)) {
+    const d = ECRAN_DEF.styles[k], s = (o.styles && o.styles[k]) || {}, r = {};
+    for (const f of Object.keys(d)) r[f] = f === 'police' ? (POLICES_OK.includes(s[f]) ? s[f] : d[f]) : (typeof d[f] === 'string' ? hex(s[f], d[f]) : nb(s[f], 8, 300, d[f]));
+    out.styles[k] = r;
+  }
+  for (const v of ['avec', 'sans']) for (const k of Object.keys(ECRAN_DEF[v])) {
+    const d = ECRAN_DEF[v][k], s = (o[v] && o[v][k]) || {}, r = {};
+    for (const f of Object.keys(d)) r[f] = f === 'x' ? nb(s[f], -400, 2320, d[f]) : (f === 'y' ? nb(s[f], -400, 1480, d[f]) : nb(s[f], 20, 2400, d[f]));
+    out[v][k] = r;
+  }
+  return out;
+}
 function miseEnPagePropre(m) {
   const format = FORMATS[m && m.format] ? m.format : '4x6p', f = FORMATS[format];
   return { id: idOk(m && m.id, 'mp') || nouvelId('mp'), nom: txt(m && m.nom, 60) || f.nom, format, w: f.w, h: f.h, cadre: idOk(m && m.cadre, 'im'), calque: { z: nb(m && m.calque && m.calque.z, 20, 400, 100), x: nb(m && m.calque && m.calque.x, -3000, 3000, 0), y: nb(m && m.calque && m.calque.y, -3000, 3000, 0) }, fond: hex(m && m.fond, '#FFFFFF'), cases: casesPropres(m && m.cases, f) };
@@ -64,7 +89,7 @@ export function evenementPropre(e, ancien) {
       logo: { image: idOk(ac.logo && ac.logo.image, 'im'), x: nb(ac.logo && ac.logo.x, 0, 1920, 960), y: nb(ac.logo && ac.logo.y, 0, 1080, 900), largeur: nb(ac.logo && ac.logo.largeur, 40, 1920, 360) },
     },
     capture: { premier: nb(cap.premier, 1, 30, 7), suivants: nb(cap.suivants, 1, 30, 3), texteAvant: txt(cap.texteAvant, 80) },
-    partage: { qr: oui(pa.qr, true), bruts: oui(pa.bruts, true), duree: nb(pa.duree, 10, 600, 45), titre: txt(pa.titre, 120), recommencer: txt(pa.recommencer, 40), terminer: txt(pa.terminer, 40) },
+    partage: { qr: oui(pa.qr, true), bruts: oui(pa.bruts, true), duree: nb(pa.duree, 10, 600, 45), titre: txt(pa.titre, 120), recommencer: txt(pa.recommencer, 40), terminer: txt(pa.terminer, 40), legende: txt(pa.legende, 80), ecran: ecranPropre(pa.ecran) },
     impression: {
       auto: oui(im.auto, false), bouton: oui(im.bouton, true), decoupe: (im.decoupe === true || im.decoupe === false) ? im.decoupe : null, copiesMax: nb(im.copiesMax, 1, 10, 2),
       txtImprimer: txt(im.txtImprimer, 40), txtImpression: txt(im.txtImpression, 40), txtCopies: txt(im.txtCopies, 60),

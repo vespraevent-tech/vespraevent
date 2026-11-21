@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#FFFFFF">
 <title>Vespra Event Photobooth</title>
 <link rel="icon" type="image/png" sizes="32x32" href="/videobooth/icones/favicon-32.png?v=3">
-<link rel="stylesheet" href="app.css?v=2">
+<link rel="stylesheet" href="app.css?v=4">
 </head>
 <body>
 <!-- 1. connexion de la borne (une seule fois : elle reste connectée 1 an) -->
@@ -63,19 +63,19 @@
 
 <!-- 6. partage : photo + QR code + impression -->
 <section id="s-partage" class="ecran plein-ecran clair">
-  <div class="partage">
-    <div class="partage-g"><img id="r-final" alt="Votre photo"></div>
-    <div class="partage-d">
-      <h1 id="r-titre">Vos photos sont prêtes !</h1>
-      <div id="r-qr-bloc"><div id="r-qr" class="qr"></div><p class="aide">Scannez pour récupérer vos photos</p></div>
-      <div id="r-imp" class="imp">
-        <div id="r-copies" class="copies"></div>
-        <button id="r-imprimer" class="btn plein grand">Imprimer</button>
-        <p id="r-imp-msg" class="aide"></p>
-      </div>
-      <div class="r-actions"><button id="r-recommencer" class="btn grand">Recommencer</button><button id="r-terminer" class="btn plein grand">Terminer</button></div>
-      <p id="r-temps" class="aide petit"></p>
+  <div id="p-scene" class="pscene">
+    <img id="r-final" class="pe" alt="Votre photo">
+    <h1 id="r-titre" class="pe"></h1>
+    <div id="r-qr-bloc" class="pe"><div id="r-qr" class="qr"></div></div>
+    <p id="r-legende" class="pe"></p>
+    <div id="r-imp" class="pe imp">
+      <div id="r-copies" class="copies"></div>
+      <button id="r-imprimer" class="pbtn">Imprimer</button>
+      <p id="r-imp-msg"></p>
     </div>
+    <button id="r-recommencer" class="pe pbtn">Recommencer</button>
+    <button id="r-terminer" class="pe pbtn">Terminer</button>
+    <p id="r-temps"></p>
   </div>
 </section>
 
@@ -129,6 +129,6 @@
 <iframe id="impr" title="impression" aria-hidden="true"></iframe>
 
 <script src="/videobooth/qr.js?v=1"></script>
-<script src="app.js?v=7"></script>
+<script src="app.js?v=8"></script>
 </body>
 </html>
