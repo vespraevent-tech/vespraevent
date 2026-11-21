@@ -44,14 +44,30 @@ const ECRAN_DEF = {
   sans: { titre: { x: 960, y: 150 }, qr: { x: 960, y: 520, taille: 440 }, legende: { x: 960, y: 800 }, imprimer: { x: 1300, y: 520, taille: 400 }, terminer: { x: 960, y: 930, w: 380, h: 100 } },
 };
 const POLICES_OK = ['elegante', 'manuscrite', 'moderne', 'festive'];
+export const ICONES_OK = ['imprimante', 'camera', 'telecharger', 'telephone', 'scan', 'coeur', 'etoile', 'fleche', 'sourire', 'fete'];
+/* textes et icônes ajoutés librement sur un écran */
+const EXTRAS_DEF = { avec: [{ id: 'ex0a0b0c01', type: 'texte', x: 960, y: 520, texte: 'ou', taille: 54, couleur: '#6B665F', police: 'elegante', icone: 'coeur' }] };
+function extrasPropres(l, def) {
+  if (!Array.isArray(l)) l = def || [];
+  return l.slice(0, 14).map((x) => (x && typeof x === 'object' ? {
+    id: /^ex[0-9a-f]{8}$/.test(String(x.id || '')) ? String(x.id) : 'ex' + randomBytes(4).toString('hex'),
+    type: x.type === 'icone' ? 'icone' : 'texte', x: nb(x.x, -400, 2320, 960), y: nb(x.y, -400, 1480, 540), texte: txt(x.texte, 120), taille: nb(x.taille, 10, 700, 50),
+    couleur: hex(x.couleur, '#1F3B5A'), police: POLICES_OK.includes(x.police) ? x.police : 'elegante', icone: ICONES_OK.includes(x.icone) ? x.icone : 'coeur' } : null)).filter(Boolean);
+}
 function ecranPropre(o) {
   o = o && typeof o === 'object' ? o : {};
-  if (o.v !== 3) o = { fond: o.fond, couleur: o.couleur };                      /* anciennes dispositions (écran unique) : on repart des nouvelles */
-  const out = { v: 3, fond: idOk(o.fond, 'im'), couleur: hex(o.couleur, '#FFFFFF'), styles: {}, valid: {}, avec: {}, sans: {} };
+  if (o.v !== 3 && o.v !== 4) o = { fond: o.fond, couleur: o.couleur };                      /* anciennes dispositions (écran unique) : on repart des nouvelles */
+  const v3 = o.v === 3;                                                                       /* v3 : pas encore de textes ajoutés → on met le « ou » d'origine */
+  const out = { v: 4, fond: idOk(o.fond, 'im'), couleur: hex(o.couleur, '#FFFFFF'), styles: {}, valid: {}, avec: {}, sans: {} };
   for (const k of Object.keys(ECRAN_DEF.styles)) {
     const d = ECRAN_DEF.styles[k], s = (o.styles && o.styles[k]) || {}, r = {};
     for (const f of Object.keys(d)) r[f] = f === 'police' ? (POLICES_OK.includes(s[f]) ? s[f] : d[f]) : (typeof d[f] === 'string' ? hex(s[f], d[f]) : nb(s[f], 8, 300, d[f]));
     out.styles[k] = r;
+  }
+  out.styles.imprimer.icone = ICONES_OK.includes((o.styles && o.styles.imprimer && o.styles.imprimer.icone)) || (o.styles && o.styles.imprimer && o.styles.imprimer.icone === 'aucune') ? o.styles.imprimer.icone : 'imprimante';
+  for (const v of ['valid', 'avec', 'sans']) {
+    const src = o[v] && typeof o[v] === 'object' ? o[v] : {};
+    out[v].extras = extrasPropres(v3 ? undefined : src.extras, EXTRAS_DEF[v]);
   }
   for (const v of ['valid', 'avec', 'sans']) for (const k of Object.keys(ECRAN_DEF[v])) {
     const d = ECRAN_DEF[v][k], s = (o[v] && o[v][k]) || {}, r = {};
@@ -106,7 +122,9 @@ export function evenementPropre(e, ancien) {
 
 export async function evenementLire(id) {
   if (!idOk(id, 'pb')) return null;
-  return pbStore().get('evt/' + id, { type: 'json' }).catch(() => null);
+  const e = await pbStore().get('evt/' + id, { type: 'json' }).catch(() => null);
+  if (e && e.partage && (!e.partage.ecran || e.partage.ecran.v !== 4)) e.partage.ecran = ecranPropre(e.partage.ecran);   /* écrans enregistrés avant la v4 */
+  return e;
 }
 export async function evenementEcrire(e) {
   const ancien = e && e.id ? await evenementLire(e.id) : null;
