@@ -34,17 +34,26 @@ function casesPropres(cases, f) {
 }
 /* ── écran de partage (1920 × 1080), entièrement personnalisable : positions du centre de chaque élément, avec ou sans bouton d'impression ── */
 const ECRAN_DEF = {
-  styles: { titre: { couleur: '#1F3B5A', police: 'elegante', taille: 64 }, legende: { couleur: '#6B665F', taille: 26 },
+  styles: { titre: { couleur: '#1F3B5A', police: 'elegante', taille: 58 }, legende: { couleur: '#6B665F', taille: 28 },
     imprimer: { fond: '#1F3B5A', texte: '#FFFFFF', taille: 36 }, recommencer: { fond: '#FFFFFF', texte: '#1F3B5A', taille: 30 }, terminer: { fond: '#1F3B5A', texte: '#FFFFFF', taille: 30 } },
-  avec: { photo: { x: 620, y: 540, w: 1000 }, titre: { x: 1440, y: 150 }, qr: { x: 1440, y: 430, taille: 290 }, legende: { x: 1440, y: 625 },
-    imprimer: { x: 1440, y: 745, w: 440, h: 100 }, recommencer: { x: 1290, y: 925, w: 290, h: 84 }, terminer: { x: 1590, y: 925, w: 290, h: 84 } },
-  sans: { photo: { x: 620, y: 540, w: 1000 }, titre: { x: 1440, y: 170 }, qr: { x: 1440, y: 540, taille: 380 }, legende: { x: 1440, y: 790 },
-    imprimer: { x: 1440, y: 745, w: 440, h: 100 }, recommencer: { x: 1290, y: 925, w: 290, h: 84 }, terminer: { x: 1590, y: 925, w: 290, h: 84 } },
+  /* colonne de gauche : la photo, avec Recommencer / Terminer dessous ; colonne de droite : titre, QR code, texte, Imprimer (photo : largeur maximale, hauteur plafonnée à 760 px) */
+  avec: { photo: { x: 560, y: 450, w: 820 }, titre: { x: 1440, y: 190 }, qr: { x: 1440, y: 470, taille: 320 }, legende: { x: 1440, y: 685 },
+    imprimer: { x: 1440, y: 810, w: 440, h: 96 }, recommencer: { x: 405, y: 930, w: 300, h: 88 }, terminer: { x: 715, y: 930, w: 300, h: 88 } },
+  sans: { photo: { x: 560, y: 450, w: 820 }, titre: { x: 1440, y: 230 }, qr: { x: 1440, y: 540, taille: 400 }, legende: { x: 1440, y: 790 },
+    imprimer: { x: 1440, y: 810, w: 440, h: 96 }, recommencer: { x: 405, y: 930, w: 300, h: 88 }, terminer: { x: 715, y: 930, w: 300, h: 88 } },
 };
+/* disposition d'origine de la v1476 : remplacée automatiquement si l'événement ne l'a pas personnalisée */
+const ECRAN_V1 = { avec: { photo: { x: 620, y: 540, w: 1000 }, titre: { x: 1440, y: 150 }, qr: { x: 1440, y: 430, taille: 290 }, legende: { x: 1440, y: 625 }, imprimer: { x: 1440, y: 745, w: 440, h: 100 }, recommencer: { x: 1290, y: 925, w: 290, h: 84 }, terminer: { x: 1590, y: 925, w: 290, h: 84 } },
+  sans: { photo: { x: 620, y: 540, w: 1000 }, titre: { x: 1440, y: 170 }, qr: { x: 1440, y: 540, taille: 380 }, legende: { x: 1440, y: 790 }, imprimer: { x: 1440, y: 745, w: 440, h: 100 }, recommencer: { x: 1290, y: 925, w: 290, h: 84 }, terminer: { x: 1590, y: 925, w: 290, h: 84 } },
+  titre: { taille: 64 }, legende: { taille: 26 } };
 const POLICES_OK = ['elegante', 'manuscrite', 'moderne', 'festive'];
 function ecranPropre(o) {
   o = o && typeof o === 'object' ? o : {};
-  const out = { fond: idOk(o.fond, 'im'), couleur: hex(o.couleur, '#FFFFFF'), styles: {}, avec: {}, sans: {} };
+  if (o.v !== 2 && (o.avec || o.sans)) {                       /* ancienne disposition d'origine, jamais modifiée : on passe à la nouvelle */
+    const egal = (a, b) => JSON.stringify(a) === JSON.stringify(b), ok1 = (o.avec && egal(o.avec, ECRAN_V1.avec)) || !o.avec, ok2 = (o.sans && egal(o.sans, ECRAN_V1.sans)) || !o.sans;
+    if (ok1 && ok2) { o = { ...o, avec: undefined, sans: undefined, styles: o.styles && ((o.styles.titre || {}).taille === 64 || (o.styles.legende || {}).taille === 26) ? undefined : o.styles }; }
+  }
+  const out = { v: 2, fond: idOk(o.fond, 'im'), couleur: hex(o.couleur, '#FFFFFF'), styles: {}, avec: {}, sans: {} };
   for (const k of Object.keys(ECRAN_DEF.styles)) {
     const d = ECRAN_DEF.styles[k], s = (o.styles && o.styles[k]) || {}, r = {};
     for (const f of Object.keys(d)) r[f] = f === 'police' ? (POLICES_OK.includes(s[f]) ? s[f] : d[f]) : (typeof d[f] === 'string' ? hex(s[f], d[f]) : nb(s[f], 8, 300, d[f]));

@@ -142,13 +142,13 @@
     sc.innerHTML = ''; sc.style.backgroundColor = ec.couleur || '#fff'; sc.style.backgroundSize = 'cover'; sc.style.backgroundPosition = 'center';
     if (ec.fond) chargerImage(e.id, ec.fond, true).then(function (i) { if (i) sc.style.backgroundImage = 'url(' + i.src + ')'; });
     var el = function (o, css, html) { var d = document.createElement('div'); d.style.cssText = 'position:absolute;transform:translate(-50%,-50%);left:' + o.x + 'px;top:' + o.y + 'px;' + css; if (html != null) d.textContent = html; sc.appendChild(d); return d; };
-    var ph = el(pos.photo, 'width:' + pos.photo.w + 'px;box-shadow:0 14px 50px rgba(0,0,0,.2)');
+    var ph = el(pos.photo, 'width:' + Math.min(pos.photo.w, 760 / (m ? m.h / m.w : 0.66)) + 'px;box-shadow:0 14px 50px rgba(0,0,0,.2)');
     if (m) vignetteCadre(e, m, true, true).then(function (c) { c.style.cssText = 'width:100%;height:auto;display:block'; ph.appendChild(c); }); else ph.style.cssText += ';height:' + pos.photo.w * 0.66 + 'px;background:#d9dde3';
     var pol = POLICES[st.titre.police] || POLICES.elegante;
-    el(pos.titre, 'white-space:nowrap;font-family:' + pol + ';font-size:' + st.titre.taille + 'px;color:' + st.titre.couleur + ';line-height:1.15', pa.titre || 'Vos photos sont prêtes !');
+    el(pos.titre, 'white-space:nowrap;font-family:' + pol + ';font-size:' + st.titre.taille + 'px;color:' + st.titre.couleur + ';line-height:1.15', pa.titre || 'Votre photo est prête !');
     if (pa.qr !== false) {
       el(pos.qr, 'width:' + pos.qr.taille + 'px;height:' + pos.qr.taille + 'px;background:repeating-conic-gradient(#111 0 25%,#fff 0 50%) 0 0/16% 16%;border:14px solid #fff;box-sizing:border-box');
-      el(pos.legende, 'white-space:nowrap;font:500 ' + st.legende.taille + 'px Inter,sans-serif;color:' + st.legende.couleur, pa.legende || 'Scannez pour récupérer vos photos');
+      el(pos.legende, 'white-space:nowrap;font:500 ' + st.legende.taille + 'px Inter,sans-serif;color:' + st.legende.couleur, pa.legende || 'Scannez pour récupérer votre photo');
     }
     [['imprimer', im.txtImprimer || 'Imprimer'], ['recommencer', pa.recommencer || 'Recommencer'], ['terminer', pa.terminer || 'Terminer']].forEach(function (c) {
       if (c[0] === 'imprimer' && !avecImp) return; var o = pos[c[0]], s2 = st[c[0]];
@@ -329,7 +329,7 @@
   var minuterie = null;
   function partage(m, final, photos) {
     var e = etat.evt, pa = e.partage || {}, im = e.impression || {}, prise = 'pr' + hex(8), rk = hex(16), quand = new Date().toISOString();
-    ecran('s-partage'); $('r-titre').textContent = pa.titre || 'Vos photos sont prêtes !'; $('r-legende').textContent = pa.legende || 'Scannez pour récupérer vos photos';
+    ecran('s-partage'); $('r-titre').textContent = pa.titre || 'Votre photo est prête !'; $('r-legende').textContent = pa.legende || 'Scannez pour récupérer votre photo';
     $('r-final').src = final.toDataURL('image/jpeg', 0.85);
     $('r-recommencer').textContent = pa.recommencer || 'Recommencer'; $('r-terminer').textContent = pa.terminer || 'Terminer';
     $('r-qr-bloc').hidden = pa.qr === false; $('r-qr').innerHTML = '';
@@ -370,7 +370,8 @@
     sc.style.backgroundColor = ec.couleur || '#fff'; $('s-partage').style.background = ec.couleur || '#fff'; sc.style.backgroundImage = '';
     if (ec.fond) chargerImage(e.id, ec.fond, false).then(function (im) { if (im) sc.style.backgroundImage = 'url(' + im.src + ')'; });
     var poser = function (id, o, w, h) { var el = $(id); el.style.left = o.x + 'px'; el.style.top = o.y + 'px'; if (w) el.style.width = w + 'px'; if (h) el.style.height = h + 'px'; };
-    poser('r-final', pos.photo, pos.photo.w);
+    var fin = $('r-final'), plafond = function () { var r = (fin.naturalHeight || 2) / (fin.naturalWidth || 3); fin.style.width = Math.min(pos.photo.w, 760 / r) + 'px'; };
+    poser('r-final', pos.photo, pos.photo.w); plafond(); fin.onload = plafond;
     var t = $('r-titre'), pol = POLICES[st.titre.police] || POLICES.elegante; poser('r-titre', pos.titre); t.style.cssText += ';font-family:' + pol + ';font-size:' + st.titre.taille + 'px;color:' + st.titre.couleur;
     poser('r-qr-bloc', pos.qr, pos.qr.taille, pos.qr.taille); $('r-qr-bloc').hidden = pa.qr === false;
     poser('r-legende', pos.legende); $('r-legende').style.cssText += ';font-size:' + st.legende.taille + 'px;color:' + st.legende.couleur + ';font-family:Inter,system-ui,sans-serif;font-weight:500'; $('r-legende').hidden = pa.qr === false;
@@ -554,7 +555,7 @@
     else if (p === 'partage') {
       var pa = e.partage || {};
       P.innerHTML = '<h2>Paramètres de partage</h2><div class="bloc">' + bascule('s-qr', pa.qr !== false, 'Afficher le QR code') + bascule('s-bruts', pa.bruts !== false, 'Envoyer aussi les photos brutes (sans cadre)') + nombre('s-duree', pa.duree || 45, 'Durée de l’écran de partage', 's', 10, 600) +
-        '<label class="champ">Titre</label><input id="s-titre" value="' + esc(pa.titre || '') + '" placeholder="Vos photos sont prêtes !"><label class="champ">Bouton « Recommencer »</label><input id="s-rec" value="' + esc(pa.recommencer || '') + '" placeholder="Recommencer"><label class="champ">Bouton « Terminer »</label><input id="s-ter" value="' + esc(pa.terminer || '') + '" placeholder="Terminer"></div><button class="btn plein" id="s-enr">Enregistrer</button>';
+        '<label class="champ">Titre</label><input id="s-titre" value="' + esc(pa.titre || '') + '" placeholder="Votre photo est prête !"><label class="champ">Bouton « Recommencer »</label><input id="s-rec" value="' + esc(pa.recommencer || '') + '" placeholder="Recommencer"><label class="champ">Bouton « Terminer »</label><input id="s-ter" value="' + esc(pa.terminer || '') + '" placeholder="Terminer"></div><button class="btn plein" id="s-enr">Enregistrer</button>';
       $('s-enr').onclick = function () { enregistrer('partage', { qr: $('s-qr').checked, bruts: $('s-bruts').checked, duree: +$('s-duree').value, titre: $('s-titre').value, recommencer: $('s-rec').value, terminer: $('s-ter').value }); };
     } else if (p === 'impression') {
       var im = e.impression || {}, li = im.limites || {};

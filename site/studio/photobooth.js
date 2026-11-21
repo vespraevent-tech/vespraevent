@@ -511,15 +511,15 @@
   function ecPos() { return PB.evt.partage.ecran[PB.ecVar || 'avec']; }
   function ecTexte(k) {
     var pa = PB.evt.partage, im = PB.evt.impression;
-    return { titre: pa.titre || 'Vos photos sont prêtes !', legende: pa.legende || 'Scannez pour récupérer vos photos', imprimer: im.txtImprimer || 'Imprimer', recommencer: pa.recommencer || 'Recommencer', terminer: pa.terminer || 'Terminer' }[k];
+    return { titre: pa.titre || 'Votre photo est prête !', legende: pa.legende || 'Scannez pour récupérer votre photo', imprimer: im.txtImprimer || 'Imprimer', recommencer: pa.recommencer || 'Recommencer', terminer: pa.terminer || 'Terminer' }[k];
   }
   function secEcran(c) {
-    var ec = PB.evt.partage.ecran; PB.ecVar = PB.ecVar || 'avec'; PB.ecSel = PB.ecSel || 'qr';
+    var ec = PB.evt.partage.ecran; PB.ecVar = PB.ecVar || 'avec'; PB.ecSel = PB.ecSel || 'qr'; if (!PB.ecSels) PB.ecSels = [PB.ecSel];
     eEc = Math.min((c.clientWidth || 800), 920) / 1920;
     c.innerHTML = '<div class="pb-bloc"><h3>Écran de partage</h3><p class="aide">Ce que voit l’invité après sa photo (1920 × 1080, comme l’écran d’accueil). Cliquez sur un élément puis faites-le glisser ; la poignée en bas à droite le redimensionne. Des repères rouges apparaissent quand il est aligné avec le centre de l’écran ou un autre élément.</p>'
       + '<div class="pb-sous"><button class="' + (PB.ecVar === 'avec' ? 'on' : '') + '" onclick="pbEcVar(\'avec\')">Avec impression</button><button class="' + (PB.ecVar === 'sans' ? 'on' : '') + '" onclick="pbEcVar(\'sans\')">Sans impression (numérique)</button></div>'
       + '<p class="aide" style="font-size:12.5px;margin:0 0 8px">' + (PB.ecVar === 'sans' ? 'Cette disposition s’affiche quand le bouton Imprimer est désactivé : le QR code peut alors se mettre au milieu.' : 'Cette disposition s’affiche quand l’impression est proposée.') + '</p>'
-      + barreAlign('pbEcAlign', '') + '<div id="pbEcAvec" class="pb-align" style="margin-top:6px"></div>'
+      + '<div id="pbEcBarre"></div><div id="pbEcAvec" class="pb-align" style="margin-top:6px"></div>'
       + '<div id="pbEcZone" style="position:relative;margin-top:10px;width:' + Math.round(1920 * eEc) + 'px;height:' + Math.round(1080 * eEc) + 'px;overflow:hidden;box-shadow:0 10px 30px -12px rgba(0,0,0,.35);touch-action:none;user-select:none;background-color:' + esc(ec.couleur) + ';background-size:cover;background-position:center' + (ec.fond ? ';background-image:url(' + urlImage(ec.fond) + ')' : '') + '"></div></div>'
       + '<div class="pb-bloc" id="pbEcProp"></div>'
       + '<div class="pb-bloc"><h3>Arrière-plan</h3><p class="aide">Utilisez le même visuel que l’écran d’accueil pour une soirée cohérente avec le thème.</p><div class="pb-actions"><label class="btn btn-ghost" style="cursor:pointer">' + (ec.fond ? 'Remplacer l’image' : 'Choisir une image (1920 × 1080)') + '<input type="file" accept="image/png,image/jpeg,image/webp" hidden onchange="pbEcFond(this)"></label>' + (ec.fond ? '<button class="btn btn-ghost" onclick="pbEcFondRetirer()">Retirer</button>' : '') + (PB.evt.accueil.fond ? '<button class="btn btn-ghost" onclick="pbEcFondAccueil()">Reprendre celui de l’accueil</button>' : '') + '</div><div class="pb-champs" style="margin-top:8px"><label>Couleur de fond<input type="color" id="pbec-fond" value="' + esc(ec.couleur) + '" style="height:38px;padding:2px" oninput="pbEcCouleurFond(this.value)"></label></div></div>'
@@ -531,10 +531,10 @@
     var ec = PB.evt.partage.ecran, pos = ecPos(), st = ec.styles, k = eEc, m = (PB.evt.misesEnPage || [])[0], f = m && PB.formats[m.format];
     var ordre = ['photo', 'titre', 'qr', 'legende'].concat(PB.ecVar === 'avec' ? ['imprimer'] : []).concat(['recommencer', 'terminer']);
     ordre.forEach(function (cle) {
-      var o = pos[cle], el = document.createElement('div'); el.dataset.k = cle; el.className = 'pb-ec-el' + (PB.ecSel === cle ? ' sel' : '');
+      var o = pos[cle], el = document.createElement('div'); el.dataset.k = cle; el.className = 'pb-ec-el' + ((PB.ecSels || [PB.ecSel]).indexOf(cle) >= 0 ? ' sel' : '');
       el.style.left = o.x * k + 'px'; el.style.top = o.y * k + 'px';
       if (cle === 'photo') {
-        var cv = document.createElement('canvas'); el.style.width = o.w * k + 'px';
+        var cv = document.createElement('canvas'), rat = (m && f) ? f.h / f.w : 2 / 3; el.style.width = Math.min(o.w, 760 / rat) * k + 'px';
         if (m && f) { dessiner(cv, m, null, true, true); chargerImage(m.cadre, function (img) { if (img) dessiner(cv, m, img, true, true); }); cv.style.cssText = 'width:100%;display:block;box-shadow:0 4px 18px rgba(0,0,0,.25)'; }
         else { cv.width = 1800; cv.height = 1200; cv.getContext('2d').fillStyle = '#d9dde3'; cv.getContext('2d').fillRect(0, 0, 1800, 1200); cv.style.cssText = 'width:100%;display:block'; }
         el.appendChild(cv);
@@ -547,18 +547,31 @@
       } else {
         var sb = st[cle]; el.textContent = ecTexte(cle); el.style.width = o.w * k + 'px'; el.style.height = o.h * k + 'px'; el.style.cssText += ';display:flex;align-items:center;justify-content:center;box-sizing:border-box;border-radius:' + o.h * k * 0.22 + 'px;background:' + sb.fond + ';color:' + sb.texte + ';font:700 ' + sb.taille * k + 'px Inter,Arial,sans-serif;border:' + Math.max(1, 2 * k) + 'px solid rgba(20,48,79,.18)';
       }
-      if (PB.ecSel === cle) { var po = document.createElement('i'); po.className = 'poignee-ec'; el.appendChild(po); }
+      if ((PB.ecSels || [PB.ecSel]).length === 1 && PB.ecSel === cle) { var po = document.createElement('i'); po.className = 'poignee-ec'; el.appendChild(po); }
       el.addEventListener('pointerdown', function (ev) { ecGlisser(ev, cle, ev.target.classList.contains('poignee-ec')); });
       z.appendChild(el);
     });
+    var multi = (PB.ecSels || []).length > 1, br = $('pbEcBarre');
+    if (br) br.innerHTML = multi ? barreAlign('pbEcAlign', '<button type="button" class="btn btn-ghost" style="padding:5px 9px;font-size:12px" title="Même espace entre les éléments, de gauche à droite" onclick="pbEcRepartir(\'x\')">⇔ Répartir</button><button type="button" class="btn btn-ghost" style="padding:5px 9px;font-size:12px" title="Même espace entre les éléments, de haut en bas" onclick="pbEcRepartir(\'y\')">⇕ Répartir</button>', PB.ecSels.length + ' éléments sélectionnés, alignés entre eux :') + '<p class="aide" style="font-size:12px;margin:4px 0 0">« Centrer » place tout le groupe au centre de l’écran. Glissez l’un d’eux pour déplacer le groupe. Maj ou Ctrl + clic pour ajouter ou retirer un élément.</p>'
+      : barreAlign('pbEcAlign', '') + '<p class="aide" style="font-size:12px;margin:4px 0 0">Maj ou Ctrl + clic sur d’autres éléments pour en sélectionner plusieurs et les aligner entre eux.</p>';
     var av = $('pbEcAvec');
+    if (multi) { if (av) av.innerHTML = ''; return; }
     if (av) av.innerHTML = '<span>Aligner sur un autre élément :</span><select id="pbEcAutre">' + ordre.filter(function (x) { return x !== PB.ecSel; }).map(function (x) { return '<option value="' + x + '">' + EC_NOMS[x] + '</option>'; }).join('') + '</select><button type="button" class="btn btn-ghost" style="padding:5px 9px;font-size:12px" onclick="pbEcAutre(\'y\')">Même hauteur</button><button type="button" class="btn btn-ghost" style="padding:5px 9px;font-size:12px" onclick="pbEcAutre(\'x\')">Même axe vertical</button>';
   }
   function ecGlisser(ev, cle, redim) {
-    ev.preventDefault(); var change = PB.ecSel !== cle; PB.ecSel = cle;
-    var pos = ecPos(), o = pos[cle], st = PB.evt.partage.ecran.styles, z = $('pbEcZone'), k = eEc, x0 = ev.clientX, y0 = ev.clientY, d = JSON.parse(JSON.stringify(o)), s0 = st[cle] ? st[cle].taille : 0, el = ev.currentTarget;
-    if (change) { ecScene(); ecProp(); }
-    var autres = Object.keys(pos).filter(function (x) { return x !== cle && !(x === 'imprimer' && PB.ecVar === 'sans'); }).map(function (x) { return pos[x]; });
+    ev.preventDefault();
+    var multi = ev.shiftKey || ev.ctrlKey || ev.metaKey, sels = PB.ecSels || [PB.ecSel];
+    if (multi && !redim) {                               /* Maj / Ctrl + clic : ajouter ou retirer de la sélection */
+      var i = sels.indexOf(cle); if (i >= 0 && sels.length > 1) sels.splice(i, 1); else if (i < 0) sels.push(cle);
+      PB.ecSels = sels; PB.ecSel = sels[sels.length - 1]; ecScene(); ecProp(); return;
+    }
+    var change = sels.indexOf(cle) < 0 || redim || PB.ecSel !== cle && sels.length === 1;
+    if (sels.indexOf(cle) < 0 || redim) sels = PB.ecSels = [cle];
+    PB.ecSel = cle; if (change) { ecScene(); ecProp(); }
+    var groupe = sels.length > 1 && !redim;
+    var pos = ecPos(), o = pos[cle], st = PB.evt.partage.ecran.styles, z = $('pbEcZone'), k = eEc, x0 = ev.clientX, y0 = ev.clientY, d = JSON.parse(JSON.stringify(o)), s0 = st[cle] ? st[cle].taille : 0;
+    var ds = sels.map(function (c) { return JSON.parse(JSON.stringify(pos[c])); });
+    var autres = Object.keys(pos).filter(function (x) { return sels.indexOf(x) < 0 && !(x === 'imprimer' && PB.ecVar === 'sans'); }).map(function (x) { return pos[x]; });
     var bouger = function (e) {
       var dx = (e.clientX - x0) / k, dy = (e.clientY - y0) / k;
       if (redim) {
@@ -567,7 +580,9 @@
         else if (cle === 'titre' || cle === 'legende') st[cle].taille = Math.max(10, Math.round(s0 + dx * 0.25));
         else { o.w = Math.max(120, Math.round(d.w + 2 * dx)); o.h = Math.max(50, Math.round(d.h + 2 * dy)); }
         ecScene();
-      } else { o.x = Math.round(d.x + dx); o.y = Math.round(d.y + dy); aimanter(o, autres, z, k); var n = z.querySelector('[data-k="' + cle + '"]'); if (n) { n.style.left = o.x * k + 'px'; n.style.top = o.y * k + 'px'; } }
+      } else if (groupe) {                               /* déplacement de tout le groupe sélectionné */
+        sels.forEach(function (c, j) { pos[c].x = Math.round(ds[j].x + dx); pos[c].y = Math.round(ds[j].y + dy); var n = z.querySelector('[data-k="' + c + '"]'); if (n) { n.style.left = pos[c].x * k + 'px'; n.style.top = pos[c].y * k + 'px'; } });
+      } else { o.x = Math.round(d.x + dx); o.y = Math.round(d.y + dy); aimanter(o, autres, z, k); var n2 = z.querySelector('[data-k="' + cle + '"]'); if (n2) { n2.style.left = o.x * k + 'px'; n2.style.top = o.y * k + 'px'; } }
     };
     var fin = function () { document.removeEventListener('pointermove', bouger); document.removeEventListener('pointerup', fin); document.removeEventListener('pointercancel', fin); z.querySelectorAll('.pb-guide').forEach(function (g) { g.remove(); }); if (redim) ecProp(); };
     document.addEventListener('pointermove', bouger); document.addEventListener('pointerup', fin); document.addEventListener('pointercancel', fin);
@@ -576,7 +591,7 @@
     var p = $('pbEcProp'); if (!p) return; var cle = PB.ecSel, st = PB.evt.partage.ecran.styles[cle], o = ecPos()[cle], pa = PB.evt.partage, im = PB.evt.impression;
     var col = function (id, l, v) { return '<label>' + l + '<input type="color" id="' + id + '" value="' + esc(v) + '" style="height:38px;padding:2px" oninput="pbEcProp()"></label>'; };
     var h = '<h3>' + EC_NOMS[cle] + '</h3><div class="pb-champs">';
-    if (cle === 'titre' || cle === 'legende') h += champ('pbep-txt', 'Texte', ecTexte(cle) === (cle === 'titre' ? 'Vos photos sont prêtes !' : 'Scannez pour récupérer vos photos') ? '' : ecTexte(cle), cle === 'titre' ? 'Vos photos sont prêtes !' : 'Scannez pour récupérer vos photos', 'text', ' oninput="pbEcProp()"') + col('pbep-c', 'Couleur', st.couleur) + champ('pbep-t', 'Taille', st.taille, '', 'number', ' min="10" max="300" oninput="pbEcProp()"') + (cle === 'titre' ? '<label>Police<select id="pbep-p" onchange="pbEcProp()">' + Object.keys(POLICES).map(function (x) { return '<option value="' + x + '"' + (x === st.police ? ' selected' : '') + '>' + POLICES[x][2] + '</option>'; }).join('') + '</select></label>' : '');
+    if (cle === 'titre' || cle === 'legende') h += champ('pbep-txt', 'Texte', ecTexte(cle) === (cle === 'titre' ? 'Votre photo est prête !' : 'Scannez pour récupérer votre photo') ? '' : ecTexte(cle), cle === 'titre' ? 'Votre photo est prête !' : 'Scannez pour récupérer votre photo', 'text', ' oninput="pbEcProp()"') + col('pbep-c', 'Couleur', st.couleur) + champ('pbep-t', 'Taille', st.taille, '', 'number', ' min="10" max="300" oninput="pbEcProp()"') + (cle === 'titre' ? '<label>Police<select id="pbep-p" onchange="pbEcProp()">' + Object.keys(POLICES).map(function (x) { return '<option value="' + x + '"' + (x === st.police ? ' selected' : '') + '>' + POLICES[x][2] + '</option>'; }).join('') + '</select></label>' : '');
     else if (cle === 'qr') h += champ('pbep-q', 'Taille du QR code', o.taille, '', 'number', ' min="100" max="900" oninput="pbEcProp()"') + '<p class="aide" style="grid-column:1/-1;margin:0;font-size:12.5px">Affiché seulement si « Afficher le QR code » est activé dans Paramètres de partage.</p>';
     else if (cle === 'photo') h += champ('pbep-w', 'Largeur de la photo', o.w, '', 'number', ' min="150" max="2400" oninput="pbEcProp()"');
     else h += champ('pbep-txt', 'Texte du bouton', ecTexte(cle) === { imprimer: 'Imprimer', recommencer: 'Recommencer', terminer: 'Terminer' }[cle] ? '' : ecTexte(cle), { imprimer: 'Imprimer', recommencer: 'Recommencer', terminer: 'Terminer' }[cle], 'text', ' oninput="pbEcProp()"') + col('pbep-f', 'Couleur du bouton', st.fond) + col('pbep-x', 'Couleur du texte', st.texte) + champ('pbep-t', 'Taille du texte', st.taille, '', 'number', ' min="10" max="120" oninput="pbEcProp()"') + champ('pbep-w', 'Largeur', o.w, '', 'number', ' min="120" max="1200" oninput="pbEcProp()"') + champ('pbep-h', 'Hauteur', o.h, '', 'number', ' min="50" max="400" oninput="pbEcProp()"');
@@ -591,8 +606,23 @@
     else { var tx = t('pbep-txt').trim(); if (cle === 'imprimer') im.txtImprimer = tx; else pa[cle] = tx; st.fond = t('pbep-f'); st.texte = t('pbep-x'); st.taille = n('pbep-t') || st.taille; o.w = n('pbep-w') || o.w; o.h = n('pbep-h') || o.h; }
     ecScene();
   };
-  window.pbEcVar = function (v) { PB.ecVar = v; if (v === 'sans' && PB.ecSel === 'imprimer') PB.ecSel = 'qr'; secEcran($('pbContenu')); };
+  window.pbEcVar = function (v) { PB.ecVar = v; PB.ecSels = null; if (v === 'sans' && PB.ecSel === 'imprimer') PB.ecSel = 'qr'; secEcran($('pbContenu')); };
+  function ecBoites() { return (PB.ecSels || []).map(function (c) { var el = document.querySelector('#pbEcZone [data-k="' + c + '"]'), o = ecPos()[c]; return el && o ? { o: o, w: el.offsetWidth / eEc, h: el.offsetHeight / eEc } : null; }).filter(Boolean); }
+  window.pbEcRepartir = function (axe) {
+    var l = ecBoites(); if (l.length < 3) return toast('Sélectionnez au moins 3 éléments pour les répartir', true);
+    var a = axe === 'x' ? ['x', 'w'] : ['y', 'h']; l.sort(function (u, v) { return u.o[a[0]] - v.o[a[0]]; });
+    var deb = l[0].o[a[0]] - l[0][a[1]] / 2, fin = l[l.length - 1].o[a[0]] + l[l.length - 1][a[1]] / 2, tot = l.reduce(function (t, b) { return t + b[a[1]]; }, 0), ecart = (fin - deb - tot) / (l.length - 1), cur = deb;
+    l.forEach(function (b) { b.o[a[0]] = Math.round(cur + b[a[1]] / 2); cur += b[a[1]] + ecart; }); ecScene();
+  };
   window.pbEcAlign = function (mode) {
+    if ((PB.ecSels || []).length > 1) {                    /* plusieurs éléments : alignés entre eux */
+      var l = ecBoites(), g = Math.min.apply(null, l.map(function (b) { return b.o.x - b.w / 2; })), d = Math.max.apply(null, l.map(function (b) { return b.o.x + b.w / 2; })), h = Math.min.apply(null, l.map(function (b) { return b.o.y - b.h / 2; })), bs = Math.max.apply(null, l.map(function (b) { return b.o.y + b.h / 2; }));
+      l.forEach(function (b) {
+        if (mode === 'g') b.o.x = Math.round(g + b.w / 2); if (mode === 'd') b.o.x = Math.round(d - b.w / 2); if (mode === 'h') b.o.x = Math.round((g + d) / 2);
+        if (mode === 'ht') b.o.y = Math.round(h + b.h / 2); if (mode === 'b') b.o.y = Math.round(bs - b.h / 2); if (mode === 'v') b.o.y = Math.round((h + bs) / 2);
+        if (mode === 'c') { b.o.x += Math.round(960 - (g + d) / 2); b.o.y += Math.round(540 - (h + bs) / 2); }
+      }); ecScene(); return;
+    }
     var cle = PB.ecSel, o = ecPos()[cle], el = document.querySelector('#pbEcZone [data-k="' + cle + '"]'); if (!o || !el) return;
     alignerObjet(o, el.offsetWidth / eEc, el.offsetHeight / eEc, mode); ecScene();
   };
@@ -661,7 +691,7 @@
     var p = PB.evt.partage;
     c.innerHTML = '<div class="pb-bloc"><h3>QR code</h3>' + ligne('Afficher le QR code', 'Tous les amis présents peuvent le scanner (10 téléphones au plus, dans le quart d’heure) ; un lien transféré plus tard ne s’ouvre pas', sw('pbp-qr', p.qr))
       + ligne('Inclure les photos brutes', 'En plus de la photo encadrée, chaque pose sans cadre', sw('pbp-bruts', p.bruts)) + '</div>'
-      + '<div class="pb-bloc"><h3>Écran de partage</h3><div class="pb-champs">' + champ('pbp-titre', 'Titre', p.titre, 'Scannez pour récupérer vos photos') + champ('pbp-duree', 'Durée d’affichage (secondes)', p.duree, '45', 'number', ' min="10" max="600"')
+      + '<div class="pb-bloc"><h3>Écran de partage</h3><div class="pb-champs">' + champ('pbp-titre', 'Titre', p.titre, 'Votre photo est prête !') + champ('pbp-duree', 'Durée d’affichage (secondes)', p.duree, '45', 'number', ' min="10" max="600"')
       + champ('pbp-rec', 'Bouton « Recommencer »', p.recommencer, 'Recommencer') + champ('pbp-ter', 'Bouton « Terminer »', p.terminer, 'Terminer') + '</div></div>'
       + '<div class="pb-pied"><button class="btn" onclick="pbPartageSauver()">Enregistrer</button></div>';
   }
