@@ -121,9 +121,11 @@
     try { var r = await api('/photobooth/evt?id=' + encodeURIComponent(id)); PB.evt = r.evenement; PB.formats = r.formats || PB.formats; PB.section = 'tableau'; PB.edit = null; rendre(); window.scrollTo(0, 0); }
     catch (e) { toast('Échec : ' + e.message, true); }
   };
-  window.pbRetour = async function () { PB.evt = null; PB.edit = null; await chargerListe(); rendre(); };
+  /* mise en page en cours de modification : on prévient avant de perdre un travail non enregistré */
+  function modifsPerdues() { return PB.edit && PB.edit.snap && PB.edit.snap !== JSON.stringify(PB.edit.m) && !confirm('Cette mise en page a des modifications non enregistrées.\n\nQuitter sans enregistrer ?'); }
+  window.pbRetour = async function () { if (modifsPerdues()) return; PB.evt = null; PB.edit = null; await chargerListe(); rendre(); };
   async function enregistrer(msg) {
-    try { var r = await api('/photobooth/evt', { method: 'POST', body: JSON.stringify(PB.evt) }); PB.evt = r.evenement; toast(msg || 'Enregistré'); return true; }
+    try { var r = await api('/photobooth/evt', { method: 'POST', body: JSON.stringify(PB.evt) }); PB.evt = r.evenement; toast((msg || 'Enregistré') + ' · envoyé aux photobooths (quelques secondes)'); return true; }
     catch (e) { toast('Échec : ' + e.message, true); return false; }
   }
 
@@ -135,7 +137,7 @@
     var c = $('pbContenu');
     ({ tableau: secTableau, experience: secExperience, capture: secCapture, accueil: secAccueil, ecran: secEcran, partage: secPartage, impression: secImpression, galerie: secGalerie })[PB.section](c);
   }
-  window.pbSection = function (s) { PB.section = s; PB.edit = null; PB.modeles = false; rendre(); };
+  window.pbSection = function (s) { if (modifsPerdues()) return; PB.section = s; PB.edit = null; PB.modeles = false; rendre(); };
 
   /* tableau de bord */
   function secTableau(c) {
@@ -241,9 +243,9 @@
   window.pbCreerMp = function (i) { PB.cadreMode = false;
     var mo = MODELES[i], f = PB.formats[mo.format];
     PB.edit = { i: -1, m: { nom: mo.nom, format: mo.format, w: f.w, h: f.h, cadre: '', fond: '#FFFFFF', cases: mo.cases.map(function (q, j) { return { n: j + 1, x: q[0], y: q[1], w: q[2], h: q[3], r: 0 }; }) } };
-    PB.sel = 0; PB.modeles = false; rendre();
+    PB.edit.snap = '__nouveau__'; PB.sel = 0; PB.modeles = false; rendre();
   };
-  window.pbModifierMp = function (i) { PB.cadreMode = false; PB.edit = { i: i, m: JSON.parse(JSON.stringify(PB.evt.misesEnPage[i])) }; PB.sel = 0; rendre(); };
+  window.pbModifierMp = function (i) { PB.cadreMode = false; PB.edit = { i: i, m: JSON.parse(JSON.stringify(PB.evt.misesEnPage[i])) }; PB.edit.snap = JSON.stringify(PB.edit.m); PB.sel = 0; rendre(); };
   window.pbDupliquerMp = function (i) { var m = JSON.parse(JSON.stringify(PB.evt.misesEnPage[i])); delete m.id; m.nom = m.nom + ' (copie)'; PB.evt.misesEnPage.splice(i + 1, 0, m); enregistrer('Mise en page dupliquée').then(rendre); };
   window.pbDeplacerMp = function (i, d) { var l = PB.evt.misesEnPage, j = i + d; if (j < 0 || j >= l.length) return; var t = l[i]; l[i] = l[j]; l[j] = t; enregistrer('Ordre enregistré').then(rendre); };
   window.pbSupprimerMp = function (i) { if (!confirm('Supprimer la mise en page « ' + PB.evt.misesEnPage[i].nom + ' » ?')) return; PB.evt.misesEnPage.splice(i, 1); enregistrer('Mise en page supprimée').then(rendre); };
@@ -265,7 +267,8 @@
         + '<div class="pb-actions" style="margin-top:6px"><button class="btn" id="pbGomme" onclick="pbGommeMode()">Gommer une zone</button></div></div>' : '') + '</div>'
       + '<div class="pb-bloc" style="margin:0"><h3>Cases des photos</h3><p class="aide">Faites glisser les cases dans les trous ; le coin en bas à droite les redimensionne. Flèches du clavier : 1 px (Maj : 10 px).</p><div class="pb-actions"><button class="btn btn-ghost" onclick="pbAjouterCase()">+ Ajouter une case</button></div><div id="pbCaseReg" style="margin-top:10px"></div></div>'
       + '<div class="pb-bloc" style="margin:0"><h3>Fond</h3><div class="pb-champs"><label>Couleur sous le calque<input type="color" id="pbe-fond" value="' + esc(m.fond) + '" oninput="pbFond(this.value)" style="height:38px;padding:2px"></label></div></div>'
-      + '</div></div>';
+      + '</div></div>'
+      + '<div class="pb-pied"><span style="color:#6b7280;font-size:12.5px;margin-right:auto">Rien n’est envoyé aux photobooths tant que vous n’avez pas enregistré.</span><button class="btn btn-ghost" onclick="pbAnnulerMp()">Annuler</button><button class="btn" onclick="pbSauverMp()">Enregistrer la mise en page</button></div>';
     dessinerScene();
   }
   /* aperçu : une photo type 3:2 (celle du reflex) recadrée dans la case, sans déformation, comme sur la borne */
@@ -469,7 +472,7 @@
     if (PB.edit.i >= 0) PB.evt.misesEnPage[PB.edit.i] = m; else PB.evt.misesEnPage.push(m);
     enregistrer('Mise en page enregistrée').then(function (ok) { if (ok) { PB.edit = null; rendre(); } });
   };
-  window.pbAnnulerMp = function () { PB.edit = null; rendre(); };
+  window.pbAnnulerMp = function () { if (modifsPerdues()) return; PB.edit = null; rendre(); };
 
   /* ───────── paramètres de capture ───────── */
   function secCapture(c) {

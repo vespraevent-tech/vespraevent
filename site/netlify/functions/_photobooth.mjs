@@ -9,7 +9,16 @@
 import { randomBytes } from 'node:crypto';
 import { getStore } from './_blobs.mjs';
 
-export const pbStore = () => getStore('photobooth');
+/* lectures « fortes » : un enregistrement fait dans le back-office est lu tel quel, tout de suite, par les bornes (sans le délai de propagation d'environ une minute des lectures habituelles).
+   Si l'environnement ne permet pas la lecture forte, on retombe sur la lecture habituelle. */
+export const pbStore = () => {
+  const fort = getStore({ name: 'photobooth', consistency: 'strong' }); let faible = null;
+  return new Proxy(fort, { get(cible, nom) {
+    const v = cible[nom];
+    if (nom === 'get' || nom === 'list' || nom === 'getWithMetadata' || nom === 'getMetadata') return async (...a) => { try { return await v.apply(cible, a); } catch (e) { if (!/strong consistency|uncachedEdgeURL/i.test(String(e && e.message))) throw e; faible = faible || getStore('photobooth'); return faible[nom](...a); } };
+    return typeof v === 'function' ? v.bind(cible) : v;
+  } });
+};
 const nouvelId = (p) => p + randomBytes(6).toString('hex');
 const txt = (v, n = 120) => String(v == null ? '' : v).replace(/[\r\n]+/g, ' ').trim().slice(0, n);
 const nb = (v, min, max, def) => { const x = Math.round(Number(v)); return Number.isFinite(x) ? Math.min(max, Math.max(min, x)) : def; };

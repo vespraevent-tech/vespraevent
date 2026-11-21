@@ -149,6 +149,11 @@ async function traiter(request) {
     const r = await evenementEcrire(n);
     return rep({ ok: true, evenement: vueEvt(r) });
   }
+  if (chemin === 'maj' && request.method === 'GET') {                 /* sondage léger : seule la date de dernière modification */
+    if (!jt) return rep({ ok: false }, 403);
+    const e = await evenementLire(jt.evt); if (!e) return rep({ ok: false, supprime: true }, 404);
+    return rep({ ok: true, maj: e.maj });
+  }
   if (parts[0] === 'img' && request.method === 'GET') {
     if (!jt) return rep({ ok: false }, 403);
     const im = await imageLire(jt.evt, parts[1]); if (!im) return rep({ ok: false }, 404);

@@ -249,18 +249,32 @@
     return Promise.all(l.map(function (id) { return chargerImage(e.id, id, false).then(function () { n++; if (montrer) prog(); }); }))
       .then(function () { if (montrer) { n = tot; prog(); return attendre(400).then(function () { $('maj').hidden = true; }); } });
   }
+  var majOccupee = false;
   function verifierMaj() {
-    if (!etat.jeton || !etat.evt) return;
+    if (!etat.jeton || !etat.evt || majOccupee) return;
     if (etat.ecran !== 's-accueil' && etat.ecran !== 's-menu') { majEnAttente = true; return; }  /* jamais pendant une prise de vue */
-    var avant = etat.evt.maj;
-    api('config').then(function (r) { return r.json(); }).then(function (d) {
-      if (!d.ok) { if (d.supprime) lireConfig(false).catch(function () {}); return; }
-      etat.stats = d.stats; etat.lien = d.lien || '';
-      if (d.evenement.maj === avant) return;
-      return precharger(d.evenement, true).then(function () { etat.evt = d.evenement; LS.set('cfg.' + d.evenement.id, d.evenement); if (etat.ecran === 's-accueil') afficherAccueil(); else ouvrirPanneau(panneauActif); });
-    }).catch(function () {});
+    majOccupee = true;
+    api('maj').then(function (r) { return r.json(); }).then(function (d) {
+      if (!d.ok) { if (d.supprime) return lireConfig(false).catch(function () {}); return; }
+      if (d.maj === etat.evt.maj) return;                     /* rien de nouveau : réponse minuscule toutes les 2 s */
+      return api('config').then(function (r) { return r.json(); }).then(function (c) {
+        if (!c.ok) return; etat.stats = c.stats; etat.lien = c.lien || '';
+        return precharger(c.evenement, true).then(function () { etat.evt = c.evenement; LS.set('cfg.' + c.evenement.id, c.evenement); if (etat.ecran === 's-accueil') afficherAccueil(); else ouvrirPanneau(panneauActif); });
+      });
+    }).catch(function () {}).then(function () { majOccupee = false; });
   }
-  setInterval(verifierMaj, 5000);
+  setInterval(verifierMaj, 2000);
+  /* écran des événements : la liste et les aperçus se rafraîchissent aussi tout seuls */
+  setInterval(function () {
+    if (etat.ecran !== 's-liste' || !etat.appareil) return;
+    var avant = JSON.stringify(etat.evts.map(function (e) { return e.id + e.maj; }));
+    api('evenements').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+      if (!d || !d.evenements) return; etat.evts = d.evenements; LS.set('evts', etat.evts);
+      if (JSON.stringify(etat.evts.map(function (e) { return e.id + e.maj; })) === avant) return;
+      if (etat.sel) etat.sel = etat.evts.find(function (e) { return e.id === etat.sel.id; }) || null;
+      dessinerListe(); if (etat.sel) apercu(etat.sel);
+    }).catch(function () {});
+  }, 4000);
 
   /* ── 4. choix du cadre puis 5. prise de vue ── */
   function commencer() {
