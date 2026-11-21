@@ -137,3 +137,15 @@
   for = "/api/videobooth/*"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow, noarchive"
+
+# L'appli des bornes Photobooth est privée : jamais référencée.
+[[headers]]
+  for = "/photobooth/app/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/api/photobooth/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"

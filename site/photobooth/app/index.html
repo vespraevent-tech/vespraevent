@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#FFFFFF">
+<title>Vespra Event Photobooth</title>
+<link rel="icon" type="image/png" sizes="32x32" href="/videobooth/icones/favicon-32.png?v=3">
+<link rel="stylesheet" href="app.css?v=1">
+</head>
+<body>
+<!-- 1. connexion de la borne (une seule fois : elle reste connectée 1 an) -->
+<section id="s-connexion" class="ecran">
+  <div class="carte-centre">
+    <div class="marque">Vespra Event <b>Photobooth</b></div>
+    <p class="aide">Mot de passe d’accès des bornes (le même que pour le vidéobooth).</p>
+    <input id="c-mdp" type="password" placeholder="Mot de passe" autocomplete="off">
+    <button id="c-ok" class="btn plein">Connecter cette borne</button>
+    <p id="c-err" class="err"></p>
+  </div>
+</section>
+
+<!-- 2. liste des événements (comme l'appli PC) -->
+<section id="s-liste" class="ecran">
+  <header class="barre">
+    <div class="marque">Vespra Event <b>Photobooth</b></div>
+    <div class="barre-d">
+      <span id="l-cam" class="puce"></span>
+      <button id="l-reg" class="btn">Réglages de la borne</button>
+      <a class="btn" href="/studio/#photobooth" target="_blank" rel="noopener">+ Nouvel événement</a>
+    </div>
+  </header>
+  <div class="liste-corps">
+    <div class="liste-g">
+      <input id="l-filtre" type="search" placeholder="Rechercher un événement">
+      <div id="l-evts"></div>
+    </div>
+    <aside class="liste-d" id="l-apercu"><p class="vide">Choisissez un événement.</p></aside>
+  </div>
+</section>
+
+<!-- 3. écran d'accueil de l'événement -->
+<section id="s-accueil" class="ecran plein-ecran">
+  <div id="a-scene" class="scene"></div>
+  <button id="a-coin" class="coin" aria-label="Réglages"></button>
+</section>
+
+<!-- 4. choix du cadre -->
+<section id="s-cadres" class="ecran plein-ecran clair">
+  <h1>Choisissez votre cadre</h1>
+  <div id="k-liste" class="cadres"></div>
+  <button id="k-retour" class="btn lien">Retour</button>
+</section>
+
+<!-- 5. prise de vue -->
+<section id="s-prise" class="ecran plein-ecran noir">
+  <video id="p-video" playsinline muted autoplay></video>
+  <img id="p-live" alt="">
+  <div id="p-pose" class="pose"></div>
+  <div id="p-compte" class="compte"></div>
+  <div id="p-flash" class="flash"></div>
+</section>
+
+<!-- 6. partage : photo + QR code + impression -->
+<section id="s-partage" class="ecran plein-ecran clair">
+  <div class="partage">
+    <div class="partage-g"><img id="r-final" alt="Votre photo"></div>
+    <div class="partage-d">
+      <h1 id="r-titre">Vos photos sont prêtes !</h1>
+      <div id="r-qr-bloc"><div id="r-qr" class="qr"></div><p class="aide">Scannez pour récupérer vos photos</p></div>
+      <div id="r-imp" class="imp">
+        <div id="r-copies" class="copies"></div>
+        <button id="r-imprimer" class="btn plein grand">Imprimer</button>
+        <p id="r-imp-msg" class="aide"></p>
+      </div>
+      <div class="r-actions"><button id="r-recommencer" class="btn grand">Recommencer</button><button id="r-terminer" class="btn plein grand">Terminer</button></div>
+      <p id="r-temps" class="aide petit"></p>
+    </div>
+  </div>
+</section>
+
+<!-- galerie de la borne -->
+<section id="s-galerie" class="ecran plein-ecran clair">
+  <header class="barre"><h1>Galerie</h1><button id="g-fermer" class="btn">Fermer</button></header>
+  <div id="g-grille" class="grille"></div>
+</section>
+
+<!-- code PIN -->
+<div id="pin" class="voile" hidden>
+  <div class="carte-centre pin">
+    <h2>Code de sécurité</h2>
+    <div id="pin-pts" class="pts"></div>
+    <div id="pin-pave" class="pave"></div>
+    <p id="pin-err" class="err"></p>
+    <button id="pin-annuler" class="btn lien">Annuler</button>
+  </div>
+</div>
+
+<!-- menu de l'événement (réglages sur la borne) -->
+<section id="s-menu" class="ecran">
+  <header class="barre">
+    <div class="evt-choix">
+      <button id="m-evt" class="btn evt-nom"></button>
+      <div id="m-evt-liste" class="deroulant" hidden></div>
+    </div>
+    <div class="barre-d">
+      <span id="m-cam" class="puce"></span>
+      <button id="m-lien" class="icone" title="Lien de l’événement"><svg viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></button>
+      <button id="m-stats" class="icone" title="Statistiques"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></button>
+      <button id="m-lancer" class="btn plein">Lancer l’événement</button>
+    </div>
+    <div id="m-pop" class="pop" hidden></div>
+  </header>
+  <div class="menu-corps">
+    <nav id="m-nav"></nav>
+    <div id="m-panneau" class="panneau"></div>
+  </div>
+</section>
+
+<!-- mise à jour en direct -->
+<div id="maj" class="voile maj" hidden>
+  <div class="carte-centre">
+    <h2>Mise à jour en cours</h2>
+    <div class="barre-prog"><i id="maj-barre"></i></div>
+    <p id="maj-pct" class="pct">0 %</p>
+  </div>
+</div>
+<div id="toast" class="toast" hidden></div>
+<iframe id="impr" title="impression" aria-hidden="true"></iframe>
+
+<script src="/videobooth/qr.js?v=1"></script>
+<script src="app.js?v=1"></script>
+</body>
+</html>

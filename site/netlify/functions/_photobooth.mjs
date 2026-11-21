@@ -49,6 +49,7 @@ export function evenementPropre(e, ancien) {
     date: /^\d{4}-\d{2}-\d{2}$/.test(String(e.date || '')) ? e.date : '',
     fin: /^\d{4}-\d{2}-\d{2}$/.test(String(e.fin || '')) ? e.fin : '',
     actif: oui(e.actif, true),
+    auto: (e.auto && e.auto.resa) ? { resa: String(e.auto.resa).slice(0, 80) } : ((ancien && ancien.auto) || null),
     mdp: txt(e.mdp, 40),
     cree: a.cree || new Date().toISOString(),
     maj: new Date().toISOString(),
@@ -92,7 +93,7 @@ export async function evenementsLister() {
 export async function evenementSupprimer(id) {
   if (!idOk(id, 'pb')) return false;
   const st = pbStore();
-  for (const pre of ['img/' + id + '/', 'imginfo/' + id + '/']) {
+  for (const pre of ['img/' + id + '/', 'imginfo/' + id + '/', 'photo/' + id + '/', 'prise/' + id + '/']) {
     const { blobs } = await st.list({ prefix: pre });
     for (const b of blobs) await st.delete(b.key).catch(() => {});
   }
@@ -118,4 +119,47 @@ export async function imageLire(evt, id) {
   if (!info) return null;
   const octets = await st.get('img/' + evt + '/' + id, { type: 'arrayBuffer' }).catch(() => null);
   return octets ? { info, octets } : null;
+}
+
+/* ── prises de vue : un dossier par événement (photo encadrée, vignette, photos brutes) ──
+   meta  : prise/<événement>/<prise>     fichiers : photo/<événement>/<prise>/<nom>
+   index : priseevt/<prise> → événement (pour retrouver le dossier depuis le QR code) */
+export const NOMS_FICHIERS = ['final', 'mini', 'brut-1', 'brut-2', 'brut-3', 'brut-4'];
+export const priseOk = (v) => /^pr[0-9a-f]{16}$/.test(String(v || ''));
+export async function priseEvenement(prise) {
+  if (!priseOk(prise)) return '';
+  const x = await pbStore().get('priseevt/' + prise, { type: 'json' }).catch(() => null);
+  return x && x.evt ? x.evt : '';
+}
+export async function priseLire(evt, prise) {
+  if (!idOk(evt, 'pb') || !priseOk(prise)) return null;
+  return pbStore().get('prise/' + evt + '/' + prise, { type: 'json' }).catch(() => null);
+}
+export async function priseEcrire(m) { await pbStore().setJSON('prise/' + m.evt + '/' + m.id, m); }
+export async function prisesLister(evt) {
+  if (!idOk(evt, 'pb')) return [];
+  const st = pbStore(); const { blobs } = await st.list({ prefix: 'prise/' + evt + '/' });
+  const out = [];
+  for (let i = 0; i < blobs.length; i += 25) {
+    const lot = await Promise.all(blobs.slice(i, i + 25).map((b) => st.get(b.key, { type: 'json' }).catch(() => null)));
+    lot.forEach((x) => { if (x) out.push(x); });
+  }
+  return out.sort((a, b) => String(b.cree).localeCompare(String(a.cree)));
+}
+export async function photoLire(evt, prise, nom) {
+  if (!idOk(evt, 'pb') || !priseOk(prise) || !NOMS_FICHIERS.includes(nom)) return null;
+  return pbStore().get('photo/' + evt + '/' + prise + '/' + nom, { type: 'arrayBuffer' }).catch(() => null);
+}
+export async function priseSupprimer(evt, prise) {
+  if (!idOk(evt, 'pb') || !priseOk(prise)) return false;
+  const st = pbStore();
+  for (const n of NOMS_FICHIERS) await st.delete('photo/' + evt + '/' + prise + '/' + n).catch(() => {});
+  await st.delete('prise/' + evt + '/' + prise).catch(() => {});
+  await st.delete('priseevt/' + prise).catch(() => {});
+  return true;
+}
+/* compteurs du tableau de bord : photos prises, imprimées, QR codes scannés */
+export async function compteurs(evt) {
+  const l = await prisesLister(evt);
+  return { photos: l.filter((p) => p.fichiers && p.fichiers.final).length, imprimees: l.reduce((t, p) => t + (Number(p.imprimees) || 0), 0), scans: l.filter((p) => p.scanne).length };
 }

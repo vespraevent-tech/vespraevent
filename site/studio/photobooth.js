@@ -49,7 +49,7 @@
       + '.pb-scene{position:relative;background:#fff;box-shadow:0 10px 30px -12px rgba(0,0,0,.35);touch-action:none;user-select:none;flex:none}.pb-case{position:absolute;display:flex;align-items:center;justify-content:center;color:#fff;font:800 28px Inter,sans-serif;cursor:move;outline:1px solid rgba(0,0,0,.15)}.pb-case.sel{outline:3px solid #14304f;z-index:3}.pb-case .poignee{position:absolute;right:-7px;bottom:-7px;width:14px;height:14px;background:#fff;border:2px solid #14304f;border-radius:3px;cursor:nwse-resize}'
       + '.pb-calque{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}.pb-outils{display:flex;flex-direction:column;gap:12px}'
       + '.pb-accueil{position:relative;overflow:hidden;border-radius:10px;box-shadow:0 10px 30px -12px rgba(0,0,0,.35);background-size:cover;background-position:center;touch-action:none;user-select:none}.pb-acc-el{position:absolute;transform:translate(-50%,-50%);cursor:move}.pb-acc-bt{border-radius:50%;display:flex;align-items:center;justify-content:center}.pb-acc-coin{position:absolute;top:2.5%;width:4.2%;aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35)}'
-      + '.pb-vide{text-align:center;color:#6b7280;padding:28px 10px;font-size:13.5px}.pb-theme{}@media(max-width:700px){.pb-theme{grid-template-columns:1fr!important}}.pb-sous{display:flex;gap:4px;border-bottom:1px solid #e6e1d6;margin:0 0 14px}.pb-sous button{border:0;background:transparent;padding:10px 14px;font:600 14px Inter,sans-serif;color:#6b7280;cursor:pointer;border-bottom:3px solid transparent}.pb-sous button.on{color:#14304f;border-bottom-color:#B8893B}';
+      + '.pb-photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}.pb-photos figure{margin:0;background:#faf8f4;border:1px solid #e6e1d6;border-radius:10px;padding:8px}.pb-photos img{width:100%;max-height:240px;object-fit:contain;border-radius:6px;display:block}.pb-photos figcaption{font-size:12px;color:#6b7280;margin-top:6px}.pb-photos figcaption span{display:block;margin-top:3px}.pb-photos a{color:#14304f}.pb-vide{text-align:center;color:#6b7280;padding:28px 10px;font-size:13.5px}.pb-theme{}@media(max-width:700px){.pb-theme{grid-template-columns:1fr!important}}.pb-sous{display:flex;gap:4px;border-bottom:1px solid #e6e1d6;margin:0 0 14px}.pb-sous button{border:0;background:transparent;padding:10px 14px;font:600 14px Inter,sans-serif;color:#6b7280;cursor:pointer;border-bottom:3px solid transparent}.pb-sous button.on{color:#14304f;border-bottom-color:#B8893B}';
     document.head.appendChild(st);
     if (typeof vbPolicesCss === 'function') vbPolicesCss();
   }
@@ -71,7 +71,7 @@
   function rendreListe(z) {
     var enCours = PB.liste.filter(function (e) { return !termine(e); }), passes = PB.liste.filter(termine);
     var carte = function (e) { return '<button type="button" class="pb-carte" onclick="pbEvt(\'' + e.id + '\')"><b>' + esc(e.nom) + '</b><span>' + (e.date ? dateFr(e.date) : 'Date à préciser') + '</span><span>' + e.misesEnPage + ' mise' + (e.misesEnPage > 1 ? 's' : '') + ' en page · ' + e.photos + ' photo' + (e.photos > 1 ? 's' : '') + '</span></button>'; };
-    z.innerHTML = '<div class="pb-tete"><h2>Photobooth</h2><button class="btn" onclick="pbNouveau()">+ Nouvel événement</button></div>'
+    z.innerHTML = '<div class="pb-tete"><h2>Photobooth</h2><span style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn btn-ghost" href="/photobooth/app/?liste" target="_blank" rel="noopener">Ouvrir l’appli des bornes</a><button class="btn" onclick="pbNouveau()">+ Nouvel événement</button></span></div>'
       + (PB.nouveau ? '<div class="pb-bloc"><h3>Nouvel événement</h3><div class="pb-champs">' + champ('pbn-nom', 'Nom de l’événement', '', 'Mariage de Sylvie & Paul') + champ('pbn-date', 'Date', '', '', 'date') + '</div><div class="pb-actions" style="margin-top:12px"><button class="btn" onclick="pbCreer()">Créer l’événement</button><button class="btn btn-ghost" onclick="pbNouveau(false)">Annuler</button></div></div>' : '')
       + '<div class="pb-titre-g">En cours et à venir</div>' + (enCours.length ? '<div class="pb-grille">' + enCours.map(carte).join('') + '</div>' : '<div class="pb-vide">Aucun événement en cours. Créez-en un avec « Nouvel événement ».</div>')
       + '<div class="pb-titre-g">Événements passés (encore sauvegardés)</div>' + (passes.length ? '<div class="pb-grille">' + passes.map(carte).join('') + '</div>' : '<div class="pb-vide">Aucun événement passé.</div>');
@@ -107,20 +107,51 @@
   /* tableau de bord */
   function secTableau(c) {
     var e = PB.evt;
-    c.innerHTML = '<div class="pb-compteurs"><div><b>0</b><span>Photos prises</span></div><div><b>0</b><span>Photos imprimées</span></div><div><b>0</b><span>QR codes scannés</span></div></div>'
+    c.innerHTML = '<div class="pb-compteurs" id="pbCompteurs"><div><b>…</b><span>Photos prises</span></div><div><b>…</b><span>Photos imprimées</span></div><div><b>…</b><span>QR codes scannés</span></div></div>'
+      + (e.auto && e.auto.resa ? '<p class="aide" style="color:#6b7280;font-size:13px;margin:10px 0 0">Créé automatiquement depuis la réservation du planning.</p>' : '')
       + '<div class="pb-bloc" style="margin-top:14px"><h3>Informations</h3><div class="pb-champs">' + champ('pbi-nom', 'Nom de l’événement', e.nom) + champ('pbi-date', 'Date', e.date, '', 'date') + champ('pbi-fin', 'Dernier jour', e.fin, '', 'date') + champ('pbi-mdp', 'Mot de passe des photobooths (facultatif)', e.mdp, 'Pour ouvrir l’événement sur un photobooth') + '</div>'
       + ligne('Événement ouvert sur les photobooths', 'Décochez pour le retirer des photobooths sans le supprimer', sw('pbi-actif', e.actif !== false))
       + '<div class="pb-actions" style="margin-top:8px"><button class="btn" onclick="pbInfosSauver()">Enregistrer</button></div></div>'
       + '<div class="pb-bloc"><h3>Partager avec un lien</h3>' + ligne('Lien de l’événement', 'Toute personne qui a le lien voit la galerie (réglable dans « Galerie en ligne »)', sw('pbi-lien', e.galerie.lien, 'pbLienBasculer(this.checked)'))
-      + '<div class="pb-champs"><label>Lien<input readonly value="Le lien sera actif dès la mise en service de l’appli des photobooths" style="color:#8a8f98"></label></div></div>'
-      + '<div class="pb-bloc"><div class="pb-actions"><button class="btn btn-ghost" disabled title="Disponible dès que les photos arrivent">Télécharger</button><button class="btn btn-ghost" disabled title="Disponible dès que les photos arrivent">Tout télécharger</button><button class="btn btn-ghost" disabled title="Disponible avec la galerie en ligne">Partager</button><button class="btn btn-ghost" style="color:#b03a2a" onclick="pbSupprimer()">Supprimer l’événement</button></div></div>'
-      + '<div class="pb-bloc"><h3>Photos</h3><div class="pb-vide">Les photos apparaîtront ici en direct, dès que les photobooths seront en service.</div></div>';
+      + '<div class="pb-champs"><label>Lien<input readonly id="pbi-url" value="' + (e.galerie.lien ? 'Chargement…' : 'Activez le lien ci-dessus') + '" onclick="this.select()"></label></div><div class="pb-actions" style="margin-top:8px"><button class="btn btn-ghost" onclick="pbLienCopier()">Copier le lien</button><button class="btn btn-ghost" onclick="pbLienOuvrir()">Ouvrir la galerie</button></div></div>'
+      + '<div class="pb-bloc"><div class="pb-actions"><button class="btn btn-ghost" style="color:#b03a2a" onclick="pbSupprimer()">Supprimer l’événement</button></div></div>'
+      + '<div class="pb-bloc"><h3>Photos <span style="font-weight:400;color:#6b7280;font-size:12px">(mise à jour en direct)</span></h3><div id="pbPhotos"><div class="pb-vide">Chargement…</div></div></div>';
+    pbPhotosCharger();
   }
+  var pbLien = '';
+  async function pbPhotosCharger() {
+    clearTimeout(pbPhotosCharger.t);
+    var zone = $('pbPhotos'); if (!zone || !PB.evt || PB.section !== 'tableau') return;
+    var id = PB.evt.id, r;
+    try { r = await api('/photobooth/photos?evt=' + id); } catch (x) { zone.innerHTML = '<div class="pb-vide">Impossible de charger les photos.</div>'; return; }
+    if (!PB.evt || PB.evt.id !== id || !$('pbPhotos')) return;
+    var s = r.stats || {}, cp = $('pbCompteurs'); if (cp) cp.innerHTML = '<div><b>' + (s.photos || 0) + '</b><span>Photos prises</span></div><div><b>' + (s.imprimees || 0) + '</b><span>Photos imprimées</span></div><div><b>' + (s.scans || 0) + '</b><span>QR codes scannés</span></div>';
+    pbLien = r.lien || ''; var u = $('pbi-url'); if (u && PB.evt.galerie.lien) u.value = pbLien;
+    var l = r.photos || [], sig = l.map(function (p) { return p.id + p.fichiers.length + p.imprimees + p.scanne; }).join();
+    if (zone.dataset.sig !== sig) {
+      zone.dataset.sig = sig;
+      var src = function (p, n) { return '/api/admin/photobooth/photo?evt=' + id + '&prise=' + p.id + '&nom=' + n; };
+      zone.innerHTML = l.length ? '<div class="pb-photos">' + l.map(function (p) {
+        var bruts = p.fichiers.filter(function (n) { return /^brut-/.test(n); });
+        return '<figure>' + (p.fichiers.indexOf('final') >= 0 ? '<a href="' + src(p, 'final') + '" target="_blank" rel="noopener"><img loading="lazy" src="' + src(p, 'final') + '" alt=""></a>' : '<div class="pb-vide">envoi en cours…</div>')
+          + '<figcaption>' + new Date(p.cree).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + (p.imprimees ? ' · ' + p.imprimees + ' impr.' : '') + (p.scanne ? ' · QR scanné' : '')
+          + '<span>' + (p.fichiers.indexOf('final') >= 0 ? '<a href="' + src(p, 'final') + '&dl=1">Télécharger</a>' : '') + bruts.map(function (n) { return ' · <a href="' + src(p, n) + '&dl=1">brute ' + n.slice(5) + '</a>'; }).join('')
+          + ' · <a href="#" onclick="pbPhotoSuppr(\'' + p.id + '\');return false" style="color:#b03a2a">Supprimer</a></span></figcaption></figure>';
+      }).join('') + '</div>' : '<div class="pb-vide">Aucune photo pour l’instant. Elles apparaîtront ici en direct, dès la première prise de vue.</div>';
+    }
+    pbPhotosCharger.t = setTimeout(pbPhotosCharger, 10000);
+  }
+  window.pbPhotoSuppr = async function (prise) {
+    if (!confirm('Supprimer cette photo (encadrée et brutes) ? Elle disparaîtra aussi de la galerie des invités.')) return;
+    try { await api('/photobooth/photo?evt=' + PB.evt.id + '&prise=' + prise, { method: 'DELETE' }); toast('Photo supprimée'); $('pbPhotos').dataset.sig = ''; pbPhotosCharger(); } catch (x) { toast('Échec : ' + x.message, true); }
+  };
+  window.pbLienCopier = function () { if (!pbLien || !PB.evt.galerie.lien) return toast('Activez d’abord le lien', true); navigator.clipboard.writeText(pbLien).then(function () { toast('Lien copié'); }); };
+  window.pbLienOuvrir = function () { if (!pbLien || !PB.evt.galerie.lien) return toast('Activez d’abord le lien', true); window.open(pbLien, '_blank', 'noopener'); };
   window.pbInfosSauver = function () {
     var e = PB.evt; e.nom = val('pbi-nom').trim() || e.nom; e.date = val('pbi-date'); e.fin = val('pbi-fin'); e.mdp = val('pbi-mdp').trim(); e.actif = coche('pbi-actif');
     enregistrer('Informations enregistrées').then(rendre);
   };
-  window.pbLienBasculer = function (on) { PB.evt.galerie.lien = on; enregistrer(on ? 'Lien activé' : 'Lien désactivé'); };
+  window.pbLienBasculer = function (on) { PB.evt.galerie.lien = on; enregistrer(on ? 'Lien activé' : 'Lien désactivé').then(function () { var u = $('pbi-url'); if (u) u.value = on ? (pbLien || 'Chargement…') : 'Activez le lien ci-dessus'; pbPhotosCharger(); }); };
   window.pbSupprimer = async function () {
     if (!confirm('Supprimer l’événement « ' + PB.evt.nom + ' », ses mises en page et ses images ?\n\nIl n’y a pas de retour en arrière.')) return;
     try { await api('/photobooth/evt?id=' + PB.evt.id, { method: 'DELETE' }); toast('Événement supprimé'); pbRetour(); } catch (e) { toast('Échec : ' + e.message, true); }

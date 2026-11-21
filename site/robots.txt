@@ -8,5 +8,7 @@ Disallow: /studio/
 Disallow: /videobooth
 Disallow: /videobooth/
 Disallow: /api/videobooth/
+Disallow: /photobooth/app/
+Disallow: /api/photobooth/
 
 Sitemap: https://www.vespraevent.fr/sitemap.xml
