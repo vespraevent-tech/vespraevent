@@ -143,7 +143,7 @@
     if (ec.fond) chargerImage(e.id, ec.fond, true).then(function (i) { if (i) sc.style.backgroundImage = 'url(' + i.src + ')'; });
     var el = function (o, css, html) { var d = document.createElement('div'); d.style.cssText = 'position:absolute;transform:translate(-50%,-50%);left:' + o.x + 'px;top:' + o.y + 'px;' + css; if (html != null) d.textContent = html; sc.appendChild(d); return d; };
     var ph = el(pos.photo, 'width:' + pos.photo.w + 'px;box-shadow:0 14px 50px rgba(0,0,0,.2)');
-    if (m) vignetteCadre(e, m, true).then(function (c) { c.style.cssText = 'width:100%;height:auto;display:block'; ph.appendChild(c); }); else ph.style.cssText += ';height:' + pos.photo.w * 0.66 + 'px;background:#d9dde3';
+    if (m) vignetteCadre(e, m, true, true).then(function (c) { c.style.cssText = 'width:100%;height:auto;display:block'; ph.appendChild(c); }); else ph.style.cssText += ';height:' + pos.photo.w * 0.66 + 'px;background:#d9dde3';
     var pol = POLICES[st.titre.police] || POLICES.elegante;
     el(pos.titre, 'white-space:nowrap;font-family:' + pol + ';font-size:' + st.titre.taille + 'px;color:' + st.titre.couleur + ';line-height:1.15', pa.titre || 'Vos photos sont prêtes !');
     if (pa.qr !== false) {
@@ -163,10 +163,13 @@
   /* position et taille du calque (PNG du cadre) dans la feuille : réglables dans le back-office */
   function rectCalque(m) { var c = m.calque || {}, z = (c.z || 100) / 100; return { x: m.w * (1 - z) / 2 + (c.x || 0), y: m.h * (1 - z) / 2 + (c.y || 0), w: m.w * z, h: m.h * z }; }
   /* vignette : le cadre posé sur des cases grises numérotées */
-  function vignetteCadre(e, m, viaBorne) {
+  var EX_IMG = (function () { var i = new Image(); i.src = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfe3f5"/><stop offset="1" stop-color="#f1e4d3"/></linearGradient></defs><rect width="300" height="200" fill="url(#g)"/><g fill="#6b7a8f"><circle cx="105" cy="78" r="22"/><path d="M62 200c0-42 18-68 43-68s43 26 43 68z"/></g><g fill="#8a6a5a"><circle cx="190" cy="84" r="20"/><path d="M150 200c0-40 17-64 40-64s40 24 40 64z"/></g></svg>'); return i; })();
+  function vignetteCadre(e, m, viaBorne, exemple) {
     var c = document.createElement('canvas'); c.width = m.w / 4; c.height = m.h / 4; var x = c.getContext('2d'), k = 0.25;
     x.fillStyle = m.fond || '#fff'; x.fillRect(0, 0, c.width, c.height);
-    (m.cases || []).forEach(function (cs) { x.save(); x.translate((cs.x + cs.w / 2) * k, (cs.y + cs.h / 2) * k); x.rotate((cs.r || 0) * Math.PI / 180); x.fillStyle = '#C9CED6'; x.fillRect(-cs.w * k / 2, -cs.h * k / 2, cs.w * k, cs.h * k); x.fillStyle = '#fff'; x.font = '700 ' + Math.round(cs.h * k / 3) + 'px system-ui'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(cs.n, 0, 0); x.restore(); });
+    (m.cases || []).forEach(function (cs) { x.save(); x.translate((cs.x + cs.w / 2) * k, (cs.y + cs.h / 2) * k); x.rotate((cs.r || 0) * Math.PI / 180);
+      if (exemple && EX_IMG.complete && EX_IMG.naturalWidth) { var qq = Math.max(cs.w / EX_IMG.naturalWidth, cs.h / EX_IMG.naturalHeight), vw = cs.w / qq, vh = cs.h / qq; x.drawImage(EX_IMG, (EX_IMG.naturalWidth - vw) / 2, (EX_IMG.naturalHeight - vh) / 2, vw, vh, -cs.w * k / 2, -cs.h * k / 2, cs.w * k, cs.h * k); x.restore(); return; }
+      x.fillStyle = '#C9CED6'; x.fillRect(-cs.w * k / 2, -cs.h * k / 2, cs.w * k, cs.h * k); x.fillStyle = '#fff'; x.font = '700 ' + Math.round(cs.h * k / 3) + 'px system-ui'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(cs.n, 0, 0); x.restore(); });
     return chargerImage(e.id, m.cadre, viaBorne).then(function (im) { if (im) { var rc = rectCalque(m); x.drawImage(im, rc.x * k, rc.y * k, rc.w * k, rc.h * k); } return c; });
   }
 
@@ -517,11 +520,25 @@
       h = '<h2>Général</h2><div class="bloc"><label class="champ">Code de sécurité (PIN)</label><div style="display:flex;gap:8px"><input id="g-pin" inputmode="numeric" maxlength="4" value="' + esc(LS.get('pin', '0104')) + '"><button class="btn" id="g-pin-ok">Changer</button></div>' +
         '<label class="champ">Dossier des données</label><input id="g-dossier" value="' + esc(opts.dossier) + '"' + (Pont ? '' : ' disabled') + '><p class="aide">' + (Pont ? 'Les photos sont enregistrées dans ce dossier, un sous-dossier par événement.' : 'Le dossier local est géré par l’appli Windows « Vespra Event Photobooth ». Dans le navigateur, les photos attendent dans la borne jusqu’à leur envoi.') + '</p></div>' +
         '<div class="bloc">' + bascule('g-plein', opts.pleinEcran, 'Démarrer en plein écran') + bascule('g-auto', opts.autoDernier, 'Ouvrir automatiquement le dernier événement', 'Au démarrage du PC, la borne rouvre directement le dernier événement lancé.') + bascule('g-enreg', opts.voirEnregistres, 'Afficher les événements passés dans la liste') + bascule('g-boot', Pont && Pont.demarrageAuto ? Pont.demarrageAuto() : true, 'Lancer l’appli au démarrage de Windows', Pont ? '' : 'Réglé par le raccourci de démarrage de Windows (voir la notice).') + '</div>' +
+        '<div class="bloc"><b>Mise à jour</b>' + (Pont && Pont.majVerifier ? '<p class="aide">Application Windows, version <b>' + esc(Pont.versionCode()) + '</b>. Vos événements, vos photos et vos réglages ne sont pas touchés : rien à désinstaller.</p><p id="g-maj-etat" class="aide"></p><p><button class="btn plein" id="g-maj">Rechercher une mise à jour</button> ' : '<p class="aide">Les écrans se mettent à jour tout seuls avec le site.</p><p>') + '<button class="btn" id="g-rech">Recharger l’écran</button></p></div>' +
         '<div class="bloc"><button class="btn" id="g-deco">Déconnecter cette borne</button></div>';
       P.innerHTML = h;
       $('g-pin-ok').onclick = function () { var v = $('g-pin').value.trim(); if (!/^\d{4}$/.test(v)) { toast('4 chiffres'); return; } LS.set('pin', v); toast('Code changé'); };
       var so = function () { opts.pleinEcran = $('g-plein').checked; opts.autoDernier = $('g-auto').checked; opts.voirEnregistres = $('g-enreg').checked; if ($('g-dossier').value) opts.dossier = $('g-dossier').value; LS.set('opts', opts); if (Pont && Pont.demarrageAuto) Pont.demarrageAuto($('g-boot').checked); if (Pont && Pont.dossier) Pont.dossier(opts.dossier); };
       ['g-plein', 'g-auto', 'g-enreg', 'g-boot', 'g-dossier'].forEach(function (id) { $(id).onchange = so; });
+      $('g-rech').onclick = function () { if (Pont && Pont.recharger) Pont.recharger(); else location.reload(); };
+      if ($('g-maj')) $('g-maj').onclick = function () {
+        var bt = $('g-maj'), et = $('g-maj-etat'); bt.disabled = true; et.textContent = 'Recherche en cours…';
+        Pont.majVerifier().then(function (r) {
+          if (!r.ok) { et.textContent = 'Impossible de vérifier : ' + r.erreur; bt.disabled = false; return; }
+          if (!r.disponible) { et.textContent = 'Vous avez déjà la dernière version (' + r.actuelle + ').'; bt.disabled = false; return; }
+          et.innerHTML = 'Version <b>' + esc(r.derniere) + '</b> disponible' + (r.notes ? ' : ' + esc(r.notes) : '') + '.'; bt.textContent = 'Installer et redémarrer'; bt.disabled = false;
+          bt.onclick = function () {
+            bt.disabled = true; et.textContent = 'Téléchargement…';
+            Pont.majInstaller().then(function (x) { et.textContent = x.ok ? (x.deja ? 'Déjà à jour.' : 'Version ' + x.version + ' installée, redémarrage…') : 'Échec : ' + x.erreur; if (!x.ok) bt.disabled = false; });
+          };
+        });
+      };
       $('g-deco').onclick = function () { if (!confirm('Déconnecter cette borne ? Il faudra ressaisir le mot de passe d’accès.')) return; LS.set('appareil', ''); LS.set('dernier', ''); etat.appareil = ''; etat.jeton = ''; ecran('s-connexion'); };
     } else if (p === 'capture') {
       var c = e.capture || {};

@@ -1,0 +1,26 @@
+{
+  "version": "1.3.0",
+  "notes": "Première version avec mise à jour intégrée",
+  "fichiers": [
+    {
+      "nom": "core.js",
+      "sha256": "c5be7212982e6ebb43259a674352605f71fb263d05c3994256d359be01a1dcdf"
+    },
+    {
+      "nom": "preload.js",
+      "sha256": "0bd4f96101d239b0c5e7fab1a972b05f8831174016c39e9592187cd0dd295571"
+    },
+    {
+      "nom": "canon.js",
+      "sha256": "9505a33d55ce4f05aeb2638a331459c1cdc06c674cd28d73824c9b8f2894bc51"
+    },
+    {
+      "nom": "hors-ligne.html",
+      "sha256": "ff674d270321fd3a622246d8a0e4410aa26eacd8e8befcfffe04e6e70c1ffe66"
+    },
+    {
+      "nom": "version.json",
+      "sha256": "1b91dfc7a80a053ef33972c66f4f766d488728c7bd6a5b47d60aae70048814b8"
+    }
+  ]
+}

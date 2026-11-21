@@ -20,6 +20,10 @@ contextBridge.exposeInMainWorld('vespraBorne', {
   /* déclenche le reflex et renvoie la photo en pleine définition (Blob JPEG) */
   declencher: async () => { const r = await ipcRenderer.invoke('declencher'); if (!r || !r.ok) throw new Error((r && r.erreur) || 'Appareil photo indisponible'); return new Blob([r.octets], { type: 'image/jpeg' }); },
   enregistrer: async (evt, nom, blob) => ipcRenderer.invoke('enregistrer', evt, nom, new Uint8Array(await blob.arrayBuffer())),
+  versionCode: () => etat.versionCode || '',
+  majVerifier: () => ipcRenderer.invoke('maj-verifier'),
+  majInstaller: () => ipcRenderer.invoke('maj-installer'),
+  recharger: () => ipcRenderer.invoke('recharger'),
   erreurAppareil: () => etat.erreurCanon || '',
   ouvrirDossier: (evt) => ipcRenderer.invoke('ouvrir-dossier', evt),
   dossier: (d) => { etat.dossier = d; ipcRenderer.invoke('reglage', 'dossier', d); },

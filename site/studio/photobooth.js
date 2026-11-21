@@ -191,16 +191,22 @@
   };
 
   /* ───────── expérience : mises en page ───────── */
+  /* photo exemple (3:2) : montre à quoi ressemble une vraie photo dans le cadre */
+  var EX_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200" preserveAspectRatio="none"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfe3f5"/><stop offset="1" stop-color="#f1e4d3"/></linearGradient></defs><rect width="300" height="200" fill="url(#g)"/><g fill="#6b7a8f"><circle cx="105" cy="78" r="22"/><path d="M62 200c0-42 18-68 43-68s43 26 43 68z"/></g><g fill="#8a6a5a"><circle cx="190" cy="84" r="20"/><path d="M150 200c0-40 17-64 40-64s40 24 40 64z"/></g><rect x="1" y="1" width="298" height="198" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2"/></svg>';
+  var EX_IMG = new Image(); EX_IMG.onload = function () { if (PB.section === 'ecran' && $('pbEcZone')) ecScene(); }; EX_IMG.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(EX_SVG);
   /* position et taille du calque dans la feuille */
   function rectCalque(m, f) { var c = m.calque || {}, z = (c.z || 100) / 100; return { x: f.w * (1 - z) / 2 + (c.x || 0), y: f.h * (1 - z) / 2 + (c.y || 0), w: f.w * z, h: f.h * z }; }
-  function dessiner(cv, m, img, petit) {
+  function dessiner(cv, m, img, petit, reel) {
     var f = PB.formats[m.format] || { w: m.w, h: m.h };
     cv.width = f.w; cv.height = f.h; var g = cv.getContext('2d');
     g.fillStyle = m.fond || '#fff'; g.fillRect(0, 0, f.w, f.h);
     (m.cases || []).forEach(function (k) {
       g.save(); g.translate(k.x + k.w / 2, k.y + k.h / 2); g.rotate((k.r || 0) * Math.PI / 180);
+      if (reel && EX_IMG.complete && EX_IMG.naturalWidth) { var q = Math.max(k.w / EX_IMG.naturalWidth, k.h / EX_IMG.naturalHeight), vw = k.w / q, vh = k.h / q; g.drawImage(EX_IMG, (EX_IMG.naturalWidth - vw) / 2, (EX_IMG.naturalHeight - vh) / 2, vw, vh, -k.w / 2, -k.h / 2, k.w, k.h); }
+      else {
       g.fillStyle = COUL[k.n] || '#999'; g.fillRect(-k.w / 2, -k.h / 2, k.w, k.h);
       g.fillStyle = '#fff'; g.font = '800 ' + Math.round(Math.min(k.w, k.h) * (petit ? 0.45 : 0.3)) + 'px Inter,Arial'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(k.n), 0, 0);
+      }
       g.restore();
     });
     if (img) { var rc = rectCalque(m, f); g.drawImage(img, rc.x, rc.y, rc.w, rc.h); }
@@ -263,7 +269,7 @@
     dessinerScene();
   }
   /* aperçu : une photo type 3:2 (celle du reflex) recadrée dans la case, sans déformation, comme sur la borne */
-  var EXEMPLE = 'url("data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" preserveAspectRatio="none"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfe3f5"/><stop offset="1" stop-color="#f1e4d3"/></linearGradient></defs><rect width="300" height="200" fill="url(#g)"/><g fill="#6b7a8f"><circle cx="105" cy="78" r="22"/><path d="M62 200c0-42 18-68 43-68s43 26 43 68z"/></g><g fill="#8a6a5a"><circle cx="190" cy="84" r="20"/><path d="M150 200c0-40 17-64 40-64s40 24 40 64z"/></g><rect x="1" y="1" width="298" height="198" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2"/></svg>') + '") center/cover no-repeat';
+  var EXEMPLE = 'url("data:image/svg+xml;utf8,' + encodeURIComponent(EX_SVG) + '") center/cover no-repeat';
   var fondCase = function (k) { var c = COUL[k.n] || '#999'; return 'linear-gradient(' + c + '55,' + c + '55),' + EXEMPLE; };
   function posCalque(im) { var m = PB.edit.m, f = PB.formats[m.format], r = rectCalque(m, f); im.style.cssText += ';inset:auto;left:' + r.x / f.w * 100 + '%;top:' + r.y / f.h * 100 + '%;width:' + r.w / f.w * 100 + '%;height:' + r.h / f.h * 100 + '%'; }
   function dessinerScene() {
@@ -529,7 +535,7 @@
       el.style.left = o.x * k + 'px'; el.style.top = o.y * k + 'px';
       if (cle === 'photo') {
         var cv = document.createElement('canvas'); el.style.width = o.w * k + 'px';
-        if (m && f) { dessiner(cv, m, null, true); chargerImage(m.cadre, function (img) { if (img) dessiner(cv, m, img, true); }); cv.style.cssText = 'width:100%;display:block;box-shadow:0 4px 18px rgba(0,0,0,.25)'; }
+        if (m && f) { dessiner(cv, m, null, true, true); chargerImage(m.cadre, function (img) { if (img) dessiner(cv, m, img, true, true); }); cv.style.cssText = 'width:100%;display:block;box-shadow:0 4px 18px rgba(0,0,0,.25)'; }
         else { cv.width = 1800; cv.height = 1200; cv.getContext('2d').fillStyle = '#d9dde3'; cv.getContext('2d').fillRect(0, 0, 1800, 1200); cv.style.cssText = 'width:100%;display:block'; }
         el.appendChild(cv);
       } else if (cle === 'qr') {
