@@ -2972,7 +2972,7 @@ function vbRendre(){
     /* toutes les sessions créées, même sans vidéo, puis les événements qui n'ont plus de session */
     const cartes=ses.map((e,i)=>({nom:vbLabel(e),i,s:e}));
     Object.keys(ev).forEach(n=>{ if(sesDe(n)<0) cartes.push({nom:n,i:-1,s:null}); });
-    cartes.sort((a,b)=>{ const ta=a.s&&!vbSessTerminee(a.s)?1:0, tb=b.s&&!vbSessTerminee(b.s)?1:0; if(ta!==tb) return tb-ta; const la=(ev[a.nom]||[]).map(v=>String(v.cree)).sort().pop()||'', lb=(ev[b.nom]||[]).map(v=>String(v.cree)).sort().pop()||''; return lb.localeCompare(la); });
+    cartes.sort((a,b)=>{ const ta=a.s&&!vbSessTerminee(a.s)?1:0, tb=b.s&&!vbSessTerminee(b.s)?1:0; if(ta!==tb) return tb-ta; if(ta&&tb){ const da=Date.parse(a.s.date||''), db=Date.parse(b.s.date||''); if(!isNaN(da)&&!isNaN(db)&&da!==db) return da-db; if(!isNaN(da)!==!isNaN(db)) return isNaN(da)?1:-1; } const la=(ev[a.nom]||[]).map(v=>String(v.cree)).sort().pop()||'', lb=(ev[b.nom]||[]).map(v=>String(v.cree)).sort().pop()||''; return lb.localeCompare(la); });
     const total=VB.reduce((t,v)=>t+(v.octets||0),0);
     const tete='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px"><div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f">Événements <span style="font-weight:500;color:#6b7280;font-size:13px">· '+VB.length+' vidéo'+(VB.length>1?'s':'')+' sur le site ('+mo(total)+')</span></div><button class="btn" onclick="vbSessEdit(-1)">+ Nouvelle session</button></div>';
     if(!cartes.length){ z.innerHTML=vbCarteTablette()+vbJauge(true)+tete+'<div class="hint" style="padding:24px 0">Aucune session pour l’instant. Créez-en une : elle apparaîtra sur la tablette.</div>'; return; }
@@ -10233,7 +10233,7 @@ checkSession();
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/studio/sw.js',{scope:'/studio/'}).catch(function(){})})}</script>
 <script src="nbsp-euro.js"></script>
-<script src="/studio/photobooth.js?v=22"></script>
+<script src="/studio/photobooth.js?v=23"></script>
 
 <script>
 /* ══ Témoin « Sauvegarde en cours » ══
