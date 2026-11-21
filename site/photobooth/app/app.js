@@ -54,11 +54,13 @@
   }
 
   /* ── appareil photo : reflex Canon via l'appli Windows, sinon webcam (essais) ── */
+  /* reflex si l'appli Windows le détecte, sinon webcam */
+  var reflex = function () { return !!(Pont && Pont.demarrerVisee && Pont.nomAppareil && Pont.nomAppareil()); };
   var Camera = {
     flux: null,
-    nom: function () { return Pont && Pont.nomAppareil ? Pont.nomAppareil() : (Camera.flux ? (Camera.flux.getVideoTracks()[0] || {}).label || 'Webcam' : ''); },
+    nom: function () { return reflex() ? Pont.nomAppareil() : (Camera.flux ? (Camera.flux.getVideoTracks()[0] || {}).label || 'Webcam' : ''); },
     demarrer: function () {
-      if (Pont && Pont.demarrerVisee) { var lv = $('p-live'); lv.style.display = 'block'; $('p-video').style.display = 'none'; return Promise.resolve(Pont.demarrerVisee(lv)); }
+      if (reflex()) { var lv = $('p-live'); lv.style.display = 'block'; $('p-video').style.display = 'none'; return Promise.resolve(Pont.demarrerVisee(lv)); }
       if (Camera.flux) return Promise.resolve();
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return Promise.reject(new Error('Aucun appareil photo'));
       return navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false }).then(function (s) {
@@ -67,11 +69,11 @@
     },
     /* renvoie une image (canvas) en pleine définition */
     photo: function () {
-      if (Pont && Pont.declencher) return Promise.resolve(Pont.declencher()).then(blobVersCanvas);
+      if (reflex()) return Promise.resolve(Pont.declencher()).then(blobVersCanvas);
       var v = $('p-video'), c = document.createElement('canvas'); c.width = v.videoWidth || 1280; c.height = v.videoHeight || 720;
       var x = c.getContext('2d'); x.translate(c.width, 0); x.scale(-1, 1); x.drawImage(v, 0, 0, c.width, c.height); return Promise.resolve(c);
     },
-    arreter: function () { if (Pont && Pont.arreterVisee) Pont.arreterVisee(); }
+    arreter: function () { if (reflex()) Pont.arreterVisee(); }
   };
   function blobVersCanvas(b) {
     return new Promise(function (ok, ko) {
@@ -289,7 +291,7 @@
     $('r-copies').innerHTML = '';
     if (max > 1) { for (var i = 1; i <= max; i++) { var bt = document.createElement('button'); bt.textContent = i; bt.className = i === 1 ? 'sel' : ''; bt.onclick = (function (i, bt) { return function () { copies = i; $('r-copies').querySelectorAll('button').forEach(function (z) { z.className = z === bt ? 'sel' : ''; }); }; })(i, bt); $('r-copies').appendChild(bt); } }
     var bImp = $('r-imprimer'); bImp.textContent = im.txtImprimer || 'Imprimer'; bImp.disabled = max <= 0; bImp.hidden = im.bouton === false;
-    var faire = function (n) { bImp.disabled = true; $('r-imp-msg').textContent = im.txtImpression || 'Impression…'; imprimer(m, final, n).then(function () { etat.imprSession += n; if (etat.stats) etat.stats.imprimees += n; api('impression', { json: { prise: prise, copies: n } }).catch(function () {}); setTimeout(function () { $('r-imp-msg').textContent = 'C’est parti, votre photo arrive !'; }, 1500); }); };
+    var faire = function (n) { bImp.disabled = true; $('r-imp-msg').textContent = im.txtImpression || 'Impression…'; imprimer(m, final, n).then(function (res) { if (res && res.ok === false) { $('r-imp-msg').textContent = 'Imprimante indisponible : prévenez l’équipe Vespra Event.'; bImp.disabled = false; return; } etat.imprSession += n; if (etat.stats) etat.stats.imprimees += n; api('impression', { json: { prise: prise, copies: n } }).catch(function () {}); setTimeout(function () { $('r-imp-msg').textContent = 'C’est parti, votre photo arrive !'; }, 1500); }); };
     bImp.onclick = function () { faire(copies); };
     if (im.auto && max > 0) faire(1);
     /* retour automatique */

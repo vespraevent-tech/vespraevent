@@ -1,0 +1,52 @@
+VESPRA EVENT PHOTOBOOTH — INSTALLATION SUR UN MINI-PC (Windows 10/11)
+=====================================================================
+
+À faire une seule fois par photobooth (environ 20 minutes).
+
+1. L'APPLI
+   - Décompressez « Vespra-Event-Photobooth-Windows-1.0.0.zip » dans C:\VespraEvent\App
+     (clic droit > Extraire tout).
+   - Double-cliquez sur « Vespra Event Photobooth.exe ».
+     Windows peut afficher « Windows a protégé votre ordinateur » (l'appli n'est pas
+     signée) : cliquez sur « Informations complémentaires » puis « Exécuter quand même ».
+   - Au premier lancement : mot de passe d'accès des bornes (le même que le vidéobooth).
+   - Démarrage automatique : l'appli s'inscrit toute seule au démarrage de Windows
+     (réglable dans le menu > Général). Au rallumage du PC, elle rouvre le dernier
+     événement lancé, en plein écran.
+   - Conseillé : ouverture de session Windows automatique (sans mot de passe) et
+     mises à jour Windows réglées hors des heures d'événement.
+
+2. L'APPAREIL PHOTO CANON EOS 1300D
+   - Installez digiCamControl (gratuit) : https://digicamcontrol.com
+   - Dans digiCamControl : File > Settings > Webserver
+       cocher « Use web server » et « Allow interaction via webserver », port 5513,
+       puis fermer et relancer digiCamControl.
+   - Mettez digiCamControl au démarrage de Windows : touche Windows + R, tapez
+     shell:startup, puis copiez-y un raccourci de digiCamControl.
+   - Sur le Canon : mode M (réglez ouverture, vitesse, ISO une fois pour toutes),
+     mise au point AF, extinction automatique désactivée (menu > Arrêt auto > Désactivé),
+     batterie factice branchée, câble USB branché au PC.
+   - Vérification : dans l'appli, menu > Paramètres de l'appareil photo > le nom
+     « Canon EOS 1300D » s'affiche en vert. « Prendre une photo test ».
+
+3. L'IMPRIMANTE DNP (DS620 ou RX1HS)
+   - Installez le pilote DNP. Réglez l'imprimante en papier 10×15 (6x4).
+   - Pour les bandelettes 5×15 : ajoutez la même imprimante une 2e fois dans Windows
+     (Paramètres > Imprimantes > Ajouter, même port USB), renommez-la
+     « DNP bandelettes » et réglez dans ses préférences la coupe 2 pouces
+     (option « 2inch cut » ou format « 6x4 x2 » selon le pilote).
+     L'appli imprime alors deux bandelettes sur une feuille 10×15, coupée en deux.
+   - Dans l'appli : menu > Paramètres de l'appareil photo > choisir
+     « Imprimante des photos 10×15 » et « Imprimante des bandelettes 5×15 ».
+
+4. MENU DE LA BORNE
+   - 5 appuis rapides (ou appui long de 3 s) dans le coin en haut à droite de l'écran
+     d'accueil, code 0104.
+   - Clavier (personnel) : Ctrl+Maj+K = quitter/remettre le plein écran,
+     Ctrl+Maj+Q = fermer l'appli.
+
+5. LES PHOTOS
+   - Sur le PC : C:\VespraEvent\Photobooth\<nom de l'événement>\ (modifiable dans Général).
+   - En ligne : back-office > Photobooth > l'événement > Tableau de bord.
+   - Sans internet, la borne continue : les photos partent toutes seules au retour du réseau.
+     (Il faut internet au tout premier lancement d'un événement.)
