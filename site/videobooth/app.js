@@ -77,7 +77,7 @@
   /* ───────── modes : message vidéo, boîte à questions, questions piquantes ─────────
      S'il n'y a que le message vidéo : un seul bouton « Commencer ». Sinon, une carte par mode ;
      les questions piquantes restent grisées jusqu'à l'heure choisie dans le back-office (heure de Paris). */
-  var mode = 'video', questionsMode = [];
+  var mode = 'video', questionsMode = [], dureesQ = [];
   function minutesParis() {
     try {
       var h = 0, m = 0; new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date()).forEach(function (x) { if (x.type === 'hour') h = +x.value; if (x.type === 'minute') m = +x.value; });
@@ -111,16 +111,21 @@
   }
   setInterval(function () { if ($('s-accueil').classList.contains('on')) rendreModes(); }, 20000);
   function choisirMode(m) {
-    mode = m; questionsMode = m === 'questions' ? (cfg.qs || []).slice() : (m === 'piquantes' ? (cfg.qp || []).slice() : []);
+    mode = m; var brut = m === 'questions' ? (cfg.qs || []).slice() : (m === 'piquantes' ? (cfg.qp || []).slice() : []);
+    /* une question peut avoir sa propre durée : « Votre meilleure anecdote ? (15 s) » */
+    dureesQ = []; questionsMode = brut.map(function (q) { var x = /\s*\((\d{1,3})\s*s\)\s*$/i.exec(String(q)); dureesQ.push(x ? Math.min(120, Math.max(3, +x[1])) : 0); return x ? String(q).slice(0, x.index) : String(q); });
     formatInvite = null; majFormat(); invite = null; ouvrirCam();
   }
   /* durée de l'enregistrement : celle de la session, allongée si les questions demandent plus de temps (secondes par question réglées dans le back-office) */
+  function dureesQuestions() {      /* secondes de chaque question : la sienne, sinon celle de la session, sinon répartition automatique */
+    var n = questionsMode.length, base = Math.max(5, Number(cfg.max) || 30), sec = Number(cfg.secQ) > 0 ? Number(cfg.secQ) : 0;
+    return questionsMode.map(function (_q, i) { return dureesQ[i] || sec || Math.max(3, base / n); });
+  }
   function dureeMax() {
     var m = Math.max(5, Number(cfg.max) || 30);
-    if (questionsMode.length && Number(cfg.secQ) > 0) m = Math.max(m, Math.min(120, questionsMode.length * Number(cfg.secQ)));
+    if (questionsMode.length && (Number(cfg.secQ) > 0 || dureesQ.some(Boolean))) m = Math.max(m, Math.min(300, dureesQuestions().reduce(function (t, x) { return t + x; }, 0)));
     return m;
   }
-  function secParQuestion() { var n = questionsMode.length; return n ? (Number(cfg.secQ) > 0 ? Number(cfg.secQ) : Math.max(3, dureeMax() / n)) : 0; }
   function libMode() { return nomMode(mode); }
   function montrerPret() {
     var z = $('pret'); if (testCam) { z.hidden = true; return; }
@@ -131,7 +136,8 @@
   }
   function majQuestion(s) {
     var n = questionsMode.length; if (!n) return;
-    var par = secParQuestion(), i = Math.min(n - 1, Math.floor(s / par)), reste = Math.min(1, Math.max(0, (s - i * par) / par));
+    var d = dureesQuestions(), i = 0, deb = 0; while (i < n - 1 && s >= deb + d[i]) { deb += d[i]; i++; }
+    var reste = Math.min(1, Math.max(0, (s - deb) / d[i]));
     $('q-lib').textContent = libMode() + ' · ' + (i + 1) + ' / ' + n; $('q-txt').textContent = questionsMode[i]; $('q-n').style.setProperty('--qp', Math.round(reste * 100) + '%');
     $('qbox').classList.toggle('pi', mode === 'piquantes'); $('qbox').hidden = false;
   }
@@ -326,7 +332,7 @@ $('b-stop').onclick = arreterRec;
   }
   $('b-refaire').onclick = function () { try { if (urlRevoir) URL.revokeObjectURL(urlRevoir); } catch (e) {} urlRevoir = null; blobFinal = null; ouvrirCam(); };
   /* « Oui, c'est parfait » : on demande alors les coordonnées */
-  $('b-fin').onclick = function () { if (!blobFinal) return; montrer('s-form'); setTimeout(function () { $('f-nom').focus(); }, 80); };
+  $('b-fin').onclick = function () { if (!blobFinal) return; montrer('s-form'); setTimeout(function () { $('f-prenom').focus(); }, 80); };
   /* ───────── QR code : l'invité scanne et récupère sa vidéo ───────── */
   function cleRecup() {
     try { var a = new Uint8Array(12); crypto.getRandomValues(a); return Array.prototype.map.call(a, function (x) { return ('0' + x.toString(16)).slice(-2); }).join(''); } catch (e) { return (Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + '000000000000').slice(0, 20); }

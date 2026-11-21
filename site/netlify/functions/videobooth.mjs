@@ -173,7 +173,7 @@ async function sessionsEcrire(st, liste) {
     modeQ: !!e.modeQ, modeP: !!e.modeP,
     heureP: /^([01]\d|2[0-3]):[0-5]\d$/.test(String(e.heureP || '')) ? String(e.heureP) : '23:00',
     qs: lignes(e.qs), qp: lignes(e.qp),
-    secQ: Math.min(20, Math.max(0, Math.round(Number(e.secQ)) || 0)),
+    secQ: Math.min(60, Math.max(0, Math.round(Number(e.secQ)) || 0)),
     merciOrga: String(e.merciOrga || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 300),
     /* phrase au-dessus des boutons de récupération : affichée ou non (non choisi = affichée, sauf pour un événement d'entreprise) */
     orgaOn: e.orgaOn === true || e.orgaOn === false ? e.orgaOn : null,

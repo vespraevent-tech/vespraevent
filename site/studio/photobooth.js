@@ -70,11 +70,11 @@
   function rendreListe(z) {
     var enCours = PB.liste.filter(function (e) { return !termine(e); }), passes = PB.liste.filter(termine);
     var carte = function (e) { return '<button type="button" class="pb-carte" onclick="pbEvt(\'' + e.id + '\')"><b>' + esc(e.nom) + '</b><span>' + (e.date ? dateFr(e.date) : 'Date à préciser') + '</span><span>' + e.misesEnPage + ' mise' + (e.misesEnPage > 1 ? 's' : '') + ' en page · ' + e.photos + ' photo' + (e.photos > 1 ? 's' : '') + '</span></button>'; };
-    z.innerHTML = '<div class="pb-tete"><h2>Photobooth</h2><span style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn btn-ghost" href="/photobooth/app/?liste" target="_blank" rel="noopener">Ouvrir l’appli des bornes</a><button class="btn" onclick="pbNouveau()">+ Nouvel événement</button></span></div>'
-      + (PB.nouveau ? '<div class="pb-bloc"><h3>Nouvel événement</h3><div class="pb-champs">' + '<label style="grid-column:1/-1">Cliente (réservation du planning, facultatif)<select id="pbn-cl" onchange="pbChoisirCliente(this.value)"><option value="">— choisir une cliente —</option>' + (PB.clientes || []).map(function (c, i) { return '<option value="' + i + '">' + esc(c.client) + (c.dateStart ? ' · ' + dateFr(c.dateStart) : '') + (c.produits ? ' · ' + esc(c.produits) : '') + '</option>'; }).join('') + '</select></label>' + champ('pbn-nom', 'Nom de l’événement', '', 'Mariage de Sylvie & Paul') + champ('pbn-date', 'Date', '', '', 'date') + '</div><div class="pb-actions" style="margin-top:12px"><button class="btn" onclick="pbCreer()">Créer l’événement</button><button class="btn btn-ghost" onclick="pbNouveau(false)">Annuler</button></div></div>' : '')
+    z.innerHTML = '<div class="pb-tete"><h2>Photobooth</h2><span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><a class="btn btn-ghost" style="padding:5px 12px;font-size:12.5px" href="/photobooth/app/?liste" target="_blank" rel="noopener">Ouvrir l’appli des bornes</a><button class="btn btn-ghost" style="padding:5px 12px;font-size:12.5px" onclick="pbNouveau()">+ Créer un événement</button></span></div>'
+      + (PB.nouveau ? '<div class="pb-bloc"><h3>Nouvel événement</h3><label>Nom de la cliente<input id="pbn-q" autocomplete="off" placeholder="Tapez un nom : la recherche se fait dans les réservations du planning" oninput="pbFiltrer()"></label><div id="pbn-res" style="margin-top:8px"></div><p class="aide" style="font-size:12.5px;color:#6b7280;margin:10px 0 0">Pas dans le planning ? <a href="#" onclick="pbManuel();return false" style="color:#14304f">Créer sans réservation</a></p>' + (PB.manuel ? '<div class="pb-champs" style="margin-top:8px">' + champ('pbn-nom', 'Nom de l’événement', '', 'Mariage de Sylvie & Paul') + champ('pbn-date', 'Date', '', '', 'date') + '</div><div class="pb-actions" style="margin-top:10px"><button class="btn" onclick="pbCreer()">Créer l’événement</button></div>' : '') + '<div class="pb-actions" style="margin-top:10px"><button class="btn btn-ghost" onclick="pbNouveau(false)">Annuler</button></div></div>' : '')
       + (PB.liste.some(function (e) { return e.auto; }) ? '<div class="pb-actions" style="margin:0 0 10px"><button class="btn btn-ghost" style="color:#b03a2a" onclick="pbAutoSuppr()">Supprimer les événements créés automatiquement (' + PB.liste.filter(function (e) { return e.auto; }).length + ')</button></div>' : '') + '<div class="pb-titre-g">En cours et à venir</div>' + (enCours.length ? '<div class="pb-grille">' + enCours.map(carte).join('') + '</div>' : '<div class="pb-vide">Aucun événement en cours. Créez-en un avec « Nouvel événement ».</div>')
       + '<div class="pb-titre-g">Événements passés (encore sauvegardés)</div>' + (passes.length ? '<div class="pb-grille">' + passes.map(carte).join('') + '</div>' : '<div class="pb-vide">Aucun événement passé.</div>');
-    if (PB.nouveau) setTimeout(function () { var n = $('pbn-nom'); if (n) n.focus(); }, 50);
+    if (PB.nouveau) { setTimeout(function () { var n = $('pbn-q'); if (n) n.focus(); }, 50); pbFiltrer(); }
   }
   /* liste des clientes du planning, pour pré-remplir un nouvel événement */
   async function chargerClientes() {
@@ -83,18 +83,28 @@
       (brut || []).forEach(function (x) {
         try {
           var r = typeof x.d === 'string' ? JSON.parse(x.d) : x; if (!r || !r.client) return;
-          l.push({ id: String(x.id || r.id), client: String(r.client), dateStart: r.dateStart || '', dateEnd: r.dateEnd || r.dateStart || '', produits: (r.products || []).map(function (p) { return p.name; }).filter(function (n) { return /photobooth|vid[ée]obooth|photomaton/i.test(n || ''); }).slice(0, 2).join(', ') });
+          l.push({ id: String(x.id || r.id), client: String(r.client), dateStart: r.dateStart || '', dateEnd: r.dateEnd || r.dateStart || '', produits: (r.products || []).map(function (p) { return p.name; }).filter(function (n) { return /photobooth|vid[ée]obooth|photomaton/i.test(n || ''); }).slice(0, 2).join(', '), tirages: ((r.products || []).map(function (p) { var m = /(\d+)\s*tirages?/i.exec(p.variant || ''); return /photobooth|photomaton/i.test(p.name || '') && m ? +m[1] : 0; }).filter(Boolean)[0]) || 0 });
         } catch (e) {}
       });
       l.sort(function (a, b) { var fa = a.dateStart >= auj, fb = b.dateStart >= auj; return fa !== fb ? (fa ? -1 : 1) : (fa ? a.dateStart.localeCompare(b.dateStart) : b.dateStart.localeCompare(a.dateStart)); });
       PB.clientes = l;
     } catch (e) { PB.clientes = []; }
   }
-  window.pbChoisirCliente = function (i) {
-    var c = (PB.clientes || [])[+i]; if (!c) return;
-    $('pbn-nom').value = c.client; if (c.dateStart) $('pbn-date').value = c.dateStart; PB.resa = c.id; PB.resaFin = c.dateEnd;
+  window.pbManuel = function () { PB.manuel = true; rendre(); setTimeout(function () { var n = $('pbn-nom'); if (n) n.focus(); }, 50); };
+  window.pbFiltrer = function () {
+    var z = $('pbn-res'); if (!z) return; var q = ($('pbn-q') ? $('pbn-q').value : '').trim().toLowerCase();
+    var l = (PB.clientes || []).map(function (c, i) { return { c: c, i: i }; }).filter(function (x) { return q ? x.c.client.toLowerCase().indexOf(q) >= 0 : !!x.c.produits && x.c.dateStart >= aujourdhui(); }).slice(0, 12);
+    z.innerHTML = l.length ? l.map(function (x) { var c = x.c; return '<button type="button" class="pb-carte" style="width:100%;text-align:left;margin-bottom:6px" onclick="pbCreerDepuis(' + x.i + ')"><b>' + esc(c.client) + '</b><span>' + (c.dateStart ? dateFr(c.dateStart) : 'Date à préciser') + (c.produits ? ' · ' + esc(c.produits) : '') + (c.tirages ? ' · ' + c.tirages + ' tirages' : '') + '</span></button>'; }).join('') : '<div class="pb-vide" style="padding:10px">' + (q ? 'Aucune réservation à ce nom.' : 'Tapez le nom de la cliente.') + '</div>';
   };
-  window.pbNouveau = async function (on) { PB.nouveau = on !== false; PB.resa = ''; if (PB.nouveau && !PB.clientes) await chargerClientes(); rendre(); };
+  /* un clic sur la cliente : l'événement est créé (nom, dates) et le nombre de tirages réservés devient la limite d'impressions */
+  window.pbCreerDepuis = async function (i) {
+    var c = (PB.clientes || [])[i]; if (!c) return;
+    var corps = { nom: c.client, date: c.dateStart, fin: c.dateEnd || c.dateStart, resa: c.id };
+    if (c.tirages) corps.impression = { limites: { on: true, parEvenement: c.tirages, parSession: 1 } };
+    try { var r = await api('/photobooth/evt', { method: 'POST', body: JSON.stringify(corps) }); PB.nouveau = false; PB.evt = r.evenement; PB.section = 'experience'; toast('Événement créé' + (c.tirages ? ' : limite de ' + c.tirages + ' impressions' : '')); rendre(); }
+    catch (e) { toast('Échec : ' + e.message, true); }
+  };
+  window.pbNouveau = async function (on) { PB.nouveau = on !== false; PB.manuel = false; PB.resa = ''; if (PB.nouveau && !PB.clientes) await chargerClientes(); rendre(); };
   window.pbAutoSuppr = async function () {
     var k = PB.liste.filter(function (e) { return e.auto; }); if (!k.length) return toast('Aucun événement créé automatiquement');
     if (!confirm('Supprimer ' + k.length + ' événement(s) créé(s) automatiquement depuis le planning, avec leurs photos ?\n\nIl n’y a pas de retour en arrière.')) return;

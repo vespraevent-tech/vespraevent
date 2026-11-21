@@ -2756,8 +2756,8 @@ function vbFormSession(){
   const sQ=sec('Boîte à questions','Les invités répondent face caméra à des questions préparées',
     '<div class="ssT">Carte sur l’écran d’accueil</div>'+t('m2n','Nom du mode')+t('m2d','Description')+
     '<div class="ssT">Questions</div>'+
-    f('secQ','Secondes par question (0 = automatique selon la durée)',e.secQ||0,'0','number')+
-    '<label class="f plein">Une question par ligne (5 conseillées pour 30 secondes, 8 au maximum)<textarea id="vs-qs" rows="6">'+vbEsc((e.qs&&e.qs.length?e.qs:VB_QS[e.type||'autre']).join('\n'))+'</textarea></label>',false,
+    f('secQ','Secondes par question (0 = automatique ; une question peut avoir sa propre durée avec « (15 s) »)',e.secQ||0,'0','number')+
+    '<label class="f plein">Une question par ligne (8 au maximum). Durée propre à une question : ajoutez « (15 s) » à la fin de la ligne, sinon c’est la durée « Secondes par question » ci-dessus<textarea id="vs-qs" rows="6">'+vbEsc((e.qs&&e.qs.length?e.qs:VB_QS[e.type||'autre']).join('\n'))+'</textarea></label>',false,
     pastille('vfs-eq',e.modeQ,'Activé','Désactivé')+sw('vs-modeQ',e.modeQ,"vbPast('vfs-eq',this.checked)"));
 
   const sP=sec('Questions piquantes','Un mode plus osé, verrouillé jusqu’à une heure choisie',
@@ -2766,7 +2766,7 @@ function vbFormSession(){
     f('heureP','Débloqué à partir de (heure de Paris)',e.heureP||'23:00','23:00','time')+t('m3b','Texte du cadenas (« {heure} » = l’heure)')+
     '<p class="aide">Avant cette heure, la carte est grisée avec un petit cadenas. Elle reste ouverte jusqu’à 6 h du matin.</p>'+
     '<div class="ssT">Questions</div>'+
-    '<label class="f plein">Une question par ligne<textarea id="vs-qp" rows="6">'+vbEsc((e.qp&&e.qp.length?e.qp:VB_QP).join('\n'))+'</textarea></label>',false,
+    '<label class="f plein">Une question par ligne (durée propre à une question : « (15 s) » à la fin de la ligne)<textarea id="vs-qp" rows="6">'+vbEsc((e.qp&&e.qp.length?e.qp:VB_QP).join('\n'))+'</textarea></label>',false,
     pastille('vfs-ep',e.modeP,'Activé','Désactivé')+sw('vs-modeP',e.modeP,"vbPast('vfs-ep',this.checked)"));
 
   const sFin=sec('Fin du parcours','Nom, récupération de la vidéo (QR code, e-mail, envoi à quelqu’un), remerciement',
@@ -10233,7 +10233,7 @@ checkSession();
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/studio/sw.js',{scope:'/studio/'}).catch(function(){})})}</script>
 <script src="nbsp-euro.js"></script>
-<script src="/studio/photobooth.js?v=8"></script>
+<script src="/studio/photobooth.js?v=9"></script>
 
 <script>
 /* ══ Témoin « Sauvegarde en cours » ══
