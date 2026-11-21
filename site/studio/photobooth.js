@@ -46,7 +46,7 @@
       + '.pb-modeles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}.pb-modeles button{background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:10px;cursor:pointer;display:flex;flex-direction:column;gap:6px;align-items:center;font:600 12.5px Inter,sans-serif;color:#1f2733}.pb-modeles button:hover{border-color:#B8893B}.pb-modeles canvas{width:100%;height:120px;object-fit:contain}'
       + '.pb-ed{display:grid;grid-template-columns:1fr 260px;gap:16px;align-items:start}@media(max-width:980px){.pb-ed{grid-template-columns:1fr}}.pb-scene-z{background:#e9e6df;border-radius:12px;padding:16px;display:flex;justify-content:center;overflow:auto}'
       + '.pb-scene{position:relative;background:#fff;box-shadow:0 10px 30px -12px rgba(0,0,0,.35);touch-action:none;user-select:none;flex:none}.pb-case{position:absolute;display:flex;align-items:center;justify-content:center;color:#fff;font:800 28px Inter,sans-serif;cursor:move;outline:1px solid rgba(0,0,0,.15)}.pb-case.sel{outline:3px solid #14304f;z-index:3}.pb-case .poignee{position:absolute;right:-7px;bottom:-7px;width:14px;height:14px;background:#fff;border:2px solid #14304f;border-radius:3px;cursor:nwse-resize}'
-      + '.pb-calque{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}.pb-gomme{cursor:crosshair}.pb-gomme .pb-case{pointer-events:none}.pb-outils{display:flex;flex-direction:column;gap:12px}'
+      + '.pb-calque{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}.pb-cadre-ov{position:absolute;z-index:6;outline:2px dashed #14304f;background:rgba(20,48,79,.06);cursor:move}.pb-cadre-ov .poignee{position:absolute;right:6px;bottom:6px;width:24px;height:24px;background:#14304f;border:2px solid #fff;border-radius:50%;cursor:nwse-resize}.pb-mode-cadre .pb-case{pointer-events:none}.pb-gomme{cursor:crosshair}.pb-gomme .pb-case{pointer-events:none}.pb-outils{display:flex;flex-direction:column;gap:12px}'
       + '.pb-accueil{position:relative;overflow:hidden;border-radius:10px;box-shadow:0 10px 30px -12px rgba(0,0,0,.35);background-size:cover;background-position:center;touch-action:none;user-select:none}.pb-acc-el{position:absolute;transform:translate(-50%,-50%);cursor:move}.pb-acc-bt{border-radius:50%;display:flex;align-items:center;justify-content:center}.pb-acc-coin{position:absolute;top:2.5%;width:4.2%;aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35)}'
       + '.pb-photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}.pb-photos figure{margin:0;background:#faf8f4;border:1px solid #e6e1d6;border-radius:10px;padding:8px}.pb-photos img{width:100%;max-height:240px;object-fit:contain;border-radius:6px;display:block}.pb-photos figcaption{font-size:12px;color:#6b7280;margin-top:6px}.pb-photos figcaption span{display:block;margin-top:3px}.pb-photos a{color:#14304f}.pb-champs input:focus,.pb-champs select:focus{outline:none!important;border-color:#14304f!important;box-shadow:0 0 0 3px rgba(20,48,79,.12)!important}.pb-vide{text-align:center;color:#6b7280;padding:28px 10px;font-size:13.5px}.pb-theme{}@media(max-width:700px){.pb-theme{grid-template-columns:1fr!important}}.pb-sous{display:flex;gap:4px;border-bottom:1px solid #e6e1d6;margin:0 0 14px}.pb-sous button{border:0;background:transparent;padding:10px 14px;font:600 14px Inter,sans-serif;color:#6b7280;cursor:pointer;border-bottom:3px solid transparent}.pb-sous button.on{color:#14304f;border-bottom-color:#B8893B}';
     document.head.appendChild(st);
@@ -232,12 +232,12 @@
     });
   }
   window.pbModeles = function () { PB.modeles = !PB.modeles; rendre(); };
-  window.pbCreerMp = function (i) {
+  window.pbCreerMp = function (i) { PB.cadreMode = false;
     var mo = MODELES[i], f = PB.formats[mo.format];
     PB.edit = { i: -1, m: { nom: mo.nom, format: mo.format, w: f.w, h: f.h, cadre: '', fond: '#FFFFFF', cases: mo.cases.map(function (q, j) { return { n: j + 1, x: q[0], y: q[1], w: q[2], h: q[3], r: 0 }; }) } };
     PB.sel = 0; PB.modeles = false; rendre();
   };
-  window.pbModifierMp = function (i) { PB.edit = { i: i, m: JSON.parse(JSON.stringify(PB.evt.misesEnPage[i])) }; PB.sel = 0; rendre(); };
+  window.pbModifierMp = function (i) { PB.cadreMode = false; PB.edit = { i: i, m: JSON.parse(JSON.stringify(PB.evt.misesEnPage[i])) }; PB.sel = 0; rendre(); };
   window.pbDupliquerMp = function (i) { var m = JSON.parse(JSON.stringify(PB.evt.misesEnPage[i])); delete m.id; m.nom = m.nom + ' (copie)'; PB.evt.misesEnPage.splice(i + 1, 0, m); enregistrer('Mise en page dupliquée').then(rendre); };
   window.pbDeplacerMp = function (i, d) { var l = PB.evt.misesEnPage, j = i + d; if (j < 0 || j >= l.length) return; var t = l[i]; l[i] = l[j]; l[j] = t; enregistrer('Ordre enregistré').then(rendre); };
   window.pbSupprimerMp = function (i) { if (!confirm('Supprimer la mise en page « ' + PB.evt.misesEnPage[i].nom + ' » ?')) return; PB.evt.misesEnPage.splice(i, 1); enregistrer('Mise en page supprimée').then(rendre); };
@@ -253,11 +253,7 @@
       + '<div class="pb-outils">'
       + '<div class="pb-bloc" style="margin:0"><h3>Calque</h3><p class="aide">Votre design PNG au format ' + esc(f.nom) + ' (' + f.w + ' × ' + f.h + ' px), avec les emplacements des photos transparents.</p><div class="pb-actions"><label class="btn btn-ghost" style="cursor:pointer">' + (m.cadre ? 'Remplacer' : 'Choisir le PNG') + '<input type="file" accept="image/png" hidden onchange="pbCalque(this)"></label>' + (m.cadre ? '<button class="btn btn-ghost" onclick="pbCalqueRetirer()">Retirer</button>' : '') + '</div>'
       + (m.cadre ? '<div class="pb-actions" style="margin-top:8px"><button class="btn" onclick="pbDetecter()">Détecter les trous du calque</button></div><label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#6b7280;margin-top:10px"><input type="range" id="pbe-op" min="15" max="100" value="100" oninput="pbOpacite(this.value)"> Transparence du calque (pour ajuster)</label>'
-        + '<div style="border-top:1px solid #eee;margin-top:12px;padding-top:10px"><b style="font-size:13px">Taille et position du calque</b>'
-        + '<label style="display:block;font-size:12.5px;color:#6b7280;margin-top:8px">Taille : <span id="pbz-v">' + Math.round((m.calque || {}).z || 100) + '</span> %<input type="range" id="pbz" min="30" max="250" value="' + Math.round((m.calque || {}).z || 100) + '" oninput="pbCalqueTf()" style="width:100%"></label>'
-        + '<label style="display:block;font-size:12.5px;color:#6b7280;margin-top:6px">Horizontal : <span id="pbx-v">' + Math.round((m.calque || {}).x || 0) + '</span> px<input type="range" id="pbx" min="-900" max="900" value="' + Math.round((m.calque || {}).x || 0) + '" oninput="pbCalqueTf()" style="width:100%"></label>'
-        + '<label style="display:block;font-size:12.5px;color:#6b7280;margin-top:6px">Vertical : <span id="pby-v">' + Math.round((m.calque || {}).y || 0) + '</span> px<input type="range" id="pby" min="-900" max="900" value="' + Math.round((m.calque || {}).y || 0) + '" oninput="pbCalqueTf()" style="width:100%"></label>'
-        + '<div class="pb-actions" style="margin-top:6px"><button class="btn btn-ghost" onclick="pbCalqueRaz()">Remettre à la taille du format</button></div></div>'
+        + '<div style="border-top:1px solid #eee;margin-top:12px;padding-top:10px"><b style="font-size:13px">Taille et position du cadre</b><p class="aide" style="margin:4px 0 8px">Cliquez sur « Ajuster le cadre », puis faites-le glisser avec la souris. Le coin en bas à droite l’agrandit ou le rétrécit.</p><div class="pb-actions"><button class="btn" id="pbCadreBtn" onclick="pbCadreMode()">' + (PB.cadreMode ? 'Terminer l’ajustement du cadre' : 'Ajuster le cadre') + '</button><button class="btn btn-ghost" onclick="pbCalqueRaz()">Remettre à la taille du format</button></div></div>'
         + '<div style="border-top:1px solid #eee;margin-top:12px;padding-top:10px"><b style="font-size:13px">Le fond n’est pas transparent ?</b><p class="aide" style="margin:4px 0 8px">Cliquez sur « Gommer », puis sur la zone du calque à rendre transparente (par exemple la zone bleue). Réglez la tolérance si des bords restent.</p>'
         + '<label style="display:block;font-size:12.5px;color:#6b7280">Tolérance : <span id="pbg-v">40</span><input type="range" id="pbg" min="5" max="120" value="40" oninput="document.getElementById(\'pbg-v\').textContent=this.value" style="width:100%"></label>'
         + '<div class="pb-actions" style="margin-top:6px"><button class="btn" id="pbGomme" onclick="pbGommeMode()">Gommer une zone</button></div></div>' : '') + '</div>'
@@ -282,6 +278,12 @@
     });
     if (m.cadre) { var im = document.createElement('img'); im.className = 'pb-calque'; im.id = 'pbCalqueImg'; im.alt = ''; im.src = urlImage(m.cadre); posCalque(im); var op = $('pbe-op'); if (op) im.style.opacity = op.value / 100; sc.appendChild(im); }
     sc.onclick = function (ev) { if (PB.gomme) pbGommer(ev); };
+    sc.classList.toggle('pb-mode-cadre', !!PB.cadreMode);
+    if (m.cadre && PB.cadreMode) {
+      var ov = document.createElement('div'); ov.id = 'pbCadreOv'; ov.className = 'pb-cadre-ov'; posCalque(ov);
+      var po = document.createElement('i'); po.className = 'poignee'; ov.appendChild(po);
+      ov.addEventListener('pointerdown', function (ev) { glisserCadre(ev, ev.target === po); }); sc.appendChild(ov);
+    }
     reglagesCase();
   }
   function glisser(ev, i, redim) {
@@ -347,14 +349,26 @@
       editeur($('pbContenu'));
     } catch (e) { toast('Échec : ' + e.message, true); }
   };
-  window.pbCalqueTf = function () {
-    var m = PB.edit.m; m.calque = { z: +$('pbz').value, x: +$('pbx').value, y: +$('pby').value };
-    $('pbz-v').textContent = m.calque.z; $('pbx-v').textContent = m.calque.x; $('pby-v').textContent = m.calque.y;
-    var im = $('pbCalqueImg'); if (im) posCalque(im);
-  };
+  /* ajustement du cadre à la souris : glisser = déplacer, coin en bas à droite = agrandir / rétrécir (proportions gardées) */
+  window.pbCadreMode = function () { PB.cadreMode = !PB.cadreMode; PB.gomme = false; editeur($('pbContenu')); };
+  function reglerCalque(r) {
+    var m = PB.edit.m, f = PB.formats[m.format], z = Math.max(0.2, Math.min(4, r.w / f.w));
+    m.calque = { z: Math.round(z * 1000) / 10, x: Math.round(r.x - f.w * (1 - z) / 2), y: Math.round(r.y - f.h * (1 - z) / 2) };
+    var im = $('pbCalqueImg'); if (im) posCalque(im); var ov = $('pbCadreOv'); if (ov) posCalque(ov);
+  }
+  function glisserCadre(ev, redim) {
+    ev.preventDefault(); ev.stopPropagation(); var m = PB.edit.m, f = PB.formats[m.format], r0 = rectCalque(m, f), x0 = ev.clientX, y0 = ev.clientY, el = ev.currentTarget;
+    el.setPointerCapture && el.setPointerCapture(ev.pointerId);
+    var bouger = function (e) {
+      var dx = (e.clientX - x0) / echelle, dy = (e.clientY - y0) / echelle;
+      if (redim) { var w = Math.max(f.w * 0.2, r0.w + dx); reglerCalque({ x: r0.x, y: r0.y, w: w, h: w * f.h / f.w }); } else reglerCalque({ x: r0.x + dx, y: r0.y + dy, w: r0.w, h: r0.h });
+    };
+    var fin = function () { el.removeEventListener('pointermove', bouger); el.removeEventListener('pointerup', fin); el.removeEventListener('pointercancel', fin); };
+    el.addEventListener('pointermove', bouger); el.addEventListener('pointerup', fin); el.addEventListener('pointercancel', fin);
+  }
   window.pbCalqueRaz = function () { PB.edit.m.calque = { z: 100, x: 0, y: 0 }; editeur($('pbContenu')); };
   window.pbGommeMode = function () {
-    PB.gomme = !PB.gomme; var sc = $('pbScene'); if (sc) sc.classList.toggle('pb-gomme', PB.gomme);
+    PB.gomme = !PB.gomme; if (PB.gomme && PB.cadreMode) { PB.cadreMode = false; editeur($('pbContenu')); } var sc = $('pbScene'); if (sc) sc.classList.toggle('pb-gomme', PB.gomme);
     var b = $('pbGomme'); if (b) b.textContent = PB.gomme ? 'Cliquez dans la zone à gommer… (annuler)' : 'Gommer une zone';
     if (PB.gomme) toast('Cliquez sur la zone du calque à rendre transparente');
   };
