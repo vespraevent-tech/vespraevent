@@ -236,20 +236,55 @@
       var t = setInterval(function () { i--; if (i <= 0) { clearInterval(t); c.textContent = ''; ok(); } else c.textContent = i; }, 1000);
     });
   }
+  /* la vue en direct s'affiche DANS les cases 1, 2, 3… du cadre : les invités se voient déjà dans la photo finale */
+  function dessinerCase(cv, src, miroir) {
+    var sw = src.videoWidth || src.naturalWidth || src.width, sh = src.videoHeight || src.naturalHeight || src.height; if (!sw || !sh) return;
+    var x = cv.getContext('2d'), r = Math.max(cv.width / sw, cv.height / sh), w = cv.width / r, h = cv.height / r;
+    x.save(); if (miroir) { x.translate(cv.width, 0); x.scale(-1, 1); } x.drawImage(src, (sw - w) / 2, (sh - h) / 2, w, h, 0, 0, cv.width, cv.height); x.restore();
+  }
+  function bâtirScene(m) {
+    var st = $('p-stage'), cp0 = $('p-compte'), fl0 = $('p-flash'); st.innerHTML = '';
+    var H = innerHeight * 0.96, W = innerWidth * 0.98, k = Math.min(H / m.h, W / m.w);
+    st.style.width = m.w * k + 'px'; st.style.height = m.h * k + 'px'; st.style.background = m.fond || '#fff';
+    var cvs = {};
+    (m.cases || []).forEach(function (cs) {
+      var d = document.createElement('div'); d.className = 'pcase'; d.style.cssText = 'left:' + cs.x * k + 'px;top:' + cs.y * k + 'px;width:' + cs.w * k + 'px;height:' + cs.h * k + 'px;transform:rotate(' + (cs.r || 0) + 'deg)';
+      var c = document.createElement('canvas'); c.width = Math.round(cs.w * k * 1.5); c.height = Math.round(cs.h * k * 1.5); d.appendChild(c); st.appendChild(d); (cvs[cs.n] = cvs[cs.n] || []).push({ cv: c, cs: cs });
+    });
+    var cadre = document.createElement('img'); cadre.className = 'pcadre'; cadre.alt = ''; st.appendChild(cadre);   /* cadre PNG par-dessus */
+    chargerImage(etat.evt.id, m.cadre, false).then(function (im) { if (im) cadre.src = im.src; });
+    st.appendChild(cp0); st.appendChild(fl0);
+    return { cvs: cvs, k: k };
+  }
   function prendre(m) {
     ecran('s-prise'); var cases = (m.cases || []).slice().sort(function (a, b) { return a.n - b.n; });
+    $('s-prise').style.background = (etat.evt.accueil && etat.evt.accueil.couleur) || '#fff';
+    var sc = bâtirScene(m), actif = 1, vivant = true;
     var poses = Math.max(1, cases.reduce(function (t, c) { return Math.max(t, c.n); }, 0)), photos = [], cap = etat.evt.capture || { premier: 7, suivants: 3 };
+    var source = function () { return reflex() ? $('p-live') : $('p-video'); };
+    (function boucle() {                                           /* ~30 images/s : le flux vivant dans la case en cours */
+      if (!vivant || etat.ecran !== 's-prise') return;
+      (sc.cvs[actif] || []).forEach(function (o) { dessinerCase(o.cv, source(), !reflex()); });
+      requestAnimationFrame(boucle);
+    })();
     var suite = Camera.demarrer().catch(function () { toast('Appareil photo introuvable'); throw new Error('cam'); });
     var une = function (i) {
-      $('p-pose').textContent = poses > 1 ? 'Photo ' + (i + 1) + ' / ' + poses : '';
+      actif = i + 1; $('p-pose').textContent = poses > 1 ? 'Photo ' + (i + 1) + ' / ' + poses : '';
+      var o = (sc.cvs[actif] || [])[0], cp = $('p-compte');
+      if (o) { cp.style.left = (o.cs.x + o.cs.w / 2) * sc.k + 'px'; cp.style.top = (o.cs.y + o.cs.h / 2) * sc.k + 'px'; cp.style.fontSize = Math.max(60, Math.min(o.cs.w, o.cs.h) * sc.k * 0.55) + 'px'; }
       return compteARebours(i === 0 ? cap.premier : cap.suivants).then(function () {
         var f = $('p-flash'); f.classList.add('on'); setTimeout(function () { f.classList.remove('on'); }, 80);
         return Camera.photo();
-      }).then(function (c) { photos.push(c); });
+      }).then(function (c) {
+        photos.push(c);
+        (sc.cvs[actif] || []).forEach(function (o) { dessinerCase(o.cv, c, false); });     /* la photo prise reste figée dans sa case */
+        actif = 0;                                                                         /* plus de flux jusqu'à la pose suivante */
+        return attendre(i < poses - 1 ? 700 : 1200);
+      });
     };
     for (var i = 0; i < poses; i++) (function (i) { suite = suite.then(function () { return une(i); }); })(i);
-    suite.then(function () { Camera.arreter(); return composer(m, photos); }).then(function (res) { partage(m, res, photos); })
-      .catch(function (e) { if (e.message !== 'cam') toast('Erreur : ' + e.message); afficherAccueil(); });
+    suite.then(function () { vivant = false; Camera.arreter(); return composer(m, photos); }).then(function (res) { partage(m, res, photos); })
+      .catch(function (e) { vivant = false; if (e.message !== 'cam') toast('Erreur : ' + e.message); afficherAccueil(); });
   }
   /* photo finale : fond, photos dans les cases (recadrées sans déformation), cadre PNG par-dessus */
   function composer(m, photos) {

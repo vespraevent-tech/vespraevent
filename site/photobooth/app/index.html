@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#FFFFFF">
 <title>Vespra Event Photobooth</title>
 <link rel="icon" type="image/png" sizes="32x32" href="/videobooth/icones/favicon-32.png?v=3">
-<link rel="stylesheet" href="app.css?v=1">
+<link rel="stylesheet" href="app.css?v=2">
 </head>
 <body>
 <!-- 1. connexion de la borne (une seule fois : elle reste connectée 1 an) -->
@@ -58,8 +58,7 @@
   <video id="p-video" playsinline muted autoplay></video>
   <img id="p-live" alt="">
   <div id="p-pose" class="pose"></div>
-  <div id="p-compte" class="compte"></div>
-  <div id="p-flash" class="flash"></div>
+  <div id="p-stage" class="pstage"><div id="p-compte" class="compte"></div><div id="p-flash" class="flash"></div></div>
 </section>
 
 <!-- 6. partage : photo + QR code + impression -->
@@ -130,6 +129,6 @@
 <iframe id="impr" title="impression" aria-hidden="true"></iframe>
 
 <script src="/videobooth/qr.js?v=1"></script>
-<script src="app.js?v=3"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>
