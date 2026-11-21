@@ -17,8 +17,11 @@ try { R = { ...R, ...JSON.parse(fs.readFileSync(fichierReglages(), 'utf8')) }; }
 const sauver = () => { try { fs.mkdirSync(path.dirname(fichierReglages()), { recursive: true }); fs.writeFileSync(fichierReglages(), JSON.stringify(R, null, 2)); } catch {} };
 
 let fen = null, appareil = '', imprimantes = [];
+/* pilote Canon intégré (USB direct) ; digiCamControl reste un repli si le pilote USB Windows n'est pas prêt */
+let canon = null; try { canon = require('./canon.js').creer(); } catch (e) { console.error('canon.js', e.message); }
+let canonMsg = '';
 const propre = (s) => String(s || 'Evenement').replace(/[<>:"/\\|?*\x00-\x1f]/g, '').replace(/\s+/g, ' ').trim().slice(0, 80) || 'Evenement';
-const etat = () => ({ version: app.getVersion(), appareil, imprimante: R.imprimante, imprimanteBandes: R.imprimanteBandes, dossier: R.dossier, demarrageAuto: R.demarrageAuto });
+const etat = () => ({ version: app.getVersion(), appareil, imprimante: R.imprimante, imprimanteBandes: R.imprimanteBandes, erreurCanon: canonMsg || (canon ? require('./canon.js').derniereErreur() : ''), dossier: R.dossier, demarrageAuto: R.demarrageAuto });
 const pause = (ms) => new Promise((r) => setTimeout(r, ms));
 async function dcc(q, type = 'text', ms = 4000) {
   const c = new AbortController(), t = setTimeout(() => c.abort(), ms);
@@ -53,6 +56,11 @@ function creerFenetre() {
 
 /* ── appareil photo (digiCamControl) ── */
 async function detecter() {
+  if (canon) {
+    try { if (await canon.connecter()) { canonMsg = ''; if (appareil !== canon.nom()) { appareil = canon.nom(); if (fen) fen.webContents.send('etat', etat()); } return; } }
+    catch (e) { canonMsg = e.message; }
+    if (canon.nom() === '' && appareil && !appareil.includes('digiCam') && !/\(digiCamControl\)/.test(appareil)) { appareil = ''; if (fen) fen.webContents.send('etat', etat()); }
+  }
   const r = await dcc('/?slc=get&param1=camera&param2=', 'text', 2500);
   const avant = appareil;
   appareil = r == null ? '' : (r && r !== '-' && !/^</.test(r) ? r : 'Reflex Canon (digiCamControl)');
@@ -68,12 +76,14 @@ async function lancerDcc() {
 }
 
 ipcMain.on('etat', (e) => { e.returnValue = etat(); });
-ipcMain.handle('visee', async (_e, on) => { await dcc(on ? '/?CMD=LiveViewWnd_Show' : '/?CMD=LiveViewWnd_Hide'); return true; });
+ipcMain.handle('visee', async (_e, on) => { if (canon && canon.nom()) { if (!on) await canon.arreterVisee().catch(() => {}); return true; } await dcc(on ? '/?CMD=LiveViewWnd_Show' : '/?CMD=LiveViewWnd_Hide'); return true; });
 ipcMain.handle('image-visee', async () => {
+  if (canon && canon.nom()) { try { const j = await canon.viseeImage(); return j ? 'data:image/jpeg;base64,' + j.toString('base64') : null; } catch { return null; } }
   const b = await dcc('/liveview.jpg?t=' + Date.now(), 'bin', 1500);
   return b && b.length > 500 ? 'data:image/jpeg;base64,' + b.toString('base64') : null;
 });
 ipcMain.handle('declencher', async () => {
+  if (canon && canon.nom()) { try { return { ok: true, octets: await canon.declencher() }; } catch (e) { return { ok: false, erreur: e.message }; } }
   const dossierCapture = path.join(R.dossier, '_capture');
   fs.mkdirSync(dossierCapture, { recursive: true });
   await dcc('/?slc=set&param1=session.folder&param2=' + encodeURIComponent(dossierCapture));
@@ -105,6 +115,7 @@ ipcMain.handle('enregistrer', async (_e, evt, nom, octets) => {
   const d = path.join(R.dossier, propre(evt)); fs.mkdirSync(d, { recursive: true });
   fs.writeFileSync(path.join(d, propre(nom).replace(/[^\w.-]/g, '_')), Buffer.from(octets)); return true;
 });
+ipcMain.handle('preparer-appareil', async () => { await shell.openExternal('https://zadig.akeo.ie/'); return 'ok'; });   /* outil libre Zadig : accès USB direct au Canon, une fois par PC */
 ipcMain.handle('ouvrir-dossier', async (_e, evt) => { const d = path.join(R.dossier, propre(evt)); fs.mkdirSync(d, { recursive: true }); return shell.openPath(d); });
 ipcMain.handle('reglage', async (_e, k, v) => {
   if (!['dossier', 'demarrageAuto', 'imprimante', 'imprimanteBandes', 'pleinEcran'].includes(k)) return false;

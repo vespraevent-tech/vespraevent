@@ -1,19 +1,51 @@
 {
   "name": "vespra-event-photobooth",
   "productName": "Vespra Event Photobooth",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Application des bornes photobooth Vespra Event",
   "author": "Vespra Event",
   "main": "main.js",
   "private": true,
-  "scripts": { "start": "electron .", "dist": "electron-builder --win nsis --x64" },
-  "devDependencies": { "electron": "33.2.1", "electron-builder": "25.1.8" },
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis --x64"
+  },
+  "devDependencies": {
+    "electron": "33.2.1",
+    "electron-builder": "25.1.8"
+  },
   "build": {
     "appId": "com.vespraevent.photobooth",
     "productName": "Vespra Event Photobooth",
-    "files": ["main.js", "preload.js", "hors-ligne.html", "icone.png"],
-    "win": { "target": "nsis", "icon": "icone.png", "signAndEditExecutable": false },
-    "nsis": { "oneClick": true, "perMachine": false, "createDesktopShortcut": true, "shortcutName": "Vespra Event Photobooth", "runAfterFinish": true },
-    "directories": { "output": "dist" }
+    "files": [
+      "main.js",
+      "preload.js",
+      "canon.js",
+      "hors-ligne.html",
+      "icone.png",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "icone.png",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "shortcutName": "Vespra Event Photobooth",
+      "runAfterFinish": true
+    },
+    "directories": {
+      "output": "dist"
+    },
+    "asarUnpack": [
+      "node_modules/usb/**/*"
+    ],
+    "npmRebuild": false
+  },
+  "dependencies": {
+    "usb": "2.14.0"
   }
 }
