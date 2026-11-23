@@ -316,10 +316,12 @@
     } catch (e) {}
     if (angleEssaye || cfg.cam || !navigator.mediaDevices.enumerateDevices) return;
     angleEssaye = true;
+    /* tablette à deux caméras avant : la dernière (ex. « camera 2 ») est l'ultra grand-angle ; on la choisit une fois pour toutes (modifiable dans Réglages › Caméra) */
     navigator.mediaDevices.enumerateDevices().then(function (d) {
       var cur = (s.getVideoTracks()[0].getSettings() || {}).deviceId;
-      var w = d.filter(function (x) { return x.kind === 'videoinput' && /ultra|wide|large|0\.5/i.test(x.label || ''); })[0];
-      if (w && w.deviceId !== cur) { cfg.cam = w.deviceId; ouvrirCam(); cfg.cam = ''; }
+      var avant = d.filter(function (x) { return x.kind === 'videoinput' && !/back|arri/i.test(x.label || ''); });
+      var w = d.filter(function (x) { return x.kind === 'videoinput' && /ultra|wide|large|0\.5/i.test(x.label || ''); })[0] || (avant.length >= 2 ? avant[avant.length - 1] : null);
+      if (w && w.deviceId !== cur) { cfg.cam = w.deviceId; ecrireCfg(cfg); ouvrirCam(); }
     }).catch(function () {});
   }
   $('b-go').onclick = function () {
