@@ -274,8 +274,9 @@
              avecAcompte: r.devisAvecAcompte === true ? true : undefined, acomptePct: Number(r.devisAcomptePct) || undefined, cond: r.devisCond || null };
     } else {
       vu = r.factureClient || {};
-      var cl2 = (r.factureClient === undefined) ? depuisClient(demandeLiee) : null;
-      if (cl2) vu = { pro: cl2.pro, siret: cl2.siret, tvaClient: cl2.tvaClient, cond: (r.factureClient && r.factureClient.cond) || null };
+      /* rien de choisi sur la réservation (pas de type de client, ni SIRET ou RNA, ni TVA) : on reprend ce que le client a indiqué dans sa demande */
+      var cl2 = (vu.pro === undefined && !vu.siret && !vu.tvaClient) ? depuisClient(demandeLiee) : null;
+      if (cl2) vu = Object.assign({}, vu, { pro: cl2.pro, siret: cl2.siret, tvaClient: cl2.tvaClient, cond: (r.factureClient && r.factureClient.cond) || null });
     }
     /* fiche de la base clients : reprise de ce qui est déjà connu */
     clientsCharger();

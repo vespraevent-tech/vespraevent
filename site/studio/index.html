@@ -6252,7 +6252,7 @@ async function reporterAuPlanning(d, avant, chg){
     if(change('type')) r.typeEvenement = d.type || '';
     if(change('message')) r.messageClient = d.message || '';
     /* type de client, société, SIRET ou RNA, TVA : le devis et la facture de la réservation les reprennent */
-    if(change('clientType') || change('societe') || change('siret') || change('tva')){
+    {
       const proD = /entreprise|association|mairie|collectivit/i.test(String(d.clientType || ''));
       r.clientType = proD ? 'Entreprise ou association' : '';
       r.societe = proD ? (d.societe || '') : ''; r.siret = proD ? (d.siret || '') : ''; r.tva = proD ? (d.tva || '') : '';
@@ -10506,7 +10506,7 @@ checkSession();
 <script src="/studio/notefrais.js"></script>
 <script src="/studio/ik.js"></script>
 <script src="/adresse-autocomplete.js"></script>
-<script src="/studio/facture.js?v=2"></script>
+<script src="/studio/facture.js?v=3"></script>
 <script>
 /* ── Accueil ── */
 function acFr(iso){ if(!iso) return ''; const d=new Date(iso+'T12:00:00'); return isNaN(d)?'':d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); }
