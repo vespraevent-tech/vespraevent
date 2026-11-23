@@ -258,7 +258,9 @@
     arreterCam();
     var garde = !camSuspecte && fluxGarde && fluxGarde.getTracks().length && fluxGarde.getTracks().every(function (t) { return t.readyState === 'live'; }) ? fluxGarde : null;
     if (garde) { fluxGarde = null; clearTimeout(minuteurGarde); } else libererCamera();
-    (garde ? Promise.resolve(garde) : navigator.mediaDevices.getUserMedia(contraintes)).then(function (s) {
+    /* haute définition exigée d'abord (au moins 1280 px) ; si la caméra la refuse, on retombe sur la demande souple */
+    var dur = JSON.parse(JSON.stringify(contraintes)); dur.video = Object.assign({}, dur.video, paysage() ? { width: { min: 1280, ideal: 1920 }, height: { min: 720, ideal: 1440 } } : { width: { min: 720, ideal: 1440 }, height: { min: 1280, ideal: 1920 } });
+    (garde ? Promise.resolve(garde) : navigator.mediaDevices.getUserMedia(dur).catch(function (e) { if (e && (e.name === 'OverconstrainedError' || e.name === 'ConstraintNotSatisfiedError')) return navigator.mediaDevices.getUserMedia(contraintes); throw e; })).then(function (s) {
       flux = s; $('b-go').hidden = false; montrerPret(); $('fmt').hidden = !(cfg.choixFormat !== false) || testCam; majFormat(); $('cadrage').textContent = cfg.cadrage || ''; $('cadrage').hidden = !cfg.cadrage; $('v-src').srcObject = s; $('v-src').play().catch(function () {}); boucle = requestAnimationFrame(dessiner);
       grandAngle(s);
       camSuspecte = false; camEtat = 'ok'; tFige = Date.now(); brancherMicro(s); $('mic').hidden = false;
