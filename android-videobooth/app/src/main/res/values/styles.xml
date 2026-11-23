@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.Videobooth" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="28" xmlns:tools="http://schemas.android.com/tools">shortEdges</item>
+    </style>
+</resources>
