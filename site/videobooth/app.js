@@ -671,6 +671,7 @@ $('b-stop').onclick = arreterRec;
   }
   function sauverConnexion() { cfg.serveur = $('a-serveur').value.trim(); cfg.cam = $('a-cam').value; cfg.mic = $('a-mic').value; ecrireCfg(cfg); }
   $('a-serveur').onchange = $('a-cam').onchange = $('a-mic').onchange = sauverConnexion;
+  try { if (window.VespraAndroid && window.VespraAndroid.quitter) { $('adm-quitter').hidden = false; $('a-quitter').onclick = function () { if (confirm('Quitter le vidéobooth ?')) window.VespraAndroid.quitter(); }; } } catch (e) {}
   $('a-close').onclick = function () { sauverConnexion(); appliquerActif(); accueil(); synchro(); };
   $('e-retour').onclick = function () { lireEdition(); appliquerActif(); ouvrirAdmin(); };
   $('e-ok').onclick = function () { lireEdition(); appliquerActif(); ouvrirAdmin(); };

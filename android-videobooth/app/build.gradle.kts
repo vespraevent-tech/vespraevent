@@ -7,8 +7,8 @@ android {
         applicationId = "com.vespraevent.videobooth"
         minSdk = 24
         targetSdk = 34
-        versionCode = 5
-        versionName = "1.1.1"
+        versionCode = 6
+        versionName = "1.1.2"
         /* clé d'application : fournie au moment de compiler (jamais dans le dépôt) ; le site n'en garde que l'empreinte */
         val cleApp = System.getenv("VB_APP_KEY") ?: throw GradleException("Variable VB_APP_KEY manquante (clé d'application)")
         buildConfigField("String", "APP_KEY", "\"$cleApp\"")
