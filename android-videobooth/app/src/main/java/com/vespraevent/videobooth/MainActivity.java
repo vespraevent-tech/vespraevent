@@ -45,6 +45,7 @@ public class MainActivity extends Activity {
     /* Code pour quitter le mode tablette dédiée (le même que le menu du vidéobooth) */
     private static final String CODE_SORTIE = "0104";
     private WebView web;
+    private boolean libre = false;   /* après « Quitter » : plus d'épinglage, la tablette est utilisable normalement jusqu'au prochain démarrage de l'application */
     private boolean admin = false;   /* vrai dans les réglages du vidéobooth : la barre du système reste visible */
     private int touches = 0;
     private long premiereTouche = 0;
@@ -158,7 +159,26 @@ public class MainActivity extends Activity {
                 try { if (epingle()) stopLockTask(); } catch (Exception e) { }
                 try { startActivity(new Intent(Settings.ACTION_HOME_SETTINGS)); } catch (Exception e) { startActivity(new Intent(Settings.ACTION_SETTINGS)); }
             } })
-            .setNegativeButton("Annuler", null).show();
+            .setNegativeButton("Quitter l'application", new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface d, int w) {
+                if (!CODE_SORTIE.equals(code.getText().toString().trim())) { Toast.makeText(MainActivity.this, "Code incorrect", Toast.LENGTH_SHORT).show(); return; }
+                quitter();
+            } })
+            .show();
+    }
+
+    /* sortie complète : épinglage levé, barres visibles, et ouverture de l'écran d'accueil habituel de la tablette (Samsung One UI, sinon choix de l'application d'accueil) */
+    private void quitter() {
+        libre = true;
+        try { if (epingle()) stopLockTask(); } catch (Exception e) { }
+        plein();
+        Intent i = null;
+        try { i = getPackageManager().getLaunchIntentForPackage("com.sec.android.app.launcher"); } catch (Exception e) { }
+        try {
+            if (i != null) { i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); startActivity(i); }
+            else startActivity(new Intent(Settings.ACTION_HOME_SETTINGS));
+        } catch (Exception e) {
+            try { startActivity(new Intent(Settings.ACTION_SETTINGS)); } catch (Exception e2) { }
+        }
     }
 
     private boolean epingle() {
@@ -169,7 +189,7 @@ public class MainActivity extends Activity {
     /* Invités : barres masquées ET épinglage de l'application, ce qui empêche le balayage depuis le bas de faire apparaître la barre.
        Réglages (après le code) : épinglage levé, barre visible en permanence. */
     private void plein() {
-        if (admin) {
+        if (admin || libre) {
             try { if (epingle()) stopLockTask(); } catch (Exception e) { }
             if (Build.VERSION.SDK_INT >= 30) {
                 getWindow().setDecorFitsSystemWindows(true);
