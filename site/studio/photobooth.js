@@ -50,6 +50,78 @@
       + '.pb-accueil{position:relative;overflow:hidden;border-radius:10px;box-shadow:0 10px 30px -12px rgba(0,0,0,.35);background-size:cover;background-position:center;touch-action:none;user-select:none}.pb-acc-el{position:absolute;transform:translate(-50%,-50%);cursor:move}.pb-acc-bt{border-radius:50%;display:flex;align-items:center;justify-content:center}.pb-acc-coin{position:absolute;top:2.5%;width:4.2%;aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35)}'
       + '.pb-photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}.pb-photos figure{margin:0;background:#faf8f4;border:1px solid #e6e1d6;border-radius:10px;padding:8px}.pb-photos img{width:100%;max-height:240px;object-fit:contain;border-radius:6px;display:block}.pb-photos figcaption{font-size:12px;color:#6b7280;margin-top:6px}.pb-photos figcaption span{display:block;margin-top:3px}.pb-photos a{color:#14304f}.pb-champs input:focus,.pb-champs select:focus{outline:none!important;border-color:#14304f!important;box-shadow:0 0 0 3px rgba(20,48,79,.12)!important}.pb-vide{text-align:center;color:#6b7280;padding:28px 10px;font-size:13.5px}.pb-theme{}@media(max-width:700px){.pb-theme{grid-template-columns:1fr!important}}.pb-sous{display:flex;gap:4px;border-bottom:1px solid #e6e1d6;margin:0 0 14px}.pb-sous button{border:0;background:transparent;padding:10px 14px;font:600 14px Inter,sans-serif;color:#6b7280;cursor:pointer;border-bottom:3px solid transparent}.pb-sous button.on{color:#14304f;border-bottom-color:#B8893B}';
     document.head.appendChild(st);
+
+    var s2 = document.createElement('style'); s2.id = 'pbx-css';
+    s2.textContent = [
+      '#pbZone{--n:#2B4A6B;--nd:#16293E;--or:#F59E0B;--t:#0C0F14;--g:#646D7C;--l:rgba(12,15,20,.08);font-family:Inter,system-ui,sans-serif}',
+      /* liste des événements */
+      '#pbZone .pb-tete h2{font:700 24px Inter,sans-serif;letter-spacing:-.01em;color:var(--t)}',
+      '#pbZone .pb-titre-g{font:700 11px Inter,sans-serif;letter-spacing:.14em;color:#8a94a3;margin:26px 0 12px}',
+      '#pbZone .pb-grille{grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}',
+      '#pbZone .pb-carte{position:relative;border:1px solid var(--l);border-radius:18px;padding:20px 22px;box-shadow:0 6px 22px rgba(12,15,20,.04);transition:transform .2s,box-shadow .2s,border-color .2s}',
+      '#pbZone .pb-carte:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(12,15,20,.09);border-color:rgba(43,74,107,.35)}',
+      '#pbZone .pb-carte b{font:700 16px Inter,sans-serif;color:var(--t);padding-right:70px}',
+      '#pbZone .pb-carte span{font-size:13px;color:var(--g);margin-top:5px}',
+      '#pbZone .pb-carte .pbx-puce{position:absolute;top:18px;right:18px;margin:0;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:600}',
+      '.pbx-puce.on{background:#E8F5EC;color:#15803D}.pbx-puce.av{background:#EEF2F7;color:var(--n)}.pbx-puce.pa{background:#F0F2F5;color:#8a94a3}',
+      '#pbZone .pb-tete .btn{border-radius:999px;font-size:13px;padding:8px 16px;font-weight:600}',
+      /* un événement : barre du haut */
+      '.pbx-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--nd);color:#fff;border-radius:18px;padding:12px 16px 12px 12px;margin-bottom:16px}',
+      '.pbx-retour{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px 0 10px;border:0;border-radius:999px;background:rgba(255,255,255,.1);color:#fff;font:600 13px Inter,sans-serif;cursor:pointer;transition:background .2s}.pbx-retour:hover{background:rgba(255,255,255,.18)}',
+      '.pbx-retour svg{width:16px;height:16px}',
+      '.pbx-nom{font:700 17px Inter,sans-serif;letter-spacing:-.005em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.pbx-date{font-size:13px;color:rgba(255,255,255,.62);white-space:nowrap}',
+      '.pbx-etat{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.08);font-size:12px;font-weight:600;color:rgba(255,255,255,.8)}',
+      '.pbx-etat::before{content:"";width:8px;height:8px;border-radius:50%;background:#8a94a3}.pbx-etat.ok::before{background:#34D27B}.pbx-etat.att::before{background:var(--or)}',
+      '.pbx-etat[hidden]{display:none}',
+      '.pbx-act{margin-left:auto;display:flex;gap:8px}',
+      '.pbx-b{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;border:0;border-radius:999px;background:rgba(255,255,255,.1);color:#fff;font:600 13px Inter,sans-serif;cursor:pointer;transition:background .2s}.pbx-b:hover{background:rgba(255,255,255,.2)}.pbx-b svg{width:16px;height:16px}',
+      '.pbx-b.p{background:var(--or);color:#16293E}.pbx-b.p:hover{background:#f7ab2b}',
+      /* menu de l'événement */
+      '.pbx-corps{display:grid;grid-template-columns:240px minmax(0,1fr);gap:20px;align-items:start}',
+      '.pbx-nav{position:sticky;top:12px;background:#fff;border:1px solid var(--l);border-radius:18px;padding:10px;box-shadow:0 6px 22px rgba(12,15,20,.04)}',
+      '.pbx-nav .g{font:700 10.5px Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9aa1ad;padding:16px 12px 6px}',
+      '.pbx-nav .g:first-child{padding-top:6px}',
+      '.pbx-nav button{position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;background:transparent;padding:10px 12px;border-radius:11px;font:500 13.5px Inter,sans-serif;color:#3D4452;cursor:pointer;transition:background .15s,color .15s}',
+      '.pbx-nav button svg{width:19px;height:19px;flex:none;color:#8a94a3;transition:color .15s}',
+      '.pbx-nav button:hover{background:#F0F2F5;color:var(--t)}',
+      '.pbx-nav button.on{background:rgba(43,74,107,.08);color:var(--n);font-weight:600}.pbx-nav button.on svg{color:var(--n)}',
+      '.pbx-nav button.on::before{content:"";position:absolute;left:-10px;top:9px;bottom:9px;width:3px;border-radius:3px;background:var(--or)}',
+      '.pbx-main{min-width:0}',
+      '.pbx-titre{font:700 22px Inter,sans-serif;letter-spacing:-.01em;color:var(--t);margin:2px 0 16px}',
+      /* tableau de bord */
+      '.pbx-haut{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;margin-bottom:16px}',
+      '.pbx-carte{background:#fff;border:1px solid var(--l);border-radius:18px;padding:20px 22px;box-shadow:0 6px 22px rgba(12,15,20,.04);margin-bottom:16px}',
+      '.pbx-haut .pbx-carte{margin-bottom:0}',
+      '.pbx-carte h3{margin:0 0 12px;font:700 15px Inter,sans-serif;color:var(--t)}',
+      '#pbCompteurs{display:grid!important;grid-template-columns:repeat(3,1fr);gap:8px;margin:0}',
+      '#pbCompteurs div{background:none!important;border:0!important;padding:0!important;text-align:left}',
+      '#pbCompteurs b{display:block;font:700 34px Inter,sans-serif;letter-spacing:-.02em;color:var(--n);line-height:1.1}',
+      '#pbCompteurs span{display:block;margin-top:4px;font-size:12.5px;color:var(--g)}',
+      '.pbx-lien-l{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.pbx-lien-l h3{margin:0}',
+      '.pbx-url{display:flex;gap:8px}.pbx-url input{flex:1;min-width:0;height:42px;border:1px solid rgba(12,15,20,.12);border-radius:12px;padding:0 14px;font:13px Inter,sans-serif;color:#3D4452;background:#F7F8FA}',
+      '.pbx-url button{flex:none;height:42px;padding:0 18px;border:0;border-radius:12px;background:var(--n);color:#fff;font:600 13px Inter,sans-serif;cursor:pointer}.pbx-url button:hover{background:#1e3650}',
+      '.pbx-acts{display:flex;gap:6px;flex-wrap:wrap;padding:4px 0 14px;margin-bottom:16px;border-bottom:1px solid var(--l)}',
+      '.pbx-acts button{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:92px;padding:10px 12px;border:0;border-radius:12px;background:transparent;color:#3D4452;font:500 12.5px Inter,sans-serif;cursor:pointer;transition:background .15s,color .15s}',
+      '.pbx-acts button svg{width:22px;height:22px;color:var(--n)}.pbx-acts button:hover{background:#fff;color:var(--t)}',
+      '.pbx-acts button.d svg,.pbx-acts button.d{color:#B91C1C}.pbx-acts button.d:hover{background:#FEF2F2}',
+      '.pbx-acts .sp{flex:1}',
+      '.pbx-det summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font:700 15px Inter,sans-serif;color:var(--t)}.pbx-det summary::-webkit-details-marker{display:none}',
+      '.pbx-det summary svg{width:18px;height:18px;color:var(--g);transition:transform .2s}.pbx-det[open] summary svg{transform:rotate(180deg)}',
+      '.pbx-det[open] summary{margin-bottom:14px}',
+      '.pbx-sync{font-size:13px;line-height:1.7;color:#3D4452}',
+      '#pbZone .pb-photos{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}',
+      '#pbZone .pb-photos figure{border:1px solid var(--l);border-radius:14px;overflow:hidden;background:#fff}',
+      /* sections de l'événement : mêmes cartes douces qu'au tableau de bord */
+      '.pbx-main .pb-bloc{border:1px solid var(--l);border-radius:18px;padding:20px 22px;box-shadow:0 6px 22px rgba(12,15,20,.04);margin-bottom:16px}',
+      '.pbx-main .pb-bloc h3{font:700 15px Inter,sans-serif;color:var(--t)}',
+      '.pbx-main .btn{border-radius:999px}',
+      '.pb-mp{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}.pb-mp-c{border:1px solid var(--l)!important;border-radius:16px!important;box-shadow:0 6px 22px rgba(12,15,20,.04)}',
+      '.pb-mp-c .pb-actions{gap:6px;flex-wrap:wrap}.pb-mp-c .btn{padding:6px 12px;font-size:12px}',
+      '@media(max-width:1000px){.pbx-haut{grid-template-columns:1fr}}',
+      '@media(max-width:860px){.pbx-corps{grid-template-columns:1fr}.pbx-nav{position:static;display:flex;gap:4px;overflow-x:auto;padding:8px}.pbx-nav .g{display:none}.pbx-nav button{white-space:nowrap;width:auto;padding:9px 12px}.pbx-nav button.on::before{display:none}.pbx-act{margin-left:0;width:100%}.pbx-b{flex:1;justify-content:center}.pbx-date{display:none}}'
+    ].join('');
+    document.head.appendChild(s2);
     if (typeof vbPolicesCss === 'function') vbPolicesCss();
   }
   var sw = function (id, on, oc) { return '<span class="pb-sw"><input type="checkbox" id="' + id + '"' + (on ? ' checked' : '') + (oc ? ' onchange="' + oc + '"' : '') + '><i></i></span>'; };
@@ -71,7 +143,7 @@
     /* ordre chronologique : à venir du plus proche au plus lointain, passés du plus récent au plus ancien, sans date à la fin */
     var parDate = function (e) { return e.date || e.fin || ''; }, croiss = function (a, b) { return !parDate(a) ? 1 : !parDate(b) ? -1 : parDate(a).localeCompare(parDate(b)); };
     var enCours = PB.liste.filter(function (e) { return !termine(e); }).sort(croiss), passes = PB.liste.filter(termine).sort(function (a, b) { return -croiss(a, b) || 0; });
-    var carte = function (e) { return '<button type="button" class="pb-carte" onclick="pbEvt(\'' + e.id + '\')"><b>' + esc(e.nom) + '</b><span>' + (e.date ? dateFr(e.date) : 'Date à préciser') + '</span><span>' + e.misesEnPage + ' mise' + (e.misesEnPage > 1 ? 's' : '') + ' en page · ' + e.photos + ' photo' + (e.photos > 1 ? 's' : '') + '</span></button>'; };
+    var carte = function (e) { var d0 = e.date || '', f0 = e.fin || e.date || '', j = aujourdhui(), etat = termine(e) ? ['pa', 'Terminé'] : (d0 && d0 <= j && f0 >= j) ? ['on', 'En cours'] : ['av', 'À venir']; return '<button type="button" class="pb-carte" onclick="pbEvt(\'' + e.id + '\')"><span class="pbx-puce ' + etat[0] + '">' + etat[1] + '</span><b>' + esc(e.nom) + '</b><span>' + (e.date ? dateFr(e.date) : 'Date à préciser') + '</span><span>' + e.misesEnPage + ' mise' + (e.misesEnPage > 1 ? 's' : '') + ' en page · ' + e.photos + ' photo' + (e.photos > 1 ? 's' : '') + '</span></button>'; };
     z.innerHTML = '<div class="pb-tete"><h2>Photobooth</h2><span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><a class="btn btn-ghost" style="padding:5px 12px;font-size:12.5px" href="/photobooth/app/?liste" target="_blank" rel="noopener">Ouvrir l’appli des bornes</a><button class="btn btn-ghost" style="padding:5px 12px;font-size:12.5px" onclick="pbNouveau()">+ Créer un événement</button></span></div>'
       + (PB.nouveau ? '<div class="pb-bloc"><h3>Nouvel événement</h3><div class="pb-champs">' + champ('pbn-q', 'Nom de la cliente', '', 'Tapez un nom : recherche dans les réservations du planning', 'text', ' autocomplete="off" oninput="pbFiltrer()"') + '</div><div id="pbn-res" style="margin-top:12px"></div><p class="aide" style="font-size:12.5px;color:#6b7280;margin:10px 0 0">Pas dans le planning ? <a href="#" onclick="pbManuel();return false" style="color:#14304f">Créer sans réservation</a></p>' + (PB.manuel ? '<div class="pb-champs" style="margin-top:8px">' + champ('pbn-nom', 'Nom de l’événement', '', 'Mariage de Sylvie & Paul') + champ('pbn-date', 'Date', '', '', 'date') + '</div><div class="pb-actions" style="margin-top:10px"><button class="btn" onclick="pbCreer()">Créer l’événement</button></div>' : '') + '<div class="pb-actions" style="margin-top:10px"><button class="btn btn-ghost" onclick="pbNouveau(false)">Annuler</button></div></div>' : '')
       + (PB.liste.some(function (e) { return e.auto; }) ? '<div class="pb-actions" style="margin:0 0 10px"><button class="btn btn-ghost" style="color:#b03a2a" onclick="pbAutoSuppr()">Supprimer les événements créés automatiquement (' + PB.liste.filter(function (e) { return e.auto; }).length + ')</button></div>' : '') + '<div class="pb-titre-g">En cours et à venir</div>' + (enCours.length ? '<div class="pb-grille">' + enCours.map(carte).join('') + '</div>' : '<div class="pb-vide">Aucun événement en cours. Créez-en un avec « Nouvel événement ».</div>')
@@ -132,10 +204,31 @@
   }
 
   /* ───────── un événement ───────── */
+
+  var IC = {
+    tableau: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+    experience: '<path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/>',
+    capture: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+    accueil: '<rect x="6" y="3" width="12" height="18" rx="2"/><path d="M11 18h2"/>',
+    ecran: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M10 10v10"/>',
+    partage: '<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>',
+    impression: '<path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-4a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v4a2 2 0 0 1-2 2h-2"/><rect x="7" y="14" width="10" height="7" rx="1"/>',
+    galerie: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 8"/>',
+    retour: '<path d="M15 6l-6 6 6 6"/>', lien: '<path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',
+    oeil: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+    corbeille: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>', reglage: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+    bas: '<path d="M6 9l6 6 6-6"/>'
+  };
+  function ic(k) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (IC[k] || '') + '</svg>'; }
   var SECTIONS = [['tableau', 'Tableau de bord', ''], ['experience', 'Expérience photobooth', 'Basique'], ['capture', 'Paramètres de capture', ''], ['accueil', 'Écran d’accueil', 'Avancé'], ['ecran', 'Écran de partage', ''], ['partage', 'Paramètres de partage', 'Impression et partage'], ['impression', 'Paramètres d’impression', ''], ['galerie', 'Galerie en ligne', '']];
   function rendreEvt(z) {
-    var nav = SECTIONS.map(function (s) { return (s[2] ? '<div class="g">' + s[2] + '</div>' : '') + '<button type="button" class="' + (PB.section === s[0] ? 'on' : '') + '" onclick="pbSection(\'' + s[0] + '\')">' + s[1] + '</button>'; }).join('');
-    z.innerHTML = '<div class="pb-tete"><div><button class="btn btn-ghost" style="padding:5px 11px;font-size:12.5px;margin-bottom:6px" onclick="pbRetour()">‹ Retour aux événements</button><h2>' + esc(PB.evt.nom) + '</h2></div></div><div class="pb-evt"><nav class="pb-nav">' + nav + '</nav><div id="pbContenu"></div></div>';
+    var nav = SECTIONS.map(function (x) { return (x[2] ? '<div class="g">' + x[2] + '</div>' : (x[0] === 'tableau' ? '' : '')) + '<button type="button" class="' + (PB.section === x[0] ? 'on' : '') + '" onclick="pbSection(\'' + x[0] + '\')">' + ic(x[0]) + '<span>' + x[1] + '</span></button>'; }).join('');
+    var e = PB.evt;
+    z.innerHTML = '<div class="pbx-bar"><button type="button" class="pbx-retour" onclick="pbRetour()">' + ic('retour') + 'Événements</button>'
+      + '<div class="pbx-nom" title="' + esc(e.nom) + '">' + esc(e.nom) + '</div>' + (e.date ? '<div class="pbx-date">' + dateFr(e.date) + '</div>' : '')
+      + '<span class="pbx-etat' + (PB.etatSync ? ' ' + PB.etatSync[0] : '') + '" id="pbxEtat"' + (PB.etatSync ? '' : ' hidden') + '>' + (PB.etatSync ? PB.etatSync[1] : '') + '</span>'
+      + '<div class="pbx-act"><button type="button" class="pbx-b" onclick="pbLienCopier()">' + ic('partage') + 'Partager</button><button type="button" class="pbx-b p" onclick="pbLienOuvrir()">' + ic('oeil') + 'Prévisualiser</button></div></div>'
+      + '<div class="pbx-corps"><nav class="pbx-nav">' + nav + '</nav><div id="pbContenu" class="pbx-main"></div></div>';
     var c = $('pbContenu');
     ({ tableau: secTableau, experience: secExperience, capture: secCapture, accueil: secAccueil, ecran: secEcran, partage: secPartage, impression: secImpression, galerie: secGalerie })[PB.section](c);
   }
@@ -144,15 +237,18 @@
   /* tableau de bord */
   function secTableau(c) {
     var e = PB.evt;
-    c.innerHTML = '<div id="pbSync" class="pb-bloc" style="margin-bottom:12px;padding:12px 16px;font-size:13px">Synchronisation des photobooths : vérification…</div><div class="pb-compteurs" id="pbCompteurs"><div><b>…</b><span>Photos prises</span></div><div><b>…</b><span>Photos imprimées</span></div><div><b>…</b><span>QR codes scannés</span></div></div>'
-      + (e.auto && e.auto.resa ? '<p class="aide" style="color:#6b7280;font-size:13px;margin:10px 0 0">Créé automatiquement depuis la réservation du planning.</p>' : '')
-      + '<div class="pb-bloc" style="margin-top:14px"><h3>Informations</h3><div class="pb-champs">' + champ('pbi-nom', 'Nom de l’événement', e.nom) + champ('pbi-date', 'Date', e.date, '', 'date') + champ('pbi-fin', 'Dernier jour', e.fin, '', 'date') + champ('pbi-mdp', 'Mot de passe des photobooths (facultatif)', e.mdp, 'Pour ouvrir l’événement sur un photobooth') + '</div>'
+    c.innerHTML = '<div class="pbx-titre">Tableau de bord</div>'
+      + '<div class="pbx-haut"><div class="pbx-carte"><h3>Aujourd’hui</h3><div id="pbCompteurs"><div><b>…</b><span>Photos prises</span></div><div><b>…</b><span>Photos imprimées</span></div><div><b>…</b><span>QR codes scannés</span></div></div></div>'
+      + '<div class="pbx-carte"><div class="pbx-lien-l"><h3>Partager avec un lien</h3>' + sw('pbi-lien', e.galerie.lien, 'pbLienBasculer(this.checked)') + '</div>'
+      + '<div class="pbx-url"><input readonly id="pbi-url" value="' + (e.galerie.lien ? 'Chargement…' : 'Activez le lien pour le partager') + '" onclick="this.select()"><button type="button" onclick="pbLienCopier()">Copier</button></div></div></div>'
+      + '<div class="pbx-acts"><button type="button" onclick="pbLienOuvrir()">' + ic('galerie') + 'Ouvrir la galerie</button><button type="button" onclick="pbSection(\'galerie\')">' + ic('lien') + 'Réglages du lien</button>'
+      + '<button type="button" onclick="var d=document.getElementById(\'pbInfos\');d.open=true;d.scrollIntoView({behavior:\'smooth\',block:\'center\'})">' + ic('reglage') + 'Informations</button><span class="sp"></span><button type="button" class="d" onclick="pbSupprimer()">' + ic('corbeille') + 'Supprimer l’événement</button></div>'
+      + (e.auto && e.auto.resa ? '<p style="color:#6b7280;font-size:13px;margin:-6px 0 14px">Créé automatiquement depuis la réservation du planning.</p>' : '')
+      + '<div class="pbx-carte"><h3 style="margin-bottom:14px">Photos <span style="font-weight:400;color:#8a94a3;font-size:12px">· mise à jour en direct</span></h3><div id="pbPhotos"><div class="pb-vide">Chargement…</div></div></div>'
+      + '<details class="pbx-carte pbx-det" id="pbInfos"><summary>Informations de l’événement' + ic('bas') + '</summary><div class="pb-champs">' + champ('pbi-nom', 'Nom de l’événement', e.nom) + champ('pbi-date', 'Date', e.date, '', 'date') + champ('pbi-fin', 'Dernier jour', e.fin, '', 'date') + champ('pbi-mdp', 'Mot de passe des photobooths (facultatif)', e.mdp, 'Pour ouvrir l’événement sur un photobooth') + '</div>'
       + ligne('Événement ouvert sur les photobooths', 'Décochez pour le retirer des photobooths sans le supprimer', sw('pbi-actif', e.actif !== false))
-      + '<div class="pb-actions" style="margin-top:8px"><button class="btn" onclick="pbInfosSauver()">Enregistrer</button></div></div>'
-      + '<div class="pb-bloc"><h3>Partager avec un lien</h3>' + ligne('Lien de l’événement', 'Toute personne qui a le lien voit la galerie (réglable dans « Galerie en ligne »)', sw('pbi-lien', e.galerie.lien, 'pbLienBasculer(this.checked)'))
-      + '<div class="pb-champs"><label>Lien<input readonly id="pbi-url" value="' + (e.galerie.lien ? 'Chargement…' : 'Activez le lien ci-dessus') + '" onclick="this.select()"></label></div><div class="pb-actions" style="margin-top:8px"><button class="btn btn-ghost" onclick="pbLienCopier()">Copier le lien</button><button class="btn btn-ghost" onclick="pbLienOuvrir()">Ouvrir la galerie</button></div></div>'
-      + '<div class="pb-bloc"><div class="pb-actions"><button class="btn btn-ghost" style="color:#b03a2a" onclick="pbSupprimer()">Supprimer l’événement</button></div></div>'
-      + '<div class="pb-bloc"><h3>Photos <span style="font-weight:400;color:#6b7280;font-size:12px">(mise à jour en direct)</span></h3><div id="pbPhotos"><div class="pb-vide">Chargement…</div></div></div>';
+      + '<div class="pb-actions" style="margin-top:8px"><button class="btn" onclick="pbInfosSauver()">Enregistrer</button></div></details>'
+      + '<details class="pbx-carte pbx-det"><summary>Synchronisation des photobooths' + ic('bas') + '</summary><div id="pbSync" class="pbx-sync">Vérification…</div></details>';
     pbPhotosCharger();
   }
   var pbLien = '';
@@ -167,6 +263,8 @@
     if (zs) {
       var heure = function (t) { return new Date(t).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' }); };
       var vu = sy.vu, aJour = vu && vu.maj === sy.serveur, recent = vu && Date.now() - vu.t < 60000;
+      var et = !vu ? ['', 'Photobooth non connecté'] : (aJour && recent) ? ['ok', 'Photobooth à jour'] : recent ? ['att', 'Synchronisation en cours'] : ['', 'Photobooth hors ligne'];
+      PB.etatSync = et; var pe = $('pbxEtat'); if (pe) { pe.hidden = false; pe.className = 'pbx-etat' + (et[0] ? ' ' + et[0] : ''); pe.textContent = et[1]; }
       zs.innerHTML = '<b>Serveur :</b> ' + (sy.cadres || 0) + ' cadre(s), modifié le ' + (sy.serveur ? heure(sy.serveur) : '—') + '<br><b>Photobooth :</b> '
         + (!vu ? '<span style="color:#6b7280">aucun photobooth n’a encore ouvert cet événement</span>'
           : (aJour ? '<span style="color:#2a7a4b">✓ à jour</span>' : '<span style="color:#b03a2a">pas encore à jour (il a la version du ' + (vu.maj ? heure(vu.maj) : '—') + ')</span>') + ' · dernier contact ' + heure(vu.t) + (recent ? '' : ' <span style="color:#8a6a1a">(photobooth éteint ou hors ligne ?)</span>'));
@@ -190,8 +288,15 @@
     if (!confirm('Supprimer cette photo (encadrée et brutes) ? Elle disparaîtra aussi de la galerie des invités.')) return;
     try { await api('/photobooth/photo?evt=' + PB.evt.id + '&prise=' + prise, { method: 'DELETE' }); toast('Photo supprimée'); $('pbPhotos').dataset.sig = ''; pbPhotosCharger(); } catch (x) { toast('Échec : ' + x.message, true); }
   };
-  window.pbLienCopier = function () { if (!pbLien || !PB.evt.galerie.lien) return toast('Activez d’abord le lien', true); navigator.clipboard.writeText(pbLien).then(function () { toast('Lien copié'); }); };
-  window.pbLienOuvrir = function () { if (!pbLien || !PB.evt.galerie.lien) return toast('Activez d’abord le lien', true); window.open(pbLien, '_blank', 'noopener'); };
+  /* le lien se lit à la demande : « Partager » et « Prévisualiser » marchent depuis toutes les pages de l'événement */
+  async function lienPret() {
+    if (!PB.evt.galerie.lien) { toast('Activez d’abord le lien (Tableau de bord › Partager avec un lien)', true); return ''; }
+    if (!pbLien) { try { var r = await api('/photobooth/photos?evt=' + PB.evt.id); pbLien = r.lien || ''; } catch (x) {} }
+    if (!pbLien) toast('Lien indisponible pour le moment', true);
+    return pbLien;
+  }
+  window.pbLienCopier = async function () { var l = await lienPret(); if (l) navigator.clipboard.writeText(l).then(function () { toast('Lien copié'); }); };
+  window.pbLienOuvrir = async function () { var l = await lienPret(); if (l) window.open(l, '_blank', 'noopener'); };
   window.pbInfosSauver = function () {
     var e = PB.evt; e.nom = val('pbi-nom').trim() || e.nom; e.date = val('pbi-date'); e.fin = val('pbi-fin'); e.mdp = val('pbi-mdp').trim(); e.actif = coche('pbi-actif');
     enregistrer('Informations enregistrées').then(rendre);
