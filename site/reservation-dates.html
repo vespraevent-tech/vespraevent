@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Réserver — Vespra Event</title>
+<link rel="icon" href="/favicon.ico?v=11" sizes="any">
+<link rel="preload" as="font" type="font/woff2" href="/polices/bebas-neue-400-latin.woff2" crossorigin>
+<style>
+@font-face{font-family:'Bebas Neue';src:url(/polices/bebas-neue-400-latin.woff2) format('woff2');font-display:swap}
+:root{--navy:#2B4A6B;--navy-h:#1e3650;--black:#0C0F14;--g1:#3D4452;--g2:#646D7C;--g3:#C8CDD8;--g4:#F0F2F5;--gold:#F59E0B;--ok:#15803D;--r:14px;--rl:22px}
+*{box-sizing:border-box}
+html,body{margin:0;background:#fff;color:var(--black);font-family:Inter,system-ui,-apple-system,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+a{color:inherit}
+.top{display:flex;align-items:center;justify-content:space-between;padding:18px clamp(16px,4vw,48px);border-bottom:1px solid rgba(12,15,20,.08)}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.02em;color:var(--navy);text-decoration:none}
+.top small{font-size:12px;color:var(--g2)}
+.wrap{max-width:1180px;margin:0 auto;padding:34px clamp(16px,4vw,32px) 80px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:34px}
+.st{border-top:3px solid var(--g3);padding-top:10px;font-size:13px;font-weight:600;color:var(--g2);display:flex;gap:8px;align-items:center;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;cursor:default}
+.st em{font-style:normal;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;background:var(--g4);color:var(--g2)}
+.st.on{border-color:var(--gold);color:var(--black)}.st.on em{background:var(--gold);color:#fff}
+.st.ok{border-color:var(--navy);color:var(--black);cursor:pointer}.st.ok em{background:var(--navy);color:#fff}
+.kick{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--navy);margin:0 0 10px}
+h1{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:clamp(36px,5vw,56px);line-height:.95;margin:0 0 10px}
+h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);text-transform:none}
+.sub{color:var(--g2);font-size:15px;line-height:1.6;margin:0 0 28px;max-width:620px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:32px;align-items:start}
+.grid>*{min-width:0}
+.card{background:#fff;border:1px solid rgba(12,15,20,.08);border-radius:var(--rl);padding:24px;box-shadow:0 10px 34px rgba(12,15,20,.05)}
+/* calendrier */
+.cal-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-h b{font-size:15px;text-transform:capitalize}
+.nav{width:36px;height:36px;border-radius:50%;border:1px solid rgba(12,15,20,.12);background:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.nav:disabled{opacity:.3;cursor:default}.nav svg{width:16px;height:16px}
+.mois{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.m-t{text-align:center;font-weight:700;font-size:14px;text-transform:capitalize;margin-bottom:10px}
+.jours{display:grid;grid-template-columns:repeat(7,1fr);row-gap:4px}
+.jours span{font-size:11px;color:var(--g2);text-align:center;padding:6px 0;font-weight:600}
+.j{all:unset;box-sizing:border-box;height:40px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;position:relative;z-index:0}
+.j:focus-visible{outline:2px solid var(--navy);outline-offset:-2px;border-radius:10px}
+.j.vide{cursor:default}
+.j.passe{color:#b9bfca;cursor:not-allowed;text-decoration:line-through}
+.j.entre::before{content:"";position:absolute;inset:2px 0;background:rgba(43,74,107,.09);z-index:-1}
+.j.deb::before,.j.fin::before{content:"";position:absolute;inset:2px 0;background:rgba(43,74,107,.09);z-index:-1}
+.j.deb::before{left:50%}.j.fin::before{right:50%}.j.deb.fin::before{display:none}
+.j.deb::after,.j.fin::after{content:"";position:absolute;width:38px;height:38px;border-radius:50%;background:var(--navy);z-index:-1}
+.j.deb,.j.fin{color:#fff;font-weight:700}
+.j:not(.passe):not(.vide):not(.deb):not(.fin):hover::after{content:"";position:absolute;width:38px;height:38px;border-radius:50%;border:1px solid var(--navy);z-index:-1}
+.j.auj{font-weight:700;color:var(--navy)}
+.dates{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 22px}
+.dt{border:1px solid rgba(12,15,20,.12);border-radius:var(--r);padding:12px 14px;background:#fff;text-align:left;cursor:pointer}
+.dt small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--g2);margin-bottom:4px}
+.dt b{font-size:15px;font-weight:600}.dt.on{border-color:var(--navy);box-shadow:0 0 0 1px var(--navy)}
+.dt b.ph{color:#9aa1ad;font-weight:500}
+.sec-t{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--g2);margin:28px 0 12px}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mode{border:1px solid rgba(12,15,20,.12);border-radius:var(--r);padding:16px;background:#fff;text-align:left;cursor:pointer;display:flex;gap:12px;align-items:flex-start;transition:border-color .2s}
+.mode svg{width:22px;height:22px;color:var(--navy);flex:none;margin-top:1px}
+.mode b{display:block;font-size:14px;margin-bottom:3px}.mode span{font-size:12.5px;color:var(--g2);line-height:1.5}
+.mode.on{border-color:var(--navy);box-shadow:0 0 0 1px var(--navy);background:rgba(43,74,107,.03)}
+/* boutons */
+.actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:26px}
+.btn{display:inline-flex;align-items:center;justify-content:center;height:46px;padding:0 26px;border-radius:999px;border:1px solid var(--navy);background:var(--navy);color:#fff;font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:background .2s,opacity .2s}
+.btn:hover{background:var(--navy-h)}.btn:disabled{opacity:.35;cursor:not-allowed}
+.lien{background:none;border:0;color:var(--g2);font-size:13px;font-weight:600;cursor:pointer;padding:0}
+.lien:hover{color:var(--navy)}
+.aide{font-size:12.5px;color:var(--g2);margin:10px 0 0}
+/* récapitulatif */
+.rec{position:sticky;top:20px}
+.rec h3{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:26px;margin:0 0 14px}
+.rl{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:9px 0;border-bottom:1px solid rgba(12,15,20,.07)}
+.rl span{color:var(--g2)}.rl b{font-weight:600;text-align:right}
+.items{margin:8px 0 0;padding:0;list-style:none}
+.it{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:12px 0;border-bottom:1px solid rgba(12,15,20,.07);font-size:13.5px}
+.it small{grid-column:1;color:var(--g2);font-size:12px}
+.qte{grid-column:1;display:inline-flex;align-items:center;gap:0;border:1px solid rgba(12,15,20,.12);border-radius:999px;width:max-content;margin-top:4px}
+.qte button{all:unset;width:28px;height:26px;text-align:center;cursor:pointer;color:var(--g2)}
+.qte span{min-width:18px;text-align:center;font-size:12.5px;font-weight:600}
+.it .px{grid-column:2;grid-row:1;font-weight:600}
+.tot{display:flex;justify-content:space-between;align-items:baseline;margin-top:16px}
+.tot span{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--g2)}
+.tot b{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:38px;color:var(--navy)}
+.vide-r{font-size:13px;color:var(--g2);padding:14px 0}
+/* mini catalogue */
+.filtres{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:18px;scrollbar-width:none}
+.filtres::-webkit-scrollbar{display:none}
+.ch{flex:none;height:34px;padding:0 14px;border-radius:999px;border:1px solid rgba(12,15,20,.12);background:#fff;font-size:12.5px;font-weight:600;color:var(--g1);cursor:pointer}
+.ch.on{background:var(--black);border-color:var(--black);color:#fff}
+.cherche{width:100%;height:44px;border:1px solid rgba(12,15,20,.12);border-radius:999px;padding:0 18px;font:inherit;font-size:14px;margin-bottom:14px}
+.cherche:focus{outline:none;border-color:var(--navy)}
+.prods{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.pc{border:1px solid rgba(12,15,20,.08);border-radius:18px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.pc img{width:100%;aspect-ratio:1/1;object-fit:cover;background:var(--g4);display:block}
+.pc-b{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.pc-c{font-size:11px;color:var(--g2)}
+.pc-n{font-size:13.5px;font-weight:800;text-transform:uppercase;color:var(--navy);line-height:1.25}
+.pc-p{font-size:12.5px;color:var(--g1);margin-top:auto}
+.pc-add{margin-top:8px;height:36px;border-radius:999px;border:1px solid var(--navy);background:#fff;color:var(--navy);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.pc-add:hover{background:var(--navy);color:#fff}
+.pc-add.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.vars{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.var{display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid rgba(12,15,20,.12);border-radius:10px;background:#fff;font-size:12px;cursor:pointer;text-align:left}
+.var:hover{border-color:var(--navy)}.var b{white-space:nowrap}
+/* coordonnées */
+.f{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.f label{display:flex;flex-direction:column;gap:6px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--g2)}
+.f .l2{grid-column:1/-1}
+.f input,.f textarea{font:inherit;font-size:14px;letter-spacing:0;text-transform:none;font-weight:400;color:var(--black);border:1px solid rgba(12,15,20,.14);border-radius:12px;padding:12px 14px}
+.f textarea{min-height:110px;resize:vertical}
+.f input:focus,.f textarea:focus{outline:none;border-color:var(--navy)}
+.err{color:#b91c1c;font-size:13px;margin:12px 0 0;min-height:1em}
+.merci{text-align:center;padding:40px 10px}
+.merci svg{width:54px;height:54px;color:var(--ok)}
+[hidden]{display:none!important}
+@media(max-width:960px){.grid{grid-template-columns:1fr}.rec{position:static}.mois{grid-template-columns:1fr}.mois .m2{display:none}}
+@media(max-width:560px){.prods{grid-template-columns:1fr 1fr;gap:10px}.pc-b{padding:10px}.pc-n{font-size:12px}.pc-add{font-size:10px;height:34px}.modes,.f,.dates{grid-template-columns:1fr}.card{padding:18px}.st{font-size:11.5px}.st span{display:none}.st.on span{display:inline}}
+</style>
+</head>
+<body>
+<header class="top"><a class="logo" href="/">VESPRA EVENT</a><small>Devis gratuit · réponse sous 24 h</small></header>
+<main class="wrap">
+  <nav class="steps" id="steps" aria-label="Étapes"></nav>
+
+  <div class="grid">
+    <section id="zone"></section>
+    <aside class="card rec" id="rec" aria-live="polite"></aside>
+  </div>
+</main>
+
+<script>
+(function(){
+  var S={etape:1,deb:null,fin:null,choix:'deb',mode:'',panier:[],cat:'Tout',q:'',mois:null,ouvert:null};
+  var PRODUITS=[];
+  var JOURS=['lun.','mar.','mer.','jeu.','ven.','sam.','dim.'];
+  var auj=new Date();auj.setHours(0,0,0,0);
+  S.mois=new Date(auj.getFullYear(),auj.getMonth(),1);
+  var $=function(s,r){return (r||document).querySelector(s)};
+  var esc=function(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+  var eur=function(n){return Number(n||0).toLocaleString('fr-FR')+' €'};
+  var fmt=function(d,long){return d?d.toLocaleDateString('fr-FR',long?{weekday:'long',day:'numeric',month:'long'}:{weekday:'short',day:'numeric',month:'short'}):''};
+  var memeJour=function(a,b){return a&&b&&a.getTime()===b.getTime()};
+  var nbJours=function(){return S.deb&&S.fin?Math.round((S.fin-S.deb)/864e5)+1:0};
+  var ico={
+    gauche:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>',
+    droite:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>',
+    depot:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/></svg>',
+    camion:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>',
+    ok:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6"/></svg>'
+  };
+
+  /* ── étapes ── */
+  function etapes(){
+    var L=[['Vos dates','Dates et retrait'],['Votre matériel','Matériel'],['Vos coordonnées','Coordonnées']];
+    $('#steps').innerHTML=L.map(function(x,i){var n=i+1,c=n===S.etape?'on':(n<S.etape?'ok':'');
+      return '<button type="button" class="st '+c+'" data-e="'+n+'"'+(c==='ok'?'':' tabindex="-1"')+'><em>'+(c==='ok'?'✓':n)+'</em><span>'+x[0]+'</span></button>'}).join('');
+  }
+  $('#steps').addEventListener('click',function(e){var b=e.target.closest('.st.ok');if(b)aller(+b.dataset.e)});
+  function aller(n){S.etape=n;rendre();window.scrollTo({top:0,behavior:'smooth'})}
+
+  /* ── étape 1 : dates + mode ── */
+  function moisHTML(m,cls){
+    var an=m.getFullYear(),mo=m.getMonth(),premier=(new Date(an,mo,1).getDay()+6)%7,n=new Date(an,mo+1,0).getDate(),h='';
+    for(var i=0;i<premier;i++)h+='<span class="j vide"></span>';
+    for(var d=1;d<=n;d++){
+      var j=new Date(an,mo,d),c=['j'];
+      if(j<auj)c.push('passe');
+      if(memeJour(j,auj))c.push('auj');
+      if(memeJour(j,S.deb))c.push('deb');
+      if(memeJour(j,S.fin))c.push('fin');
+      if(S.deb&&S.fin&&j>S.deb&&j<S.fin)c.push('entre');
+      h+='<button type="button" class="'+c.join(' ')+'" data-t="'+j.getTime()+'"'+(j<auj?' disabled':'')+' aria-label="'+fmt(j,1)+'">'+d+'</button>';
+    }
+    return '<div class="'+cls+'"><div class="m-t">'+m.toLocaleDateString('fr-FR',{month:'long',year:'numeric'})+'</div><div class="jours">'+JOURS.map(function(x){return '<span>'+x+'</span>'}).join('')+h+'</div></div>';
+  }
+  function etape1(){
+    var m2=new Date(S.mois.getFullYear(),S.mois.getMonth()+1,1),premierMois=S.mois<=new Date(auj.getFullYear(),auj.getMonth(),1);
+    return '<p class="kick">Étape 1 sur 3</p><h1>VOS <em>dates</em></h1><p class="sub">Choisissez le jour où vous récupérez le matériel et le jour où vous le rendez. Vous pourrez ensuite composer votre sélection.</p>'+
+    '<div class="card">'+
+      '<div class="dates"><button type="button" class="dt'+(S.choix==='deb'?' on':'')+'" data-c="deb"><small>Début de location</small><b class="'+(S.deb?'':'ph')+'">'+(S.deb?fmt(S.deb,1):'Choisir une date')+'</b></button>'+
+      '<button type="button" class="dt'+(S.choix==='fin'?' on':'')+'" data-c="fin"><small>Fin de location</small><b class="'+(S.fin?'':'ph')+'">'+(S.fin?fmt(S.fin,1):'Choisir une date')+'</b></button></div>'+
+      '<div class="cal-h"><button type="button" class="nav" data-m="-1" aria-label="Mois précédent"'+(premierMois?' disabled':'')+'>'+ico.gauche+'</button><b></b><button type="button" class="nav" data-m="1" aria-label="Mois suivant">'+ico.droite+'</button></div>'+
+      '<div class="mois">'+moisHTML(S.mois,'m1')+moisHTML(m2,'m2')+'</div>'+
+      '<p class="aide">'+(S.deb&&S.fin?'Location de '+nbJours()+' jour'+(nbJours()>1?'s':'')+'.':S.deb?'Choisissez maintenant la date de fin.':'Une date de début et une date de fin sont nécessaires.')+'</p>'+
+      '<div class="sec-t">Retrait ou livraison</div>'+
+      '<div class="modes"><button type="button" class="mode'+(S.mode==='retrait'?' on':'')+'" data-mode="retrait">'+ico.depot+'<div><b>Retrait au dépôt de Vitré</b><span>Vous venez chercher le matériel, avec une prise en main sur place.</span></div></button>'+
+      '<button type="button" class="mode'+(S.mode==='livraison'?' on':'')+'" data-mode="livraison">'+ico.camion+'<div><b>Livraison et installation</b><span>Sur le lieu de votre événement, dans tout le Grand Ouest. Tarif selon la distance.</span></div></button></div>'+
+      '<div class="actions"><span></span><button type="button" class="btn" id="suiv1"'+(S.deb&&S.fin&&S.mode?'':' disabled')+'>Choisir mon matériel</button></div>'+
+    '</div>';
+  }
+  function clicJour(t){
+    var d=new Date(t);
+    if(S.choix==='deb'||!S.deb||d<S.deb){S.deb=d;if(S.fin&&S.fin<d)S.fin=null;S.choix='fin';}
+    else{S.fin=d;S.choix='deb';}
+    rendre();
+  }
+
+  /* ── étape 2 : mini catalogue ── */
+  function cats(){var c=['Tout'];PRODUITS.forEach(function(p){(p.cats||[p.cat]).forEach(function(x){if(x&&c.indexOf(x)<0)c.push(x)})});return c}
+  function norm(t){return String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')}
+  function etape2(){
+    var l=PRODUITS.filter(function(p){return (S.cat==='Tout'||(p.cats||[p.cat]).indexOf(S.cat)>=0)&&(!S.q||norm(p.name+' '+p.cat).indexOf(norm(S.q))>=0)});
+    return '<p class="kick">Étape 2 sur 3</p><h1>VOTRE <em>matériel</em></h1><p class="sub">Du '+fmt(S.deb,1)+' au '+fmt(S.fin,1)+'. Ajoutez ce dont vous avez besoin : le total se met à jour à droite.</p>'+
+    '<input class="cherche" id="q" type="search" placeholder="Rechercher un produit" value="'+esc(S.q)+'">'+
+    '<div class="filtres">'+cats().map(function(c){return '<button type="button" class="ch'+(c===S.cat?' on':'')+'" data-cat="'+esc(c)+'">'+esc(c)+'</button>'}).join('')+'</div>'+
+    (PRODUITS.length?'<div class="prods">'+l.map(carte).join('')+'</div>':'<p class="aide">Chargement du catalogue…</p>')+
+    '<div class="actions"><button type="button" class="lien" data-go="1">← Modifier les dates</button><button type="button" class="btn" id="suiv2"'+(S.panier.length?'':' disabled')+'>Continuer</button></div>';
+  }
+  function carte(p){
+    var dans=S.panier.some(function(x){return x.pid===p.id});
+    var vars=(p.variants||[]).length>1&&S.ouvert===p.id;
+    return '<div class="pc"><img src="/'+esc(p.img)+'" alt="" loading="lazy"><div class="pc-b"><div class="pc-c">'+esc(p.cat)+'</div><div class="pc-n">'+esc(p.name)+'</div>'+
+      '<div class="pc-p">'+(p.devis?'Sur devis':((p.variants||[]).length>1?'À partir de ':'')+eur(p.price))+'</div>'+
+      (vars?'<div class="vars">'+p.variants.map(function(v,i){return '<button type="button" class="var" data-add="'+esc(p.id)+'" data-v="'+i+'"><span>'+esc(v.label)+'</span><b>'+eur(v.price)+'</b></button>'}).join('')+'</div>'
+        :'<button type="button" class="pc-add'+(dans?' ok':'')+'" data-add="'+esc(p.id)+'">'+(dans?'Ajouté ✓':'Ajouter')+'</button>')+
+    '</div></div>';
+  }
+  function ajouter(id,v){
+    var p=PRODUITS.find(function(x){return x.id===id});if(!p)return;
+    if((p.variants||[]).length>1&&v==null){S.ouvert=id;rendre();return}
+    var va=v!=null?p.variants[v]:null,cle=id+(v!=null?'_'+v:'');
+    var ex=S.panier.find(function(x){return x.cle===cle});
+    if(ex)ex.qty++;else S.panier.push({cle:cle,pid:id,nom:p.name,label:va?va.label:'',price:va?va.price:(p.devis?0:p.price),devis:!!p.devis,qty:1,img:p.img});
+    S.ouvert=null;rendre();
+  }
+
+  /* ── étape 3 : coordonnées ── */
+  function etape3(){
+    return '<p class="kick">Étape 3 sur 3</p><h1>VOS <em>coordonnées</em></h1><p class="sub">Nous vérifions la disponibilité et vous envoyons votre devis sous 24 h. Sans engagement.</p>'+
+    '<form class="card" id="form" novalidate><div class="f">'+
+      '<label>Prénom<input name="prenom" autocomplete="given-name" required></label>'+
+      '<label>Nom<input name="nom" autocomplete="family-name" required></label>'+
+      '<label>E-mail<input name="email" type="email" autocomplete="email" required></label>'+
+      '<label>Téléphone<input name="tel" type="tel" autocomplete="tel" required></label>'+
+      (S.mode==='livraison'?'<label class="l2">Adresse du lieu de l’événement<input name="adresse" autocomplete="street-address" required></label>':'')+
+      '<label class="l2">Message (facultatif)<textarea name="message" placeholder="Type d’événement, nombre d’invités, contraintes d’accès…"></textarea></label>'+
+    '</div><p class="err" id="err"></p>'+
+    '<div class="actions"><button type="button" class="lien" data-go="2">← Modifier le matériel</button><button type="submit" class="btn">Envoyer ma demande</button></div></form>';
+  }
+  function merci(){
+    return '<div class="card merci">'+ico.ok+'<h1 style="margin-top:14px">DEMANDE <em>envoyée</em></h1><p class="sub" style="margin:0 auto">Aperçu de la maquette : rien n’a été envoyé. Dans la version finale, la demande arrive dans le back-office comme une réservation classique.</p></div>';
+  }
+
+  /* ── récapitulatif ── */
+  function recap(){
+    var tot=0,devis=false;
+    var items=S.panier.map(function(x,i){tot+=x.price*x.qty;if(x.devis)devis=true;
+      return '<li class="it"><span>'+esc(x.nom)+'</span><span class="px">'+(x.devis?'Sur devis':eur(x.price*x.qty))+'</span>'+(x.label?'<small>'+esc(x.label)+'</small>':'')+
+      '<span class="qte"><button type="button" data-q="'+i+'" data-d="-1" aria-label="Retirer un">−</button><span>'+x.qty+'</span><button type="button" data-q="'+i+'" data-d="1" aria-label="Ajouter un">+</button></span></li>'}).join('');
+    $('#rec').innerHTML='<h3>VOTRE RÉSERVATION</h3>'+
+      '<div class="rl"><span>Début</span><b>'+(S.deb?fmt(S.deb):'—')+'</b></div>'+
+      '<div class="rl"><span>Fin</span><b>'+(S.fin?fmt(S.fin):'—')+'</b></div>'+
+      '<div class="rl"><span>Mode</span><b>'+(S.mode==='retrait'?'Retrait à Vitré':S.mode==='livraison'?'Livraison et installation':'—')+'</b></div>'+
+      (S.panier.length?'<ul class="items">'+items+'</ul>':'<p class="vide-r">Aucun produit pour l’instant.</p>')+
+      '<div class="tot"><span>Total estimé</span><b>'+eur(tot)+'</b></div>'+
+      (devis||S.mode==='livraison'?'<p class="aide">'+(S.mode==='livraison'?'+ livraison selon la distance':'')+(devis?(S.mode==='livraison'?' · ':'')+'+ éléments sur devis':'')+'</p>':'');
+  }
+  $('#rec').addEventListener('click',function(e){var b=e.target.closest('[data-q]');if(!b)return;var x=S.panier[+b.dataset.q];x.qty+=+b.dataset.d;if(x.qty<1)S.panier.splice(+b.dataset.q,1);rendre()});
+
+  /* ── rendu ── */
+  function rendre(){
+    etapes();
+    var z=$('#zone');
+    z.innerHTML=S.etape===1?etape1():S.etape===2?etape2():S.etape===3?etape3():merci();
+    recap();
+  }
+  $('#zone').addEventListener('click',function(e){
+    var t=e.target.closest('button');if(!t)return;
+    if(t.dataset.t){clicJour(+t.dataset.t);return}
+    if(t.dataset.c){S.choix=t.dataset.c;rendre();return}
+    if(t.dataset.m){S.mois=new Date(S.mois.getFullYear(),S.mois.getMonth()+(+t.dataset.m),1);rendre();return}
+    if(t.dataset.mode){S.mode=t.dataset.mode;rendre();return}
+    if(t.id==='suiv1'){aller(2);return}
+    if(t.id==='suiv2'){aller(3);return}
+    if(t.dataset.go){aller(+t.dataset.go);return}
+    if(t.dataset.cat){S.cat=t.dataset.cat;rendre();return}
+    if(t.dataset.add){ajouter(t.dataset.add,t.dataset.v!=null?+t.dataset.v:null);return}
+  });
+  $('#zone').addEventListener('input',function(e){if(e.target.id==='q'){S.q=e.target.value;var pos=e.target.selectionStart;rendre();var q=$('#q');q.focus();try{q.setSelectionRange(pos,pos)}catch(x){}}});
+  $('#zone').addEventListener('submit',function(e){
+    e.preventDefault();var f=e.target,ok=true;
+    f.querySelectorAll('[required]').forEach(function(i){if(!i.value.trim())ok=false});
+    if(ok&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email.value.trim()))ok=false;
+    if(!ok){$('#err').textContent='Merci de compléter vos coordonnées (e-mail valide).';return}
+    S.etape=4;rendre();
+  });
+
+  rendre();
+  fetch('/catalogue.html',{credentials:'omit'}).then(function(r){return r.text()}).then(function(t){
+    var d=t.indexOf('const PRODUCTS=[');if(d<0)return;var fin=t.indexOf('\n];',d);
+    try{PRODUITS=(new Function('return '+t.slice(d+'const PRODUCTS='.length,fin+2)))()}catch(x){PRODUITS=[]}
+    if(S.etape===2)rendre();
+  }).catch(function(){});
+})();
+</script>
+</body>
+</html>
