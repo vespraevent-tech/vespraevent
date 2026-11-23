@@ -396,3 +396,19 @@ html[data-ori="portrait"] .mode .d{min-height:calc(1.45em * 2)}
   html .mode .d{font-size:clamp(15px,4vw,18px);max-width:none;min-height:0}
   #s-accueil{overflow-y:auto;-webkit-overflow-scrolling:touch}
 }
+
+/* champs secrets : masqués sans être des « mots de passe » (pas de fenêtre « enregistrer le mot de passe ») */
+.secret{-webkit-text-security:disc;text-security:disc}
+/* aperçu caméra : rien d'affiché tant que la nouvelle image n'est pas arrivée (jamais l'image de l'invité précédent) */
+#v-live.vide{visibility:hidden}
+/* accueil avec un seul mode : titre et bouton centrés, à taille raisonnable */
+body.mode-seul #s-accueil{justify-content:center;padding-top:0;padding-bottom:0}
+body.mode-seul #s-accueil .hero{margin:0 0 clamp(28px,5vh,56px)}
+body.mode-seul #t-accueil{font-size:clamp(34px,5.4vw,64px);line-height:1.12}
+body.mode-seul #s-accueil #b-commencer:not([hidden]){position:static;transform:none;padding:clamp(16px,2.6vh,22px) clamp(48px,7vw,84px);font-size:clamp(19px,2.2vw,24px);border-radius:16px;margin:0 auto}
+body.mode-seul #s-accueil #b-commencer:not([hidden]):active{transform:scale(.97)}
+/* consentement : texte court et discret */
+#f-ok-txt{font-size:clamp(13px,1.5vw,15px);line-height:1.45}
+/* récupérer la vidéo : titre aéré, bouton Terminé de taille normale */
+#l-titre{margin-bottom:clamp(18px,3vh,32px)!important}
+#l-fin{width:auto!important;min-width:min(320px,80vw);max-width:420px;align-self:center;margin-left:auto;margin-right:auto;padding-left:48px;padding-right:48px}

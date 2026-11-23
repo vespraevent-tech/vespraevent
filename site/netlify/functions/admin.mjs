@@ -40,7 +40,7 @@ import { createHmac, timingSafeEqual, createHash, randomUUID, randomBytes, rando
    introuvable au moment de l'exécution et TOUTE modification depuis le
    back-office échouerait. */
 import { getStore, stockageActif, stats as stockStats } from './_stockage.mjs';
-import { evenementLire as pbLire, evenementEcrire as pbEcrire, evenementsLister as pbLister, evenementSupprimer as pbSupprimer, imageAjouter as pbImageAjouter, imageLire as pbImageLire, FORMATS as PB_FORMATS, compteurs as pbCompteurs, prisesLister as pbPrises, photoLire as pbPhoto, priseSupprimer as pbPriseSuppr } from './_photobooth.mjs';
+import { evenementLire as pbLire, evenementEcrire as pbEcrire, evenementsLister as pbLister, evenementSupprimer as pbSupprimer, imageAjouter as pbImageAjouter, imageLire as pbImageLire, FORMATS as PB_FORMATS, vuLire as pbVuLire, compteurs as pbCompteurs, prisesLister as pbPrises, photoLire as pbPhoto, priseSupprimer as pbPriseSuppr } from './_photobooth.mjs';
 import { jetonGalerie as pbJetonGalerie } from './photobooth.mjs';
 import { lireMetas as vbLireMetas, videoStore, envoyerMail as vbEnvoyerMail, jetonEvt as vbJetonEvt, galLire as vbGalLire, galEcrire as vbGalEcrire, genMdp as vbGenMdp, accesLire as vbAccesLire, accesEcrire as vbAccesEcrire, sessionsLire as vbSessionsLire, sessionsEcrire as vbSessionsEcrire } from './videobooth.mjs';
 import * as secu from './_sauvegarde.mjs';
@@ -2386,7 +2386,8 @@ const gestionnaire = async (request) => {
   if (path === '/photobooth/photos' && request.method === 'GET') {
     const evt = url.searchParams.get('evt') || ''; if (!(await pbLire(evt))) return json({ error: 'Événement introuvable' }, 404);
     const l = (await pbPrises(evt)).sort((a, b) => String(b.cree).localeCompare(String(a.cree)));
-    return json({ stats: await pbCompteurs(evt), lien: (process.env.URL || '') + '/api/photobooth/galerie/' + evt + '?t=' + pbJetonGalerie(evt),
+    const evtLu = await pbLire(evt), vu = await pbVuLire(evt);
+    return json({ sync: { serveur: evtLu.maj, cadres: (evtLu.misesEnPage || []).length, vu: vu ? { maj: vu.maj, t: vu.t } : null }, stats: await pbCompteurs(evt), lien: (process.env.URL || '') + '/api/photobooth/galerie/' + evt + '?t=' + pbJetonGalerie(evt),
       photos: l.map((p) => ({ id: p.id, cree: p.cree, imprimees: p.imprimees || 0, scanne: !!p.scanne, fichiers: Object.keys(p.fichiers || {}) })) });
   }
   if (path === '/photobooth/photo' && request.method === 'GET') {

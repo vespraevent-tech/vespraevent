@@ -24,7 +24,8 @@
     if (etat.appareil) h['x-borne'] = etat.appareil;
     if (etat.jeton) h['x-appareil'] = etat.jeton;
     if (o.json) { h['content-type'] = 'application/json'; o.body = JSON.stringify(o.json); }
-    return fetch(API + chemin, { method: o.method || (o.body ? 'POST' : 'GET'), headers: h, body: o.body, cache: 'no-store' });
+    var q = (o.method || (o.body ? 'POST' : 'GET')) === 'GET' && chemin.indexOf('envoi') !== 0 ? (chemin.indexOf('?') >= 0 ? '&' : '?') + '_=' + Date.now() : '';   /* jamais de réponse gardée en cache */
+    return fetch(API + chemin + q, { method: o.method || (o.body ? 'POST' : 'GET'), headers: h, body: o.body, cache: 'no-store' });
   }
   function dateFr(d, court) { if (!d) return ''; var x = new Date(d + 'T12:00:00'); return x.toLocaleDateString('fr-FR', court ? { day: 'numeric', month: 'short' } : { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); }
   var auj = function () { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date()); };
@@ -254,7 +255,8 @@
     if (!etat.jeton || !etat.evt || majOccupee) return;
     if (etat.ecran !== 's-accueil' && etat.ecran !== 's-menu') { majEnAttente = true; return; }  /* jamais pendant une prise de vue */
     majOccupee = true;
-    api('maj').then(function (r) { return r.json(); }).then(function (d) {
+    api('maj?v=' + encodeURIComponent(etat.evt.maj || '')).then(function (r) { return r.json(); }).then(function (d) {
+      etat.derniereVerif = Date.now(); etat.cadresServeur = d.cadres;
       if (!d.ok) { if (d.supprime) return lireConfig(false).catch(function () {}); return; }
       if (d.maj === etat.evt.maj) return;                     /* rien de nouveau : réponse minuscule toutes les 2 s */
       return api('config').then(function (r) { return r.json(); }).then(function (c) {

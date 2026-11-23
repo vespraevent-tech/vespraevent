@@ -144,7 +144,7 @@
   /* tableau de bord */
   function secTableau(c) {
     var e = PB.evt;
-    c.innerHTML = '<div class="pb-compteurs" id="pbCompteurs"><div><b>…</b><span>Photos prises</span></div><div><b>…</b><span>Photos imprimées</span></div><div><b>…</b><span>QR codes scannés</span></div></div>'
+    c.innerHTML = '<div id="pbSync" class="pb-bloc" style="margin-bottom:12px;padding:12px 16px;font-size:13px">Synchronisation des photobooths : vérification…</div><div class="pb-compteurs" id="pbCompteurs"><div><b>…</b><span>Photos prises</span></div><div><b>…</b><span>Photos imprimées</span></div><div><b>…</b><span>QR codes scannés</span></div></div>'
       + (e.auto && e.auto.resa ? '<p class="aide" style="color:#6b7280;font-size:13px;margin:10px 0 0">Créé automatiquement depuis la réservation du planning.</p>' : '')
       + '<div class="pb-bloc" style="margin-top:14px"><h3>Informations</h3><div class="pb-champs">' + champ('pbi-nom', 'Nom de l’événement', e.nom) + champ('pbi-date', 'Date', e.date, '', 'date') + champ('pbi-fin', 'Dernier jour', e.fin, '', 'date') + champ('pbi-mdp', 'Mot de passe des photobooths (facultatif)', e.mdp, 'Pour ouvrir l’événement sur un photobooth') + '</div>'
       + ligne('Événement ouvert sur les photobooths', 'Décochez pour le retirer des photobooths sans le supprimer', sw('pbi-actif', e.actif !== false))
@@ -163,6 +163,14 @@
     try { r = await api('/photobooth/photos?evt=' + id); } catch (x) { zone.innerHTML = '<div class="pb-vide">Impossible de charger les photos.</div>'; return; }
     if (!PB.evt || PB.evt.id !== id || !$('pbPhotos')) return;
     var s = r.stats || {}, cp = $('pbCompteurs'); if (cp) cp.innerHTML = '<div><b>' + (s.photos || 0) + '</b><span>Photos prises</span></div><div><b>' + (s.imprimees || 0) + '</b><span>Photos imprimées</span></div><div><b>' + (s.scans || 0) + '</b><span>QR codes scannés</span></div>';
+    var sy = r.sync || {}, zs = $('pbSync');
+    if (zs) {
+      var heure = function (t) { return new Date(t).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' }); };
+      var vu = sy.vu, aJour = vu && vu.maj === sy.serveur, recent = vu && Date.now() - vu.t < 60000;
+      zs.innerHTML = '<b>Serveur :</b> ' + (sy.cadres || 0) + ' cadre(s), modifié le ' + (sy.serveur ? heure(sy.serveur) : '—') + '<br><b>Photobooth :</b> '
+        + (!vu ? '<span style="color:#6b7280">aucun photobooth n’a encore ouvert cet événement</span>'
+          : (aJour ? '<span style="color:#2a7a4b">✓ à jour</span>' : '<span style="color:#b03a2a">pas encore à jour (il a la version du ' + (vu.maj ? heure(vu.maj) : '—') + ')</span>') + ' · dernier contact ' + heure(vu.t) + (recent ? '' : ' <span style="color:#8a6a1a">(photobooth éteint ou hors ligne ?)</span>'));
+    }
     pbLien = r.lien || ''; var u = $('pbi-url'); if (u && PB.evt.galerie.lien) u.value = pbLien;
     var l = r.photos || [], sig = l.map(function (p) { return p.id + p.fichiers.length + p.imprimees + p.scanne; }).join();
     if (zone.dataset.sig !== sig) {
@@ -472,7 +480,12 @@
     var m = PB.edit.m; m.nom = val('pbe-nom').trim() || m.nom;
     if (!m.cases.length) return toast('Ajoutez au moins une case photo', true);
     if (PB.edit.i >= 0) PB.evt.misesEnPage[PB.edit.i] = m; else PB.evt.misesEnPage.push(m);
-    enregistrer('Mise en page enregistrée').then(function (ok) { if (ok) { PB.edit = null; rendre(); } });
+    var attendu = PB.evt.misesEnPage.length;
+    enregistrer('Mise en page enregistrée').then(async function (ok) {
+      if (!ok) return;
+      try { var v = await api('/photobooth/evt?id=' + PB.evt.id); var n = (v.evenement.misesEnPage || []).length; if (n !== attendu) toast('Attention : le serveur a ' + n + ' cadre(s) au lieu de ' + attendu + '. Réessayez.', true); else toast('Vérifié sur le serveur : ' + n + ' cadre(s) · les photobooths se mettent à jour'); } catch (e) {}
+      PB.edit = null; rendre();
+    });
   };
   window.pbAnnulerMp = function () { if (modifsPerdues()) return; PB.edit = null; rendre(); };
 

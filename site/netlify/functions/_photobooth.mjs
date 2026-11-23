@@ -142,6 +142,12 @@ export async function evenementEcrire(e) {
   await pbStore().setJSON('evt/' + propre.id, propre);
   return propre;
 }
+/* ce que la borne a vu en dernier (version de l'événement + heure), pour que le back-office sache si elle est à jour */
+export async function vuLire(evt) { return idOk(evt, 'pb') ? pbStore().get('vu/' + evt, { type: 'json' }).catch(() => null) : null; }
+export async function vuEcrire(evt, maj, serveur) {
+  if (!idOk(evt, 'pb')) return; const st = pbStore(), prec = await st.get('vu/' + evt, { type: 'json' }).catch(() => null);
+  if (!prec || prec.maj !== maj || Date.now() - prec.t > 15000) await st.setJSON('vu/' + evt, { maj: String(maj || ''), serveur: String(serveur || ''), t: Date.now() });   /* au plus toutes les 15 s */
+}
 export async function evenementsLister() {
   const st = pbStore();
   const { blobs } = await st.list({ prefix: 'evt/' });

@@ -16,7 +16,7 @@
      GET  /api/photobooth/f/<prise>/<nom>    une photo, si le navigateur y a droit
    ════════════════════════════════════════════════════ */
 import { createHmac, createHash, randomBytes, timingSafeEqual } from 'node:crypto';
-import { pbStore, evenementEcrire, evenementLire, evenementsLister, imageLire, priseOk, priseEvenement, priseLire, priseEcrire, prisesLister, photoLire, compteurs, NOMS_FICHIERS } from './_photobooth.mjs';
+import { pbStore, vuEcrire, evenementEcrire, evenementLire, evenementsLister, imageLire, priseOk, priseEvenement, priseLire, priseEcrire, prisesLister, photoLire, compteurs, NOMS_FICHIERS } from './_photobooth.mjs';
 import { accesLire } from './videobooth.mjs';
 
 export const config = { path: '/api/photobooth/*' };
@@ -152,7 +152,8 @@ async function traiter(request) {
   if (chemin === 'maj' && request.method === 'GET') {                 /* sondage léger : seule la date de dernière modification */
     if (!jt) return rep({ ok: false }, 403);
     const e = await evenementLire(jt.evt); if (!e) return rep({ ok: false, supprime: true }, 404);
-    return rep({ ok: true, maj: e.maj });
+    await vuEcrire(jt.evt, url.searchParams.get('v') || '', e.maj).catch(() => {});
+    return rep({ ok: true, maj: e.maj, cadres: (e.misesEnPage || []).length });
   }
   if (parts[0] === 'img' && request.method === 'GET') {
     if (!jt) return rep({ ok: false }, 403);

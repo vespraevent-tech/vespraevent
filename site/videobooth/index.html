@@ -12,11 +12,11 @@
 <link rel="icon" type="image/png" sizes="48x48" href="/videobooth/icones/favicon-48.png?v=3">
 <link rel="apple-touch-icon" href="/videobooth/icones/apple-touch-icon.png">
 <link rel="stylesheet" href="/polices.css?v=1">
-<link rel="stylesheet" href="app.css?v=36">
+<link rel="stylesheet" href="app.css?v=37">
 </head>
 <body>
 <main id="app">
-  <section id="s-accueil" class="ecran inv on">
+  <section id="s-accueil" class="ecran inv">
     <div class="noel noel-haut" aria-hidden="true"></div><div class="noel noel-bas" aria-hidden="true"></div>
     <button id="cadenas" class="cadenas" type="button" aria-label="Réglages"></button>
     <header class="hero"><h1 id="t-accueil">Enregistrer un souvenir</h1><i class="filet"></i><p id="p-accueil"></p></header>
@@ -34,7 +34,7 @@
           <label>Prénom<input id="f-prenom" type="text" inputmode="text" autocapitalize="words" required></label>
           <label>Nom<input id="f-nom" type="text" inputmode="text" autocapitalize="words" required></label>
         </div>
-        <label class="coche"><input id="f-ok" type="checkbox"><span id="f-ok-txt">J’accepte que ma vidéo et mon nom soient conservés par Vespra Event et remis aux organisateurs de l’événement. Si je donne une adresse e-mail, elle sert uniquement à envoyer la vidéo. Tout est supprimé peu après la fin de l’événement.</span></label>
+        <label class="coche"><input id="f-ok" type="checkbox"><span id="f-ok-txt">L’adresse e-mail sert uniquement à vous envoyer la vidéo. Tout est supprimé 30 jours après l’événement.</span></label>
         <div id="f-err" class="err" role="alert"></div>
         <div class="rang"><button id="f-retour" class="ghost" type="button">Retour</button><button id="f-suite" class="cta" type="submit">Continuer</button></div>
       </form>
@@ -103,7 +103,7 @@
     <div class="marque" style="position:static;margin-bottom:6px">VESPRA EVENT</div>
     <h2>Vidéobooth</h2>
     <p class="petit">Saisissez le mot de passe d’accès</p>
-    <form onsubmit="return false" style="width:min(420px,90vw);display:flex;flex-direction:column;gap:12px"><input id="acces-in" type="password" autocomplete="off" placeholder="Mot de passe" style="text-align:center"><div id="acces-err" class="err"></div><button id="acces-ok" class="gros" type="button">Entrer</button></form>
+    <form onsubmit="return false" style="width:min(420px,90vw);display:flex;flex-direction:column;gap:12px"><input id="acces-in" type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" autocomplete="off" placeholder="Mot de passe" style="text-align:center"><div id="acces-err" class="err"></div><button id="acces-ok" class="gros" type="button">Entrer</button></form>
   </section>
 
   <section id="s-sessions" class="ecran inv">
@@ -115,7 +115,7 @@
   <section id="s-sess-mdp" class="ecran inv">
     <h2 id="sm-titre">Session</h2>
     <p class="petit">Saisissez le mot de passe de cette session</p>
-    <form onsubmit="return false" style="width:min(420px,90vw);display:flex;flex-direction:column;gap:12px"><input id="sm-in" type="password" autocomplete="off" placeholder="Mot de passe de la session" style="text-align:center"><div id="sm-err" class="err"></div><div class="rang"><button id="sm-retour" class="sec" type="button">Retour</button><button id="sm-ok" class="gros" type="button">Valider</button></div></form>
+    <form onsubmit="return false" style="width:min(420px,90vw);display:flex;flex-direction:column;gap:12px"><input id="sm-in" type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" autocomplete="off" placeholder="Mot de passe de la session" style="text-align:center"><div id="sm-err" class="err"></div><div class="rang"><button id="sm-retour" class="sec" type="button">Retour</button><button id="sm-ok" class="gros" type="button">Valider</button></div></form>
   </section>
 
   <section id="s-admin" class="ecran inv">
@@ -167,12 +167,12 @@
 
   <section id="s-pin" class="ecran inv">
     <h2 id="pin-t">Code d’accès</h2>
-    <input id="pin-in" type="password" inputmode="numeric" autocomplete="off" maxlength="12">
+    <input id="pin-in" type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" inputmode="numeric" autocomplete="off" maxlength="12">
     <div id="pin-err" class="err"></div>
     <div class="rang"><button id="pin-x" class="sec" type="button">Annuler</button><button id="pin-ok" class="gros" type="button">Valider</button></div>
   </section>
 </main>
 <script src="qr.js?v=1"></script>
-<script src="app.js?v=43"></script>
+<script src="app.js?v=44"></script>
 </body>
 </html>

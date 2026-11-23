@@ -97,7 +97,7 @@
   function nomMode(id) { return T(CLE_MODE[id || mode][0]); }
   function rendreModes() {
     var z = $('modes'), l = modesDispo(), seul = l.length === 1;
-    $('b-commencer').hidden = !seul; z.hidden = seul; z.innerHTML = ''; if (seul) return; z.style.setProperty('--n', l.length);
+    document.body.classList.toggle('mode-seul', !!seul); $('b-commencer').hidden = !seul; z.hidden = seul; z.innerHTML = ''; if (seul) return; z.style.setProperty('--n', l.length);
     l.forEach(function (id) {
       var b = document.createElement('button'), ferme = id === 'piquantes' && !piquantesOuvertes();
       b.type = 'button'; b.className = 'mode ' + id;
@@ -189,7 +189,7 @@
       if (vw / vh > R) { H = Math.min(vh, 1920); W = Math.round(H * R / 2) * 2; } else { W = Math.min(vw, 1920); H = Math.round(W / R / 2) * 2; }
       if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
       var sc = Math.max(W / vw, H / vh), sw = W / sc, sh = H / sc;
-      cx.drawImage(v, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, W, H);
+      cx.drawImage(v, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, W, H); cv.classList.remove('vide');
       /* image figée plus de 5 s alors que la caméra est ouverte : la caméra a décroché */
       if (v.currentTime !== derniereImage) { derniereImage = v.currentTime; tFige = Date.now(); } else if (tFige && Date.now() - tFige > 5000) { tFige = 0; perteCapteur('cam'); }
     }
@@ -222,27 +222,41 @@
      à l'écran d'accueil (la prochaine personne retentera). Le compteur repart à zéro quand la caméra tient 30 s.
      Les invités ne voient jamais de message technique : seulement « Un instant… ». Le détail va dans l'état de la tablette (back-office). */
   var essaisCam = 0, minuteurReco = null, minuteurStable = null, nbReco = 0, nbSilence = 0;
+  var camSuspecte = false;
   function perteCapteur(quoi) {
+    camSuspecte = true;                    /* flux douteux : on ne le réutilisera pas */
     if (quoi === 'cam') camEtat = 'perdue'; else micEtat = 'perdu';
     clearTimeout(minuteurStable);
     if (enregistrement) { arreterRec(); return; }
     if (!$('s-cam').classList.contains('on') || minuteurReco) return;
-    if (essaisCam >= 6) { essaisCam = 0; arreterCam(); accueil(); return; }
+    if (essaisCam >= 6) { essaisCam = 0; arreterCam(true); accueil(); return; }
     var delai = Math.min(60000, 2000 * Math.pow(2, essaisCam)); essaisCam++; nbReco++;
     $('cam-err').textContent = 'Un instant…'; $('cam-err').hidden = false;
     minuteurReco = setTimeout(function () { minuteurReco = null; if ($('s-cam').classList.contains('on') && !enregistrement) ouvrirCam(); }, delai);
   }
-  function arreterCam() {
-    analyseur = null; $('mic').hidden = true; $('qbox').hidden = true; $('pret').hidden = true; if (boucle) { cancelAnimationFrame(boucle); boucle = 0; } if (flux) { flux.getTracks().forEach(function (t) { t.stop(); }); flux = null; } $('v-src').srcObject = null; }
+  /* La caméra reste allumée entre deux invités (ouverture immédiate, sans écran noir) ; elle est coupée après 10 min sans invité,
+     ou quand on va dans les réglages. L'aperçu est effacé à chaque fois : jamais l'image de l'invité précédent. */
+  var fluxGarde = null, minuteurGarde = null;
+  function libererCamera() { clearTimeout(minuteurGarde); minuteurGarde = null; if (fluxGarde) { fluxGarde.getTracks().forEach(function (t) { t.stop(); }); fluxGarde = null; } }
+  function effacerApercu() { try { cx.setTransform(1, 0, 0, 1, 0, 0); cx.clearRect(0, 0, cv.width, cv.height); } catch (e) {} cv.classList.add('vide'); }
+  function arreterCam(couper) {
+    analyseur = null; $('mic').hidden = true; $('qbox').hidden = true; $('pret').hidden = true; if (boucle) { cancelAnimationFrame(boucle); boucle = 0; }
+    if (flux) { if (couper) flux.getTracks().forEach(function (t) { t.stop(); }); else { fluxGarde = flux; clearTimeout(minuteurGarde); minuteurGarde = setTimeout(libererCamera, 10 * 60000); } flux = null; }
+    if (couper) libererCamera();
+    $('v-src').srcObject = null; effacerApercu();
+  }
+  document.addEventListener('visibilitychange', function () { if (document.hidden && !flux) libererCamera(); });
   function ouvrirCam() {
     montrer('s-cam'); $('s-cam').classList.remove('flou'); $('cam-err').hidden = true; $('compte').hidden = true; $('rec').hidden = true; $('barre').hidden = true;
     $('b-go').hidden = true; $('b-stop').hidden = true; $('fmt').hidden = true; enregistrement = false;
     var contraintes = { audio: Object.assign({ echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1, sampleRate: 48000 }, cfg.mic ? { deviceId: { exact: cfg.mic } } : {}), video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, { width: { ideal: 1920 }, height: { ideal: 1080 } }) };
     arreterCam();
-    navigator.mediaDevices.getUserMedia(contraintes).then(function (s) {
+    var garde = !camSuspecte && fluxGarde && fluxGarde.getTracks().length && fluxGarde.getTracks().every(function (t) { return t.readyState === 'live'; }) ? fluxGarde : null;
+    if (garde) { fluxGarde = null; clearTimeout(minuteurGarde); } else libererCamera();
+    (garde ? Promise.resolve(garde) : navigator.mediaDevices.getUserMedia(contraintes)).then(function (s) {
       flux = s; $('b-go').hidden = false; montrerPret(); $('fmt').hidden = !(cfg.choixFormat !== false) || testCam; majFormat(); $('cadrage').textContent = cfg.cadrage || ''; $('cadrage').hidden = !cfg.cadrage; $('v-src').srcObject = s; $('v-src').play().catch(function () {}); boucle = requestAnimationFrame(dessiner);
       grandAngle(s);
-      camEtat = 'ok'; tFige = Date.now(); brancherMicro(s); $('mic').hidden = false;
+      camSuspecte = false; camEtat = 'ok'; tFige = Date.now(); brancherMicro(s); $('mic').hidden = false;
       clearTimeout(minuteurStable); minuteurStable = setTimeout(function () { essaisCam = 0; }, 30000);
       s.getVideoTracks().forEach(function (t) { t.onended = function () { perteCapteur('cam'); }; });
       s.getAudioTracks().forEach(function (t) { t.onended = function () { perteCapteur('mic'); }; });
@@ -315,7 +329,7 @@
 $('b-stop').onclick = arreterRec;
   /* croix : on abandonne la prise et on revient au formulaire, les champs restent remplis */
   $('b-x').onclick = function () {
-    if (testCam) { testCam = false; $('guide').hidden = true; $('cam-info').hidden = true; arreterCam(); ouvrirAdmin(); return; }
+    if (testCam) { testCam = false; $('guide').hidden = true; $('cam-info').hidden = true; arreterCam(true); ouvrirAdmin(); return; }
     if (decompte) { clearInterval(decompte); decompte = null; }
     clearInterval(minuteur);
     if (rec && rec.state !== 'inactive') { rec.onstop = null; try { rec.stop(); } catch (e) {} }
@@ -415,7 +429,7 @@ $('b-stop').onclick = arreterRec;
     var cache = function (e) { var i = e.indexOf('@'); return i > 2 ? e.slice(0, 2) + '•••' + e.slice(i) : e; };
     var l = []; if (v.email && v.pour === 'moi') l.push('Vous : ' + cache(v.email)); if (v.plusEmail) l.push((v.plusDest || 'Autre personne') + ' : ' + cache(v.plusEmail)); if (v.email && v.pour === 'autre') l.push((v.dest || 'Autre personne') + ' : ' + cache(v.email));
     $('m-mails').textContent = l.length ? 'La vidéo est envoyée par e-mail à :\n' + l.join('\n') : ''; $('m-mails').hidden = !l.length; $('m-sup').hidden = !l.length;
-    montrer('s-merci'); clearTimeout(minuteurMerci); minuteurMerci = setTimeout(retourAccueilMerci, 9000);
+    montrer('s-merci'); clearTimeout(minuteurMerci); minuteurMerci = setTimeout(retourAccueilMerci, 5000);
   }
 
   /* ───────── envoi au serveur ───────── */
@@ -574,6 +588,7 @@ $('b-stop').onclick = arreterRec;
     cfg.event = s ? (s.label || s.nom || '') : '';
     cfg.titre = (s && s.titre) || CFG0.titre; cfg.sous = s ? (s.sous || '') : CFG0.sous; cfg.max = (s && Number(s.max)) || 30;
     cfg.ori = (s && s.ori) || 'auto'; cfg.police = (s && s.police) || 'elegante'; cfg.amb = (s && s.amb) || 'blanc'; cfg.fond = (s && s.fond) || ''; cfg.accent = (s && s.accent) || ''; cfg.textes = (s && s.textes) || {}; appliquerTheme(); appliquerOrientation();
+    $('f-ok-txt').textContent = 'L’adresse e-mail sert uniquement à vous envoyer la vidéo. Tout est supprimé ' + ((s && s.conserv) || 30) + ' jours après l’événement.';
     cfg.type = (s && s.type) || 'autre'; cfg.modeQ = !!(s && s.modeQ); cfg.modeP = !!(s && s.modeP); cfg.heureP = (s && s.heureP) || '23:00'; cfg.qs = (s && s.qs) || []; cfg.qp = (s && s.qp) || []; cfg.secQ = (s && Number(s.secQ)) || 0; cfg.merciOrga = (s && s.merciOrga) || ''; cfg.orgaOn = s && (s.orgaOn === true || s.orgaOn === false) ? s.orgaOn : null;
     cfg.noel = !!(s && s.noel); cfg.format = (s && s.format) || 'auto';
     cfg.qui = (s && s.qui) || ''; cfg.quiSous = s ? (s.quiSous == null || s.quiSous === '' ? null : s.quiSous) : null; cfg.qualite = (s && s.qualite) || 'standard'; cfg.garde = (s && Number(s.garde)) || 14; cfg.choixFormat = !s || s.choixFormat !== false;
@@ -697,10 +712,10 @@ $('b-stop').onclick = arreterRec;
     return fetch(baseApi() + '/api/videobooth/' + route, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(corps) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j._st = r.status; return j; }); });
   }
   function sessionStockee() { try { var s = JSON.parse(localStorage.getItem('vb-sess') || 'null'); if (s && s.exp > Date.now() && s.jeton && s.session) return s; } catch (e) {} return null; }
-  function accesStocke() { try { var a = JSON.parse(sessionStorage.getItem('vb-acces') || 'null'); if (a && a.exp > Date.now()) return a; } catch (e) {} return null; }
+  function accesStocke() { try { var a = JSON.parse(localStorage.getItem('vb-acces') || 'null'); if (a && a.exp > Date.now()) return a; } catch (e) {} return null; }
   function ouvrirSession(s) { cfg.session = s.session; cfg.jeton = s.jeton; appliquerActif(); accueil(); synchro(); }
   var accesLibre = false;
-  function memoriserAcces(j) { accesLibre = !!j.libre; try { sessionStorage.setItem('vb-acces', JSON.stringify({ acces: j.acces, exp: Date.now() + 11 * 3600e3 })); } catch (e) {} }
+  function memoriserAcces(j) { accesLibre = !!j.libre; try { localStorage.setItem('vb-acces', JSON.stringify({ acces: j.acces, exp: Date.now() + 11 * 3600e3 })); } catch (e) {} }
   function ecranMdpAcces() { $('acces-in').value = ''; $('acces-err').textContent = ''; montrer('s-acces'); setTimeout(function () { $('acces-in').focus(); }, 100); }
   /* sans mot de passe général (réglage du back-office) la liste des sessions s'ouvre directement ; sinon on le demande */
   function versAcces() {
@@ -748,7 +763,7 @@ $('b-stop').onclick = arreterRec;
     }).catch(function () { $('acces-ok').disabled = false; $('acces-err').textContent = 'Pas de réseau : branchez la tablette à internet pour ouvrir une session.'; });
   };
   $('acces-in').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('acces-ok').click(); });
-  $('sess-retour').onclick = function () { try { sessionStorage.removeItem('vb-acces'); } catch (e) {} ecranMdpAcces(); };
+  $('sess-retour').onclick = function () { try { localStorage.removeItem('vb-acces'); } catch (e) {} ecranMdpAcces(); };
   $('sm-retour').onclick = function () { listerSessions(); };
   $('sm-ok').onclick = function () {
     if (!choisie) return versAcces();
