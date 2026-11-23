@@ -5105,7 +5105,7 @@ function ficheDemande(id, relu){
 
     modifsBloc(['d:' + d.id].concat(d.resaId ? ['r:' + d.resaId] : [])) +
     bloc('', champ('Téléphone', tel) + champ('Email', mail) +
-      (d.clientType === 'Entreprise ou association' ? champ('Société', esc(d.societe)) + champ('SIRET', esc(d.siret)) + champ('N° de TVA', esc(d.tva)) : '') +
+      (d.clientType === 'Entreprise ou association' ? champ('Société', esc(d.societe)) + champ('SIRET / RNA', esc(d.siret)) + champ('N° de TVA', esc(d.tva)) : '') +
       champ('Date', d.date ? esc(d.date) : '<span class="fd-manque">à préciser</span>')) +
 
     bloc('Logistique',
@@ -5470,7 +5470,7 @@ function modifierDemande(id){
       champ('clienttype', 'Type de client', '<select id="m-clienttype" onchange="mdPro()"><option value="Particulier"' + (iniPro ? '' : ' selected') + '>Particulier</option><option value="Entreprise ou association"' + (iniPro ? ' selected' : '') + '>Entreprise, association, mairie…</option></select>', true) +
       '<div class="pm-cond" id="m-proWrap"' + (iniPro ? '' : ' style="display:none"') + '>' +
         saisie('societe', 'Nom de l\u2019entreprise ou de l\u2019association', d.societe, 'Ex : Comité des fêtes de Vitré', 'text', true) +
-        saisie('siret', 'SIRET', d.siret, '123 456 789 00012') +
+        saisie('siret', 'SIRET ou n° RNA', d.siret, '123 456 789 00012 ou W123456789') +
         saisie('tva', 'N° de TVA (facultatif)', d.tva, 'FR00123456789') +
       '</div>' +
       saisie('date', 'Date de début', iniDebut, '', 'date') +
@@ -7850,7 +7850,7 @@ async function ouvrirFicheClient(nom, tel, email){
     + '<div class="g2"><div>'+ch('tel','Téléphone',fiche.phone)+'</div><div>'+ch('mail','E-mail',fiche.email,'','email')+'</div></div>'
     + '<label class="l" for="fcl-adr">Adresse de facturation</label><textarea id="fcl-adr" rows="2" placeholder="Rue, code postal, ville">'+esc(fiche.billAdresse||'')+'</textarea>'
     + '<div class="ty"><label><input type="radio" name="fcl-type" value="part" onchange="fclTypeBo()"'+(pro?'':' checked')+'> Particulier</label><label><input type="radio" name="fcl-type" value="pro" onchange="fclTypeBo()"'+(pro?' checked':'')+'> Entreprise / association</label></div>'
-    + '<div id="fcl-pro" style="display:'+(pro?'':'none')+'">'+ch('soc','Société',fiche.societe,'Raison sociale')+'<div class="g2"><div>'+ch('siret','SIRET',fiche.siret,'123 456 789 00012')+'</div><div>'+ch('tva','N° de TVA',fiche.tva,'FR 00 123456789')+'</div></div></div>'
+    + '<div id="fcl-pro" style="display:'+(pro?'':'none')+'">'+ch('soc','Société',fiche.societe,'Raison sociale')+'<div class="g2"><div>'+ch('siret','SIRET ou n° RNA',fiche.siret,'123 456 789 00012 ou W123456789')+'</div><div>'+ch('tva','N° de TVA',fiche.tva,'FR 00 123456789')+'</div></div></div>'
     + '<label class="l" for="fcl-notes">Notes</label><textarea id="fcl-notes" rows="2">'+esc(fiche.notes||'')+'</textarea>'
     + '<label class="l" style="margin-top:18px">Réservations et demandes (<span id="fcl-nb">'+ds.length+'</span>)</label><div id="fcl-liste" style="max-height:210px;overflow:auto">'+_fclListe(ds)+'</div>'
     + '<div class="pied"><span>'+(fiche.email ? '<button type="button" class="lien" onclick="fclEspace()">Son espace client</button>' : '')+'</span>'

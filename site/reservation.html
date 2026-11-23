@@ -992,8 +992,8 @@ transform:none!important;stroke-dashoffset:0!important}}
                 <input class="form-input" type="text" name="societe" placeholder="Nom de la structure" disabled>
               </div>
               <div class="form-group">
-                <label class="form-label">SIRET *</label>
-                <input class="form-input" type="text" name="siret" inputmode="numeric" placeholder="14 chiffres" pattern="[0-9 ]{14,17}" title="14 chiffres" disabled>
+                <label class="form-label">SIRET ou n° RNA *</label>
+                <input class="form-input" type="text" name="siret" autocapitalize="characters" placeholder="SIRET (14 chiffres) ou RNA (W123456789)" pattern="([0-9 ]{14,17}|[Ww][0-9]{9})" title="SIRET : 14 chiffres. Association : numéro RNA, la lettre W suivie de 9 chiffres (ex. W123456789)" disabled>
               </div>
             </div>
             <div class="form-group">

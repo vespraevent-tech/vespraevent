@@ -363,7 +363,7 @@ export function construireFacture({ emetteur, client, facture, lignes, reglages 
   const XC = 322;
   const lignesClient = [[client.nom, true]];
   (client.adresse || []).forEach((l) => lignesClient.push([l, false]));
-  if (client.siret) lignesClient.push(['SIRET ' + client.siret, false]);
+  if (client.siret) lignesClient.push([(/^w\d{9}$/i.test(String(client.siret).replace(/\s+/g, '')) ? 'N° RNA ' + String(client.siret).replace(/\s+/g, '').toUpperCase() : 'SIRET ' + client.siret), false]);
   if (client.tvaClient) lignesClient.push(['TVA ' + client.tvaClient, false]);
   if (client.tel) lignesClient.push([client.tel, false]);
   if (client.email) lignesClient.push([client.email, false]);
