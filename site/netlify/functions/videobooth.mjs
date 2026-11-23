@@ -98,7 +98,7 @@ async function envoyerMail(m, octets, site) {
    la première ouverture. Le QR code ne s'affiche qu'à la cabine : un lien recopié et envoyé plus tard ne montre rien.
    E-mail : au plus 2 appareils (téléphone puis ordinateur, par exemple). Un renvoi de l'e-mail depuis le back-office remet le compteur à zéro.
    L'ouverture passe par un bouton (et non par la simple visite du lien) : les robots qui analysent les liens des messageries ne prennent pas la place de l'invité. */
-const APPAREILS = { qr: { champ: 'appQr', max: 10, fenetre: 15 * 60000 }, mail: { champ: 'appMail', max: 2, fenetre: 0 } };
+const APPAREILS = { qr: { champ: 'appQr', max: 10, fenetre: 6 * 3600000 }, mail: { champ: 'appMail', max: 2, fenetre: 0 } };
 const sha = (x) => createHash('sha256').update(String(x)).digest('hex');
 const nomCookie = (id, type) => (type === 'qr' ? 'vbq_' : 'vbm_') + id;
 function lireCookie(request, nom) {

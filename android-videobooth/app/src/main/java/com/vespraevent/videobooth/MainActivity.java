@@ -182,11 +182,17 @@ public class MainActivity extends Activity {
         libre = true;
         try { if (epingle()) stopLockTask(); } catch (Exception e) { }
         plein();
-        Intent i = null;
-        try { i = getPackageManager().getLaunchIntentForPackage("com.sec.android.app.launcher"); } catch (Exception e) { }
+        /* on ouvre l'écran d'accueil de la tablette (Samsung One UI…) — pas notre propre appli, qui est aussi déclarée comme accueil — puis on ferme le vidéobooth */
         try {
-            if (i != null) { i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); startActivity(i); }
-            else startActivity(new Intent(Settings.ACTION_HOME_SETTINGS));
+            Intent h = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME);
+            for (android.content.pm.ResolveInfo ri : getPackageManager().queryIntentActivities(h, 0)) {
+                if (getPackageName().equals(ri.activityInfo.packageName)) continue;
+                Intent i = new Intent(h); i.setClassName(ri.activityInfo.packageName, ri.activityInfo.name); i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i);
+                tempo.postDelayed(new Runnable() { @Override public void run() { finishAndRemoveTask(); } }, 600);
+                return;
+            }
+            startActivity(new Intent(Settings.ACTION_HOME_SETTINGS));   /* aucun autre écran d'accueil trouvé : choix de l'application d'accueil */
         } catch (Exception e) {
             try { startActivity(new Intent(Settings.ACTION_SETTINGS)); } catch (Exception e2) { }
         }
