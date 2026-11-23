@@ -1,4 +1,5 @@
 # Pages fusionnées en « Événements »
+/reserver           /reservation-dates.html  200
 /prestations        /evenements  301!
 /prestations.html   /evenements  301!
 /rendez-vous        /evenements  301!

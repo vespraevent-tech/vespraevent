@@ -116,6 +116,7 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
 .fen-o input{accent-color:var(--navy);margin:0}.fen-o span{flex:1}.fen-o b{font-weight:600;white-space:nowrap;font-size:13px}
 .fen-i{width:100%;font:inherit;font-size:14px;border:1px solid rgba(12,15,20,.14);border-radius:12px;padding:11px 13px;margin-bottom:8px}
 .fen-ok{width:100%;margin-top:18px}
+.fen-i.err{border-color:#b91c1c}
 .fen-pas{display:flex;gap:6px;margin:-4px 0 14px}.fen-pas i{flex:1;height:3px;border-radius:3px;background:var(--g4)}.fen-pas i.on{background:var(--navy)}
 .fen-t small{font-weight:500;letter-spacing:0;text-transform:none;color:#9aa1ad;margin-left:4px}
 .dd{position:relative}
@@ -150,6 +151,14 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
 .merci{text-align:center;padding:40px 10px}
 .merci svg{width:54px;height:54px;color:var(--ok)}
 [hidden]{display:none!important}
+.grp{display:flex;flex-direction:column;gap:8px}.grp-t{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--g2)}.grp-t small{font-weight:500;letter-spacing:0;text-transform:none;color:#9aa1ad}
+.puces{display:flex;flex-wrap:wrap;gap:8px}
+.puce{height:36px;padding:0 14px;border-radius:999px;border:1px solid rgba(12,15,20,.14);background:#fff;font-size:13px;font-weight:500;color:var(--g1);cursor:pointer;transition:border-color .2s,background .2s}
+.puce:hover{border-color:var(--navy)}.puce.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.ok-c{flex-direction:row!important;align-items:flex-start;gap:10px!important;font-size:12.5px!important;font-weight:400!important;letter-spacing:0!important;text-transform:none!important;color:var(--g1)!important;line-height:1.5}
+.ok-c input{margin-top:2px;accent-color:var(--navy);width:16px;height:16px;flex:none}.ok-c a{color:var(--navy)}
+.rl.rem span,.rl.rem b{color:var(--ok)}
+
 .barre-m{display:none}
 @media(max-width:960px){
   .barre-m{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:20;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid rgba(12,15,20,.08)}
@@ -162,6 +171,9 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
 @media(max-width:960px){.grid{grid-template-columns:1fr}.rec{position:static}.mois{grid-template-columns:1fr}.mois .m2{display:none}}
 @media(max-width:560px){.prods{grid-template-columns:1fr 1fr;gap:8px}.pc{border-radius:14px}.pc img{aspect-ratio:4/3}.pc-b{padding:8px 10px 10px;gap:3px}.pc-c{font-size:10px}.pc-n{font-size:11px}.pc-p{font-size:11px}.pc-bas{flex-direction:column;align-items:stretch;gap:6px}.pc-add{height:26px;font-size:11px}.modes,.f,.dates{grid-template-columns:1fr}.card{padding:18px}.st{font-size:11.5px}.st span{display:none}.st.on span{display:inline}}
 </style>
+<script src="/donnees.js"></script>
+<script src="/theme.js"></script>
+<script src="/pack-mariage.js"></script>
 </head>
 <body>
 <header class="top"><a class="logo" href="/">VESPRA EVENT</a><small>Devis gratuit · réponse sous 24 h</small></header>
@@ -313,7 +325,7 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
         '<button type="button" class="btn fen-ok" data-a="'+(avecO?'suiv':'ok')+'">'+(avecO?'Suivant':'Ajouter au devis')+'</button></div>'+
       '<div class="fen-p" data-page="2">'+
         (os.length?'<div class="fen-t">'+esc(p.optTitre||'Options')+' <small>facultatif</small></div><div class="fen-l">'+os.map(function(o,i){return '<label class="fen-o"><input type="checkbox" value="'+i+'"><span>'+esc(o.label)+'</span><b>'+(o.price&&weekend()?'+ '+eur(o.price):'Sur devis')+'</b></label>'}).join('')+'</div>':'')+
-        (ps.length?'<div class="fen-t">Personnalisation</div>'+ps.map(function(x){return '<input class="fen-i" data-p="'+esc(x.id)+'" maxlength="'+(x.max||60)+'" placeholder="'+esc(x.label)+(x.ph?' — '+esc(x.ph):'')+'">'}).join(''):'')+
+        (ps.length?'<div class="fen-t">Personnalisation</div>'+ps.map(function(x){return '<input class="fen-i" data-p="'+esc(x.id)+'"'+(x.req?' data-req':'')+' maxlength="'+(x.max||60)+'" placeholder="'+esc(x.label)+(x.ph?' — '+esc(x.ph):'')+'">'}).join(''):'')+
         '<div class="fen-act">'+(avecF?'<button type="button" class="lien" data-a="prec">← Formule</button>':'<span></span>')+'<button type="button" class="btn" data-a="ok">Valider</button></div></div>'+
       '</div>';
     document.body.appendChild(f);requestAnimationFrame(function(){f.classList.add('on')});
@@ -326,6 +338,8 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
     majDD();montrer(page);
     function fermer(){f.classList.remove('on');document.removeEventListener('keydown',clavier);setTimeout(function(){f.remove()},200)}
     function valider(){
+      var manque=[].filter.call(f.querySelectorAll('.fen-i[data-req]'),function(i){return !i.value.trim()});
+      if(manque.length){if(page!==2)montrer(2);manque[0].classList.add('err');manque[0].focus();return}
       var opts=[].map.call(f.querySelectorAll('.fen-l input:checked'),function(c){return os[+c.value]});
       var txt=[].map.call(f.querySelectorAll('.fen-i'),function(i){return i.value.trim()}).filter(Boolean).join(' / ');
       fermer();ajouter(p.id,vs.length?choix:-1,opts,txt);
@@ -347,20 +361,27 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
   }
 
   /* ── étape 3 : coordonnées ── */
+  var CONV=['Moins de 30 personnes','30 à 80 personnes','80 à 150 personnes','150 à 300 personnes','Plus de 300 personnes'];
+  var TYP=['Mariage','Anniversaire','Fête de village / Comité des fêtes',"Événement d'entreprise",'Concert / Spectacle','Autre'];
+  function puces(nom,l){return '<div class="puces" data-nom="'+nom+'">'+l.map(function(x){return '<button type="button" class="puce'+(S[nom]===x?' on':'')+'" data-puce="'+esc(x)+'">'+esc(x.replace(' personnes',''))+'</button>'}).join('')+'</div>'}
   function etape3(){
+    var c=S.coord||{};var v=function(k){return esc(c[k]||'')};
     return '<p class="kick">Étape 3 sur 3</p><h1>VOS <em>coordonnées</em></h1><p class="sub">Nous vérifions la disponibilité et vous envoyons votre devis sous 24 h. Sans engagement.</p>'+
     '<form class="card" id="form" novalidate><div class="f">'+
-      '<label>Prénom<input name="prenom" autocomplete="given-name" required></label>'+
-      '<label>Nom<input name="nom" autocomplete="family-name" required></label>'+
-      '<label>E-mail<input name="email" type="email" autocomplete="email" required></label>'+
-      '<label>Téléphone<input name="tel" type="tel" autocomplete="tel" required></label>'+
-      (S.mode==='livraison'?'<label class="l2">Adresse du lieu de l’événement<input name="adresse" autocomplete="street-address" required></label>':'')+
-      '<label class="l2">Message (facultatif)<textarea name="message" placeholder="Type d’événement, nombre d’invités, contraintes d’accès…"></textarea></label>'+
+      '<label>Prénom<input name="prenom" autocomplete="given-name" required value="'+v('prenom')+'"></label>'+
+      '<label>Nom<input name="nom" autocomplete="family-name" required value="'+v('nom')+'"></label>'+
+      '<label>E-mail<input name="email" type="email" autocomplete="email" required value="'+v('email')+'"></label>'+
+      '<label>Téléphone<input name="tel" type="tel" autocomplete="tel" required value="'+v('tel')+'"></label>'+
+      (S.mode==='livraison'?'<label class="l2">Adresse du lieu de l’événement<input name="adresse" autocomplete="street-address" required value="'+v('adresse')+'"></label>':'')+
+      '<div class="l2 grp"><span class="grp-t">Nombre d’invités</span>'+puces('convives',CONV)+'</div>'+
+      '<div class="l2 grp"><span class="grp-t">Type d’événement <small>facultatif</small></span>'+puces('type',TYP)+'</div>'+
+      '<label class="l2">Message (facultatif)<textarea name="message" placeholder="Lieu, horaires, contraintes d’accès, questions…">'+v('message')+'</textarea></label>'+
+      '<label class="l2 ok-c"><input type="checkbox" name="cgv"> <span>J’accepte les <a href="/cgv" target="_blank" rel="noopener">conditions de location</a> et que mes informations servent à traiter ma demande (<a href="/politique-de-confidentialite" target="_blank" rel="noopener">confidentialité</a>).</span></label>'+
     '</div><p class="err" id="err"></p>'+
-    '<div class="actions"><button type="button" class="lien" data-go="2">← Modifier le matériel</button><button type="submit" class="btn">Envoyer ma demande</button></div></form>';
+    '<div class="actions"><button type="button" class="lien" data-go="2">← Modifier le matériel</button><button type="submit" class="btn" id="envoyer">Envoyer ma demande</button></div></form>';
   }
   function merci(){
-    return '<div class="card merci">'+ico.ok+'<h1 style="margin-top:14px">DEMANDE <em>envoyée</em></h1><p class="sub" style="margin:0 auto">Aperçu de la maquette : rien n’a été envoyé. Dans la version finale, la demande arrive dans le back-office comme une réservation classique.</p></div>';
+    return '<div class="card merci">'+ico.ok+'<h1 style="margin-top:14px">DEMANDE <em>envoyée</em></h1><p class="sub" style="margin:0 auto">Merci ! Nous vérifions la disponibilité du matériel à vos dates et nous vous répondons sous 24 h.</p><div class="actions" style="justify-content:center"><a class="btn" href="/">Retour à l’accueil</a></div></div>';
   }
 
   /* ── récapitulatif ── */
@@ -374,7 +395,8 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
       '<div class="rl"><span>Fin</span><b>'+(S.fin?fmt(S.fin):'—')+'</b></div>'+
       '<div class="rl"><span>Mode</span><b>'+(S.mode==='retrait'?'Retrait à Vitré':S.mode==='livraison'?'Livraison et installation':'—')+'</b></div>'+
       (S.panier.length?'<ul class="items">'+items+'</ul>':'<p class="vide-r">Aucun produit pour l’instant.</p>')+
-      (weekend()?'<div class="tot"><span>Total estimé</span><b>'+eur(tot)+'</b></div>':'<div class="tot"><span>Total</span><b style="font-size:26px">Sur devis</b></div><p class="aide">Location hors week-end : le tarif dépend de la durée et du matériel, nous vous l’envoyons sous 24 h.</p>')+
+      ((function(){var pk=infoPack();return weekend()&&pk&&pk.actif?'<div class="rl rem"><span>Remise 10 %</span><b>− '+eur(pk.remise)+'</b></div>':''})())+
+      (weekend()?'<div class="tot"><span>Total estimé</span><b>'+eur(tot-((infoPack()||{}).actif?infoPack().remise:0))+'</b></div>':'<div class="tot"><span>Total</span><b style="font-size:26px">Sur devis</b></div><p class="aide">Location hors week-end : le tarif dépend de la durée et du matériel, nous vous l’envoyons sous 24 h.</p>')+
       (devis||S.mode==='livraison'?'<p class="aide">'+(S.mode==='livraison'?'+ livraison selon la distance':'')+(devis?(S.mode==='livraison'?' · ':'')+'+ éléments sur devis':'')+'</p>':'');
   }
   $('#barreM').addEventListener('click',function(e){if(e.target.closest('[data-suiv]'))aller(3)});
@@ -385,7 +407,7 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
     etapes();
     var z=$('#zone');
     z.innerHTML=S.etape===1?etape1():S.etape===2?etape2():S.etape===3?etape3():merci();
-    recap();
+    recap();sauver();
     /* téléphone : total et bouton « Continuer » toujours visibles en bas de l'écran */
     var bm=$('#barreM');
     if(S.etape===2){var tot=S.panier.reduce(function(a,x){return a+x.price*x.qty},0),n=S.panier.reduce(function(a,x){return a+x.qty},0);
@@ -405,13 +427,52 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
     if(t.dataset.add){ajouter(t.dataset.add,t.dataset.v!=null?+t.dataset.v:null);return}
   });
   $('#zone').addEventListener('input',function(e){if(e.target.id==='q'){S.q=e.target.value;var pos=e.target.selectionStart;rendre();var q=$('#q');q.focus();try{q.setSelectionRange(pos,pos)}catch(x){}}});
+  /* Envoi : même formulaire Netlify « reservation » que la page Réservation, donc même arrivée dans le back-office. */
+  function jj(d){return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear()}
+  function infoPack(){try{return window.VESPRA_PACK?VESPRA_PACK.info(S.panier.map(function(x){return {id:x.pid,price:x.price,qty:x.qty}})):null}catch(e){return null}}
+  $('#zone').addEventListener('input',function(e){if(e.target.form&&e.target.form.id==='form'){S.coord=S.coord||{};S.coord[e.target.name]=e.target.value}});
   $('#zone').addEventListener('submit',function(e){
-    e.preventDefault();var f=e.target,ok=true;
-    f.querySelectorAll('[required]').forEach(function(i){if(!i.value.trim())ok=false});
-    if(ok&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email.value.trim()))ok=false;
-    if(!ok){$('#err').textContent='Merci de compléter vos coordonnées (e-mail valide).';return}
-    S.etape=4;rendre();
+    e.preventDefault();var f=e.target,ok=true,g=function(n){return f.elements[n]?String(f.elements[n].value||'').trim():''};
+    f.querySelectorAll('input[required]').forEach(function(i){if(!i.value.trim())ok=false});
+    if(!ok||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(g('email'))){$('#err').textContent='Merci de compléter vos coordonnées (e-mail valide).';return}
+    if(!S.convives){$('#err').textContent='Merci d’indiquer le nombre d’invités.';return}
+    if(!f.elements.cgv.checked){$('#err').textContent='Merci d’accepter les conditions de location.';return}
+    var we=weekend(),pk=infoPack(),n=nbJours();
+    var lignes=S.panier.map(function(x){var l=String(x.label||'').split(' · ');return {produit:x.nom,formule:l[0]||'',options:l.slice(1).join(', '),quantite:x.qty,prix:x.devis||!we?'sur devis':(x.price*x.qty)+' €'}});
+    var periode='Du '+fmt(S.deb,1)+' '+S.deb.getFullYear()+' au '+fmt(S.fin,1)+' '+S.fin.getFullYear()+' ('+n+' jour'+(n>1?'s':'')+')';
+    var det=['PÉRIODE DE LOCATION : '+periode+(we?'':' — hors week-end : tarif sur devis'),
+      'MODE : '+(S.mode==='livraison'?'Livraison et installation':'Retrait au dépôt de Vitré'),''].concat(S.panier.map(function(x){return '• '+x.nom+(x.label?' — '+x.label:'')+' × '+x.qty+' : '+(x.devis||!we?'sur devis':(x.price*x.qty)+' €')}));
+    if(pk&&pk.actif&&we){det.push('');det.push('OFFRE ÉVÉNEMENT : '+pk.n+' produits — remise de 10 % ('+pk.remise+' €) à déduire du total des locations (livraison exclue)')}
+    var d={'form-name':'reservation','bot-field':'','subject':'📅 Demande de disponibilité — Vespra Event','demande':'Disponibilités pour réserver',
+      'client_type':S.type==="Événement d'entreprise"?'Entreprise ou association':'Particulier',
+      prenom:g('prenom'),nom:g('nom'),email:g('email'),tel:g('tel'),date:jj(S.deb),convives:S.convives||'',type:S.type||'',
+      livraison:S.mode==='livraison'?'oui':'non',adresse_livraison:g('adresse'),source:'Parcours de réservation en 3 étapes',
+      message:periode+(g('message')?'\n\n'+g('message'):''),cartData:JSON.stringify(lignes,null,1),
+      livraison_installation:S.mode==='livraison'?'Oui — livraison et installation demandées':'Non',
+      details_devis:det.join('\n'),pack_mariage:(pk&&pk.actif&&we)?('Oui — '+pk.n+' produits — remise de 10 % ('+pk.remise+' €) à déduire'):'',
+      conditions_acceptees:'Oui',donnees_acceptees:'Oui'};
+    var b=$('#envoyer');b.disabled=true;b.textContent='Envoi en cours…';
+    fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(d).toString()})
+      .then(function(r){if(!r.ok)throw 0;S.panier=[];S.etape=4;rendre();try{localStorage.removeItem('vespra_cart');localStorage.removeItem('vespra_parcours')}catch(x){}window.scrollTo(0,0)})
+      .catch(function(){b.disabled=false;b.textContent='Envoyer ma demande';$('#err').textContent='Envoi impossible pour le moment. Réessayez ou appelez le 06 50 83 68 28.'});
   });
+  $('#zone').addEventListener('click',function(e){var p=e.target.closest('[data-puce]');if(!p)return;var nom=p.parentNode.dataset.nom;
+    S[nom]=(S[nom]===p.dataset.puce&&nom==='type')?'':p.dataset.puce;
+    p.parentNode.querySelectorAll('.puce').forEach(function(x){x.classList.toggle('on',x.dataset.puce===S[nom])});});
+
+  /* Panier partagé avec le reste du site (« vespra_cart ») ; dates et mode gardés si la page est rechargée */
+  function sauver(){
+    if(S.etape===4)return;
+    try{localStorage.setItem('vespra_cart',JSON.stringify(S.panier.map(function(x){return {id:x.pid+'_'+x.cle.replace(/[^a-z0-9]/gi,'').slice(-12),baseName:x.nom,name:x.nom+(x.label?' — '+x.label:''),label:x.label,price:x.price,qty:x.qty,devis:x.devis,img:x.img}})));
+      localStorage.setItem('vespra_parcours',JSON.stringify({deb:S.deb&&S.deb.getTime(),fin:S.fin&&S.fin.getTime(),mode:S.mode}))}catch(x){}
+  }
+  (function reprendre(){
+    try{var c=JSON.parse(localStorage.getItem('vespra_cart')||'[]');
+      S.panier=c.filter(function(x){return x&&x.price!=null}).map(function(x,i){return {cle:'ext'+i+'_'+(x.id||''),pid:String(x.id||'').split('_')[0],nom:x.baseName||String(x.name||'Produit').split(' — ')[0],label:x.label||'',price:Number(x.price)||0,devis:!!x.devis,qty:x.qty||1,img:x.img||''}});
+      var p=JSON.parse(localStorage.getItem('vespra_parcours')||'null');
+      if(p){if(p.deb&&p.deb>=auj.getTime())S.deb=new Date(p.deb);if(p.fin&&S.deb&&p.fin>=S.deb.getTime())S.fin=new Date(p.fin);S.mode=p.mode||''}
+    }catch(x){}
+  })();
 
   rendre();
   fetch('/catalogue.html',{credentials:'omit'}).then(function(r){return r.text()}).then(function(t){
