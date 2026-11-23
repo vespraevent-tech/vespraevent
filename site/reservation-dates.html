@@ -116,6 +116,22 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
 .fen-o input{accent-color:var(--navy);margin:0}.fen-o span{flex:1}.fen-o b{font-weight:600;white-space:nowrap;font-size:13px}
 .fen-i{width:100%;font:inherit;font-size:14px;border:1px solid rgba(12,15,20,.14);border-radius:12px;padding:11px 13px;margin-bottom:8px}
 .fen-ok{width:100%;margin-top:18px}
+.fen-pas{display:flex;gap:6px;margin:-4px 0 14px}.fen-pas i{flex:1;height:3px;border-radius:3px;background:var(--g4)}.fen-pas i.on{background:var(--navy)}
+.fen-t small{font-weight:500;letter-spacing:0;text-transform:none;color:#9aa1ad;margin-left:4px}
+.dd{position:relative}
+.dd-b{width:100%;display:flex;align-items:center;gap:12px;padding:13px 14px;border:1px solid rgba(12,15,20,.14);border-radius:14px;background:#fff;cursor:pointer;text-align:left;transition:border-color .2s,box-shadow .2s}
+.dd-b:hover,.dd.ouvert .dd-b{border-color:var(--navy)}.dd.ouvert .dd-b{box-shadow:0 0 0 3px rgba(43,74,107,.08)}
+.dd-b svg{width:16px;height:16px;flex:none;color:var(--g2);transition:transform .2s}.dd.ouvert .dd-b svg{transform:rotate(180deg)}
+.dd-v{flex:1;display:flex;justify-content:space-between;gap:10px;font-size:14px}.dd-v b{font-weight:600}
+.dd-l{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:5;margin:0;padding:6px;list-style:none;background:#fff;border:1px solid rgba(12,15,20,.1);border-radius:14px;box-shadow:0 18px 40px rgba(12,15,20,.14);max-height:260px;overflow:auto}
+.dd-l li{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:10px;font-size:13.5px;cursor:pointer;outline:none}
+.dd-l li:hover,.dd-l li:focus{background:var(--g4)}.dd-l li[aria-selected=true]{color:var(--navy);font-weight:600}
+.dd-l li b{font-weight:600;white-space:nowrap}
+.fen-act{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px}
+.fen-p[data-page="1"]{min-height:150px;display:flex;flex-direction:column}.fen-p[data-page="1"] .fen-ok{margin-top:auto}
+.fen-p[hidden]{display:none!important}
+.fen .dd-l{position:static;margin-top:6px;box-shadow:0 10px 26px rgba(12,15,20,.08);max-height:none}
+
 .pc-add-old{margin-top:8px;height:36px;border-radius:999px;border:1px solid var(--navy);background:#fff;color:var(--navy);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
 .pc-add{flex:none;height:28px;padding:0 11px;border-radius:999px;border:1px solid rgba(12,15,20,.14);background:#fff;color:var(--navy);font-size:11.5px;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s}
 .pc-add:hover{border-color:var(--navy)}
@@ -222,7 +238,7 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
   }
   function modesHTML(){
     var M={retrait:'<button type="button" class="mode'+(S.mode==='retrait'?' on':'')+'" data-mode="retrait">'+ico.depot+'<div><b>Retrait au dépôt de Vitré</b><span>Vous venez chercher le matériel, avec une prise en main sur place.</span></div></button>',
-      livraison:'<button type="button" class="mode'+(S.mode==='livraison'?' on':'')+'" data-mode="livraison">'+ico.camion+'<div><b>Livraison et installation</b><span>Sur le lieu de votre événement, dans tout le Grand Ouest. Tarif selon la distance.</span></div></button>'};
+      livraison:'<button type="button" class="mode'+(S.mode==='livraison'?' on':'')+'" data-mode="livraison">'+ico.camion+'<div><b>Livraison et installation</b><span>Sur le lieu de votre événement, où qu’il se trouve. Tarif selon la distance.</span></div></button>'};
     /* l'option choisie passe à gauche, l'autre reste proposée à droite */
     return S.mode==='livraison'?M.livraison+M.retrait:M.retrait+M.livraison;
   }
@@ -280,22 +296,53 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
     rendre();
   }
 
+  /* Fenêtre de personnalisation en deux temps : 1. la formule (liste déroulante), 2. les options. */
   function fenetre(p){
-    var f=document.createElement('div');f.className='fen';f.setAttribute('role','dialog');f.setAttribute('aria-modal','true');
+    var f=document.createElement('div');f.className='fen';f.setAttribute('role','dialog');f.setAttribute('aria-modal','true');f.setAttribute('aria-label',p.name);
     var vs=(p.variants||[]),os=(p.options||[]),ps=(p.perso||[]);
-    f.innerHTML='<div class="fen-b"><button type="button" class="fen-x" aria-label="Fermer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'+
+    var avecF=vs.length>1,avecO=os.length||ps.length,choix=Math.min(p.vdef||0,Math.max(0,vs.length-1)),page=avecF?1:2;
+    var X='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    var CHEV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+    f.innerHTML='<div class="fen-b"><button type="button" class="fen-x" aria-label="Fermer">'+X+'</button>'+
       '<div class="fen-h"><img src="/'+esc(p.img)+'" alt=""><div><div class="pc-c">'+esc(p.cat)+'</div><div class="fen-n">'+esc(p.name)+'</div></div></div>'+
-      (vs.length>1?'<div class="fen-t">'+esc(p.varTitre||'Formule')+'</div><div class="fen-l">'+vs.map(function(v,i){return '<label class="fen-o"><input type="radio" name="fv" value="'+i+'"'+(i===(p.vdef||0)?' checked':'')+'><span>'+esc(v.label)+'</span><b>'+prixTxt(v.price)+'</b></label>'}).join('')+'</div>':'')+
-      (os.length?'<div class="fen-t">'+esc(p.optTitre||'Options')+'</div><div class="fen-l">'+os.map(function(o,i){return '<label class="fen-o"><input type="checkbox" value="'+i+'"><span>'+esc(o.label)+'</span><b>'+(o.price?(weekend()?'+ '+eur(o.price):'Sur devis'):'Sur devis')+'</b></label>'}).join('')+'</div>':'')+
-      (ps.length?'<div class="fen-t">Personnalisation</div>'+ps.map(function(x){return '<input class="fen-i" data-p="'+esc(x.id)+'" maxlength="'+(x.max||60)+'" placeholder="'+esc(x.label)+(x.ph?' — '+esc(x.ph):'')+'">'}).join(''):'')+
-      '<button type="button" class="btn fen-ok">Ajouter au devis</button></div>';
+      (avecF&&avecO?'<div class="fen-pas"><i class="on"></i><i></i></div>':'')+
+      '<div class="fen-p" data-page="1">'+(avecF?
+        '<div class="fen-t">'+esc(p.varTitre||'Formule')+'</div>'+
+        '<div class="dd"><button type="button" class="dd-b" aria-haspopup="listbox" aria-expanded="false"><span class="dd-v"></span>'+CHEV+'</button>'+
+        '<ul class="dd-l" role="listbox" hidden>'+vs.map(function(v,i){return '<li role="option" tabindex="-1" data-i="'+i+'"><span>'+esc(v.label)+'</span><b>'+prixTxt(v.price)+'</b></li>'}).join('')+'</ul></div>':'')+
+        '<button type="button" class="btn fen-ok" data-a="'+(avecO?'suiv':'ok')+'">'+(avecO?'Suivant':'Ajouter au devis')+'</button></div>'+
+      '<div class="fen-p" data-page="2">'+
+        (os.length?'<div class="fen-t">'+esc(p.optTitre||'Options')+' <small>facultatif</small></div><div class="fen-l">'+os.map(function(o,i){return '<label class="fen-o"><input type="checkbox" value="'+i+'"><span>'+esc(o.label)+'</span><b>'+(o.price&&weekend()?'+ '+eur(o.price):'Sur devis')+'</b></label>'}).join('')+'</div>':'')+
+        (ps.length?'<div class="fen-t">Personnalisation</div>'+ps.map(function(x){return '<input class="fen-i" data-p="'+esc(x.id)+'" maxlength="'+(x.max||60)+'" placeholder="'+esc(x.label)+(x.ph?' — '+esc(x.ph):'')+'">'}).join(''):'')+
+        '<div class="fen-act">'+(avecF?'<button type="button" class="lien" data-a="prec">← Formule</button>':'<span></span>')+'<button type="button" class="btn" data-a="ok">Valider</button></div></div>'+
+      '</div>';
     document.body.appendChild(f);requestAnimationFrame(function(){f.classList.add('on')});
-    function fermer(){f.classList.remove('on');setTimeout(function(){f.remove()},200)}
-    f.addEventListener('click',function(e){if(e.target===f||e.target.closest('.fen-x'))fermer()});
-    f.querySelector('.fen-ok').addEventListener('click',function(){
-      var r=f.querySelector('input[name=fv]:checked'),opts=[].map.call(f.querySelectorAll('.fen-l input[type=checkbox]:checked'),function(c){return os[+c.value]});
+    var dd=f.querySelector('.dd'),ddb=f.querySelector('.dd-b'),ddl=f.querySelector('.dd-l');
+    function majDD(){if(!dd)return;f.querySelector('.dd-v').innerHTML='<span>'+esc(vs[choix].label)+'</span><b>'+prixTxt(vs[choix].price)+'</b>';
+      ddl.querySelectorAll('li').forEach(function(li){li.setAttribute('aria-selected',String(+li.dataset.i===choix))})}
+    function ouvrirDD(o){if(!dd)return;ddl.hidden=!o;ddb.setAttribute('aria-expanded',String(o));dd.classList.toggle('ouvert',o);if(o){var c=ddl.querySelector('[aria-selected=true]');if(c)c.focus()}}
+    function montrer(n){page=n;f.querySelectorAll('.fen-p').forEach(function(x){x.hidden=+x.dataset.page!==n});
+      f.querySelectorAll('.fen-pas i').forEach(function(x,i){x.classList.toggle('on',i<n)})}
+    majDD();montrer(page);
+    function fermer(){f.classList.remove('on');document.removeEventListener('keydown',clavier);setTimeout(function(){f.remove()},200)}
+    function valider(){
+      var opts=[].map.call(f.querySelectorAll('.fen-l input:checked'),function(c){return os[+c.value]});
       var txt=[].map.call(f.querySelectorAll('.fen-i'),function(i){return i.value.trim()}).filter(Boolean).join(' / ');
-      fermer();ajouter(p.id,r?+r.value:(vs.length?0:-1),opts,txt);
+      fermer();ajouter(p.id,vs.length?choix:-1,opts,txt);
+    }
+    function clavier(e){
+      if(e.key==='Escape'){if(dd&&!ddl.hidden){ouvrirDD(false);ddb.focus()}else fermer();return}
+      if(dd&&!ddl.hidden&&(e.key==='ArrowDown'||e.key==='ArrowUp')){e.preventDefault();var l=[].slice.call(ddl.children),i=l.indexOf(document.activeElement);i=Math.max(0,Math.min(l.length-1,i+(e.key==='ArrowDown'?1:-1)));l[i].focus()}
+      if(dd&&!ddl.hidden&&e.key==='Enter'&&document.activeElement.dataset.i!=null){e.preventDefault();choix=+document.activeElement.dataset.i;majDD();ouvrirDD(false);ddb.focus()}
+    }
+    document.addEventListener('keydown',clavier);
+    f.addEventListener('click',function(e){
+      if(e.target===f||e.target.closest('.fen-x')){fermer();return}
+      if(e.target.closest('.dd-b')){ouvrirDD(ddl.hidden);return}
+      var li=e.target.closest('.dd-l li');if(li){choix=+li.dataset.i;majDD();ouvrirDD(false);return}
+      if(dd&&!e.target.closest('.dd'))ouvrirDD(false);
+      var a=e.target.closest('[data-a]');if(!a)return;
+      if(a.dataset.a==='suiv')montrer(2);else if(a.dataset.a==='prec')montrer(1);else if(a.dataset.a==='ok')valider();
     });
   }
 

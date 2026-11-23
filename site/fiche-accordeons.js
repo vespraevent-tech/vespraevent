@@ -99,7 +99,7 @@
   bloc.appendChild(volet('desc', 'Description', [desc, feats], true));
   bloc.appendChild(volet('prix', 'Tarifs', '', false));
   bloc.appendChild(volet('livr', 'Livraison et retrait',
-    '<p><b>Livraison et installation</b> sur le lieu de votre événement, dans tout le Grand Ouest. Tarif selon la distance, précisé sur votre devis.</p>' +
+    '<p><b>Livraison et installation</b> sur le lieu de votre événement, où qu’il se trouve. Tarif selon la distance, précisé sur votre devis.</p>' +
     '<p><b>Retrait au dépôt de Vitré</b> sur rendez-vous, avec une démonstration du matériel.</p>' +
     '<p><b>Reprise</b> : nous pouvons venir récupérer le matériel le lendemain de l’événement.</p>', false));
   col.insertBefore(bloc, ancre && ancre.parentNode === col ? ancre : null);
