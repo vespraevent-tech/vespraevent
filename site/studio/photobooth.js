@@ -66,17 +66,17 @@
       '.pbx-puce.on{background:#E8F5EC;color:#15803D}.pbx-puce.av{background:#EEF2F7;color:var(--n)}.pbx-puce.pa{background:#F0F2F5;color:#8a94a3}',
       '#pbZone .pb-tete .btn{border-radius:999px;font-size:13px;padding:8px 16px;font-weight:600}',
       /* un événement : barre du haut */
-      '.pbx-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--nd);color:#fff;border-radius:18px;padding:12px 16px 12px 12px;margin-bottom:16px}',
-      '.pbx-retour{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px 0 10px;border:0;border-radius:999px;background:rgba(255,255,255,.1);color:#fff;font:600 13px Inter,sans-serif;cursor:pointer;transition:background .2s}.pbx-retour:hover{background:rgba(255,255,255,.18)}',
+      '.pbx-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;color:var(--t);padding:0 0 4px;margin-bottom:18px}',
+      '.pbx-retour{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px 0 10px;border:1px solid rgba(12,15,20,.12);border-radius:999px;background:#fff;color:#3D4452;font:600 13px Inter,sans-serif;cursor:pointer;transition:border-color .2s}.pbx-retour:hover{border-color:var(--n)}',
       '.pbx-retour svg{width:16px;height:16px}',
-      '.pbx-nom{font:700 17px Inter,sans-serif;letter-spacing:-.005em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
-      '.pbx-date{font-size:13px;color:rgba(255,255,255,.62);white-space:nowrap}',
-      '.pbx-etat{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.08);font-size:12px;font-weight:600;color:rgba(255,255,255,.8)}',
+      '.pbx-nom{font:700 22px Inter,sans-serif;letter-spacing:-.01em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.pbx-date{font-size:13px;color:#8a94a3;white-space:nowrap}',
+      '.pbx-etat{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 12px;border-radius:999px;background:#F0F2F5;font-size:12px;font-weight:600;color:#646D7C}',
       '.pbx-etat::before{content:"";width:8px;height:8px;border-radius:50%;background:#8a94a3}.pbx-etat.ok::before{background:#34D27B}.pbx-etat.att::before{background:var(--or)}',
       '.pbx-etat[hidden]{display:none}',
       '.pbx-act{margin-left:auto;display:flex;gap:8px}',
-      '.pbx-b{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;border:0;border-radius:999px;background:rgba(255,255,255,.1);color:#fff;font:600 13px Inter,sans-serif;cursor:pointer;transition:background .2s}.pbx-b:hover{background:rgba(255,255,255,.2)}.pbx-b svg{width:16px;height:16px}',
-      '.pbx-b.p{background:var(--or);color:#16293E}.pbx-b.p:hover{background:#f7ab2b}',
+      '.pbx-b{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;border:1px solid rgba(12,15,20,.12);border-radius:999px;background:#fff;color:#3D4452;font:600 13px Inter,sans-serif;cursor:pointer;transition:border-color .2s,background .2s}.pbx-b:hover{border-color:var(--n)}.pbx-b svg{width:16px;height:16px}',
+      '.pbx-b.p{background:var(--n);border-color:var(--n);color:#fff}.pbx-b.p:hover{background:#1e3650}',
       /* menu de l'événement */
       '.pbx-corps{display:grid;grid-template-columns:240px minmax(0,1fr);gap:20px;align-items:start}',
       '.pbx-nav{position:sticky;top:12px;background:#fff;border:1px solid var(--l);border-radius:18px;padding:10px;box-shadow:0 6px 22px rgba(12,15,20,.04)}',
@@ -117,7 +117,11 @@
       '.pbx-main .pb-bloc h3{font:700 15px Inter,sans-serif;color:var(--t)}',
       '.pbx-main .btn{border-radius:999px}',
       '.pb-mp{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}.pb-mp-c{border:1px solid var(--l)!important;border-radius:16px!important;box-shadow:0 6px 22px rgba(12,15,20,.04)}',
-      '.pb-mp-c .pb-actions{gap:6px;flex-wrap:wrap}.pb-mp-c .btn{padding:6px 12px;font-size:12px}',
+      '.pbx-mp-v{position:relative}.pbx-mn{position:absolute;top:8px;z-index:3}.pbx-mn.g{left:8px}.pbx-mn.d{right:8px}',
+      '.pbx-rond{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:0;border-radius:50%;background:rgba(255,255,255,.94);color:#3D4452;box-shadow:0 2px 10px rgba(12,15,20,.18);cursor:pointer;transition:transform .15s,color .15s}.pbx-rond:hover{transform:scale(1.07);color:var(--n)}.pbx-rond svg{width:17px;height:17px}',
+      '.pbx-liste{display:none;position:absolute;top:38px;min-width:190px;padding:6px;background:#fff;border:1px solid var(--l);border-radius:14px;box-shadow:0 18px 40px rgba(12,15,20,.18)}.pbx-mn.g .pbx-liste{left:0}.pbx-mn.d .pbx-liste{right:0}.pbx-mn.ouvert .pbx-liste{display:block}',
+      '.pbx-liste button{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:0;border-radius:9px;background:none;font:500 13px Inter,sans-serif;color:#3D4452;cursor:pointer;text-align:left}.pbx-liste button svg{width:16px;height:16px;flex:none;color:#8a94a3}',
+      '.pbx-liste button:hover:not(:disabled){background:#F0F2F5;color:var(--t)}.pbx-liste button:disabled{opacity:.38;cursor:default}.pbx-liste button.d,.pbx-liste button.d svg{color:#B91C1C}.pbx-liste button.d:hover{background:#FEF2F2}',
       '@media(max-width:1000px){.pbx-haut{grid-template-columns:1fr}}',
       '@media(max-width:860px){.pbx-corps{grid-template-columns:1fr}.pbx-nav{position:static;display:flex;gap:4px;overflow-x:auto;padding:8px}.pbx-nav .g{display:none}.pbx-nav button{white-space:nowrap;width:auto;padding:9px 12px}.pbx-nav button.on::before{display:none}.pbx-act{margin-left:0;width:100%}.pbx-b{flex:1;justify-content:center}.pbx-date{display:none}}'
     ].join('');
@@ -142,12 +146,13 @@
   function rendreListe(z) {
     /* ordre chronologique : à venir du plus proche au plus lointain, passés du plus récent au plus ancien, sans date à la fin */
     var parDate = function (e) { return e.date || e.fin || ''; }, croiss = function (a, b) { return !parDate(a) ? 1 : !parDate(b) ? -1 : parDate(a).localeCompare(parDate(b)); };
-    var enCours = PB.liste.filter(function (e) { return !termine(e); }).sort(croiss), passes = PB.liste.filter(termine).sort(function (a, b) { return -croiss(a, b) || 0; });
+    var auj0 = aujourdhui(), actifs = PB.liste.filter(function (e) { return !termine(e); }).sort(croiss), enCours = actifs.filter(function (e) { var d0 = e.date || '', f0 = e.fin || e.date || ''; return d0 && d0 <= auj0 && f0 >= auj0; }), aVenir = actifs.filter(function (e) { return enCours.indexOf(e) < 0; }), passes = PB.liste.filter(termine).sort(function (a, b) { return -croiss(a, b) || 0; });
     var carte = function (e) { var d0 = e.date || '', f0 = e.fin || e.date || '', j = aujourdhui(), etat = termine(e) ? ['pa', 'Terminé'] : (d0 && d0 <= j && f0 >= j) ? ['on', 'En cours'] : ['av', 'À venir']; return '<button type="button" class="pb-carte" onclick="pbEvt(\'' + e.id + '\')"><span class="pbx-puce ' + etat[0] + '">' + etat[1] + '</span><b>' + esc(e.nom) + '</b><span>' + (e.date ? dateFr(e.date) : 'Date à préciser') + '</span><span>' + e.misesEnPage + ' mise' + (e.misesEnPage > 1 ? 's' : '') + ' en page · ' + e.photos + ' photo' + (e.photos > 1 ? 's' : '') + '</span></button>'; };
     z.innerHTML = '<div class="pb-tete"><h2>Photobooth</h2><span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><a class="btn btn-ghost" style="padding:5px 12px;font-size:12.5px" href="/photobooth/app/?liste" target="_blank" rel="noopener">Ouvrir l’appli des bornes</a><button class="btn btn-ghost" style="padding:5px 12px;font-size:12.5px" onclick="pbNouveau()">+ Créer un événement</button></span></div>'
       + (PB.nouveau ? '<div class="pb-bloc"><h3>Nouvel événement</h3><div class="pb-champs">' + champ('pbn-q', 'Nom de la cliente', '', 'Tapez un nom : recherche dans les réservations du planning', 'text', ' autocomplete="off" oninput="pbFiltrer()"') + '</div><div id="pbn-res" style="margin-top:12px"></div><p class="aide" style="font-size:12.5px;color:#6b7280;margin:10px 0 0">Pas dans le planning ? <a href="#" onclick="pbManuel();return false" style="color:#14304f">Créer sans réservation</a></p>' + (PB.manuel ? '<div class="pb-champs" style="margin-top:8px">' + champ('pbn-nom', 'Nom de l’événement', '', 'Mariage de Sylvie & Paul') + champ('pbn-date', 'Date', '', '', 'date') + '</div><div class="pb-actions" style="margin-top:10px"><button class="btn" onclick="pbCreer()">Créer l’événement</button></div>' : '') + '<div class="pb-actions" style="margin-top:10px"><button class="btn btn-ghost" onclick="pbNouveau(false)">Annuler</button></div></div>' : '')
-      + (PB.liste.some(function (e) { return e.auto; }) ? '<div class="pb-actions" style="margin:0 0 10px"><button class="btn btn-ghost" style="color:#b03a2a" onclick="pbAutoSuppr()">Supprimer les événements créés automatiquement (' + PB.liste.filter(function (e) { return e.auto; }).length + ')</button></div>' : '') + '<div class="pb-titre-g">En cours et à venir</div>' + (enCours.length ? '<div class="pb-grille">' + enCours.map(carte).join('') + '</div>' : '<div class="pb-vide">Aucun événement en cours. Créez-en un avec « Nouvel événement ».</div>')
-      + '<div class="pb-titre-g">Événements passés (encore sauvegardés)</div>' + (passes.length ? '<div class="pb-grille">' + passes.map(carte).join('') + '</div>' : '<div class="pb-vide">Aucun événement passé.</div>');
+      + (PB.liste.some(function (e) { return e.auto; }) ? '<div class="pb-actions" style="margin:0 0 10px"><button class="btn btn-ghost" style="color:#b03a2a" onclick="pbAutoSuppr()">Supprimer les événements créés automatiquement (' + PB.liste.filter(function (e) { return e.auto; }).length + ')</button></div>' : '') + '<div class="pb-titre-g">À venir</div>' + (aVenir.length ? '<div class="pb-grille">' + aVenir.map(carte).join('') + '</div>' : '<div class="pb-vide">Aucun événement à venir. Créez-en un avec « Créer un événement ».</div>')
+      + '<div class="pb-titre-g">En cours</div>' + (enCours.length ? '<div class="pb-grille">' + enCours.map(carte).join('') + '</div>' : '<div class="pb-vide">Aucun événement en cours aujourd’hui.</div>')
+      + '<div class="pb-titre-g">Événements passés</div>' + (passes.length ? '<div class="pb-grille">' + passes.map(carte).join('') + '</div>' : '<div class="pb-vide">Aucun événement passé.</div>');
     if (PB.nouveau) { setTimeout(function () { var n = $('pbn-q'); if (n) n.focus(); }, 50); pbFiltrer(); }
   }
   /* liste des clientes du planning, pour pré-remplir un nouvel événement */
@@ -217,7 +222,13 @@
     retour: '<path d="M15 6l-6 6 6 6"/>', lien: '<path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',
     oeil: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
     corbeille: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>', reglage: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
-    bas: '<path d="M6 9l6 6 6-6"/>'
+    bas: '<path d="M6 9l6 6 6-6"/>',
+    cle: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+    points: '<circle cx="9" cy="9" r="1.4" fill="currentColor"/><circle cx="15" cy="9" r="1.4" fill="currentColor"/><circle cx="9" cy="15" r="1.4" fill="currentColor"/><circle cx="15" cy="15" r="1.4" fill="currentColor"/>',
+    dupli: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
+    crayon: '<path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/>',
+    haut: '<path d="M12 19V5M6 11l6-6 6 6"/>', bashaut: '<path d="M12 5v14M6 13l6 6 6-6"/>',
+    premier: '<path d="M5 4h14M12 20V9M7 14l5-5 5 5"/>', dernier: '<path d="M5 20h14M12 4v11M7 10l5 5 5-5"/>'
   };
   function ic(k) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (IC[k] || '') + '</svg>'; }
   var SECTIONS = [['tableau', 'Tableau de bord', ''], ['experience', 'Expérience photobooth', 'Basique'], ['capture', 'Paramètres de capture', ''], ['accueil', 'Écran d’accueil', 'Avancé'], ['ecran', 'Écran de partage', ''], ['partage', 'Paramètres de partage', 'Impression et partage'], ['impression', 'Paramètres d’impression', ''], ['galerie', 'Galerie en ligne', '']];
@@ -349,8 +360,16 @@
     }
     var zl = $('pbMpListe'); if (!zl) return;
     l.forEach(function (m, i) {
-      var d = document.createElement('div'); d.className = 'pb-mp-c'; var cv = document.createElement('canvas'); d.appendChild(cv);
-      d.insertAdjacentHTML('beforeend', '<div><b>' + esc(m.nom) + '</b><br><small>' + esc((PB.formats[m.format] || {}).nom || m.format) + ' · ' + m.cases.length + ' case' + (m.cases.length > 1 ? 's' : '') + (m.cadre ? '' : ' · sans calque') + '</small></div><div class="pb-actions"><button class="btn btn-ghost" onclick="pbModifierMp(' + i + ')">Modifier</button><button class="btn btn-ghost" onclick="pbDupliquerMp(' + i + ')">Dupliquer</button><button class="btn btn-ghost" title="Monter" onclick="pbDeplacerMp(' + i + ',-1)"' + (i ? '' : ' disabled') + '>↑</button><button class="btn btn-ghost" title="Descendre" onclick="pbDeplacerMp(' + i + ',1)"' + (i < l.length - 1 ? '' : ' disabled') + '>↓</button><button class="btn btn-ghost" style="color:#b03a2a" onclick="pbSupprimerMp(' + i + ')">Supprimer</button></div>');
+      var d = document.createElement('div'); d.className = 'pb-mp-c'; var cv = document.createElement('canvas');
+      var haut = i > 0, bas = i < l.length - 1, mi = function (ic0, txt, fn, o) { o = o || {}; return '<button type="button"' + (o.off ? ' disabled' : '') + (o.rouge ? ' class="d"' : '') + ' onclick="pbMenuFermer();' + fn + '">' + ic(ic0) + txt + '</button>'; };
+      var vis = document.createElement('div'); vis.className = 'pbx-mp-v'; vis.appendChild(cv);
+      vis.insertAdjacentHTML('beforeend',
+        '<div class="pbx-mn g"><button type="button" class="pbx-rond" title="Changer la place" aria-label="Changer la place" onclick="pbMenu(this,event)">' + ic('points') + '</button><div class="pbx-liste">'
+        + mi('premier', 'Mettre en première', 'pbPlacerMp(' + i + ',0)', { off: !haut }) + mi('haut', 'Monter', 'pbDeplacerMp(' + i + ',-1)', { off: !haut }) + mi('bashaut', 'Descendre', 'pbDeplacerMp(' + i + ',1)', { off: !bas }) + mi('dernier', 'Mettre en dernière', 'pbPlacerMp(' + i + ',1)', { off: !bas }) + '</div></div>'
+        + '<div class="pbx-mn d"><button type="button" class="pbx-rond" title="Actions" aria-label="Actions" onclick="pbMenu(this,event)">' + ic('cle') + '</button><div class="pbx-liste">'
+        + mi('crayon', 'Modifier', 'pbModifierMp(' + i + ')') + mi('dupli', 'Dupliquer', 'pbDupliquerMp(' + i + ')') + mi('corbeille', 'Supprimer', 'pbSupprimerMp(' + i + ')', { rouge: true }) + '</div></div>');
+      d.appendChild(vis);
+      d.insertAdjacentHTML('beforeend', '<div><b>' + esc(m.nom) + '</b><br><small>' + esc((PB.formats[m.format] || {}).nom || m.format) + ' · ' + m.cases.length + ' case' + (m.cases.length > 1 ? 's' : '') + (m.cadre ? '' : ' · sans calque') + '</small></div>');
       zl.appendChild(d); dessiner(cv, m, null, true); chargerImage(m.cadre, function (img) { if (img) dessiner(cv, m, img, true); });
     });
   }
@@ -362,6 +381,11 @@
   };
   window.pbModifierMp = function (i) { PB.cadreMode = false; PB.edit = { i: i, m: JSON.parse(JSON.stringify(PB.evt.misesEnPage[i])) }; PB.edit.snap = JSON.stringify(PB.edit.m); PB.sel = 0; rendre(); };
   window.pbDupliquerMp = function (i) { var m = JSON.parse(JSON.stringify(PB.evt.misesEnPage[i])); delete m.id; m.nom = m.nom + ' (copie)'; PB.evt.misesEnPage.splice(i + 1, 0, m); enregistrer('Mise en page dupliquée').then(rendre); };
+  /* petits menus des cartes : un seul ouvert à la fois, fermés par un clic ailleurs */
+  window.pbMenuFermer = function () { document.querySelectorAll('.pbx-mn.ouvert').forEach(function (x) { x.classList.remove('ouvert'); }); };
+  window.pbMenu = function (b, ev) { ev.stopPropagation(); var m = b.parentNode, o = m.classList.contains('ouvert'); pbMenuFermer(); if (!o) m.classList.add('ouvert'); };
+  if (!window.__pbMenuDoc) { window.__pbMenuDoc = 1; document.addEventListener('click', function () { pbMenuFermer(); }); document.addEventListener('keydown', function (e) { if (e.key === 'Escape') pbMenuFermer(); }); }
+  window.pbPlacerMp = function (i, fin) { var l = PB.evt.misesEnPage, x = l.splice(i, 1)[0]; if (fin) l.push(x); else l.unshift(x); enregistrer('Ordre enregistré').then(rendre); };
   window.pbDeplacerMp = function (i, d) { var l = PB.evt.misesEnPage, j = i + d; if (j < 0 || j >= l.length) return; var t = l[i]; l[i] = l[j]; l[j] = t; enregistrer('Ordre enregistré').then(rendre); };
   window.pbSupprimerMp = function (i) { if (!confirm('Supprimer la mise en page « ' + PB.evt.misesEnPage[i].nom + ' » ?')) return; PB.evt.misesEnPage.splice(i, 1); enregistrer('Mise en page supprimée').then(rendre); };
 
@@ -880,7 +904,7 @@
     var g = PB.evt.galerie;
     c.innerHTML = '<div class="pb-bloc"><h3>Couverture</h3><div style="height:170px;border-radius:10px;background:#eceae4 center/cover no-repeat;' + (g.couverture ? 'background-image:url(' + urlImage(g.couverture) + ')' : '') + ';display:flex;align-items:center;justify-content:center;color:#9a958a;font-size:13px">' + (g.couverture ? '' : 'Aucune image de couverture') + '</div>'
       + '<div class="pb-actions" style="margin-top:10px"><label class="btn btn-ghost" style="cursor:pointer">' + (g.couverture ? 'Modifier' : 'Choisir une image') + '<input type="file" accept="image/png,image/jpeg,image/webp" hidden onchange="pbCouverture(this)"></label><button class="btn ' + (g.ouverte ? '' : 'btn-ghost') + '" onclick="pbGalOuverte()">' + (g.ouverte ? 'Galerie ouverte' : 'Galerie fermée') + '</button></div></div>'
-      + '<div class="pb-bloc">' + ligne('Partager avec un lien', 'Toute personne disposant du lien de l’événement voit la galerie', sw('pbg-lien', g.lien)) + ligne('Accès des invités', 'Un invité voit aussi les photos des autres invités. Décochez pour un événement public : chacun ne voit que les siennes (QR code)', sw('pbg-inv', g.invites)) + ligne('Tout télécharger', 'Les visiteurs peuvent télécharger tout le contenu de l’événement', sw('pbg-tout', g.toutTelecharger))
+      + '<div class="pb-bloc">' + ligne('Partager avec un lien', 'Toute personne disposant du lien de l’événement voit la galerie', sw('pbg-lien', g.lien)) + ligne('Accès des invités', 'Un invité voit aussi les photos des autres invités. Décochez pour un événement public : chacun ne voit que les siennes (QR code)', sw('pbg-inv', g.invites)) + ligne('Tout télécharger sur la galerie des invités', 'Le bouton est toujours présent sur le lien de l’événement. Cochez pour l’ajouter aussi à la galerie des invités (mariage, fête privée)', sw('pbg-tout', g.toutTelecharger))
       + '<div class="pb-champs" style="margin-top:8px"><label>Mot de passe de la galerie (facultatif)<input id="pbg-mdp" value="' + esc(g.mdp) + '" placeholder="Sans mot de passe"></label></div><div class="pb-actions" style="margin-top:8px"><button class="btn btn-ghost" onclick="document.getElementById(\'pbg-mdp\').value=(typeof vbMdp===\'function\'?vbMdp():\'\')">Générer un mot de passe</button></div></div>'
       + blocTheme(g.theme)
       + '<div class="pb-pied"><button class="btn" onclick="pbGalSauver()">Enregistrer</button></div>';
