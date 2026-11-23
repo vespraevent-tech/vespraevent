@@ -69,9 +69,10 @@ export function presigner({ host, path, ak, sk, region = 'auto', secondes = 600,
   const cle = hmac(hmac(hmac(hmac('AWS4' + sk, jour), region), 's3'), 'aws4_request');
   return cq + '&X-Amz-Signature=' + createHmac('sha256', cle).update(aSigner).digest('hex');
 }
-export function r2LienTemporaire(cle, secondes = 600, nomFichier = '') {
+export function r2LienTemporaire(cle, secondes = 600, nomFichier = '', typeMime = '') {
   const e = env(), u = new URL(e.ep);
   const extra = nomFichier ? { 'response-content-disposition': 'attachment; filename="' + String(nomFichier).replace(/"/g, '') + '"' } : {};
+  if (typeMime) extra['response-content-type'] = String(typeMime);   /* R2 ne connaît pas le type du fichier : sans cela, les lecteurs reçoivent « binary/octet-stream » */
   return e.ep + '/' + enc(e.bucket) + '/' + encChemin(cle) + '?' + presigner({ host: u.host, path: '/' + enc(e.bucket) + '/' + encChemin(cle), ak: e.ak, sk: e.sk, secondes, extra });
 }
 export async function r2Existe(cle) {

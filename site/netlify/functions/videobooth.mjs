@@ -17,6 +17,7 @@ import { getStore } from './_blobs.mjs';
 import { binEcrire, binLire, binSupprimer, r2Actif, r2Existe, r2LienTemporaire } from './_r2.mjs';
 import { htmlVideo } from './_mails-auto.mjs';
 import { appOk, codeLire } from './_appli.mjs';
+import { reparerSiBesoin } from './_mp4fix.mjs';
 
 export const config = { path: '/api/videobooth/*' };
 
@@ -447,7 +448,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
     /* Cloudflare actif : la vidéo part directement de R2 (lien signé court), sans passer par la fonction (pas de limite de taille, lecture fluide) */
     const direct = r2Actif() && await r2Existe('video/' + id).catch(() => false);
     if (direct && (lecture || dl)) {
-      return new Response(null, { status: 302, headers: { Location: r2LienTemporaire('video/' + id, dl ? 600 : 7200, dl ? m.fichier : ''), 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
+      return new Response(null, { status: 302, headers: { Location: r2LienTemporaire('video/' + id, dl ? 600 : 7200, dl ? m.fichier : '', m.type || 'video/mp4'), 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
     }
     const buf = direct ? new Uint8Array(0) : await binLire(st, 'video/' + id);
     if (!buf) return new Response('Vidéo introuvable', { status: 404 });
@@ -510,12 +511,14 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
       parts.push(new Uint8Array(b));
     }
     const total = parts.reduce((t, p) => t + p.length, 0);
-    const tout = new Uint8Array(total); let o = 0; for (const p of parts) { tout.set(p, o); o += p.length; }
+    let tout = new Uint8Array(total); let o = 0; for (const p of parts) { tout.set(p, o); o += p.length; }
+    /* MP4 fragmenté du navigateur (sans durée) : reconstruit en MP4 classique pour que tous les lecteurs le lisent en entier */
+    tout = reparerSiBesoin(tout);
     const plusDest = String(q.get('plusDest') || '').replace(/[<>\r\n]+/g, ' ').trim().slice(0, 60);
     const m = {
       id, event: String(q.get('event') || '').slice(0, 160), nom: String(q.get('nom') || '').slice(0, 80), prenom: String(q.get('prenom') || '').slice(0, 80), email,
       fichier: String(q.get('fichier') || 'video.mp4').replace(/[\\/:*?"<>|\r\n]+/g, ' ').trim().slice(0, 150) || 'video.mp4',
-      type: String(q.get('type') || 'video/mp4').slice(0, 40), duree: Number(q.get('duree')) || 0, pour: q.get('pour') === 'autre' ? 'autre' : 'moi', dest: q.get('pour') === 'autre' ? String(q.get('dest') || '').replace(/[<>\r\n]+/g, ' ').trim().slice(0, 60) : '', son: q.get('son') === '' || q.get('son') == null ? null : Math.min(100, Math.max(0, Math.round(Number(q.get('son')) || 0))), octets: total, cree: new Date().toISOString(),
+      type: String(q.get('type') || 'video/mp4').slice(0, 40), duree: Number(q.get('duree')) || 0, pour: q.get('pour') === 'autre' ? 'autre' : 'moi', dest: q.get('pour') === 'autre' ? String(q.get('dest') || '').replace(/[<>\r\n]+/g, ' ').trim().slice(0, 60) : '', son: q.get('son') === '' || q.get('son') == null ? null : Math.min(100, Math.max(0, Math.round(Number(q.get('son')) || 0))), octets: tout.length, cree: new Date().toISOString(),
     };
     /* un destinataire de plus (« voulez-vous l'envoyer à quelqu'un ? ») : l'e-mail principal reste celui de l'invité */
     if (plusEmail) m.autres = [{ email: plusEmail, dest: plusDest, mail: 'attente' }];
