@@ -601,7 +601,7 @@
 
     el.innerHTML =
       (window.aLivraison && window.aLivraison(r) ? '<span class="vb-liv" style="color:inherit">LIV</span>' : '') +
-      '<span class="vb-nom" style="color:inherit">' + echapper(r.client || 'Client') + '</span>' +
+      '<span class="vb-nom" style="color:inherit">' + echapper((window.nomAffiche && window.nomAffiche(r)) || r.client || 'Client') + '</span>' +
       '<span class="vb-mat" style="color:inherit;opacity:.78">' + echapper(materiel) + '</span>' +
       (total > 0 ? '<span class="vb-prix" style="color:inherit">' + total.toLocaleString('fr-FR') + ' €</span>' : '');
 
@@ -863,7 +863,7 @@
         return '<span style="background:' + c + '"></span>';
       }).join('') + '</span>' +
       '<span class="vp-txt">' +
-        '<span class="vp-nom" style="color:inherit">' + echapper(r.client || 'Client') + '</span>' +
+        '<span class="vp-nom" style="color:inherit">' + echapper((window.nomAffiche && window.nomAffiche(r)) || r.client || 'Client') + '</span>' +
         (materiel ? '<span class="vp-mat" style="color:inherit;opacity:.78">' + echapper(materiel) + '</span>' : '') +
         (suite ? '<span class="vp-suite-j" style="color:inherit;opacity:.75">'+echapper(jourLong(r.dateEnd))+'</span>' : '') +
       '</span>' +

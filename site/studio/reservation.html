@@ -1964,7 +1964,7 @@ function renderWeekRow(week,td,singleRes,multiRes){
     if(!day)return '<div class="day out-month" style="padding-bottom:'+(maxSlot>=0?evH:0)+'px"></div>';
     var iso=dateToIso(day);var isToday=day.toDateString()===td.toDateString();
     var singEvH=singleRes.filter(function(r){return r.dateStart===iso;}).map(function(r){
-      var cols=getCatColorsForRes(r);var lname=lastName(r.client);var tot=calcResTotal(r);
+      var cols=getCatColorsForRes(r);var lname=nomAffiche(r)||lastName(r.client);var tot=calcResTotal(r);
       return '<div class="event" style="'+buildLeftStyle(cols)+'" data-res-id="'+r.id+'">'
         +'<button class="del-ev" data-res-id="'+r.id+'">&#215;</button>'
         +'<div style="display:flex;align-items:center;gap:4px;margin-bottom:2px">'
@@ -1983,7 +1983,7 @@ function renderWeekRow(week,td,singleRes,multiRes){
     var bottomPx=(maxSlot-ev.slot)*24+4;
     var br=(ev.isFD?'6px':'0')+' '+(ev.isLD?'6px':'0')+' '+(ev.isLD?'6px':'0')+' '+(ev.isFD?'6px':'0');
     var bgStyle='background:'+mc+';color:'+mtxt+';border:1px solid '+mc+';border-left:3px solid '+mc;
-    var lname=lastName(r.client);var prods=(r.products||[]).map(function(x){return x.short||x.name;}).join(' \u00b7 ');
+    var lname=nomAffiche(r)||lastName(r.client);var prods=(r.products||[]).map(function(x){return x.short||x.name;}).join(' \u00b7 ');
     var tot=calcResTotal(r);
     return '<div class="span-ev" data-res-id="'+r.id+'" style="position:absolute;left:'+lp+';width:'+wp+';bottom:'+bottomPx+'px;'+bgStyle+';border-radius:'+br+';color:'+mc+';height:22px;display:flex;align-items:center;padding:0 7px;gap:5px;overflow:hidden;white-space:nowrap;cursor:pointer;font:600 10.5px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;box-sizing:border-box;z-index:2">'
       +(ev.isFD?'<b style="flex-shrink:0;margin-right:3px">'+(aLivraison(r)?'<span style="font:700 8.5px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;letter-spacing:.05em;opacity:.6">LIV</span> ':'')+lname+(tot>0?' <span style="font:500 9px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;opacity:.9">'+tot+' \u20ac</span>':'')+'</b><span style="overflow:hidden;text-overflow:ellipsis;flex:1;font:400 9.5px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;opacity:.8">'+prods+'</span><span style="display:flex;gap:2px;flex-shrink:0;margin-left:3px">'+renderDots(cols)+'</span>':'')
@@ -3494,7 +3494,7 @@ window.ouvrirListeAcomptes=function(periode){
   var lignes=liste.map(function(r){
     var m=acompteRes(r);total+=m;
     var evt=fr(r.dateStart)+(r.dateEnd&&r.dateEnd!==r.dateStart?' \u2192 '+fr(r.dateEnd):'');
-    return '<tr><td class="ac-c">'+escHtmlBo(r.client||'Client')+'</td><td class="ac-d">'+evt+'</td><td class="ac-d">'+fr(r.acompteDate)+'</td><td class="ac-m">'+m.toLocaleString('fr-FR')+' \u20ac'+(caTiers(r)>0?'<div style="font:11px Inter,system-ui,sans-serif;color:#7a8190;font-weight:500">dont part prestataire '+(Math.round(tiersAcompte(r)*100)/100).toLocaleString('fr-FR')+' \u20ac \u00b7 part Vespra '+(Math.round((m-tiersAcompte(r))*100)/100).toLocaleString('fr-FR')+' \u20ac</div>':'')+'</td></tr>';
+    return '<tr><td class="ac-c">'+escHtmlBo(nomAffiche(r)||r.client||'Client')+'</td><td class="ac-d">'+evt+'</td><td class="ac-d">'+fr(r.acompteDate)+'</td><td class="ac-m">'+m.toLocaleString('fr-FR')+' \u20ac'+(caTiers(r)>0?'<div style="font:11px Inter,system-ui,sans-serif;color:#7a8190;font-weight:500">dont part prestataire '+(Math.round(tiersAcompte(r)*100)/100).toLocaleString('fr-FR')+' \u20ac \u00b7 part Vespra '+(Math.round((m-tiersAcompte(r))*100)/100).toLocaleString('fr-FR')+' \u20ac</div>':'')+'</td></tr>';
   }).join('');
   var old=document.getElementById('acListeMb'); if(old) old.remove();
   var mb=document.createElement('div');
@@ -4353,7 +4353,7 @@ function buildAcomptesHtml(){
       var d2=r.dateEnd&&r.dateEnd!==r.dateStart?new Date(r.dateEnd).toLocaleDateString('fr-FR'):'';
       var prods=(r.products||[]).map(function(p){return p.short||p.name;}).join(', ');
       return '<tr style="border-bottom:1px solid #f5f0e8">'
-        +'<td style="padding:10px 8px;font:600 13px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif">'+((r.client||'').split(' ')[0]||r.client||'')+'</td>'
+        +'<td style="padding:10px 8px;font:600 13px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif">'+(nomAffiche(r)||(r.client||'').split(' ')[0]||r.client||'')+'</td>'
         +'<td style="padding:10px 8px;font:12px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--ink)">'+d1+(d2?' → '+d2:'')+'</td>'
         +'<td style="padding:10px 8px;font:12px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--ink);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+prods+'</td>'
         +'<td style="padding:10px 8px;text-align:right;font:13px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif">'+montant.toLocaleString('fr-FR')+' €</td>'
@@ -6062,6 +6062,8 @@ function populateValidatedBy(selectedName){
   }
 }
 
+/* professionnels : le nom de l'entreprise ou de l'association remplace le nom de la personne (planning, listes, fiche) */
+window.nomAffiche=function(r){var fc=(r&&r.factureClient)||{};var pro=!!r&&(/entreprise|association|mairie|collectivit/i.test(String(r.clientType||''))||fc.pro===true);var soc=String((r&&r.societe)||fc.societe||'').trim();return pro&&soc?soc:'';};
 window.majTypeClient=function(){var s=document.getElementById('clientType'),w=document.getElementById('proWrap');if(w&&s)w.style.display=s.value==='pro'?'':'none';};
 function remplirTypeClient(r){
   var fc=(r&&r.factureClient)||{};
@@ -6727,7 +6729,7 @@ function openDetail(id) {
   }
   currentDetailId = id;
 
-  document.getElementById('detailTitle').textContent = r.client;
+  document.getElementById('detailTitle').textContent = nomAffiche(r) ? nomAffiche(r)+' — '+r.client : r.client;
 
   var dateStr = r.dateStart === r.dateEnd
     ? formatDate(r.dateStart)
@@ -7042,11 +7044,11 @@ if(true){
 </script>
 <script src="/studio/modal-garde.js"></script>
 <script src="/studio/reservation-pont.js?v=706"></script>
-<script src="/studio/reservation-plus.js"></script>
+<script src="/studio/reservation-plus.js?v=2"></script>
 <script src="/studio/mandats.js?v=1"></script>
 <script src="/studio/reservation-excel.js"></script>
 <script src="/studio/reservation-import.js"></script>
-<script src="/studio/reservation-vue.js"></script>
+<script src="/studio/reservation-vue.js?v=2"></script>
 <script src="/adresse-autocomplete.js"></script>
 <script src="/studio/securite.js"></script>
 <script src="nbsp-euro.js"></script>

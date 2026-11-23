@@ -13,6 +13,8 @@
    il ne change que l'affichage et le déplacement des barres.
    ═════════════════════════════════════════════════════════════════ */
 (function () {
+  /* professionnels : le nom de l'entreprise ou de l'association remplace celui de la personne */
+  function nomPro(r) { var fc = (r && r.factureClient) || {}; var pro = !!r && (/entreprise|association|mairie|collectivit/i.test(String(r.clientType || '')) || fc.pro === true); var soc = String((r && r.societe) || fc.societe || '').trim(); return pro && soc ? soc : ''; }
   'use strict';
   if (window.__vueNouvelle) return;
   window.__vueNouvelle = true;
@@ -385,8 +387,8 @@
     var cl = r.dateStart < w0 ? ' cl' : '', cr = fin(r) > w1 ? ' cr' : '';
     var col = jours(w0, a) + 1, span = jours(a, b) + 1;
     return '<div class="span-ev' + cl + cr + '" data-res-id="' + esc(r.id) + '" style="grid-column:' + col + '/span ' + span + ';grid-row:' + (lane + 2)
-      + ';background:' + c + ';color:' + txt + '" title="' + esc(r.client) + '">'
-      + '<span class="t"><b>' + esc(r.client || '') + '</b><small>' + puces(libelleBarre(r)) + '</small></span>'
+      + ';background:' + c + ';color:' + txt + '" title="' + esc(nomPro(r) || r.client) + '">'
+      + '<span class="t"><b>' + esc(nomPro(r) || r.client || '') + '</b><small>' + puces(libelleBarre(r)) + '</small></span>'
       + '<span class="r">' + (nb ? '<em class="vn-nb" title="' + nb + ' produit' + (nb > 1 ? 's' : '') + '">' + nb + '</em>' : '')
       + '<i class="vn-led ' + (livre ? 'oui' : 'non') + '" title="' + (livre ? 'Livraison / montage' : 'Retrait sur place') + '"></i></span></div>';
   }
@@ -534,7 +536,7 @@
           + '<td class="m">—</td><td><span class="vn-st ' + (l.d.statut === 'validee' ? 'v' : enc ? 'c' : 'w') + '">' + (l.d.statut === 'validee' ? 'Validée' : enc ? 'En cours' : 'Nouvelle') + '</span></td><td class="m">—</td></tr>';
       }
       var r = l.r, t = window.calcResTotal(r); total += t;
-      return '<tr data-res-id="' + esc(r.id) + '"><td><b>' + lib + '</b></td><td>' + esc(r.client) + noteDe(r, null) + '</td><td class="prod" title="' + esc(produitsReservation(r)) + '">' + esc(produitsReservation(r)) + '</td>'
+      return '<tr data-res-id="' + esc(r.id) + '"><td><b>' + lib + '</b></td><td>' + esc(nomPro(r) || r.client) + noteDe(r, null) + '</td><td class="prod" title="' + esc(produitsReservation(r)) + '">' + esc(produitsReservation(r)) + '</td>'
         + '<td class="m">' + euro(t) + '</td>'
         + '<td><span class="vn-st v">Validée</span></td>'
         + '<td class="m">' + (window.aLivraison(r) ? 'Oui' : 'Non') + '</td></tr>';

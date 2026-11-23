@@ -2708,7 +2708,7 @@ function rdvCarte(d){
   /* les adresses web du message restent du texte : jamais cliquables */
   const msg = d.message ? esc(d.message).replace(/https?:\/\/\S+/gi, m => '<span style="text-decoration:underline dotted" title="Lien non cliquable">'+m.replace(/^(https?):\/\//i,'$1 ://')+'</span>') : '';
   return '<div style="border:1px solid var(--g3);border-radius:12px;padding:14px 16px;margin-bottom:10px;background:#fff;'+(fait?'opacity:.6':'')+'">'
-    + '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><strong style="font-size:15px">'+esc(d.nom||'Sans nom')+'</strong><span style="font-size:12.5px;color:var(--g2)">Reçue le '+esc(recue)+(fait?' · traitée':'')+'</span></div>'
+    + '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><strong style="font-size:15px">'+esc(nomDemande(d))+'</strong><span style="font-size:12.5px;color:var(--g2)">Reçue le '+esc(recue)+(fait?' · traitée':'')+'</span></div>'
     + '<div style="font-size:13.5px;color:var(--g1);margin-top:6px;display:flex;gap:6px 18px;flex-wrap:wrap">'
     + (d.telephone?'<a style="color:inherit" href="tel:'+esc(d.telephone)+'">'+esc(d.telephone)+'</a>':'')
     + (d.email?'<a style="color:inherit" href="mailto:'+esc(d.email)+'">'+esc(d.email)+'</a>':'')
@@ -4444,6 +4444,8 @@ function modifAttente(d){
   const ids = ['d:' + d.id].concat(d.resaId ? ['r:' + d.resaId] : []);
   return (cache.modifs||[]).some(m => m.etat === 'attente' && ids.indexOf(m.dossier) >= 0);
 }
+/* professionnels : le nom de l'entreprise ou de l'association remplace celui de la personne */
+function nomDemande(d){ const pro = /entreprise|association|mairie|collectivit/i.test(String((d && d.clientType) || '')); const soc = String((d && d.societe) || '').trim(); return pro && soc ? soc : ((d && d.nom) || 'Sans nom'); }
 function renderDemandes(){
   const zone = document.getElementById('listDemandes');
   const toutes = cache.demandes || [];
@@ -4570,7 +4572,7 @@ function renderDemandes(){
       '<div class="dm-ligne">' +
         '<div class="dm-txt">' +
           '<div class="dm-h">' +
-            '<span class="dm-nom">' + esc(d.nom || 'Sans nom') + '</span>' + badgeNumero(d) +
+            '<span class="dm-nom">' + esc(nomDemande(d)) + '</span>' + (nomDemande(d) !== (d.nom || 'Sans nom') ? '<span style="font-size:12px;color:#8a8f98;margin-left:8px">· ' + esc(d.nom || '') + '</span>' : '') + badgeNumero(d) +
             quand + neuve + relances +
             (suitCadre ? '<span class="dm-cadre-control ' + (cadre === 'termine' ? 'fait' : '') + '" title="Modifier l\'état du cadre photobooth">' +
               '<span class="dm-cadre-led"></span>' +
@@ -10559,7 +10561,7 @@ function accueilRender2(){
     T('CA ce mois-ci',dash||acEuro(caM),dash?'chargement…':acEuro(resteM)+' à encaisser',"switchTab('resa-ca')",1)+
     T('CA '+an,dash||acEuro(caA),dash?'chargement…':nA+' réservation'+(nA>1?'s':''),"switchTab('resa-ca')",1);
   document.getElementById('acDemandes').innerHTML=nouv.length
-    ? nouv.slice(0,4).map(d=>'<div class="ac-ligne" onclick="switchTab(\'demandes\')"><span><b>'+esc(d.nom||'Sans nom')+'</b><small>'+esc(d.date||'date à préciser')+'</small></span></div>').join('')
+    ? nouv.slice(0,4).map(d=>'<div class="ac-ligne" onclick="switchTab(\'demandes\')"><span><b>'+esc(nomDemande(d))+'</b><small>'+esc(d.date||'date à préciser')+'</small></span></div>').join('')
     : '<div class="ac-vide">Rien en attente.</div>';
   document.getElementById('acEvents').innerHTML=evts.length
     ? evts.slice(0,4).map(r=>{ const p=(r.products&&r.products[0]&&r.products[0].name)||''; return '<div class="ac-ligne" onclick="switchTab(\'resa-planning\')"><span><b>'+esc(r.client||'Sans nom')+'</b><small>'+esc(p)+'</small></span><span class="d">'+acFr(r.dateStart)+'</span></div>'; }).join('')
