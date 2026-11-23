@@ -44,7 +44,8 @@
           + '<td style="padding:7px 4px;color:#6b7280">' + (s.motif === 'auto' ? 'automatique' : 'manuelle') + ' · ' + s.reservations + ' réservations</td>'
           + '<td style="padding:7px 4px;text-align:right;white-space:nowrap">'
           + '<a href="/api/admin/sauvegarde?cle=' + encodeURIComponent(s.cle) + '" style="margin-right:10px">Télécharger</a>'
-          + '<button type="button" data-manq="' + esc(s.cle) + '" style="' + BTN + '">Retrouver les manquantes</button></td></tr>';
+          + '<button type="button" data-manq="' + esc(s.cle) + '" style="' + BTN + ';margin-right:6px">Retrouver les manquantes</button>'
+          + '<button type="button" data-pro="' + esc(s.cle) + '" style="' + BTN + '">Récupérer entreprise, SIRET, RNA, TVA</button></td></tr>';
       }).join('') + '</table>';
       h += '<div style="font-weight:700;margin:20px 0 8px">Réservations supprimées (corbeille)</div>';
       if (!d.corbeille.length) h += '<div>La corbeille est vide.</div>';
@@ -60,6 +61,21 @@
           api('/restaurer', { method: 'POST', body: JSON.stringify({ source: 'corbeille', cle: b.getAttribute('data-corb') }) })
             .then(function (r) { msg(r.remises ? 'Réservation restaurée. Elle réapparaît au planning dans quelques secondes.' : 'Elle existe déjà au planning.'); if (window.vespraActualiser) window.vespraActualiser(); })
             .catch(function (e) { msg(e.message, true); });
+        };
+      });
+      /* récupère le type de client (entreprise, association), la société, le SIRET, le RNA et la TVA depuis une sauvegarde : ne remplit QUE ce qui est vide aujourd'hui */
+      zone.querySelectorAll('[data-pro]').forEach(function (b) {
+        b.onclick = function () {
+          var cle = b.getAttribute('data-pro');
+          msg('Comparaison avec la sauvegarde en cours…');
+          api('/restaurer-pro?cle=' + encodeURIComponent(cle)).then(function (r) {
+            if (!r.reservations && !r.clients) { msg('Rien à récupérer : toutes les réservations et fiches clients de cette sauvegarde ont déjà leurs informations.'); return; }
+            var liste = (r.exemples || []).slice(0, 10).map(function (m) { return '• ' + (m.societe || m.client || m.id); }).join('\n');
+            if (!confirm(r.reservations + ' réservation(s) et ' + r.clients + ' fiche(s) client retrouveront leur type de client, leur société, leur SIRET, RNA et TVA :\n\n' + liste + (r.reservations > 10 ? '\n…' : '') + '\n\nRien de ce qui est déjà rempli n\u2019est modifié. Continuer ?')) { msg(''); return; }
+            api('/restaurer-pro', { method: 'POST', body: JSON.stringify({ cle: cle, appliquer: true }) })
+              .then(function (x) { msg(x.reservations + ' réservation(s) et ' + x.clients + ' fiche(s) client récupérée(s).'); if (window.vespraActualiser) window.vespraActualiser(); })
+              .catch(function (e) { msg(e.message, true); });
+          }).catch(function (e) { msg(e.message, true); });
         };
       });
       zone.querySelectorAll('[data-manq]').forEach(function (b) {

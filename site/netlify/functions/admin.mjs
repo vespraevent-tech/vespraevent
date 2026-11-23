@@ -2625,6 +2625,65 @@ const gestionnaire = async (request) => {
   }
 
 
+  /* ── Récupérer le type de client (entreprise, association…), la société, le SIRET, le RNA et la TVA depuis une sauvegarde ──
+     Jamais d'écrasement : on ne remplit que ce qui est VIDE aujourd'hui. Sans « appliquer », on montre seulement ce qui serait remis. */
+  if (path === '/restaurer-pro' && (request.method === 'GET' || request.method === 'POST')) {
+    try {
+      let body = {}; if (request.method === 'POST') { try { body = await request.json(); } catch {} }
+      const cle = String(request.method === 'POST' ? body.cle : url.searchParams.get('cle') || '');
+      const appliquer = request.method === 'POST' && body.appliquer === true;
+      const texte = await secu.lireSauvegarde(cle);
+      if (!texte) return json({ error: 'Sauvegarde introuvable' }, 404);
+      const sauv = JSON.parse(texte);
+      const RE_PRO = /entreprise|association|mairie|collectivit/i;
+      const lirePro = (r) => { const fc = (r && r.factureClient) || {};
+        const o = { clientType: String((r && r.clientType) || '').trim(), societe: String((r && r.societe) || fc.societe || '').trim(), siret: String((r && r.siret) || fc.siret || '').trim(), rna: String((r && r.rna) || fc.rna || '').trim(), tva: String((r && r.tva) || fc.tvaClient || '').trim(), pro: fc.pro === true };
+        o.estPro = o.pro || RE_PRO.test(o.clientType) || !!(o.societe || o.siret || o.rna || o.tva); return o; };
+      const completerPro = (r, ancien) => {
+        const a = lirePro(ancien); if (!a.estPro) return false;
+        const c = lirePro(r); let chg = false; const fc = Object.assign({}, r.factureClient || {});
+        if (!RE_PRO.test(c.clientType)) { r.clientType = RE_PRO.test(a.clientType) ? a.clientType : 'Entreprise ou association'; chg = true; }
+        for (const [k, fk] of [['societe', 'societe'], ['siret', 'siret'], ['rna', 'rna'], ['tva', 'tvaClient']]) {
+          if (!c[k] && a[k]) { r[k] = a[k]; fc[fk] = a[k]; chg = true; } else if (c[k] && !fc[fk]) fc[fk] = c[k];
+        }
+        if (fc.pro !== true) { fc.pro = true; chg = true; }
+        if (chg) r.factureClient = fc;
+        return chg;
+      };
+      const actuelles = await secu.reservationsActuelles();
+      const aModifier = [];
+      for (const x of (sauv.collections && sauv.collections.reservations || [])) {
+        if (!x || !x.id || x.id === 'cfg' || !x.d) continue;
+        const cur = actuelles.get(String(x.id)); if (!cur || !cur.d) continue;
+        let ancien, courant; try { ancien = JSON.parse(x.d); courant = JSON.parse(cur.d); } catch { continue; }
+        if (completerPro(courant, ancien)) aModifier.push({ id: String(x.id), client: courant.client || '', societe: courant.societe || '', courant, cur });
+      }
+      /* fiches clients */
+      const cs = await blobStore(CLIENT_STORE);
+      const fichesActuelles = await cs.get('clients', { type: 'json', consistency: 'strong' }).catch(() => null);
+      const fiches = Array.isArray(fichesActuelles) ? fichesActuelles : [];
+      const nn = (v) => String(v || '').toLowerCase().replace(/\s+/g, ' ').trim();
+      let nbFiches = 0;
+      for (const old of (Array.isArray(sauv.clients) ? sauv.clients : [])) {
+        if (!old || old._deleted) continue;
+        const a = { pro: old.pro === true || RE_PRO.test(String(old.clientType || '')) || !!(old.societe || old.siret || old.rna || old.tva), societe: old.societe || '', siret: old.siret || '', rna: old.rna || '', tva: old.tva || '' };
+        if (!a.pro) continue;
+        const cur = fiches.find((f) => f && !f._deleted && ((old.id && f.id === old.id) || (nn(f.fullName) && nn(f.fullName) === nn(old.fullName))));
+        if (!cur) continue;
+        let chg = false;
+        if (cur.pro !== true) { cur.pro = true; chg = true; }
+        for (const k of ['societe', 'siret', 'rna', 'tva']) if (!cur[k] && a[k]) { cur[k] = a[k]; chg = true; }
+        if (chg) nbFiches++;
+      }
+      if (!appliquer) {
+        return json({ ok: true, reservations: aModifier.length, clients: nbFiches, exemples: aModifier.slice(0, 15).map((m) => ({ id: m.id, client: m.client, societe: m.societe })) });
+      }
+      for (const m of aModifier) await saveBlobItem('reservations', { id: m.id, d: JSON.stringify(m.courant), _created: m.cur._created }, secret);
+      if (nbFiches) await cs.setJSON('clients', fiches);
+      return json({ ok: true, reservations: aModifier.length, clients: nbFiches });
+    } catch (e) { return json({ ok: false, error: e.message }, 500); }
+  }
+
   /* ── Réponse automatique (mail après une demande, délai réglable) : activer / désactiver, textes modifiables ── */
   if (path === '/reponse-auto' && request.method === 'GET') {
     try {

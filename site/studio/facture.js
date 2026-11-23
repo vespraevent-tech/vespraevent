@@ -41,11 +41,14 @@
       var nom = String((source === 'demande' ? r.nom : r.client) || '').trim();
       if (!nom) return;
       var c = ficheClientDe(r, source);
-      var maj = { pro: !!v.pro, siret: v.siret || '', rna: v.rna || '', tva: v.tvaClient || '', billAdresse: v.adresse || '', _maj: Date.now() };
-      var change = !c || ['pro', 'siret', 'rna', 'tva', 'billAdresse'].some(function (k) { return String(c[k] == null ? '' : c[k]) !== String(maj[k]); });
+      /* on AJOUTE à la fiche ; on n'efface jamais ce qu'elle contient déjà (un écran vide ne doit pas repasser un professionnel en particulier) */
+      var maj = { _maj: Date.now() };
+      if (v.pro) maj.pro = true;
+      if (v.siret) maj.siret = v.siret; if (v.rna) maj.rna = v.rna; if (v.tvaClient) maj.tva = v.tvaClient; if (v.adresse) maj.billAdresse = v.adresse;
+      var change = !c || Object.keys(maj).filter(function (k) { return k !== '_maj'; }).some(function (k) { return String(c[k] == null ? '' : c[k]) !== String(maj[k]); });
       if (!change) return;
       /* rien de saisi et pas de fiche : on ne crée pas une fiche vide */
-      if (!c && !maj.pro && !maj.siret && !maj.rna && !maj.tva && !maj.billAdresse) return;
+      if (!c && Object.keys(maj).length <= 1) return;
       var mots = nom.split(/\s+/);
       var fiche = c ? Object.assign({ id: c.id, fullName: c.fullName }, maj)
         : Object.assign({ id: 'c' + Date.now(), fullName: nom, firstName: mots[0] || '', lastName: mots.slice(1).join(' '),
@@ -98,7 +101,8 @@
           if (typeof showToast === 'function') showToast('Saisies non enregistrées : ' + e.message, true);
         });
       }
-      r.factureClient = { adresse: v.adresse || '', pro: !!v.pro, siret: v.siret || '', rna: v.rna || '', tvaClient: v.tvaClient || '', avecAcompte: !!v.avecAcompte, acomptePct: v.acomptePct || 30, cond: v.cond || null, societe: (r.factureClient && r.factureClient.societe) || r.societe || '' };
+      var _fcp = r.factureClient || {};
+      r.factureClient = { adresse: v.adresse || '', pro: !!v.pro || _fcp.pro === true, siret: v.siret || _fcp.siret || '', rna: v.rna || _fcp.rna || '', tvaClient: v.tvaClient || _fcp.tvaClient || '', avecAcompte: !!v.avecAcompte, acomptePct: v.acomptePct || 30, cond: v.cond || null, societe: (r.factureClient && r.factureClient.societe) || r.societe || '' };
       if (typeof api === 'function') {
         return Promise.resolve(api('/data', { method: 'POST', body: JSON.stringify({ collection: 'reservations', item: { id: r.id, d: JSON.stringify(r) } }) }))
           .catch(function (e) { if (typeof showToast === 'function') showToast('Saisies non enregistrées : ' + e.message, true); });

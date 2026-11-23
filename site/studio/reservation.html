@@ -751,7 +751,7 @@ html body input, html body select, html body textarea { max-width: 100%; }
       <div class="field ac-wrap"><label>Prénom &amp; Nom du client</label><input id="client" placeholder="Ex : Jean Dupuis" autocomplete="off" oninput="acSearch(this.value)"><div class="ac-list" id="ac-list"></div></div>
       <div class="field"><label>Téléphone</label><input id="phone" type="tel" placeholder="06 00 00 00 00"></div>
       <div class="field"><label>Email</label><input id="email" type="email" placeholder="client@email.com"></div>
-      <div class="field"><label>Type de client</label><select id="clientType" onchange="majTypeClient()"><option value="">Particulier</option><option value="pro">Entreprise, association, mairie…</option></select></div>
+      <div class="field"><label>Type de client</label><select id="clientType" onchange="window._typeTouche=true;majTypeClient()"><option value="">Particulier</option><option value="pro">Entreprise, association, mairie…</option></select></div>
       <div class="field" id="proWrap" style="display:none;grid-column:1/-1"><label>Nom de l’entreprise ou de l’association</label><input id="societe" placeholder="Ex : Comité des fêtes de Vitré" autocomplete="off"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px"><div><label>SIRET <small style="font-weight:400">(entreprise)</small></label><input id="siret" placeholder="123 456 789 00012" autocomplete="off"></div><div><label>N° RNA <small style="font-weight:400">(association)</small></label><input id="rna" placeholder="W123456789" autocomplete="off"></div><div><label>N° de TVA (facultatif)</label><input id="tvaClient" placeholder="FR00123456789" autocomplete="off"></div></div></div>
       <div class="field"><label>Date de début</label><input id="dateStart" type="date"></div>
       <div class="field"><label>Date de fin</label><input id="dateEnd" type="date"></div>
@@ -6075,6 +6075,13 @@ function remplirTypeClient(r){
 /* type de client, société, SIRET et TVA : repris par le devis et la facture */
 function appliquerTypeClient(o){
   if(!o)return;
+  /* type de client non touché par l'utilisateur : on n'écrase pas un professionnel déjà enregistré (seules les informations saisies sont ajoutées) */
+  if(!window._typeTouche && (/entreprise|association|mairie|collectivit/i.test(String(o.clientType||''))||(o.factureClient&&o.factureClient.pro===true))){
+    var w=function(id){var e=document.getElementById(id);return e?(e.value||'').trim():'';};
+    ['societe','siret','rna','tva'].forEach(function(k){var v=w(k==='tva'?'tvaClient':k);if(k==='rna')v=v.toUpperCase();if(v)o[k]=v;});
+    o.factureClient=Object.assign({},o.factureClient||{},{pro:true,siret:o.siret||'',rna:o.rna||'',tvaClient:o.tva||'',societe:o.societe||''});
+    return;
+  }
   var pro=document.getElementById('clientType').value==='pro';
   var v=function(id){return (document.getElementById(id).value||'').trim();};
   o.clientType=pro?'Entreprise ou association':'';
@@ -6082,6 +6089,7 @@ function appliquerTypeClient(o){
   o.factureClient=Object.assign({},o.factureClient||{},{pro:pro,siret:o.siret,rna:o.rna,tvaClient:o.tva,societe:o.societe});
 }
 function openModal(){
+  window._typeTouche=false;
   editMode=false;currentDetailId=null;
   livraison=true;acompte=false;if(window.toggleVirement)window.toggleVirement(false);
   livEl.oui.classList.add('active');livEl.non.classList.remove('active');
@@ -6943,7 +6951,7 @@ function openModalEdit(id) {
   renderAccordion();
 
   // Pré-remplir les champs
-  document.getElementById('client').value = r.client||'';
+  window._typeTouche=false;document.getElementById('client').value = r.client||'';
   populateValidatedBy(typeof r.validatedBy==='string'?r.validatedBy:(r.validatedBy?r.validatedBy.firstName:null));
   document.getElementById('phone').value = r.phone||'';
   try{ var _dl=(window.parent&&window.parent.cache&&window.parent.cache.demandes||[]).find(function(x){return x&&x.resaId&&String(x.resaId)===String(r.id);}); var _src=Object.assign({},_dl&&{clientType:_dl.clientType,societe:_dl.societe,siret:_dl.siret,rna:_dl.rna,tva:_dl.tva});['clientType','societe','siret','rna','tva'].forEach(function(k){if(r[k])_src[k]=r[k];});if(r.factureClient)_src.factureClient=r.factureClient;remplirTypeClient(_src); }catch(e){ remplirTypeClient(r); }
@@ -7050,7 +7058,7 @@ if(true){
 <script src="/studio/reservation-import.js"></script>
 <script src="/studio/reservation-vue.js?v=2"></script>
 <script src="/adresse-autocomplete.js"></script>
-<script src="/studio/securite.js"></script>
+<script src="/studio/securite.js?v=2"></script>
 <script src="nbsp-euro.js"></script>
 </body>
 </html>
