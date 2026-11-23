@@ -73,10 +73,14 @@
     return res;
   }
   function poster(r) {
+    /* « volontaire » : l'utilisateur vient de changer lui-même le type de client ou ses numéros dans la fiche ; le serveur le laisse alors passer.
+       Sans cet indicateur, le serveur refuse qu'un professionnel repasse en particulier ou perde ses numéros. L'indicateur n'est jamais enregistré. */
+    var volontaire = !!r._typeVolontaire, copie = Object.assign({}, r);
+    delete copie._typeVolontaire;
     return api('/data', {
       method: 'POST',
-      body: JSON.stringify({ collection: 'reservations', item: { id: String(r.id), d: JSON.stringify(r) } }),
-    });
+      body: JSON.stringify({ collection: 'reservations', item: { id: String(r.id), d: JSON.stringify(copie) }, volontaire: volontaire }),
+    }).then(function (rep) { delete r._typeVolontaire; return rep; });
   }
   function enregistrer(r) {
     if (!r || !r.id) return Promise.resolve();

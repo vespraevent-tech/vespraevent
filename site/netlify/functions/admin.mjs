@@ -2943,6 +2943,32 @@ const gestionnaire = async (request) => {
     if (collection === 'reservations' && item && typeof item.d === 'string') {
       try { const rr = JSON.parse(item.d); if (rr && typeof rr === 'object') item.d = JSON.stringify(assainirPrestations(rr)); } catch { /* laissé tel quel */ }
     }
+    /* VERROU « client professionnel » : une réservation déjà enregistrée comme entreprise ou association ne repasse JAMAIS en particulier,
+       et ne perd jamais sa société, son SIRET, son RNA ni sa TVA, par une sauvegarde venue d'un écran qui ne les connaît pas (copie périmée, autre écran…).
+       Seule une modification volontaire faite dans la fiche de la réservation (indicateur « volontaire ») peut les changer ou les retirer. */
+    if (collection === 'reservations' && item && item.id && String(item.id) !== 'cfg' && typeof item.d === 'string' && body.volontaire !== true) {
+      try {
+        const nouveau = JSON.parse(item.d);
+        const brut = await (await blobStore(DATA_STORE)).get(blobKey('reservations', item.id), { type: 'json' });
+        const ancien = brut && typeof brut.d === 'string' ? JSON.parse(brut.d) : null;
+        if (ancien && nouveau && typeof nouveau === 'object') {
+          const RE = /entreprise|association|mairie|collectivit/i;
+          const lire = (r) => { const fc = (r && r.factureClient) || {}; return { type: String((r && r.clientType) || '').trim(), societe: String((r && r.societe) || fc.societe || '').trim(), siret: String((r && r.siret) || fc.siret || '').trim(), rna: String((r && r.rna) || fc.rna || '').trim(), tva: String((r && r.tva) || fc.tvaClient || '').trim(), pro: fc.pro === true }; };
+          const a = lire(ancien), n = lire(nouveau);
+          const aPro = a.pro || RE.test(a.type) || !!(a.societe || a.siret || a.rna || a.tva);
+          if (aPro) {
+            const fc = Object.assign({}, nouveau.factureClient || {});
+            let chg = false;
+            if (!RE.test(n.type)) { nouveau.clientType = RE.test(a.type) ? a.type : 'Entreprise ou association'; chg = true; }
+            for (const [k, fk] of [['societe', 'societe'], ['siret', 'siret'], ['rna', 'rna'], ['tva', 'tvaClient']]) {
+              if (!n[k] && a[k]) { nouveau[k] = a[k]; fc[fk] = a[k]; chg = true; } else if (n[k] && !fc[fk]) fc[fk] = n[k];
+            }
+            if (fc.pro !== true) { fc.pro = true; chg = true; }
+            if (chg) { nouveau.factureClient = fc; item.d = JSON.stringify(nouveau); }
+          }
+        }
+      } catch { /* verrou impossible : on enregistre tel quel plutôt que de bloquer */ }
+    }
     const formName = formDe(collection);
     if (!formName || !item || !item.id) return json({ error: 'collection ou item invalide' }, 400);
     try {
