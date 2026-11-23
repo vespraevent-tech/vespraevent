@@ -192,3 +192,35 @@ label.champ{display:block;margin:.9em 0 .3em;font-weight:600;color:var(--navy);f
 .pscene #r-imp #r-copies{position:absolute;left:0;right:0;top:100%;bottom:auto;margin:22px 0 0}
 .pscene #r-imp #r-imp-msg{top:calc(100% + 100px)}
 .boite-ap .ap-titre{padding-right:52px}.boite-ap .btn.grand{font-size:17px;padding:.7em 1.4em;border-radius:99px}
+
+/* ── bouton Galerie : petite icône de photo en haut à gauche (visible dès qu'une photo a été prise) ── */
+.a-gal{position:absolute;top:18px;left:18px;z-index:6;width:58px;height:58px;border-radius:16px;border:1.5px solid rgba(20,48,79,.16);background:rgba(255,255,255,.92);color:#1F3B5A;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.12);padding:0;backdrop-filter:blur(6px)}
+.a-gal[hidden]{display:none}
+.a-gal svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.a-gal:active{transform:scale(.96)}
+
+/* ── réglages de l'événement : tiroir en haut de l'accueil, replié avec la flèche ── */
+.reg{position:fixed;left:0;right:0;top:0;z-index:40;pointer-events:none}
+.reg[hidden]{display:none}
+.reg-tiroir{pointer-events:auto;background:#fff;box-shadow:0 18px 50px rgba(0,0,0,.28);border-radius:0 0 22px 22px;max-height:82vh;display:flex;flex-direction:column;transition:transform .32s ease;overflow:hidden}
+.reg.ferme .reg-tiroir{transform:translateY(-105%)}
+.reg-nav{display:flex;gap:6px;padding:8px 16px;overflow-x:auto;border-bottom:1px solid var(--trait);background:#fff;flex:none;scrollbar-width:none}
+.reg-nav::-webkit-scrollbar{display:none}
+.reg-nav button{flex:none;border:0;background:none;padding:.6em 1.05em;border-radius:99px;font:600 14px system-ui;color:var(--txt);cursor:pointer;white-space:nowrap}
+.reg-nav button.sel{background:#1F3B5A;color:#fff}
+.reg .panneau{padding:18px 26px 24px;overflow:auto;flex:1;min-height:0}
+.reg .panneau h2{font-size:20px;margin:0 0 12px}
+.reg .barre{flex:none}
+.reg-fleche{pointer-events:auto;position:absolute;left:50%;transform:translateX(-50%);bottom:auto;top:100%;margin-top:-1px;width:68px;height:26px;border:0;border-radius:0 0 16px 16px;background:#1F3B5A;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.reg-fleche svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s}
+.reg.ferme .reg-fleche{top:0}
+.reg.ferme .reg-fleche svg{transform:rotate(180deg)}
+.reg .barre-d{display:flex;align-items:center;gap:8px}
+
+/* ── réglages de la borne ── */
+#s-borne{background:var(--fond)}
+#s-borne .b-titre{font:700 20px system-ui;margin:0}
+#b-panneau{max-width:820px;width:100%;margin:0 auto;padding:24px 20px}
+#m-nav.reg-nav{display:flex;border-right:0;padding:8px 16px;background:#fff;overflow-x:auto}
+#m-nav.reg-nav button{display:block;width:auto;flex:none;text-align:center;padding:.6em 1.05em;border-radius:99px;font:600 14px system-ui}
+#m-nav.reg-nav button.sel{background:#1F3B5A;color:#fff}

@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#FFFFFF">
 <title>Vespra Event Photobooth</title>
 <link rel="icon" type="image/png" sizes="32x32" href="/videobooth/icones/favicon-32.png?v=3">
-<link rel="stylesheet" href="app.css?v=8">
+<link rel="stylesheet" href="app.css?v=99">
 </head>
 <body>
 <!-- 0. hors du logiciel Windows -->
@@ -54,6 +54,7 @@
 <section id="s-accueil" class="ecran plein-ecran">
   <div id="a-scene" class="scene"></div>
   <button id="a-coin" class="coin" aria-label="Réglages"></button>
+  <button id="a-gal" class="a-gal" aria-label="Galerie" hidden><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10.5" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg></button>
 </section>
 
 <!-- 4. choix du cadre -->
@@ -116,24 +117,32 @@
 </div>
 
 <!-- menu de l'événement (réglages sur la borne) -->
-<section id="s-menu" class="ecran">
-  <header class="barre">
-    <div class="evt-choix">
-      <button id="m-evt" class="btn evt-nom"></button>
-      <div id="m-evt-liste" class="deroulant" hidden></div>
-    </div>
-    <div class="barre-d">
-      <span id="m-cam" class="puce"></span>
-      <button id="m-lien" class="icone" title="Lien de l’événement"><svg viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></button>
-      <button id="m-stats" class="icone" title="Statistiques"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></button>
-      <button id="m-lancer" class="btn plein">Lancer l’événement</button>
-    </div>
-    <div id="m-pop" class="pop" hidden></div>
-  </header>
-  <div class="menu-corps">
-    <nav id="m-nav"></nav>
+<!-- réglages de l'événement : tiroir en haut de l'écran d'accueil, replié ou déplié avec la flèche -->
+<div id="s-menu" class="reg" hidden>
+  <div class="reg-tiroir">
+    <header class="barre">
+      <div class="evt-choix">
+        <button id="m-evt" class="btn evt-nom"></button>
+        <div id="m-evt-liste" class="deroulant" hidden></div>
+      </div>
+      <div class="barre-d">
+        <span id="m-cam" class="puce"></span>
+        <button id="m-lien" class="icone" title="Lien de l’événement"><svg viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></button>
+        <button id="m-stats" class="icone" title="Statistiques"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></button>
+        <button id="m-lancer" class="btn plein">Lancer l’événement</button>
+      </div>
+      <div id="m-pop" class="pop" hidden></div>
+    </header>
+    <nav id="m-nav" class="reg-nav"></nav>
     <div id="m-panneau" class="panneau"></div>
   </div>
+  <button id="m-fleche" class="reg-fleche" aria-label="Replier ou déplier les réglages"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
+</div>
+
+<!-- réglages de la borne (ce PC) : mise à jour, code de sécurité, déconnexion — sans rapport avec un événement -->
+<section id="s-borne" class="ecran">
+  <header class="barre"><button id="b-retour" class="btn lien">‹ Événements</button><h1 class="b-titre">Réglages de la borne</h1><span></span></header>
+  <div id="b-panneau" class="panneau"></div>
 </section>
 
 <!-- mise à jour en direct -->
@@ -148,6 +157,6 @@
 <iframe id="impr" title="impression" aria-hidden="true"></iframe>
 
 <script src="/videobooth/qr.js?v=1"></script>
-<script src="app.js?v=18"></script>
+<script src="app.js?v=19"></script>
 </body>
 </html>

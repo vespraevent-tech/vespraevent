@@ -18,7 +18,8 @@
   var hex = function (n) { var a = new Uint8Array(n); crypto.getRandomValues(a); return Array.prototype.map.call(a, function (b) { return ('0' + b.toString(16)).slice(-2); }).join(''); };
   var attendre = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
   function toast(t, ms) { var e = $('toast'); e.textContent = t; e.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(function () { e.hidden = true; }, ms || 2600); }
-  function ecran(id) { document.querySelectorAll('.ecran').forEach(function (e) { e.classList.toggle('on', e.id === id); }); etat.ecran = id; }
+  function ecran(id) { document.querySelectorAll('.ecran').forEach(function (e) { e.classList.toggle('on', e.id === id); }); etat.ecran = id; var m = $('s-menu'); if (m && id !== 's-accueil') m.hidden = true; }
+  function menuOuvert() { var m = $('s-menu'); return !!m && !m.hidden; }
   function api(chemin, o) {
     o = o || {}; var h = Object.assign({}, o.headers || {});
     if (etat.appareil) h['x-borne'] = etat.appareil;
@@ -135,7 +136,7 @@
     $('l-evts').innerHTML = l.length ? groupe('À venir', gV) + groupe('En cours', gC) + groupe('Événements passés', gP) : '<p class="vide">Aucun événement. Créez-le dans le back-office.</p>';
     $('l-evts').querySelectorAll('.evc').forEach(function (n) {
       var e = etat.evts.find(function (x) { return x.id === n.dataset.id; });
-      n.querySelector('[data-ap]').onclick = function (ev) { ev.stopPropagation(); etat.sel = e; apercu(e); };
+      n.querySelector('[data-ap]').onclick = function (ev) { ev.stopPropagation(); etat.sel = e; lancer(e.id).then(function () { ouvrirMenu('capture'); }); };
       n.querySelector('[data-go]').onclick = function (ev) { ev.stopPropagation(); etat.sel = e; lancer(e.id); };
       n.onclick = function () { etat.sel = e; apercu(e); };
     });
@@ -221,7 +222,6 @@
     var bt = document.createElement('button'); bt.className = 'declic'; bt.innerHTML = ICONE; bt.setAttribute('aria-label', 'Prendre une photo');
     bt.style.cssText = 'left:' + b.x + 'px;top:' + b.y + 'px;width:' + b.taille + 'px;height:' + b.taille + 'px;background:' + b.couleur;
     bt.querySelector('svg').style.stroke = b.icone; sc.appendChild(bt);
-    if (a.galerie !== false) { var g = document.createElement('button'); g.className = 'gal'; g.textContent = 'Galerie'; sc.appendChild(g); }
     return Promise.all(p);
   }
   function ajusterScene() { var sc = $('a-scene'), k = Math.min(innerWidth / 1920, innerHeight / 1080); sc.style.transformOrigin = 'center'; sc.style.transform = 'translate(-50%,-50%) scale(' + k + ')'; }
@@ -231,7 +231,7 @@
     dessinerAccueil($('a-scene'), e, false); ajusterScene();
     var sc = $('a-scene');
     sc.querySelector('.declic').onclick = commencer;
-    var g = sc.querySelector('.gal'); if (g) g.onclick = galerie;
+    majBoutonGalerie();
     if (majEnAttente) { majEnAttente = false; verifierMaj(); }
   }
 
@@ -271,7 +271,7 @@
   var majOccupee = false;
   function verifierMaj() {
     if (!etat.jeton || !etat.evt || majOccupee) return;
-    if (etat.ecran !== 's-accueil' && etat.ecran !== 's-menu') { majEnAttente = true; return; }  /* jamais pendant une prise de vue */
+    if (etat.ecran !== 's-accueil') { majEnAttente = true; return; }  /* jamais pendant une prise de vue */
     majOccupee = true;
     api('maj?v=' + encodeURIComponent(etat.evt.maj || '')).then(function (r) { return r.json(); }).then(function (d) {
       etat.derniereVerif = Date.now(); etat.cadresServeur = d.cadres;
@@ -517,6 +517,12 @@
     clearTimeout(galerie.t); galerie.t = setTimeout(function () { if (etat.ecran === 's-galerie') afficherAccueil(); }, 90000);
   }
   $('g-fermer').onclick = function () { afficherAccueil(); };
+  /* bouton Galerie : une petite icône de photo en haut à gauche, qui n'apparaît qu'une fois la première photo prise */
+  function majBoutonGalerie() {
+    var b = $('a-gal'), e = etat.evt; b.hidden = true; if (!e || (e.accueil && e.accueil.galerie === false)) return;
+    Galerie.lister(e.id).then(function (l) { if (etat.evt === e && etat.ecran === 's-accueil') b.hidden = !l.length; }).catch(function () {});
+  }
+  $('a-gal').onclick = galerie;
 
   /* ── code PIN (0104 par défaut, modifiable dans Général) ── */
   var pinSuite = null, pinSaisie = '';
@@ -524,14 +530,15 @@
     var bl = LS.get('pinBloque', 0); if (bl > Date.now()) { toast('Trop d’essais : réessayez dans ' + Math.ceil((bl - Date.now()) / 60000) + ' min'); return; }
     pinSuite = suite; pinSaisie = ''; $('pin').hidden = false; $('pin-err').textContent = ''; pts();
   }
-  function pts() { $('pin-pts').innerHTML = [0, 1, 2, 3].map(function (i) { return '<i class="' + (i < pinSaisie.length ? 'p' : '') + '"></i>'; }).join(''); }
+  function pts() { $('pin-pts').innerHTML = Array.apply(null, Array(Math.max(4, String(LS.get('pin', '0104')).length))).map(function (_, i) { return '<i class="' + (i < pinSaisie.length ? 'p' : '') + '"></i>'; }).join(''); }
   $('pin-pave').innerHTML = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'].map(function (k) { return k ? '<button data-k="' + k + '">' + k + '</button>' : '<span></span>'; }).join('');
   $('pin-pave').onclick = function (ev) {
     var k = ev.target.dataset && ev.target.dataset.k; if (!k) return;
-    if (k === '⌫') pinSaisie = pinSaisie.slice(0, -1); else if (pinSaisie.length < 4) pinSaisie += k;
+    var code = String(LS.get('pin', '0104'));
+    if (k === '⌫') pinSaisie = pinSaisie.slice(0, -1); else if (pinSaisie.length < Math.max(4, code.length)) pinSaisie += k;
     pts();
-    if (pinSaisie.length === 4) {
-      if (pinSaisie === String(LS.get('pin', '0104'))) { LS.set('pinEssais', 0); $('pin').hidden = true; var s = pinSuite; pinSuite = null; s && s(); }
+    if (pinSaisie.length === code.length) {
+      if (pinSaisie === code) { LS.set('pinEssais', 0); $('pin').hidden = true; var s = pinSuite; pinSuite = null; s && s(); }
       else { var n = LS.get('pinEssais', 0) + 1; LS.set('pinEssais', n); pinSaisie = ''; pts(); $('pin-err').textContent = 'Code incorrect'; if (n >= 5) { LS.set('pinBloque', Date.now() + 5 * 60000); LS.set('pinEssais', 0); $('pin').hidden = true; toast('Trop d’essais : bloqué 5 minutes'); } }
     }
   };
@@ -543,20 +550,25 @@
     c.onpointerup = c.onpointerleave = function () { clearTimeout(long); };
     c.onclick = function () { var t = Date.now(); n = t - t0 < 600 ? n + 1 : 1; t0 = t; if (n >= 5) { n = 0; demanderPin(ouvrirMenu); } };
   })();
-  $('l-reg').onclick = function () { demanderPin(function () { var e = etat.sel || etat.evts.find(function (x) { return x.id === LS.get('dernier', ''); }) || etat.evts[0]; if (e) { lancer(e.id).then(function () { ouvrirMenu('general'); }); } else toast('Aucun événement : créez-en un dans le back-office.', true); }); };
+  $('l-reg').onclick = function () { ecran('s-borne'); panneauBorne($('b-panneau')); };
+  $('b-retour').onclick = function () { afficherListe(); };
   $('ap-fermer').onclick = function () { $('l-modal').hidden = true; };
   $('l-modal').onclick = function (ev) { if (ev.target === $('l-modal')) $('l-modal').hidden = true; };
 
   /* ── menu de l'événement (comme l'appli PC) ── */
-  var PANNEAUX = [['general', 'Général'], ['capture', 'Paramètres de capture'], ['appareil', 'Paramètres de l’appareil photo'], ['mise', 'Mise en page des photos'], ['partage', 'Paramètres de partage'], ['impression', 'Paramètres d’impression'], ['dossier', 'Dossier d’événement']];
-  var panneauActif = 'general';
+  var PANNEAUX = [['capture', 'Paramètres de capture'], ['appareil', 'Paramètres de l’appareil photo'], ['mise', 'Mise en page des photos'], ['partage', 'Paramètres de partage'], ['impression', 'Paramètres d’impression'], ['dossier', 'Dossier d’événement']];
+  var panneauActif = 'capture';
   function ouvrirMenu(p) {
-    ecran('s-menu'); majCamera(); $('m-evt').textContent = etat.evt.nom; $('m-pop').hidden = true; $('m-evt-liste').hidden = true;
+    if (!etat.evt) { afficherListe(); return; }
+    if (etat.ecran !== 's-accueil') afficherAccueil();
+    var m = $('s-menu'); m.hidden = false; m.classList.remove('ferme');
+    majCamera(); $('m-evt').textContent = etat.evt.nom; $('m-pop').hidden = true; $('m-evt-liste').hidden = true;
     $('m-nav').innerHTML = PANNEAUX.map(function (x) { return '<button data-p="' + x[0] + '">' + x[1] + '</button>'; }).join('');
     $('m-nav').querySelectorAll('button').forEach(function (b) { b.onclick = function () { ouvrirPanneau(b.dataset.p); }; });
-    ouvrirPanneau(typeof p === 'string' ? p : panneauActif);
+    ouvrirPanneau(typeof p === 'string' && PANNEAUX.some(function (x) { return x[0] === p; }) ? p : panneauActif);
   }
-  $('m-lancer').onclick = function () { afficherAccueil(); if (opts.pleinEcran) pleinEcran(); };
+  $('m-fleche').onclick = function () { $('s-menu').classList.toggle('ferme'); };
+  $('m-lancer').onclick = function () { $('s-menu').hidden = true; afficherAccueil(); if (opts.pleinEcran) pleinEcran(); };
   $('m-evt').onclick = function () {
     var d = $('m-evt-liste'); if (!d.hidden) { d.hidden = true; return; }
     chargerListe().catch(function () { return etat.evts; }).then(function () {
@@ -585,11 +597,11 @@
     return api('reglages', { json: o }).then(function (r) { return r.json(); }).then(function (d) { if (!d.ok) throw new Error(); etat.evt = d.evenement; LS.set('cfg.' + d.evenement.id, d.evenement); toast('Enregistré'); })
       .catch(function () { toast('Enregistrement impossible (réseau ?)'); });
   }
-  function ouvrirPanneau(p) {
-    panneauActif = p; var e = etat.evt, P = $('m-panneau'), h = '';
-    $('m-nav').querySelectorAll('button').forEach(function (b) { b.classList.toggle('sel', b.dataset.p === p); });
-    if (p === 'general') {
-      h = '<h2>Général</h2><div class="bloc"><label class="champ">Code de sécurité (PIN)</label><div style="display:flex;gap:8px"><input id="g-pin" inputmode="numeric" maxlength="4" value="' + esc(LS.get('pin', '0104')) + '"><button class="btn" id="g-pin-ok">Changer</button></div>' +
+  /* réglages de la borne : uniquement ce qui concerne ce PC (code, démarrage, mise à jour, déconnexion) */
+  function panneauBorne(P) {
+    var h = '';
+
+      h = '<h2>Code de sécurité et logiciel</h2><div class="bloc"><label class="champ">Code de sécurité (PIN)</label><div style="display:flex;gap:8px"><input id="g-pin" inputmode="numeric" maxlength="4" value="' + esc(LS.get('pin', '0104')) + '"><button class="btn" id="g-pin-ok">Changer</button></div>' +
         '<label class="champ">Dossier des données</label><input id="g-dossier" value="' + esc(opts.dossier) + '"' + (Pont ? '' : ' disabled') + '><p class="aide">' + (Pont ? 'Les photos sont enregistrées dans ce dossier, un sous-dossier par événement.' : 'Le dossier local est géré par l’appli Windows « Vespra Event Photobooth ». Dans le navigateur, les photos attendent dans la borne jusqu’à leur envoi.') + '</p></div>' +
         '<div class="bloc">' + bascule('g-plein', opts.pleinEcran, 'Démarrer en plein écran') + bascule('g-auto', opts.autoDernier, 'Ouvrir automatiquement le dernier événement', 'Au démarrage du PC, la borne rouvre directement le dernier événement lancé.') + bascule('g-enreg', opts.voirEnregistres, 'Afficher les événements passés dans la liste') + bascule('g-boot', Pont && Pont.demarrageAuto ? Pont.demarrageAuto() : true, 'Lancer l’appli au démarrage de Windows', Pont ? '' : 'Réglé par le raccourci de démarrage de Windows (voir la notice).') + '</div>' +
         '<div class="bloc"><b>Mise à jour</b>' + (Pont && Pont.majVerifier ? '<p class="aide">Application Windows, version <b>' + esc(Pont.versionCode()) + '</b>. Vos événements, vos photos et vos réglages ne sont pas touchés : rien à désinstaller.</p><p id="g-maj-etat" class="aide"></p><p><button class="btn plein" id="g-maj">Rechercher une mise à jour</button> ' : '<p class="aide">Les écrans se mettent à jour tout seuls avec le site.</p><p>') + '<button class="btn" id="g-rech">Recharger l’écran</button></p></div>' +
@@ -613,7 +625,11 @@
         });
       };
       $('g-deco').onclick = function () { if (!confirm('Déconnecter cette borne ? Il faudra ressaisir le mot de passe d’accès.')) return; LS.set('appareil', ''); LS.set('dernier', ''); etat.appareil = ''; etat.jeton = ''; ecran('s-connexion'); };
-    } else if (p === 'capture') {
+  }
+  function ouvrirPanneau(p) {
+    panneauActif = p; var e = etat.evt, P = $('m-panneau'), h = '';
+    $('m-nav').querySelectorAll('button').forEach(function (b) { b.classList.toggle('sel', b.dataset.p === p); });
+    if (p === 'capture') {
       var c = e.capture || {};
       P.innerHTML = '<h2>Paramètres de capture</h2><div class="bloc">' + nombre('c-1', c.premier, 'Compte à rebours de la première photo', 's', 1, 30) + nombre('c-2', c.suivants, 'Compte à rebours entre les photos', 's', 1, 30) + '</div><button class="btn plein" id="c-enr">Enregistrer</button>';
       $('c-enr').onclick = function () { enregistrer('capture', { premier: +$('c-1').value, suivants: +$('c-2').value }); };
@@ -650,7 +666,7 @@
     if (!mps.length) { P.innerHTML = '<h2>Mise en page des photos</h2><p class="aide">Aucun cadre. Ajoutez-les dans le back-office.</p>'; return; }
     var m = JSON.parse(JSON.stringify(mps[panneauMise.i || 0] || mps[0]));
     P.innerHTML = '<h2>Mise en page des photos</h2><div class="bloc" style="max-width:none"><p><select id="mp-choix">' + mps.map(function (x, i) { return '<option value="' + i + '"' + (x.id === m.id ? ' selected' : '') + '>' + esc(x.nom) + '</option>'; }).join('') + '</select></p>' +
-      '<div class="edit-mp"><div class="edit-stage" id="mp-stage"></div><div style="min-width:220px"><p class="aide">Faites glisser une case pour la déplacer, coin bas-droit pour l’agrandir. Les flèches du clavier déplacent la case choisie d’1 pixel.</p><button class="btn plein" id="mp-enr">Enregistrer</button></div></div></div>';
+      '<div class="edit-mp"><div class="edit-stage" id="mp-stage"></div><div style="min-width:220px"><p class="aide">Faites glisser une case pour la déplacer, coin bas-droit pour l’agrandir. Les flèches du clavier déplacent la case choisie d’1 pixel.</p><p><button class="btn" id="mp-add">+ Ajouter une photo</button> <button class="btn" id="mp-del">Supprimer la photo choisie</button></p><button class="btn plein" id="mp-enr">Enregistrer</button></div></div></div>';
     $('mp-choix').onchange = function () { panneauMise.i = +this.value; panneauMise(P, e); };
     var st = $('mp-stage'), H = Math.min(innerHeight * 0.62, 640), k = H / m.h; st.style.width = m.w * k + 'px'; st.style.height = H + 'px';
     vignetteCadre(e, m, false).then(function (c) { st.insertBefore(c, st.firstChild); });
@@ -670,7 +686,9 @@
       });
     };
     dessiner();
-    document.onkeydown = function (ev) { if (etat.ecran !== 's-menu' || panneauActif !== 'mise' || sel == null) return; var cs = m.cases[sel], d = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[ev.key]; if (!d) return; ev.preventDefault(); cs.x += d[0]; cs.y += d[1]; dessiner(); };
+    $('mp-add').onclick = function () { if (m.cases.length >= 8) { toast('8 photos au maximum'); return; } var w = Math.round(m.w * 0.4), q = Math.round(w * 0.75); m.cases.push({ n: m.cases.length + 1, x: Math.round((m.w - w) / 2), y: Math.round((m.h - q) / 2), w: w, h: q, r: 0 }); sel = m.cases.length - 1; dessiner(); };
+    $('mp-del').onclick = function () { if (m.cases.length <= 1) { toast('Il faut au moins une photo'); return; } if (sel == null) { toast('Touchez d’abord la photo à retirer'); return; } m.cases.splice(sel, 1); m.cases.forEach(function (c, i) { c.n = i + 1; }); sel = null; dessiner(); };
+    document.onkeydown = function (ev) { if (!menuOuvert() || panneauActif !== 'mise' || sel == null) return; var cs = m.cases[sel], d = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[ev.key]; if (!d) return; ev.preventDefault(); cs.x += d[0]; cs.y += d[1]; dessiner(); };
     $('mp-enr').onclick = function () { enregistrer('misesEnPage', [{ id: m.id, cases: m.cases }]); };
   }
 
@@ -683,7 +701,7 @@
     if (dernier && opts.autoDernier && !forcer) { lancer(dernier); chargerListe().catch(function () {}); return; }
     chargerListe().then(afficherListe).catch(function () { afficherListe(); });
   }
-  setInterval(function () { if (etat.ecran === 's-liste' || etat.ecran === 's-menu') majCamera(); }, 3000);   /* le nom de l'appareil apparaît dès qu'il est branché */
+  setInterval(function () { if (etat.ecran === 's-liste' || etat.ecran === 's-borne' || menuOuvert()) majCamera(); }, 3000);   /* le nom de l'appareil apparaît dès qu'il est branché */
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
   File.vider();
   demarrer();
