@@ -51,6 +51,7 @@ public class MainActivity extends Activity {
     /* Code pour quitter le mode tablette dédiée (le même que le menu du vidéobooth) */
     private static final String CODE_SORTIE = "0104";
     private WebView web;
+    private boolean pinDemande = false;   /* l'épinglage n'est demandé qu'une fois par ouverture (Android affiche une fenêtre de confirmation à chaque demande) */
     private boolean libre = false;   /* après « Quitter » : plus d'épinglage, la tablette est utilisable normalement jusqu'au prochain démarrage de l'application */
     private boolean admin = false;   /* vrai dans les réglages du vidéobooth : la barre du système reste visible */
     private int touches = 0;
@@ -234,6 +235,7 @@ public class MainActivity extends Activity {
        Réglages (après le code) : épinglage levé, barre visible en permanence. */
     private void plein() {
         if (admin || libre) {
+            pinDemande = false;
             try { if (epingle()) stopLockTask(); } catch (Exception e) { }
             if (Build.VERSION.SDK_INT >= 30) {
                 getWindow().setDecorFitsSystemWindows(true);
@@ -255,7 +257,7 @@ public class MainActivity extends Activity {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
-        try { if (!epingle()) startLockTask(); } catch (Exception e) { /* refusé : les barres restent seulement masquées */ }
+        if (!pinDemande) { pinDemande = true; try { if (!epingle()) startLockTask(); } catch (Exception e) { /* refusé : les barres restent seulement masquées */ } }
     }
     @Override protected void onResume() { super.onResume(); plein(); web.onResume(); if (horsLigne) web.loadUrl(ADRESSE); }
     @Override protected void onPause() { web.onPause(); super.onPause(); }
