@@ -52,6 +52,8 @@ html body .cta-engage h2 em.ac{color:var(--gold,#F59E0B)}
 html body .hero,html body .off,html body .bests,html body .cta-engage,html body .contact-section{
   margin-left:16px;margin-right:16px;border-radius:32px;overflow:hidden}
 html body .hero{margin-top:12px}
+/* En-tête de l'accueil en pleine largeur, sauf si le back-office demande la version arrondie */
+html:not(.hero-arrondi) body .hero{margin:0!important;border-radius:0!important}
 html body .bests,html body .cta-engage,html body .contact-section{margin-top:12px;margin-bottom:12px}
 html body .off{margin-top:12px;margin-bottom:12px}
 html body .contact-section{margin-bottom:16px}

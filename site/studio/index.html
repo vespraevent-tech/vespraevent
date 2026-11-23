@@ -1670,6 +1670,13 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
               </select>
             </div>
             <div class="field">
+              <label>En-tête de l'accueil</label>
+              <select id="t-entete_accueil" onchange="apercuTheme()">
+                <option value="plein">Pleine largeur</option>
+                <option value="arrondi">Arrondi, détaché des bords</option>
+              </select>
+            </div>
+            <div class="field">
               <label>Arrondi des boutons</label>
               <select id="t-bouton_arrondi" onchange="apercuTheme()">
                 <option value="0">Carrés</option>
@@ -9917,6 +9924,7 @@ function remplirTheme(){
   document.getElementById('t-police_texte').value = t.police_texte;
   document.getElementById('t-police_sous').value = t.police_sous || '';
   document.getElementById('t-bouton_arrondi').value = String(t.bouton_arrondi || '8');
+  document.getElementById('t-entete_accueil').value = t.entete_accueil === 'arrondi' ? 'arrondi' : 'plein';
   document.getElementById('t-taille').value = t.taille;
   document.getElementById('t-arrondi').value = t.arrondi;
   majEtatTheme();
@@ -9942,6 +9950,7 @@ function lireTheme(){
     bandeau_mobile: (cache.theme && cache.theme.bandeau_mobile) || 'non',
     bandeau_pc: (cache.theme && cache.theme.bandeau_pc) || 'oui',
     bouton_arrondi: document.getElementById('t-bouton_arrondi').value,
+    entete_accueil: document.getElementById('t-entete_accueil').value,
     police_sous: document.getElementById('t-police_sous').value,
   };
 }

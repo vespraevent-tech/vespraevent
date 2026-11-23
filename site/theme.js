@@ -173,6 +173,8 @@
     try { extras(reglage); } catch (e) {}
     var map = table(reglage);
     var racine = document.documentElement;
+    /* en-tête de l'accueil : pleine largeur (par défaut) ou arrondi, réglé dans le back-office */
+    racine.classList.toggle('hero-arrondi', reglage.entete_accueil === 'arrondi');
 
     /* bandeau défilant du haut : masqué sur téléphone par défaut (règle dans
        chaque page), réaffiché si le back-office l'a activé */
