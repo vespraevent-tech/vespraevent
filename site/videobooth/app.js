@@ -60,7 +60,7 @@
   function montrer(id) {
     if (id !== 's-revoir') { var vr = $('v-revoir'); try { vr.pause(); vr.removeAttribute('src'); vr.load(); } catch (e) {} } document.querySelectorAll('.ecran').forEach(function (e) { e.classList.toggle('on', e.id === id); });
     /* application Android : la barre du système n'apparaît que dans les réglages (après le code), jamais devant les invités */
-    try { if (window.VespraAndroid) window.VespraAndroid.admin(id === 's-admin'); } catch (e) {} }
+    try { if (window.VespraAndroid) window.VespraAndroid.admin(id === 's-admin' || id === 's-appli'); } catch (e) {} }
   var inactif = null;
   function veille() { clearTimeout(inactif); inactif = setTimeout(function () { if (!$('s-accueil').classList.contains('on') && !$('s-admin').classList.contains('on') && !$('s-pin').classList.contains('on') && !enregistrement) { arreterCam(); accueil(); } }, 120000); }
   ['pointerdown', 'keydown'].forEach(function (t) { document.addEventListener(t, veille, { passive: true }); });
@@ -761,6 +761,9 @@ $('b-stop').onclick = arreterRec;
     $('appli-t').textContent = maj ? 'Mettez l’application à jour' : 'Application requise';
     $('appli-p').textContent = maj ? 'Cette version de l’application Vespra Vidéobooth est trop ancienne. Installez la dernière version.' : 'Ce vidéobooth fonctionne uniquement dans l’application Vespra Vidéobooth pour tablette Android.';
     montrer('s-appli');
+    /* application trop ancienne : on ne laisse jamais la tablette bloquée (barres visibles, épinglage levé) pour pouvoir installer la nouvelle version */
+    if (maj) $('appli-p').textContent += ' Les barres de la tablette sont maintenant visibles : quittez l’application, puis installez la nouvelle version depuis vespraevent.fr/telecharger.';
+    try { if (window.VespraAndroid && window.VespraAndroid.admin) window.VespraAndroid.admin(true); } catch (e) {}
   }
   function appelApi(route, corps) {
     return fetch(baseApi() + '/api/videobooth/' + route, { method: 'POST', headers: ent({ 'content-type': 'application/json' }), body: JSON.stringify(corps) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j._st = r.status; if (j.appli) ecranAppli(!!window.VespraAndroid); appliquerCode(j); return j; }); });
