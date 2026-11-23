@@ -2215,6 +2215,16 @@ const gestionnaire = async (request) => {
       const ENT = await lireEntreprise();
       const condReg = conditionsReglement(envoi ? envoi.cond : { mode: url.searchParams.get('cm'), jours: url.searchParams.get('cj'), note: url.searchParams.get('cn') },
         (envoi ? Number(envoi.acompte) : Number(url.searchParams.get('acompte'))) > 0);
+      /* Tout numéro de facturation renseigné (SIRET, RNA, TVA) figure sur le document, que le client soit un particulier, une entreprise ou une association :
+         on prend ce que l'écran envoie, sinon la réservation, sinon la fiche client. */
+      let ficheClient = null;
+      try {
+        const cs = await blobStore(CLIENT_STORE);
+        const donnees = await cs.get('clients', { type: 'json' });
+        const nn = (x) => String(x || '').toLowerCase().replace(/\s+/g, ' ').trim(), tt = (x) => String(x || '').replace(/\D/g, '');
+        ficheClient = (Array.isArray(donnees) ? donnees : []).find((c) => c && !c._deleted && ((tt(c.phone) && tt(c.phone) === tt(r.phone)) || (nn(c.fullName) && nn(c.fullName) === nn(r.client)))) || null;
+      } catch { /* sans fiche : on continue avec la réservation */ }
+      const premier = (...v) => { for (const x of v) { const t = String(x == null ? '' : x).trim(); if (t) return t; } return ''; };
       const pdf = construireFacture({
         emetteur: ENT.emetteur,
         client: {
@@ -2222,9 +2232,9 @@ const gestionnaire = async (request) => {
           nom: String((url.searchParams.get('societe') || '')).trim().slice(0, 120) || r.client,
           adresse,
           /* le numéro RNA / SIRET / TVA : ce que l'écran envoie, sinon ce qui est enregistré sur la réservation elle-même. Dès qu'un RNA existe quelque part sur la réservation, il figure sur le document. */
-          siret: (envoi ? (envoi.client && envoi.client.siret) : url.searchParams.get('siret')) || (r.factureClient && r.factureClient.siret) || r.siret || '',
-          rna: (envoi ? (envoi.client && envoi.client.rna) : url.searchParams.get('rna')) || (r.factureClient && r.factureClient.rna) || r.rna || '',
-          tvaClient: (envoi ? (envoi.client && envoi.client.tvaClient) : url.searchParams.get('tvaclient')) || (r.factureClient && r.factureClient.tvaClient) || r.tva || '',
+          siret: premier(envoi ? (envoi.client && envoi.client.siret) : url.searchParams.get('siret'), r.factureClient && r.factureClient.siret, r.siret, r.devisSiret, ficheClient && ficheClient.siret),
+          rna: premier(envoi ? (envoi.client && envoi.client.rna) : url.searchParams.get('rna'), r.factureClient && r.factureClient.rna, r.rna, r.devisRna, ficheClient && ficheClient.rna),
+          tvaClient: premier(envoi ? (envoi.client && envoi.client.tvaClient) : url.searchParams.get('tvaclient'), r.factureClient && r.factureClient.tvaClient, r.tva, r.devisTva, ficheClient && ficheClient.tva),
           tel: r.phone || '',
           email: r.email || '',
         },

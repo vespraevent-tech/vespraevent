@@ -41,7 +41,7 @@
       var nom = String((source === 'demande' ? r.nom : r.client) || '').trim();
       if (!nom) return;
       var c = ficheClientDe(r, source);
-      var maj = { pro: !!v.pro, siret: v.pro ? (v.siret || '') : '', rna: v.pro ? (v.rna || '') : '', tva: v.pro ? (v.tvaClient || '') : '', billAdresse: v.adresse || '', _maj: Date.now() };
+      var maj = { pro: !!v.pro, siret: v.siret || '', rna: v.rna || '', tva: v.tvaClient || '', billAdresse: v.adresse || '', _maj: Date.now() };
       var change = !c || ['pro', 'siret', 'rna', 'tva', 'billAdresse'].some(function (k) { return String(c[k] == null ? '' : c[k]) !== String(maj[k]); });
       if (!change) return;
       /* rien de saisi et pas de fiche : on ne crée pas une fiche vide */
@@ -364,7 +364,7 @@
       '</div>' +
 
       /* SIRET ou RNA et TVA : repris de la fiche client, modifiables ici (une association peut n'avoir qu'un numéro RNA) */
-      '<div id="fcBlocPro"' + (pro ? '' : ' hidden') + '>' +
+      '<div id="fcBlocPro"' + ((pro || vu.siret || vu.rna || vu.tvaClient) ? '' : ' hidden') + '>' +
         '<div class="fc-champ"><label class="fc-l" for="fcSiret">SIRET <small>(entreprise)</small></label>' +
           '<input class="fc-input" id="fcSiret" type="text" autocomplete="off" placeholder="14 chiffres" value="' + txt(vu.siret || '') + '"></div>' +
         '<div class="fc-champ"><label class="fc-l" for="fcRna">N° RNA <small>(association)</small></label>' +
@@ -429,7 +429,7 @@
 
     function majType() {
       var estPro = zone.querySelector('input[name="fcType"][value="pro"]').checked;
-      var bp = zone.querySelector('#fcBlocPro'); if (bp) bp.hidden = !estPro;
+      var bp = zone.querySelector('#fcBlocPro'); if (bp) bp.hidden = !(estPro || ((zone.querySelector('#fcSiret') || {}).value || (zone.querySelector('#fcRna') || {}).value || (zone.querySelector('#fcTvaClient') || {}).value));
       zone.querySelector('#fcAideType').textContent = devis
         ? (estPro ? 'Devis valable 30 jours, adressé à une structure.' : 'Devis valable 30 jours.')
         : (estPro
@@ -540,9 +540,9 @@
     var libelle = bouton.innerHTML;
     var adresse = (zone.querySelector('#fcAdresse').value || '').trim();
     var pro = zone.querySelector('input[name="fcType"][value="pro"]').checked;
-    var siret = pro ? ((zone.querySelector('#fcSiret') || {}).value || '').trim() : '';
-    var rna = pro ? ((zone.querySelector('#fcRna') || {}).value || '').trim().toUpperCase() : '';
-    var tvaClient = pro ? ((zone.querySelector('#fcTvaClient') || {}).value || '').trim() : '';
+    var siret = ((zone.querySelector('#fcSiret') || {}).value || '').trim();
+    var rna = ((zone.querySelector('#fcRna') || {}).value || '').trim().toUpperCase();
+    var tvaClient = ((zone.querySelector('#fcTvaClient') || {}).value || '').trim();
     var avecAcompte = zone.querySelector('#fcAvecAcompte').checked;
     var cond = (function () {
       var mode = (zone.querySelector('#fcCondMode') || {}).value || '';
