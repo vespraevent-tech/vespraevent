@@ -57,6 +57,28 @@ async function appel(methode, cle, { query, corps } = {}) {
   return fetch(e.ep + chemin + (qs ? '?' + qs : ''), { method: methode, headers: entetes, body: octets || undefined });
 }
 
+/* Lien de téléchargement temporaire (signé dans l'adresse) : le fichier part directement de R2, sans passer par une fonction du site */
+export function presigner({ host, path, ak, sk, region = 'auto', secondes = 600, extra = {}, date = new Date() }) {
+  const amz = date.toISOString().replace(/[:-]|\.\d{3}/g, '');
+  const jour = amz.slice(0, 8);
+  const portee = jour + '/' + region + '/s3/aws4_request';
+  const q = Object.assign({ 'X-Amz-Algorithm': 'AWS4-HMAC-SHA256', 'X-Amz-Credential': ak + '/' + portee, 'X-Amz-Date': amz, 'X-Amz-Expires': String(secondes), 'X-Amz-SignedHeaders': 'host' }, extra);
+  const cq = Object.keys(q).sort().map((k) => enc(k) + '=' + enc(q[k])).join('&');
+  const canon = ['GET', path, cq, 'host:' + host + '\n', 'host', 'UNSIGNED-PAYLOAD'].join('\n');
+  const aSigner = ['AWS4-HMAC-SHA256', amz, portee, sha(canon)].join('\n');
+  const cle = hmac(hmac(hmac(hmac('AWS4' + sk, jour), region), 's3'), 'aws4_request');
+  return cq + '&X-Amz-Signature=' + createHmac('sha256', cle).update(aSigner).digest('hex');
+}
+export function r2LienTemporaire(cle, secondes = 600, nomFichier = '') {
+  const e = env(), u = new URL(e.ep);
+  const extra = nomFichier ? { 'response-content-disposition': 'attachment; filename="' + String(nomFichier).replace(/"/g, '') + '"' } : {};
+  return e.ep + '/' + enc(e.bucket) + '/' + encChemin(cle) + '?' + presigner({ host: u.host, path: '/' + enc(e.bucket) + '/' + encChemin(cle), ak: e.ak, sk: e.sk, secondes, extra });
+}
+export async function r2Existe(cle) {
+  const r = await appel('HEAD', cle);
+  return r.ok;
+}
+
 export async function r2Put(cle, donnees) {
   const r = await appel('PUT', cle, { corps: donnees });
   if (!r.ok) throw new Error('R2 écriture refusée (' + r.status + ') : ' + (await r.text().catch(() => '')).slice(0, 200));

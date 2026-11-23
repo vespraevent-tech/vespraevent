@@ -82,6 +82,8 @@ public class MainActivity extends Activity {
 
         /* le vidéobooth prévient l'application quand les réglages (après le code) s'ouvrent ou se ferment */
         web.addJavascriptInterface(new Object() {
+            /* clé d'application : prouve au site que c'est bien cette application (et non un navigateur) */
+            @JavascriptInterface public String cle() { return BuildConfig.APP_KEY; }
             @JavascriptInterface public void admin(final boolean on) {
                 runOnUiThread(new Runnable() { @Override public void run() { admin = on; plein(); } });
             }

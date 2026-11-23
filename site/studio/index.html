@@ -2905,13 +2905,34 @@ function vbConfigRendre(){
   let h='';
   if(VBEDIT!==null) h+=vbFormSession();
   if(!VBEVT){
+    h+='<div style="'+VB_CARTE+'" id="vbAppli"><div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f">Télécharger l’application</div><div id="vbAppliCorps" style="font-size:13px;color:#6b7280;margin-top:8px">Chargement…</div></div>';
     h+='<details style="'+VB_CARTE+'"'+((VBCFG.acces||VBCFG.accesLibre)?'':' open')+'><summary style="cursor:pointer;font:700 15px Poppins,Inter,sans-serif;color:#14304f">Accès à l’appli de la tablette</summary>'+
-    '<div style="font-size:12.5px;color:#6b7280;margin:8px 0 10px">Adresse : <b>'+location.origin+'/videobooth/</b>. La tablette affiche la liste des événements en cours : on touche le sien, et c’est parti (avec un mot de passe seulement si vous en avez mis un sur la session).</div>'+
+    '<div style="font-size:12.5px;color:#6b7280;margin:8px 0 10px">Le vidéobooth ne s’ouvre plus dans un navigateur : il fonctionne uniquement dans l’application Android installée sur la tablette. Elle affiche la liste des événements en cours : on touche le sien, et c’est parti (avec un mot de passe seulement si vous en avez mis un sur la session).</div>'+
     '<label style="font-size:13.5px;display:flex;align-items:center;gap:8px;margin-bottom:10px"><input type="checkbox" id="vbExiger"'+(VBCFG.accesLibre?'':' checked')+' onchange="document.getElementById(\'vbAccesBloc\').style.display=this.checked?\'flex\':\'none\'"> Demander un mot de passe général pour ouvrir l’appli</label>'+
     '<div id="vbAccesBloc" style="display:'+(VBCFG.accesLibre?'none':'flex')+';gap:8px;flex-wrap:wrap"><input id="vbAcces" value="'+vbEsc(VBCFG.acces||'')+'" placeholder="Mot de passe d’accès (6 caractères minimum)" style="flex:1 1 240px;'+VB_INPUT+';font:600 14px monospace" autocomplete="off"><button class="btn btn-ghost" onclick="document.getElementById(\'vbAcces\').value=vbMdp()">Générer</button></div>'+
     '<div style="margin-top:10px"><button class="btn" onclick="vbAccesSauver()">Enregistrer</button></div>'+((VBCFG.acces||VBCFG.accesLibre)?'':'<div style="color:#b03a2a;font-size:12.5px;margin-top:8px">Rien n’est réglé : la tablette ne peut pas se connecter. Choisissez un mot de passe, ou décochez la case pour une appli sans mot de passe général.</div>')+'</details>';
   }
   z.innerHTML=h; try{ vbAmbApercu(); vbPoliceApercu(); }catch(e){}
+  vbAppliCharger();
+}
+/* téléchargement protégé des applications : le mot de passe est généré par le site, affiché une seule fois */
+async function vbAppliCharger(){
+  const c=document.getElementById('vbAppliCorps'); if(!c) return;
+  try{
+    const e=await api('/appli');
+    c.innerHTML='<div style="margin-bottom:10px">'+(e.defini?'Mot de passe de téléchargement défini'+(e.maj?' le '+new Date(e.maj).toLocaleDateString('fr-FR'):'')+'.':'<b style="color:#b03a2a">Aucun mot de passe défini : personne ne peut télécharger l’application.</b>')+'</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn" onclick="vbAppliMdp()">'+(e.defini?'Changer le mot de passe':'Créer le mot de passe')+'</button><a class="btn btn-ghost" href="/videobooth/telecharger.html" target="_blank" rel="noopener">Ouvrir la page de téléchargement</a></div>'
+      +'<div id="vbAppliMdp"></div>'
+      +'<div style="margin-top:12px;line-height:1.6">Donnez à la personne qui installe : l’adresse <b>'+location.origin+'/telecharger</b> et le mot de passe. Android : le fichier se télécharge directement. Windows (photobooth) : déposez une fois le fichier <code>photobooth-windows.zip</code> dans Cloudflare R2, dossier <code>appli</code>'+(e.r2?'':' <b>(R2 n’est pas encore configuré)</b>')+'.</div>';
+  }catch(x){ c.textContent='Indisponible : '+x.message; }
+}
+async function vbAppliMdp(){
+  if(!confirm('Créer un nouveau mot de passe de téléchargement ?\n\nL’ancien ne fonctionnera plus. Le nouveau ne s’affiche qu’une seule fois.')) return;
+  try{
+    const r=await api('/appli/mdp',{method:'POST'});
+    document.getElementById('vbAppliMdp').innerHTML='<div style="margin-top:12px;padding:14px 16px;border-radius:12px;background:#FFF8E6;border:1px solid #F3D38A"><div style="font-size:12px;color:#8a6a1a;font-weight:600;margin-bottom:6px">NOUVEAU MOT DE PASSE — NOTEZ-LE MAINTENANT, IL NE S’AFFICHERA PLUS</div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><code id="vbAppliMdpVal" style="font:700 20px monospace;letter-spacing:.04em;color:#14304f">'+r.mdp+'</code><button class="btn btn-ghost" onclick="navigator.clipboard.writeText(document.getElementById(\'vbAppliMdpVal\').textContent).then(()=>showToast(\'Mot de passe copié\'))">Copier</button></div></div>';
+    showToast('Mot de passe créé');
+  }catch(e){ showToast('Échec : '+e.message,true); }
 }
 function vbSessEdit(i){ VBEDIT=(i===null)?null:{i}; vbConfigRendre(); if(i!==null) { const z=document.getElementById('vbConfig'); if(z) z.scrollIntoView({block:'start',behavior:'smooth'}); } }
 async function vbConfigPoster(corps,msg){ try{ VBCFG=await api('/videobooth/config',{method:'POST',body:JSON.stringify(corps)}); showToast(msg); }catch(e){ showToast('Échec : '+e.message,true); } VBEDIT=null; vbConfigRendre(); vbRendre(); }
@@ -10332,7 +10353,7 @@ checkSession();
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/studio/sw.js',{scope:'/studio/'}).catch(function(){})})}</script>
 <script src="nbsp-euro.js"></script>
-<script src="/studio/photobooth.js?v=28"></script>
+<script src="/studio/photobooth.js?v=29"></script>
 
 <script>
 /* ══ Témoin « Sauvegarde en cours » ══

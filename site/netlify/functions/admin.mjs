@@ -43,6 +43,7 @@ import { getStore, stockageActif, stats as stockStats } from './_stockage.mjs';
 import { evenementLire as pbLire, evenementEcrire as pbEcrire, evenementsLister as pbLister, evenementSupprimer as pbSupprimer, imageAjouter as pbImageAjouter, imageLire as pbImageLire, FORMATS as PB_FORMATS, vuLire as pbVuLire, compteurs as pbCompteurs, prisesLister as pbPrises, photoLire as pbPhoto, priseSupprimer as pbPriseSuppr } from './_photobooth.mjs';
 import { jetonGalerie as pbJetonGalerie } from './photobooth.mjs';
 import { binLire, binSupprimer, r2Actif, r2Put, r2Get, r2Delete } from './_r2.mjs';
+import { appliEtat, appliNouveauMdp } from './appli.mjs';
 import { lireMetas as vbLireMetas, videoStore, envoyerMail as vbEnvoyerMail, jetonEvt as vbJetonEvt, galLire as vbGalLire, galEcrire as vbGalEcrire, genMdp as vbGenMdp, accesLire as vbAccesLire, accesEcrire as vbAccesEcrire, sessionsLire as vbSessionsLire, sessionsEcrire as vbSessionsEcrire } from './videobooth.mjs';
 import * as secu from './_sauvegarde.mjs';
 /* Fabrication du PDF de facture : écrite à la main, sans dépendance,
@@ -2378,6 +2379,9 @@ const gestionnaire = async (request) => {
     return json({ url: `${site}/api/videobooth/evenement?e=${encodeURIComponent(e)}&t=${vbJetonEvt(e)}`, mdp: g ? g.mdp : '' });
   }
   /* ── Photobooth : événements, mises en page, images ── */
+  /* mot de passe de téléchargement des applications (affiché une seule fois à la création) */
+  if (path === '/appli' && request.method === 'GET') return json(await appliEtat());
+  if (path === '/appli/mdp' && request.method === 'POST') return json(await appliNouveauMdp());
   /* contrôle du stockage Cloudflare R2 : écrit, relit et supprime un petit fichier d'essai */
   if (path === '/stockage/r2' && request.method === 'GET') {
     if (!r2Actif()) return json({ actif: false, message: 'Cloudflare R2 n’est pas configuré : les photos et vidéos restent dans Netlify.' });

@@ -16,12 +16,13 @@ import { createHmac, createHash, randomBytes, timingSafeEqual } from 'node:crypt
 import { getStore } from './_blobs.mjs';
 import { binEcrire, binLire, binSupprimer } from './_r2.mjs';
 import { htmlVideo } from './_mails-auto.mjs';
+import { appOk } from './_appli.mjs';
 
 export const config = { path: '/api/videobooth/*' };
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'content-type, x-appareil',
+  'Access-Control-Allow-Headers': 'content-type, x-appareil, x-vespra-app',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 };
 const rep = (obj, status = 200) =>
@@ -214,6 +215,13 @@ async function traiter(request) {
   if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
   const url = new URL(request.url);
   const cle = process.env.VIDEOBOOTH_CLE;
+
+  /* ── appels de la tablette : seule l'application Vespra Vidéobooth (qui porte la clé d'application) est acceptée ── */
+  const deLaTablette = (request.method === 'POST' && /\/api\/videobooth\/(acces|sessions|session|chunk|etat|relance)$/.test(url.pathname))
+    || (request.method === 'GET' && /\/api\/videobooth\/(ma-session|ping)$/.test(url.pathname));
+  if (deLaTablette && !appOk(request, 'videobooth')) {
+    return rep({ ok: false, appli: true, erreur: 'Ce vidéobooth fonctionne uniquement dans l’application Vespra Vidéobooth (à jour).' }, 403);
+  }
 
   /* ── accès à l'appli de la tablette : mot de passe général ── */
   if (request.method === 'POST' && /\/api\/videobooth\/(acces|sessions|session)$/.test(url.pathname)) {

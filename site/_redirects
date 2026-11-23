@@ -1,3 +1,4 @@
+/telecharger        /videobooth/telecharger.html  200
 # Pages fusionnées en « Événements »
 /reserver           /reservation-dates.html  200
 /prestations        /evenements  301!

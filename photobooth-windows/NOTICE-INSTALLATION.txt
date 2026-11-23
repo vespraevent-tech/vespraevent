@@ -75,3 +75,11 @@ VESPRA EVENT PHOTOBOOTH — INSTALLATION SUR UN MINI-PC (Windows 10/11)
    - En ligne : back-office > Photobooth > l'événement > Tableau de bord.
    - Sans internet, la borne continue : les photos partent toutes seules au retour du réseau.
      (Il faut internet au tout premier lancement d'un événement.)
+
+7. WINDOWS NE DOIT PAS SE METTRE À JOUR EN PLEIN ÉVÉNEMENT
+   - Une seule fois sur le mini-PC : clic droit sur « outils\mises-a-jour-windows.ps1 » > Exécuter avec PowerShell.
+     Windows prévient qu'une mise à jour existe mais ne la télécharge, ne l'installe et ne redémarre plus tout seul.
+     (Pour annuler : lancer le même fichier avec l'option -Annuler.)
+   - Lancez les mises à jour Windows vous-même, de temps en temps, HORS événement : Paramètres > Windows Update > Rechercher.
+   - Aussi : réglez le Wi-Fi en « connexion limitée » (Paramètres > Réseau > Wi-Fi > propriétés) pour retarder les gros téléchargements.
+   - Le logiciel du photobooth, lui, ne se met jamais à jour tout seul : seulement quand vous touchez « Installer et redémarrer ».

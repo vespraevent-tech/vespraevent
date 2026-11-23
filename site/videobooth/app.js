@@ -471,7 +471,7 @@ $('b-stop').onclick = arreterRec;
     var n = Math.max(1, Math.ceil(v.blob.size / TAILLE)), i = 0, dernier = {};
     function suite() {
       var q = new URLSearchParams({ id: v.id, i: i, n: n, fichier: v.fichier, type: v.type || '', nom: v.nom, prenom: v.prenom, email: v.email || '', plusEmail: v.plusEmail || '', plusDest: v.plusDest || '', event: v.event || '', duree: v.duree || 0, son: (v.son == null ? '' : v.son), pour: v.pour || 'moi', dest: v.dest || '', rk: v.rk || '', mode: v.mode || 'video', qs: (v.qs || []).join('|') });
-      return fetch(base + '/api/videobooth/chunk?' + q.toString(), { method: 'POST', headers: { 'x-appareil': (cfg.jeton || cfg.cle), 'content-type': 'application/octet-stream' }, body: v.blob.slice(i * TAILLE, (i + 1) * TAILLE) }).then(function (r) {
+      return fetch(base + '/api/videobooth/chunk?' + q.toString(), { method: 'POST', headers: ent({ 'x-appareil': (cfg.jeton || cfg.cle), 'content-type': 'application/octet-stream' }), body: v.blob.slice(i * TAILLE, (i + 1) * TAILLE) }).then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (j) {
           if (!r.ok || j.ok === false) throw new Error(j.erreur || ('Serveur : ' + r.status));
           dernier = j; i++; return i < n ? suite() : dernier;
@@ -502,7 +502,7 @@ $('b-stop').onclick = arreterRec;
       toutes().then(function (l) { etat.att = l.filter(function (v) { return !v.envoye; }).length; etat.tot = l.length; }).catch(function () {}).then(function () {
         return (navigator.storage && navigator.storage.estimate) ? navigator.storage.estimate().then(function (e) { etat.usage = e.usage || 0; etat.quota = e.quota || 0; }).catch(function () {}) : null;
       }).then(function () {
-        return fetch(baseApi() + '/api/videobooth/etat', { method: 'POST', headers: { 'x-appareil': (cfg.jeton || cfg.cle), 'content-type': 'application/json' }, body: JSON.stringify(etat) }).catch(function () {});
+        return fetch(baseApi() + '/api/videobooth/etat', { method: 'POST', headers: ent({ 'x-appareil': (cfg.jeton || cfg.cle), 'content-type': 'application/json' }), body: JSON.stringify(etat) }).catch(function () {});
       });
     };
     if (navigator.getBattery) navigator.getBattery().then(function (b) { etat.batt = Math.round(b.level * 100); etat.charge = !!b.charging; fin(); }).catch(fin); else fin();
@@ -520,7 +520,7 @@ $('b-stop').onclick = arreterRec;
     var der = 0; try { der = +localStorage.getItem('vb-relance') || 0; } catch (e) {}
     if (Date.now() - der < 6 * 3600 * 1000) return;
     try { localStorage.setItem('vb-relance', String(Date.now())); } catch (e) {}
-    fetch(baseApi() + '/api/videobooth/relance', { method: 'POST', headers: { 'x-appareil': (cfg.jeton || cfg.cle) } }).catch(function () {});
+    fetch(baseApi() + '/api/videobooth/relance', { method: 'POST', headers: ent({ 'x-appareil': (cfg.jeton || cfg.cle) }) }).catch(function () {});
   }
   setTimeout(relanceMails, 60000); setInterval(relanceMails, 30 * 60000);
   setInterval(synchro, 20000); window.addEventListener('online', synchro);
@@ -687,7 +687,7 @@ $('b-stop').onclick = arreterRec;
   $('a-test').onclick = function () {
     var base = ($('a-serveur').value.trim() || location.origin).replace(/\/+$/, ''), cle = (cfg.jeton || cfg.cle || '');
     $('a-test-r').textContent = 'Test en cours…';
-    fetch(base + '/api/videobooth/ping', { headers: { 'x-appareil': cle } }).then(function (r) { return r.json().catch(function () { return { ok: false, erreur: 'Réponse inattendue (' + r.status + ')' }; }); }).then(function (j) {
+    fetch(base + '/api/videobooth/ping', { headers: ent({ 'x-appareil': cle }) }).then(function (r) { return r.json().catch(function () { return { ok: false, erreur: 'Réponse inattendue (' + r.status + ')' }; }); }).then(function (j) {
       $('a-test-r').textContent = j.ok ? ('✓ Connexion OK' + (j.resend ? '' : ' — mais l’envoi d’e-mail n’est pas configuré (RESEND_API_KEY manquante)')) : ('✗ ' + (j.erreur || 'échec'));
     }).catch(function (e) { $('a-test-r').textContent = '✗ Serveur injoignable : ' + (e.message || 'réseau'); });
   };
@@ -727,8 +727,17 @@ $('b-stop').onclick = arreterRec;
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
   /* ── accès : mot de passe général → liste des sessions → mot de passe de la session ── */
   function baseApi() { return (cfg.serveur || location.origin).replace(/\/+$/, ''); }
+  /* clé de l'application Android (jamais dans la page : c'est l'application qui la fournit) */
+  function cleAppli() { try { return window.VespraAndroid && window.VespraAndroid.cle ? String(window.VespraAndroid.cle() || '') : ''; } catch (e) { return ''; } }
+  function ent(h) { h = h || {}; h['x-vespra-app'] = cleAppli(); return h; }
+  function ecranAppli(maj) {
+    var z = $('s-appli'); if (!z) return;
+    $('appli-t').textContent = maj ? 'Mettez l’application à jour' : 'Application requise';
+    $('appli-p').textContent = maj ? 'Cette version de l’application Vespra Vidéobooth est trop ancienne. Installez la dernière version.' : 'Ce vidéobooth fonctionne uniquement dans l’application Vespra Vidéobooth pour tablette Android.';
+    montrer('s-appli');
+  }
   function appelApi(route, corps) {
-    return fetch(baseApi() + '/api/videobooth/' + route, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(corps) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j._st = r.status; return j; }); });
+    return fetch(baseApi() + '/api/videobooth/' + route, { method: 'POST', headers: ent({ 'content-type': 'application/json' }), body: JSON.stringify(corps) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j._st = r.status; if (j.appli) ecranAppli(!!window.VespraAndroid); return j; }); });
   }
   function sessionStockee() { try { var s = JSON.parse(localStorage.getItem('vb-sess') || 'null'); if (s && s.exp > Date.now() && s.jeton && s.session) return s; } catch (e) {} return null; }
   function accesStocke() { try { var a = JSON.parse(localStorage.getItem('vb-acces') || 'null'); if (a && a.exp > Date.now()) return a; } catch (e) {} return null; }
@@ -813,12 +822,17 @@ $('b-stop').onclick = arreterRec;
   function majSession() {
     if (!cfg.jeton || !navigator.onLine || enregistrement) return;
     dernierMaj = Date.now();
-    fetch(baseApi() + '/api/videobooth/ma-session', { headers: { 'x-appareil': cfg.jeton } }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+    fetch(baseApi() + '/api/videobooth/ma-session', { headers: ent({ 'x-appareil': cfg.jeton }) }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
       if (!j || !j.ok || !j.session) return;
       sessionMaj = j.session; if ($('s-accueil').classList.contains('on')) accueil(true);
     }).catch(function () {});
   }
   setInterval(majSession, 5 * 60e3); window.addEventListener('online', function () { setTimeout(majSession, 1500); }); setTimeout(majSession, 6000);
-  function demarrerAppli() { var s = sessionStockee(); if (s) ouvrirSession(s); else versAcces(); }
+  function demarrerAppli() {
+    /* hors de l'application (navigateur) ou application trop ancienne : on n'ouvre rien */
+    if (!window.VespraAndroid) return ecranAppli(false);
+    if (!cleAppli()) return ecranAppli(true);
+    var s = sessionStockee(); if (s) ouvrirSession(s); else versAcces();
+  }
   ouvrirDb().then(function () { demarrerAppli(); }).catch(function () { demarrerAppli(); $('etat').hidden = false; $('etat').textContent = 'Stockage de la tablette indisponible'; $('etat').classList.add('alerte'); });
 })();

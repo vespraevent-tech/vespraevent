@@ -671,6 +671,8 @@
 
   /* ── démarrage : la borne rouvre seule le dernier événement (PC rallumé) ── */
   function demarrer() {
+    /* hors du logiciel Windows (navigateur) : rien ne s'ouvre. (__PB_TEST : essais automatiques uniquement) */
+    if (!window.vespraBorne && !window.__PB_TEST) { ecran('s-appli'); return; }
     if (!etat.appareil) { ecran('s-connexion'); return; }
     var dernier = LS.get('dernier', ''), forcer = /[?&]liste/.test(location.search);
     if (dernier && opts.autoDernier && !forcer) { lancer(dernier); chargerListe().catch(function () {}); return; }
