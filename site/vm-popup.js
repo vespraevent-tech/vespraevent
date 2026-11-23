@@ -89,7 +89,7 @@ function handleAdd(id){loadCart();
   if(p.id==='p22'){
     vz.hidden=true;
     sel.innerHTML='';
-    document.getElementById('vmPrice').textContent='À partir de 179 €';
+    document.getElementById('vmPrice').textContent='À partir de '+p.price+' €';
   }else if(p.carHoursRate){
     vz.hidden=true;sel.innerHTML='';document.getElementById('vmPrice').textContent=p.price+' €';
   }else if(p.variants&&p.variants.length){

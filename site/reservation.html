@@ -134,7 +134,11 @@ a{text-decoration:none;color:inherit}img{display:block;max-width:100%}button{cur
   margin-top:10px;font-size:13.5px;font-weight:600;color:#15803D}
 .pa-remise[hidden]{display:none}
 .pa-remise strong{font-size:15px;font-weight:700;white-space:nowrap}
-.pa-champ{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.pa-champ{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;position:relative}
+.pa-champ.pa-valide .form-input{border-color:#15803D;padding-right:44px}
+.pa-champ.pa-valide::after{content:"";position:absolute;right:14px;top:50%;width:20px;height:20px;margin-top:-10px;border-radius:50%;background:#15803D url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/13px no-repeat}
+.form-section{margin-top:56px}
+.rep-q{text-transform:none!important;letter-spacing:0!important;font-size:14px!important;font-weight:600!important;color:var(--black)!important}
 .pa-champ .form-input{flex:1;min-width:180px;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
 .pa-btn{flex:0 0 auto;min-height:46px;padding:0 20px;border:2px solid var(--navy);border-radius:var(--pill);
   background:var(--white);color:var(--navy);font:inherit;font-size:14px;font-weight:700;cursor:pointer;
@@ -797,7 +801,7 @@ transform:none!important;stroke-dashoffset:0!important}}
 <!-- REASSURANCE -->
 <div class="rea-bar">
   <div class="rea-item"><div class="rea-icon">⚡</div><div class="rea-label">Réponse sous 24h</div><div class="rea-sub">garanti, 7j/7</div></div>
-  <div class="rea-item"><div class="rea-icon">🚚</div><div class="rea-label">Livraison &amp; installation</div><div class="rea-sub">partout</div></div>
+  <div class="rea-item"><div class="rea-icon">🚚</div><div class="rea-label">Livraison &amp; installation</div><div class="rea-sub">dans tout le Grand Ouest</div></div>
 </div>
 
 <!-- PAGE BODY -->
@@ -816,7 +820,7 @@ transform:none!important;stroke-dashoffset:0!important}}
         </div>
         <div class="cs-items" id="csItems"></div>
         <div id="csNudge"></div>
-        <div class="pa-remise" id="csPack" hidden><span>Offre −10 %</span><strong>− 0 €</strong></div>
+        <div class="pa-remise" id="csPack" hidden><span>Remise</span><strong>− 0 €</strong></div>
         <div class="pa-remise" id="csRemise" hidden><span>Parrainage — code <span id="csRemiseCode"></span></span><strong>− 10 €</strong></div>
         <div class="cs-total"><span>Total (devis)</span><span id="csTotal">0 €</span></div>
         <p class="voir-place">Envie de voir le matériel avant de le louer ? <a href="/evenements.html#rdv">Passez nous voir à Vitré</a> : ouvert sans rendez-vous le mercredi et le samedi.</p>
@@ -942,7 +946,7 @@ transform:none!important;stroke-dashoffset:0!important}}
     <div class="total-block" id="totalBlock">
       <div class="total-block-title">Récapitulatif de votre sélection</div>
       <div class="total-items" id="totalItems"></div>
-      <div class="pa-remise" id="tbPack" hidden><span>Offre −10 %</span><strong>− 0 €</strong></div>
+      <div class="pa-remise" id="tbPack" hidden><span>Remise</span><strong>− 0 €</strong></div>
       <div class="pa-remise" id="tbRemise" hidden><span>Parrainage — code <span id="tbRemiseCode"></span></span><strong>− 10 €</strong></div>
       <div class="total-footer">
         <div class="total-devis-note" id="totalNote" style="display:none">* Les éléments Sur devis seront précisés lors du contact</div>
@@ -1069,10 +1073,10 @@ transform:none!important;stroke-dashoffset:0!important}}
           <textarea class="form-input" name="adresse_livraison" id="adresseLivraison" rows="2" data-adresse-autocomplete placeholder="N° et rue&#10;Code postal Ville"></textarea>
           <p class="form-hint" id="livraisonHint" style="display:none;margin-top:8px;font-size:13px;line-height:1.6;color:var(--g2);background:var(--g4);border-left:3px solid var(--navy);border-radius:0 8px 8px 0;padding:10px 14px">Vous avez choisi l'option <strong id="livraisonOptNom">livraison et installation</strong> sur au moins un produit : l'adresse exacte du lieu de réception est nécessaire pour calculer le tarif de déplacement.</p>
           <div id="repriseGroup" style="margin-top:16px">
-            <label class="form-label">Reprise du matériel après l'événement</label>
+            <label class="form-label rep-q">Voulez-vous que nous venions récupérer le matériel le lendemain&nbsp;?</label>
             <div class="radio-row">
-              <label class="radio-opt"><input type="radio" name="reprise" value="oui" onchange="choisirReprise(this.value)"> Oui, nous venons récupérer le matériel</label>
-              <label class="radio-opt"><input type="radio" name="reprise" value="non" onchange="choisirReprise(this.value)"> Non, je rapporte moi-même le matériel au dépôt de Vitré</label>
+              <label class="radio-opt"><input type="radio" name="reprise" value="oui" onchange="choisirReprise(this.value)"> Oui</label>
+              <label class="radio-opt"><input type="radio" name="reprise" value="non" onchange="choisirReprise(this.value)"> Non, je le rapporte au dépôt de Vitré</label>
             </div>
             <p class="form-hint" id="repriseCompris" style="display:none;margin-top:8px;font-size:13px;line-height:1.6;color:var(--g2)">Reprise comprise avec l'option <strong>démontage ou lancement</strong>&nbsp;: nous venons récupérer le matériel.</p>
             <p class="form-err" id="repriseErr" style="display:none;margin-top:6px;font-size:13px;color:#b91c1c">Merci d'indiquer si vous souhaitez la reprise du matériel.</p>
@@ -1104,7 +1108,6 @@ transform:none!important;stroke-dashoffset:0!important}}
           <div class="pa-champ">
             <input class="form-input" type="text" id="paCode" name="parrainage" placeholder="MARTINJULIEN10"
                    autocomplete="off" spellcheck="false" maxlength="32">
-            <button type="button" class="pa-btn" id="paBtn">Appliquer</button>
           </div>
           <p class="pa-etat" id="paEtat" hidden role="status"></p>
         </div>
@@ -1171,7 +1174,6 @@ transform:none!important;stroke-dashoffset:0!important}}
         <li><a href="organisation-mariage.html">Organisation de mariage</a></li>
         <li><a href="organisation-anniversaire.html">Organisation d'anniversaire</a></li>
         <li><a href="organisation-evenements-entreprises.html">Événements d'entreprise</a></li>
-        <li><a href="pack-mariage.html">Pack −10 %</a></li>
         <li><a href="nos-recommandations.html">Les lieux de réception</a></li>
         <li><a href="nos-prestataires.html">Prestataires recommandés</a></li>
         
@@ -2189,12 +2191,12 @@ function majReprise(){
   const dem=demontageDansLeDevis();
   let v=''; try{ v=localStorage.getItem('vespra_reprise')||''; }catch(e){}
   g.querySelectorAll('.radio-row').forEach(r=>{ r.style.display = dem ? 'none' : ''; });
-  g.querySelectorAll('input[name="reprise"]').forEach(r=>{ r.checked = !dem && r.value===(v==='oui'?'oui':'non'); });
+  g.querySelectorAll('input[name="reprise"]').forEach(r=>{ r.checked = !dem && !!v && r.value===v; });
   const ok=document.getElementById('repriseCompris'); if(ok) ok.style.display = dem ? 'block' : 'none';
   const lb=g.querySelector('.form-label'); if(lb) lb.style.display = dem ? 'none' : '';
   const hid=document.getElementById('hidReprise');
   const lo=document.querySelector('input[name="livraison"][value="oui"]');
-  if(hid) hid.value = !(lo&&lo.checked) ? '' : dem ? 'Oui — comprise avec le démontage' : (v==='oui' ? 'Oui — reprise du matériel demandée' : 'Non — le client rapporte le matériel');
+  if(hid) hid.value = !(lo&&lo.checked) ? '' : dem ? 'Oui — comprise avec le démontage' : (v==='oui' ? 'Oui — reprise du matériel le lendemain' : v==='non' ? 'Non — le client rapporte le matériel' : 'Non précisé');
 }
 function livraisonRequiseParLesOptions(){
   try{ majReprise(); }catch(e){}
@@ -2514,6 +2516,9 @@ window.VESPRA_PARRAIN = null;
     etat.hidden = !texte;
   }
 
+  function marquer() {
+    var z = champ.parentNode; if (z) z.classList.toggle('pa-valide', !!window.VESPRA_PARRAIN);
+  }
   function nettoyer(v) {
     return String(v || '').toUpperCase()
       .normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -2546,7 +2551,7 @@ window.VESPRA_PARRAIN = null;
     if (!window.VESPRA_PARRAIN) return;
     var p = window.VESPRA_PARRAIN;
     if (panierBrut() >= MINIMUM) {
-      dire('Code valide' + (p.parrain ? ', parrainé par ' + p.parrain : '.')
+      dire('Code valide' + (p.parrain ? ', parrainé par ' + p.parrain + '.' : '.')
            + ' Remise de ' + p.remise + ' € appliquée à votre devis.', 'pa-ok');
     } else {
       dire('Code valide, mais la remise de ' + p.remise + ' € s’applique à partir de ' + MINIMUM
@@ -2679,9 +2684,11 @@ window.VESPRA_PARRAIN = null;
         dernierTeste = code;
         if (d && d.ok) {
           window.VESPRA_PARRAIN = { code: d.code, remise: Number(d.remise) || 10, parrain: d.parrain || '' };
+          marquer();
         } else {
           window.VESPRA_PARRAIN = null;
           dire((d && d.message) || 'Ce code n’est pas reconnu.', 'pa-non');
+          marquer();
         }
         majTotaux();
       })
@@ -2694,6 +2701,15 @@ window.VESPRA_PARRAIN = null;
   }
 
   if (bouton) bouton.addEventListener('click', function () { verifier(false); });
+  /* Validation pendant la saisie : pas de bouton, le code est vérifié dès qu'on s'arrête de taper. */
+  var attente = 0;
+  champ.addEventListener('input', function () {
+    clearTimeout(attente);
+    var c = nettoyer(champ.value);
+    if (c !== dernierTeste) { window.VESPRA_PARRAIN = null; marquer(); }
+    if (c.length < 4) { if (!c) { dernierTeste = ''; dire(''); majTotaux(); } return; }
+    attente = setTimeout(function () { verifier(true); }, 550);
+  });
   champ.addEventListener('blur', function () { if (champ.value.trim()) verifier(false); });
   champ.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') { e.preventDefault(); verifier(false); }

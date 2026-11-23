@@ -322,9 +322,8 @@ function set(k,v){
 const V={
 hero(){return `<div class="kick">Aperçu : page Catalogue</div><div class="hero" id="hero">
  <div class="sl" style="background-image:url(${IM['ambiance-soiree']})"><h1>Location de matériel événementiel</h1><p>Sono, lumière, barnums, effets : tout pour votre soirée en Ille-et-Vilaine.</p><button class="btn">Voir le catalogue</button></div>
- <div class="sl" style="background-image:url(${IM['pack-mariage']})"><h1>Pack −10 %</h1><p>Dès 5 produits sélectionnés, la remise est automatique.</p><button class="btn">Découvrir</button></div>
  <div class="sl on" style="background-image:url(${IM['boite-nuit-ambiance']})"><h1>Vous hésitez ?</h1><p>Vous ne savez pas quoi prendre ? Répondez à quelques questions, on vous guide.</p><button class="btn" onclick="go(['intro'])">Être guidé</button></div></div>
- <div class="dots" id="dots"><i></i><i></i><i class="on"></i></div><p class="note">Troisième diapositive du carrousel du catalogue, ici pour l'aperçu. Cliquez sur « Être guidé ».</p>`},
+ <div class="dots" id="dots"><i></i><i class="on"></i></div><p class="note">Diapositive du carrousel du catalogue, ici pour l'aperçu. Cliquez sur « Être guidé ».</p>`},
 intro(){return `<div class="welcome"><div class="kick">Vespra Event</div><h1>Bonjour et bienvenue.</h1><p class="sub">Je vais vous guider pour choisir le bon matériel pour votre événement. Quelques questions, une à la fois, et vous repartez avec une sélection prête à demander en devis. Moins d'une minute.</p><button class="btn" onclick="go(['type'])">C'est parti</button></div>`},
 type(){return `<div class="step"><div class="kick">Votre événement</div><h2>Qu'est-ce que vous organisez ?</h2><p class="sub">Je m'adapte à votre réponse pour ne vous proposer que ce qui a du sens.</p><div class="opts">${TYPES.map(t=>`<button class="opt" onclick="set('type','${t[0]}')"><span><b>${t[1]}</b><small>${t[2]}</small></span><span class="ar">→</span></button>`).join('')}</div></div>`},
 lieu(){return `<div class="step"><div class="kick">${L[S.type].pre}</div><h2>Où cela se passe-t-il ?</h2><p class="sub">Cela change le matériel que je vais vous conseiller (abri, éclairage, effets).</p><div class="opts">${LIEUX.map(t=>`<button class="opt" onclick="set('lieu','${t[0]}')"><span><b>${t[1]}</b><small>${t[2]}</small></span><span class="ar">→</span></button>`).join('')}</div></div>`},
@@ -345,8 +344,8 @@ res(){
  const rows=ids.map(id=>it(id));
  const on=rows.filter(r=>!S.off[r.id]);
  const sum=on.reduce((a,r)=>a+r.price,0);
- const rem=(S.type==='mariage'&&on.length>=5)?Math.round(sum*0.1):0;
- const nud=S.type==='mariage'&&on.length===4?`<div class="nudge">Plus qu'un produit et la remise mariage de 10 % s'applique automatiquement (soit environ ${eur(Math.round(sum*.1))} sur votre sélection).</div>`:'';
+ const rem=0;
+ const nud=false?`<div class="nudge">Plus qu'un produit et la remise mariage de 10 % s'applique automatiquement (soit environ ${eur(Math.round(sum*.1))} sur votre sélection).</div>`:'';
  const row=r=>`<div class="res-item ${S.off[r.id]?'off':''}"><img src="${IM[r.img]}" alt=""><span class="m"><b><a href="${PAGE[r.id]}.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">${r.n}</a></b><small>${r.v?r.v+'. ':''}${(r.v&&P[r.id].opt?'':(P[r.id].hook||'').slice(0,90)+((P[r.id].hook||'').length>90?'…':''))}</small></span><span class="p">${r.dès?'dès ':''}${eur(r.price)}</span>${P[r.id].opt?`<button class="x" title="Modifier" onclick="openSheet('${r.id}')" style="font-size:12px">✎</button>`:''}<button class="x" title="${S.off[r.id]?'Remettre':'Retirer'}" onclick="tg('${r.id}')">${S.off[r.id]?'+':'×'}</button></div>`;
  const ab=rows.filter(r=>r.id===S.abri),rest=rows.filter(r=>r.id!==S.abri);
  const sug=suggest(ids);

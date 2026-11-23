@@ -8568,7 +8568,7 @@ async function enregistrerFiche(id){
     const input = document.getElementById('v-prix-'+v.prixId);
     if(!input) continue;
     const n = parseFloat(String(input.value||'').trim().replace(',','.'));
-    if(!isFinite(n) || n<=0){ showToast('Prix invalide : ' + (v.label||p.nom), true); input.focus(); return; }
+    if(!isFinite(n) || n<0 || (n===0 && parseFloat(v.prix)>0)){ showToast('Prix invalide : ' + (v.label||p.nom), true); input.focus(); return; }
     const actuel = mp[v.prixId]!==undefined ? parseFloat(mp[v.prixId]) : parseFloat(v.prix);
     if(n === actuel) continue;
     if(n === parseFloat(v.prix)) ecritures.push(['suppr', v.prixId]);   /* retour au prix d'origine */
@@ -8581,8 +8581,10 @@ async function enregistrerFiche(id){
     if(o.prix === null || o.prix === undefined) continue;
     const input = document.getElementById('v-prix-'+o.id);
     if(!input) continue;
-    const n = parseFloat(String(input.value||'').trim().replace(',','.'));
-    if(!isFinite(n) || n<=0){ showToast('Prix invalide : ' + o.nom, true); input.focus(); return; }
+    const brut = String(input.value||'').trim();
+    if(brut === '' && !(parseFloat(o.prix) > 0)) continue;           /* option « sur devis » laissée vide : rien à enregistrer */
+    const n = parseFloat(brut.replace(',','.'));
+    if(!isFinite(n) || n<0){ showToast('Prix invalide : ' + o.nom, true); input.focus(); return; }   /* 0 € accepté : option sur devis ou offerte */
     const actuel = mp[o.id]!==undefined ? parseFloat(mp[o.id]) : parseFloat(o.prix);
     if(n === actuel) continue;
     if(n === parseFloat(o.prix)) ecritures.push(['suppr', o.id]);

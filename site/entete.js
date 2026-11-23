@@ -279,6 +279,7 @@
     }
     champ.addEventListener('input', function () { f.classList.toggle('plein', !!champ.value); afficher(); });
     champ.addEventListener('focus', function () { produits(); });
+    champ.addEventListener('pointerdown', function () { produits(); });
     champ.addEventListener('keydown', function (e) {
       var as = sug.querySelectorAll('a'); if (!as.length) return;
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
@@ -290,7 +291,9 @@
       e.preventDefault();
       var as = sug.querySelectorAll('a'); var cible = as[sel >= 0 ? sel : 0];
       if (cible) { location.href = cible.getAttribute('href'); return; }
-      afficher();
+      /* Entrée tapée avant que la liste ne soit chargée : on attend la liste puis on ouvre le premier produit */
+      var q = champ.value.trim(); if (!q) return;
+      produits().then(function (l) { var r = trouver(q, l); if (r.length) location.href = '/' + String(r[0].page).replace(/^\//, ''); else afficher(); });
     });
   }
 
@@ -711,4 +714,67 @@
       window._maisQte = b.classList.contains('op') ? Math.min(20, window._maisQte + 1) : Math.max(1, window._maisQte - 1); maj(); base(); });
     cb.addEventListener('change', maj); maj();
   });
+})();
+
+/* ── Cartes produits et fenêtre « ajouter au devis » : présentation premium, commune à toutes les pages ──
+   • carte : le nom du produit ressort (majuscules, bleu), la catégorie devient une petite mention discrète ;
+   • fenêtre : petite croix, nom lisible en entier, photo et nom cliquables vers la fiche (plus de lien « Voir la fiche »),
+     formules présentées en choix élégants au lieu d'une liste déroulante. */
+(function () {
+  var css = document.createElement('style');
+  css.textContent =
+    '.prod-name{font-family:"Archivo","Archivo Narrow","Helvetica Neue",Arial,sans-serif!important;font-size:16px!important;font-weight:800!important;letter-spacing:.04em!important;text-transform:uppercase!important;color:var(--navy,#1F3B5A)!important;line-height:1.25!important;margin-bottom:6px!important}' +
+    '.prod-cat{font-size:11px!important;font-weight:500!important;letter-spacing:0!important;text-transform:none!important;color:#5b6170!important;opacity:1!important;margin-bottom:4px!important}' +
+    '@media(max-width:600px){.prod-name{font-size:13.5px!important}.prod-cat{font-size:10.5px!important}}' +
+    '.vm{border-radius:20px!important;padding:28px 28px 24px!important}' +
+    '.vm-head{gap:16px!important;margin-bottom:20px!important;align-items:center!important;position:relative;padding-right:34px}' +
+    '.vm-img{width:76px!important;height:76px!important;border-radius:14px!important;border:0!important;box-shadow:0 6px 18px rgba(20,30,50,.12)}' +
+    '.vm-info h3,#vmName{font-family:"Archivo","Archivo Narrow","Helvetica Neue",Arial,sans-serif!important;font-size:21px!important;font-weight:800!important;letter-spacing:.04em!important;text-transform:uppercase!important;line-height:1.2!important;color:var(--navy,#1F3B5A)!important;margin:0 0 8px!important;white-space:normal!important;overflow-wrap:anywhere}' +
+    '.vm-lien{color:inherit;text-decoration:none}.vm-lien:hover h3,.vm-lien:hover #vmName{text-decoration:underline;text-underline-offset:3px}' +
+    '.vm-cls{position:absolute!important;top:-6px;right:-6px;width:28px!important;height:28px!important;background:transparent!important;border:0!important;opacity:.55}.vm-cls:hover{opacity:1}' +
+    '.vm-cls::before,.vm-cls::after{width:14px!important}' +
+    '#vmLink{display:none!important}#vmOv #vmSelect{display:none!important}' +
+    '#vmVariants label{font-size:11px!important;letter-spacing:.08em!important;color:#5b6170!important}' +
+    '.vm-choix{display:grid;gap:8px}' +
+    '.vm-choix button{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;padding:13px 16px;border:1.5px solid #e3e5ea;border-radius:12px;background:#fff;font:500 14px Inter,system-ui,sans-serif;color:#1b1f27;cursor:pointer;text-align:left;transition:border-color .15s,background .15s}' +
+    '.vm-choix button b{font-weight:700;color:var(--navy,#1F3B5A);white-space:nowrap}' +
+    '.vm-choix button:hover{border-color:#b9c2d0}' +
+    '.vm-choix button.on{border-color:var(--navy,#1F3B5A);background:rgba(31,59,90,.05);box-shadow:inset 0 0 0 1px var(--navy,#1F3B5A)}';
+  document.head.appendChild(css);
+
+  function preparer(ov) {
+    if (ov.dataset.premium) return; ov.dataset.premium = '1';
+    var img = ov.querySelector('#vmImg'), nom = ov.querySelector('#vmName'), lien = ov.querySelector('#vmLink');
+    /* photo et nom cliquables vers la fiche produit */
+    [img, nom && nom.parentNode === ov.querySelector('.vm-info') ? nom : nom].forEach(function (el) {
+      if (!el || el.parentNode.classList.contains('vm-lien')) return;
+      var a = document.createElement('a'); a.className = 'vm-lien'; el.parentNode.insertBefore(a, el); a.appendChild(el);
+    });
+    var sel = ov.querySelector('#vmSelect');
+    if (sel) {
+      var z = document.createElement('div'); z.className = 'vm-choix'; sel.parentNode.insertBefore(z, sel); sel.style.display = 'none';
+      var dessiner = function () {
+        z.innerHTML = '';
+        Array.prototype.forEach.call(sel.options, function (o, i) {
+          var b = document.createElement('button'); b.type = 'button'; b.className = i === sel.selectedIndex ? 'on' : '';
+          var prix = o.dataset && o.dataset.price ? o.dataset.price + ' €' : '';
+          b.innerHTML = '<span></span><b></b>'; b.firstChild.textContent = (o.dataset && o.dataset.label) || o.textContent.replace(/\s*[—-]\s*\d+[\s\d,.]*€.*$/, ''); b.lastChild.textContent = prix;
+          b.addEventListener('click', function () { sel.selectedIndex = i; sel.dispatchEvent(new Event('change', { bubbles: true })); if (typeof window.updateVMPrice === 'function') { try { window.updateVMPrice(); } catch (e) {} } dessiner(); });
+          z.appendChild(b);
+        });
+      };
+      new MutationObserver(dessiner).observe(sel, { childList: true });
+      sel.addEventListener('change', dessiner);
+      dessiner();
+    }
+    /* à chaque ouverture : liens vers la fiche du produit affiché */
+    new MutationObserver(function () {
+      if (!ov.classList.contains('open')) return;
+      var href = lien && lien.getAttribute('href'), ok = href && href !== '#' && !lien.hidden;
+      ov.querySelectorAll('.vm-lien').forEach(function (a) { if (ok) a.setAttribute('href', href); else a.removeAttribute('href'); });
+    }).observe(ov, { attributes: true, attributeFilter: ['class'] });
+  }
+  function chercher() { var ov = document.getElementById('vmOv'); if (ov) preparer(ov); }
+  chercher();
+  new MutationObserver(chercher).observe(document.documentElement, { childList: true, subtree: true });
 })();

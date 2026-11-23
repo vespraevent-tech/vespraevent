@@ -409,12 +409,12 @@
         return;
       }
       var e = ids[ecran], i = info(), devis = _cart.some(function (x) { return x.devis; });
-      var remise = i.actif
+      var remise = i.off ? '' : i.actif
         ? etapeLi('ok', COCHE, '−10 % obtenu', pluriel(i.n) + ' · remise de ' + eur(i.remise))
         : etapeLi('num', i.n, '−10 % dès ' + i.seuil + ' produits', pluriel(i.n) + ' sur ' + i.seuil + ' · encore ' + i.restant + ' pour −10 %');
       var seg = ''; for (var q = 0; q < i.seuil; q++) seg += '<i' + (q < i.n ? ' class="on"' : '') + '></i>';
       var mini = '<div class="pc-mini"><div class="pc-mt"><span>Total du devis</span><b>' + eur(i.net) + (devis ? ' <small>+ sur devis</small>' : '') + '</b></div>' +
-        '<div class="pc-mp"><small>' + (i.actif ? '−10\u00a0% obtenu' : pluriel(i.n) + ' · encore ' + i.restant + ' pour −10\u00a0%') + '</small><span class="pc-seg' + (i.actif ? ' full' : '') + '">' + seg + '</span></div></div>';
+        (i.off ? '' : '<div class="pc-mp"><small>' + (i.actif ? '−10\u00a0% obtenu' : pluriel(i.n) + ' · encore ' + i.restant + ' pour −10\u00a0%') + '</small><span class="pc-seg' + (i.actif ? ' full' : '') + '">' + seg + '</span></div>') + '</div>';
       var bs = $('#pcMiniBas'); if (bs) bs.innerHTML = mini;
       p.className = 'pc-panel';
       p.innerHTML = mini + '<p class="pc-k">Total du devis</p><h3>Votre parcours</h3><ul class="pc-ul">' +
