@@ -8,7 +8,7 @@
 # besoin du gabarit de page et de la page 404 : ils sont joints au code
 # de la fonction, sinon ils ne sont pas lisibles à l'exécution.
 [functions]
-  included_files = ["modele-produit.html", "404.html", "netlify/functions/_historique-reservations.json", "netlify/functions/_produits-pages.json", "netlify/functions/_contrat-modele.docx"]
+  included_files = ["modele-produit.html", "404.html", "netlify/functions/_historique-reservations.json", "netlify/functions/_produits-pages.json", "netlify/functions/_contrat-modele.docx", "netlify/functions/_appli/**"]
 
 # Le site est entièrement statique : aucune commande de build.
 [build.environment]
