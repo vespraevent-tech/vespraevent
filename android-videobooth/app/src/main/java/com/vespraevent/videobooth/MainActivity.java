@@ -3,6 +3,15 @@ package com.vespraevent.videobooth;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.provider.Settings;
+import android.text.InputType;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.Toast;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -29,7 +38,11 @@ public class MainActivity extends Activity {
     private static final String HOTE = "vespraevent.fr";
     private static final int CODE_PERMISSIONS = 7;
 
+    /* Code pour quitter le mode tablette dédiée (le même que le menu du vidéobooth) */
+    private static final String CODE_SORTIE = "0104";
     private WebView web;
+    private int touches = 0;
+    private long premiereTouche = 0;
     private PermissionRequest enAttente;
     private boolean horsLigne = false;
     private final Handler tempo = new Handler(Looper.getMainLooper());
@@ -42,7 +55,14 @@ public class MainActivity extends Activity {
         super.onCreate(b);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         web = new WebView(this);
-        setContentView(web);
+        FrameLayout racine = new FrameLayout(this);
+        racine.addView(web, new FrameLayout.LayoutParams(-1, -1));
+        /* zone cachée en haut à gauche : 5 appuis rapides ouvrent la sortie (réservée au personnel) */
+        View coin = new View(this);
+        int t = (int) (110 * getResources().getDisplayMetrics().density);
+        racine.addView(coin, new FrameLayout.LayoutParams(t, t));
+        coin.setOnClickListener(new View.OnClickListener() { @Override public void onClick(View v) { toucheCoin(); } });
+        setContentView(racine);
 
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
@@ -84,6 +104,7 @@ public class MainActivity extends Activity {
 
         if (Build.VERSION.SDK_INT >= 23) requestPermissions(new String[]{ Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO }, CODE_PERMISSIONS);
         if (b != null) web.restoreState(b); else web.loadUrl(ADRESSE);
+        inviterApplicationAccueil();
     }
 
     @Override public void onRequestPermissionsResult(int code, String[] p, int[] res) {
@@ -92,6 +113,37 @@ public class MainActivity extends Activity {
         for (int x : res) if (x != PackageManager.PERMISSION_GRANTED) ok = false;
         if (ok) enAttente.grant(enAttente.getResources()); else enAttente.deny();
         enAttente = null;
+    }
+
+    /* première ouverture : propose de faire de Vespra Vidéobooth l'application d'accueil (démarrage automatique) */
+    private void inviterApplicationAccueil() {
+        final SharedPreferences p = getSharedPreferences("vb", MODE_PRIVATE);
+        if (p.getBoolean("accueil_propose", false)) return;
+        p.edit().putBoolean("accueil_propose", true).apply();
+        tempo.postDelayed(new Runnable() { @Override public void run() {
+            Toast.makeText(MainActivity.this, "Choisissez « Vespra Vidéobooth » puis « Toujours » pour qu'il s'ouvre au démarrage", Toast.LENGTH_LONG).show();
+            try { Intent h = new Intent(Intent.ACTION_MAIN); h.addCategory(Intent.CATEGORY_HOME); startActivity(h); } catch (Exception e) { }
+        } }, 2500);
+    }
+
+    private void toucheCoin() {
+        long n = System.currentTimeMillis();
+        if (n - premiereTouche > 3000) { touches = 0; premiereTouche = n; }
+        if (++touches < 5) return;
+        touches = 0;
+        final EditText code = new EditText(this);
+        code.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+        code.setHint("Code");
+        new AlertDialog.Builder(this).setTitle("Sortie du vidéobooth").setView(code)
+            .setPositiveButton("Réglages Android", new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface d, int w) {
+                if (!CODE_SORTIE.equals(code.getText().toString().trim())) { Toast.makeText(MainActivity.this, "Code incorrect", Toast.LENGTH_SHORT).show(); return; }
+                startActivity(new Intent(Settings.ACTION_SETTINGS));
+            } })
+            .setNeutralButton("Application d'accueil", new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface d, int w) {
+                if (!CODE_SORTIE.equals(code.getText().toString().trim())) { Toast.makeText(MainActivity.this, "Code incorrect", Toast.LENGTH_SHORT).show(); return; }
+                try { startActivity(new Intent(Settings.ACTION_HOME_SETTINGS)); } catch (Exception e) { startActivity(new Intent(Settings.ACTION_SETTINGS)); }
+            } })
+            .setNegativeButton("Annuler", null).show();
     }
 
     private void plein() {
