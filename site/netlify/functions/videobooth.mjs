@@ -14,7 +14,7 @@
    ════════════════════════════════════════════════════ */
 import { createHmac, createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { getStore } from './_blobs.mjs';
-import { binEcrire, binLire, binSupprimer } from './_r2.mjs';
+import { binEcrire, binLire, binSupprimer, r2Actif, r2Existe, r2LienTemporaire } from './_r2.mjs';
 import { htmlVideo } from './_mails-auto.mjs';
 import { appOk } from './_appli.mjs';
 
@@ -436,9 +436,14 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
       return new Response(null, { status: 303, headers: { Location: url.pathname + url.search, 'Set-Cookie': ck, 'Cache-Control': 'private, no-store' } });
     }
     if (request.method !== 'GET') return new Response('Méthode non autorisée', { status: 405 });
-    const buf = await binLire(st, 'video/' + id);
-    if (!buf) return new Response('Vidéo introuvable', { status: 404 });
     const lecture = url.searchParams.get('lecture') === '1', dl = url.searchParams.get('dl') === '1';
+    /* Cloudflare actif : la vidéo part directement de R2 (lien signé court), sans passer par la fonction (pas de limite de taille, lecture fluide) */
+    const direct = r2Actif() && await r2Existe('video/' + id).catch(() => false);
+    if (direct && (lecture || dl)) {
+      return new Response(null, { status: 302, headers: { Location: r2LienTemporaire('video/' + id, dl ? 600 : 7200, dl ? m.fichier : ''), 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
+    }
+    const buf = direct ? new Uint8Array(0) : await binLire(st, 'video/' + id);
+    if (!buf) return new Response('Vidéo introuvable', { status: 404 });
     /* lien de l'e-mail sans option : une page avec le lecteur et le bouton de téléchargement */
     if (!lecture && !dl) {
       const q = `?t=${encodeURIComponent(url.searchParams.get('t'))}`;
