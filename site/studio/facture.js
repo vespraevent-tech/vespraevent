@@ -357,10 +357,12 @@
         '<p class="fc-aide" id="fcAideAcompte"></p>' +
       '</div>' +
 
-      /* SIRET et TVA viennent de la fiche client : ils restent transmis au document, sans champ à remplir ici */
-      '<div id="fcBlocPro" hidden>' +
-        '<input id="fcSiret" type="hidden" value="' + txt(vu.siret || '') + '">' +
-        '<input id="fcTvaClient" type="hidden" value="' + txt(vu.tvaClient || '') + '">' +
+      /* SIRET ou RNA et TVA : repris de la fiche client, modifiables ici (une association peut n'avoir qu'un numéro RNA) */
+      '<div id="fcBlocPro"' + (pro ? '' : ' hidden') + '>' +
+        '<div class="fc-champ"><label class="fc-l" for="fcSiret">SIRET ou n° RNA</label>' +
+          '<input class="fc-input" id="fcSiret" type="text" autocomplete="off" placeholder="SIRET (14 chiffres) ou RNA (W123456789)" value="' + txt(vu.siret || '') + '"></div>' +
+        '<div class="fc-champ"><label class="fc-l" for="fcTvaClient">N° de TVA <small>(facultatif)</small></label>' +
+          '<input class="fc-input" id="fcTvaClient" type="text" autocomplete="off" placeholder="FR00 000000000" value="' + txt(vu.tvaClient || '') + '"></div>' +
       '</div>' +
 
       '<div class="fc-champ" id="fcBlocCond">' +
@@ -419,6 +421,7 @@
 
     function majType() {
       var estPro = zone.querySelector('input[name="fcType"][value="pro"]').checked;
+      var bp = zone.querySelector('#fcBlocPro'); if (bp) bp.hidden = !estPro;
       zone.querySelector('#fcAideType').textContent = devis
         ? (estPro ? 'Devis valable 30 jours, adressé à une structure.' : 'Devis valable 30 jours.')
         : (estPro
@@ -529,8 +532,8 @@
     var libelle = bouton.innerHTML;
     var adresse = (zone.querySelector('#fcAdresse').value || '').trim();
     var pro = zone.querySelector('input[name="fcType"][value="pro"]').checked;
-    var siret = (zone.querySelector('#fcSiret') || {}).value || '';
-    var tvaClient = (zone.querySelector('#fcTvaClient') || {}).value || '';
+    var siret = pro ? ((zone.querySelector('#fcSiret') || {}).value || '').trim() : '';
+    var tvaClient = pro ? ((zone.querySelector('#fcTvaClient') || {}).value || '').trim() : '';
     var avecAcompte = zone.querySelector('#fcAvecAcompte').checked;
     var cond = (function () {
       var mode = (zone.querySelector('#fcCondMode') || {}).value || '';
