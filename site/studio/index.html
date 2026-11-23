@@ -1195,6 +1195,7 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
     </div>
     <button class="tab" data-tab="videobooth" onclick="switchTab('videobooth')">Vidéobooth</button>
     <button class="tab" data-tab="photobooth" onclick="switchTab('photobooth')">Photobooth</button>
+    <button class="tab" data-tab="logiciels" onclick="switchTab('logiciels')">Logiciels</button>
     <button class="tab" data-tab="notesfrais" onclick="switchTab('notesfrais')">Frais</button>
     <button class="tab" data-tab="resa-ca" onclick="switchTab('resa-ca')">Chiffre d'affaires</button>
 
@@ -1998,6 +1999,7 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
     </div>
 
     <div class="panel" id="panel-photobooth"><div id="pbZone"></div></div>
+    <div class="panel" id="panel-logiciels"><div id="lgZone"></div></div>
     <div class="panel" id="panel-videobooth">
       <div class="toolbar">
         <div>
@@ -2904,16 +2906,35 @@ function vbConfigRendre(){
   const z=document.getElementById('vbConfig'); if(!z) return;
   let h='';
   if(VBEDIT!==null) h+=vbFormSession();
-  if(!VBEVT){
-    h+='<div style="'+VB_CARTE+'" id="vbAppli"><div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f">Télécharger l’application</div><div id="vbAppliCorps" style="font-size:13px;color:#6b7280;margin-top:8px">Chargement…</div></div>';
-    h+='<details style="'+VB_CARTE+'"'+((VBCFG.acces||VBCFG.accesLibre)?'':' open')+'><summary style="cursor:pointer;font:700 15px Poppins,Inter,sans-serif;color:#14304f">Accès à l’appli de la tablette</summary>'+
-    '<div style="font-size:12.5px;color:#6b7280;margin:8px 0 10px">Le vidéobooth ne s’ouvre plus dans un navigateur : il fonctionne uniquement dans l’application Android installée sur la tablette. Elle affiche la liste des événements en cours : on touche le sien, et c’est parti (avec un mot de passe seulement si vous en avez mis un sur la session).</div>'+
+  if(!VBEVT) h+='<div id="vbStock"></div><div style="font-size:12.5px;color:#6b7280;margin:0 0 12px">Téléchargement de l’appli, mots de passe et état du stockage : onglet <a href="#" onclick="switchTab(\'logiciels\');return false" style="color:#14304f;font-weight:600">Logiciels</a>.</div>';
+  z.innerHTML=h; try{ vbAmbApercu(); vbPoliceApercu(); }catch(e){}
+  vbAppliCharger(); lgStock('vbStock'); lgRendre();
+}
+
+/* ── onglet Logiciels : réglages communs au photobooth et au vidéobooth ── */
+const LG_STYLE='<style>.lg-stock{display:inline-flex;align-items:center;gap:8px;margin:0 0 14px;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600;background:#F0F2F5;color:#646D7C}.lg-stock::before{content:"";width:9px;height:9px;border-radius:50%;background:#8a94a3}.lg-stock.ok{background:#E8F5EC;color:#15803D}.lg-stock.ok::before{background:#34D27B}.lg-stock.ko{background:#FEF2F2;color:#B91C1C}.lg-stock.ko::before{background:#EF4444}.lg-grille{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:800px){.lg-grille{grid-template-columns:1fr}}</style>';
+async function lgStock(id){
+  const d=document.getElementById(id); if(!d) return;
+  try{ const r=await api('/stockage/r2'); d.className='lg-stock '+(r.actif?(r.ok?'ok':'ko'):'off'); d.textContent=r.message; if(!document.getElementById('lg-style')){ const t=document.createElement('div'); t.id='lg-style'; t.innerHTML=LG_STYLE; document.head.appendChild(t.firstChild); } }catch(e){}
+}
+async function lgOuvrir(){
+  const z=document.getElementById('lgZone'); if(!z) return;
+  z.innerHTML='<div class="hint">Chargement…</div>';
+  try{ VBCFG=await api('/videobooth/config'); }catch(e){ VBCFG={acces:'',accesLibre:false,sessions:[],err:e.message}; }
+  lgRendre();
+}
+function lgRendre(){
+  const z=document.getElementById('lgZone'); if(!z) return;
+  let h='';
+  h+='<div style="'+VB_CARTE+'" id="vbAppli"><div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f">Télécharger les applications (photobooth et vidéobooth)</div><div id="vbAppliCorps" style="font-size:13px;color:#6b7280;margin-top:8px">Chargement…</div></div>';
+  h+='<details style="'+VB_CARTE+'"'+((VBCFG.acces||VBCFG.accesLibre)?'':' open')+'><summary style="cursor:pointer;font:700 15px Poppins,Inter,sans-serif;color:#14304f">Accès aux applications des bornes (photobooth et vidéobooth)</summary>'+
+    '<div style="font-size:12.5px;color:#6b7280;margin:8px 0 10px">Le photobooth et le vidéobooth ne s’ouvrent plus dans un navigateur : ils fonctionnent uniquement dans leur application (Windows pour le photobooth, Android pour le vidéobooth). Le même mot de passe sert aux deux. Le vidéobooth affiche la liste des événements en cours : on touche le sien, et c’est parti (avec un mot de passe seulement si vous en avez mis un sur la session).</div>'+
     '<label style="font-size:13.5px;display:flex;align-items:center;gap:8px;margin-bottom:10px"><input type="checkbox" id="vbExiger"'+(VBCFG.accesLibre?'':' checked')+' onchange="document.getElementById(\'vbAccesBloc\').style.display=this.checked?\'flex\':\'none\'"> Demander un mot de passe général pour ouvrir l’appli</label>'+
     '<div id="vbAccesBloc" style="display:'+(VBCFG.accesLibre?'none':'flex')+';gap:8px;flex-wrap:wrap"><input id="vbAcces" value="'+vbEsc(VBCFG.acces||'')+'" placeholder="Mot de passe d’accès (6 caractères minimum)" style="flex:1 1 240px;'+VB_INPUT+';font:600 14px monospace" autocomplete="off"><button class="btn btn-ghost" onclick="document.getElementById(\'vbAcces\').value=vbMdp()">Générer</button></div>'+
     '<div style="margin-top:10px"><button class="btn" onclick="vbAccesSauver()">Enregistrer</button></div>'+((VBCFG.acces||VBCFG.accesLibre)?'':'<div style="color:#b03a2a;font-size:12.5px;margin-top:8px">Rien n’est réglé : la tablette ne peut pas se connecter. Choisissez un mot de passe, ou décochez la case pour une appli sans mot de passe général.</div>')+'</details>';
-  }
-  z.innerHTML=h; try{ vbAmbApercu(); vbPoliceApercu(); }catch(e){}
-  vbAppliCharger();
+  
+  h='<div style="font:700 22px Poppins,Inter,sans-serif;color:#14304f;margin:0 0 4px">Logiciels</div><div class="hint" style="margin:0 0 14px">Réglages communs au photobooth (Windows) et au vidéobooth (tablette Android) : applications, mots de passe, stockage.</div><div id="lgStock"></div>'+h+'<div style="'+VB_CARTE+'"><div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f;margin-bottom:8px">Récapitulatif des mots de passe</div><div style="font-size:13px;line-height:1.7;color:#3D4452"><b>Téléchargement</b> : une seule fois pour les deux applications (carte ci-dessus).<br><b>Accès des bornes</b> : le même pour le photobooth et le vidéobooth, ou aucun si l’accès libre est choisi.<br><b>Code des réglages et sortie de la tablette</b> : réglé sur la tablette, dans Réglages › Changer le code.</div></div>';
+  z.innerHTML=h; vbAppliCharger(); lgStock('lgStock');
 }
 /* téléchargement protégé des applications : le mot de passe est généré par le site, affiché une seule fois */
 async function vbAppliCharger(){
@@ -3245,6 +3266,7 @@ function switchTabBase(name){
   if(name==='espace') espCharger();
   if(name==='videobooth'){ VBEVT=''; vbCharger(); }
   if(name==='photobooth' && typeof pbOuvrir==='function') pbOuvrir();
+  if(name==='logiciels') lgOuvrir();
   if(name==='demandes' && typeof chargerModifs==='function') chargerModifs();
   if(name==='logistique') loadLogistique();
   if(name==='auto') raCharger();
