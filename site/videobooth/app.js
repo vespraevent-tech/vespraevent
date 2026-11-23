@@ -729,6 +729,15 @@ $('b-stop').onclick = arreterRec;
   /* ── accès : mot de passe général → liste des sessions → mot de passe de la session ── */
   function baseApi() { return (cfg.serveur || location.origin).replace(/\/+$/, ''); }
   /* clé de l'application Android (jamais dans la page : c'est l'application qui la fournit) */
+  /* code de sortie / réglages choisi dans le back-office (Logiciels) : il remplace le code local et est transmis à l'application Android */
+  var codeServeur = false;
+  function appliquerCode(j) {
+    if (!j || !/^\d{4,12}$/.test(String(j.code))) return;
+    codeServeur = true;
+    if (cfg.pin !== String(j.code)) { cfg.pin = String(j.code); try { ecrireCfg(cfg); } catch (e) {} }
+    try { if (window.VespraAndroid && window.VespraAndroid.code) window.VespraAndroid.code(String(j.code)); } catch (e) {}
+    try { var c = $('a-pin') && $('a-pin').closest('.adm-c'); if (c) c.hidden = true; } catch (e) {}
+  }
   function cleAppli() { try { return window.VespraAndroid && window.VespraAndroid.cle ? String(window.VespraAndroid.cle() || '') : ''; } catch (e) { return ''; } }
   function ent(h) { h = h || {}; h['x-vespra-app'] = cleAppli(); return h; }
   function ecranAppli(maj) {
@@ -738,7 +747,7 @@ $('b-stop').onclick = arreterRec;
     montrer('s-appli');
   }
   function appelApi(route, corps) {
-    return fetch(baseApi() + '/api/videobooth/' + route, { method: 'POST', headers: ent({ 'content-type': 'application/json' }), body: JSON.stringify(corps) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j._st = r.status; if (j.appli) ecranAppli(!!window.VespraAndroid); return j; }); });
+    return fetch(baseApi() + '/api/videobooth/' + route, { method: 'POST', headers: ent({ 'content-type': 'application/json' }), body: JSON.stringify(corps) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j._st = r.status; if (j.appli) ecranAppli(!!window.VespraAndroid); appliquerCode(j); return j; }); });
   }
   function sessionStockee() { try { var s = JSON.parse(localStorage.getItem('vb-sess') || 'null'); if (s && s.exp > Date.now() && s.jeton && s.session) return s; } catch (e) {} return null; }
   function accesStocke() { try { var a = JSON.parse(localStorage.getItem('vb-acces') || 'null'); if (a && a.exp > Date.now()) return a; } catch (e) {} return null; }
@@ -824,6 +833,7 @@ $('b-stop').onclick = arreterRec;
     if (!cfg.jeton || !navigator.onLine || enregistrement) return;
     dernierMaj = Date.now();
     fetch(baseApi() + '/api/videobooth/ma-session', { headers: ent({ 'x-appareil': cfg.jeton }) }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (j) appliquerCode(j);
       if (!j || !j.ok || !j.session) return;
       sessionMaj = j.session; if ($('s-accueil').classList.contains('on')) accueil(true);
     }).catch(function () {});

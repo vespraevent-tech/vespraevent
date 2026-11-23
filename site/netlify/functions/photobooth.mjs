@@ -19,6 +19,8 @@ import { createHmac, createHash, randomBytes, timingSafeEqual } from 'node:crypt
 import { binEcrire } from './_r2.mjs';
 import { pbStore, vuEcrire, evenementEcrire, evenementLire, evenementsLister, imageLire, priseOk, priseEvenement, priseLire, priseEcrire, prisesLister, photoLire, compteurs, NOMS_FICHIERS } from './_photobooth.mjs';
 import { accesLire } from './videobooth.mjs';
+import { codeLire } from './_appli.mjs';
+import { getStore as blobStore } from './_blobs.mjs';
 
 export const config = { path: '/api/photobooth/*' };
 
@@ -120,13 +122,13 @@ async function traiter(request) {
       if (!a || (!a.h && !a.libre)) return rep({ ok: false, erreur: 'Aucun mot de passe d’accès n’est défini (back-office, onglet Vidéobooth).' }, 409);
       if (!a.libre && !egal(createHmac('sha256', process.env.VIDEOBOOTH_CLE || '').update('acces:' + String(d.mdp || '').trim()).digest('hex'), a.h)) { await pause(900); return rep({ ok: false, erreur: 'Mot de passe incorrect.' }, 401); }
       /* jeton « appareil » longue durée : la borne se reconnecte seule au démarrage du PC */
-      return rep({ ok: true, libre: !!a.libre, appareil: signer({ t: 'pba', exp: Date.now() + 365 * 86400e3 }), evenements: await listeBorne() });
+      return rep({ ok: true, code: await codeLire(blobStore('videobooth')), libre: !!a.libre, appareil: signer({ t: 'pba', exp: Date.now() + 365 * 86400e3 }), evenements: await listeBorne() });
     }
     if (!lireJeton(d.acces || request.headers.get('x-borne'), 'pba')) return rep({ ok: false, erreur: 'Accès expiré : saisissez de nouveau le mot de passe.', expire: true }, 401);
     const e = await evenementLire(String(d.id || ''));
     if (!e) return rep({ ok: false, erreur: 'Événement introuvable (supprimé ?).' }, 404);
     const exp = Date.now() + 60 * 86400e3;
-    return rep({ ok: true, jeton: signer({ t: 'pbs', evt: e.id, exp }), exp, evenement: vueEvt(e) });
+    return rep({ ok: true, code: await codeLire(blobStore('videobooth')), jeton: signer({ t: 'pbs', evt: e.id, exp }), exp, evenement: vueEvt(e) });
   }
 
   /* ── borne connectée : liste des événements (du plus proche au plus lointain) ── */

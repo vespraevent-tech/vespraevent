@@ -2917,10 +2917,18 @@ async function lgStock(id){
   const d=document.getElementById(id); if(!d) return;
   try{ const r=await api('/stockage/r2'); d.className='lg-stock '+(r.actif?(r.ok?'ok':'ko'):'off'); d.textContent=r.message; if(!document.getElementById('lg-style')){ const t=document.createElement('div'); t.id='lg-style'; t.innerHTML=LG_STYLE; document.head.appendChild(t.firstChild); } }catch(e){}
 }
+let LGCODE='';
+async function lgCodeSauver(){
+  const v=(document.getElementById('lgCode').value||'').trim();
+  if(!/^\d{4,12}$/.test(v)){ showToast('Le code doit comporter de 4 à 12 chiffres',true); return; }
+  try{ const r=await api('/appli/code',{method:'POST',body:JSON.stringify({code:v})}); LGCODE=r.code; showToast('Code enregistré : les appareils le reprendront à leur prochaine connexion'); }
+  catch(e){ showToast('Échec : '+e.message,true); }
+}
 async function lgOuvrir(){
   const z=document.getElementById('lgZone'); if(!z) return;
   z.innerHTML='<div class="hint">Chargement…</div>';
   try{ VBCFG=await api('/videobooth/config'); }catch(e){ VBCFG={acces:'',accesLibre:false,sessions:[],err:e.message}; }
+  try{ LGCODE=(await api('/appli/code')).code; }catch(e){}
   lgRendre();
 }
 function lgRendre(){
@@ -2933,7 +2941,7 @@ function lgRendre(){
     '<div id="vbAccesBloc" style="display:'+(VBCFG.accesLibre?'none':'flex')+';gap:8px;flex-wrap:wrap"><input id="vbAcces" value="'+vbEsc(VBCFG.acces||'')+'" placeholder="Mot de passe d’accès (6 caractères minimum)" style="flex:1 1 240px;'+VB_INPUT+';font:600 14px monospace" autocomplete="off"><button class="btn btn-ghost" onclick="document.getElementById(\'vbAcces\').value=vbMdp()">Générer</button></div>'+
     '<div style="margin-top:10px"><button class="btn" onclick="vbAccesSauver()">Enregistrer</button></div>'+((VBCFG.acces||VBCFG.accesLibre)?'':'<div style="color:#b03a2a;font-size:12.5px;margin-top:8px">Rien n’est réglé : la tablette ne peut pas se connecter. Choisissez un mot de passe, ou décochez la case pour une appli sans mot de passe général.</div>')+'</details>';
   
-  h+='<div style="'+VB_CARTE+'"><div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f;margin-bottom:8px">Code de sortie et de réglages</div><div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"><code style="font:700 26px monospace;letter-spacing:.12em;color:#14304f;background:#F0F2F5;padding:6px 16px;border-radius:10px">0104</code><div style="font-size:13px;color:#3D4452;line-height:1.6;flex:1 1 280px">Ouvre les réglages et permet de <b>quitter</b> l’application, sur la tablette (vidéobooth) comme sur le mini-PC (photobooth).<br><span style="color:#6b7280">Vidéobooth : 5 appuis rapides dans le coin en haut à gauche, puis ce code. Le code des réglages du vidéobooth peut être changé sur la tablette (Réglages › Changer le code) ; le code de sortie de l’appli Android reste 0104.</span></div></div></div>';
+  h+='<div style="'+VB_CARTE+'"><div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f;margin-bottom:8px">Code de sortie et de réglages</div><div style="font-size:13px;color:#3D4452;line-height:1.6;margin-bottom:10px">Un seul code pour les deux applications : il ouvre les réglages et permet de <b>quitter</b> (tablette vidéobooth et mini-PC photobooth). Chaque appareil le reprend à sa prochaine connexion.<br><span style="color:#6b7280">Vidéobooth : 5 appuis rapides dans le coin en haut à gauche, puis ce code.</span></div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="lgCode" inputmode="numeric" maxlength="12" value="'+vbEsc(LGCODE||'')+'" placeholder="Chargement…" style="width:160px;'+VB_INPUT+';font:700 20px monospace;letter-spacing:.12em;text-align:center" autocomplete="off"><button class="btn" onclick="lgCodeSauver()">Enregistrer</button></div></div>';
   h='<div style="font:700 22px Poppins,Inter,sans-serif;color:#14304f;margin:0 0 4px">Logiciels</div><div class="hint" style="margin:0 0 14px">Réglages communs au photobooth (Windows) et au vidéobooth (tablette Android) : applications, mots de passe, stockage.</div><div id="lgStock"></div>'+h+'<div style="'+VB_CARTE+'"><div style="font:700 15px Poppins,Inter,sans-serif;color:#14304f;margin-bottom:8px">Récapitulatif des mots de passe</div><div style="font-size:13px;line-height:1.7;color:#3D4452"><b>Téléchargement</b> : une seule fois pour les deux applications (carte ci-dessus).<br><b>Accès des bornes</b> : le même pour le photobooth et le vidéobooth, ou aucun si l’accès libre est choisi.<br><b>Code des réglages et sortie de la tablette</b> : réglé sur la tablette, dans Réglages › Changer le code.</div>'+(function(){const l=(VBCFG.sessions||[]).filter(x=>x.mdp);return l.length?'<div style="font-weight:600;font-size:13px;margin:12px 0 4px;color:#14304f">Sessions protégées par un mot de passe</div>'+l.map(x=>'<div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;padding:5px 0;border-top:1px dashed #e6e1d6"><span>'+vbEsc(x.nom||'Session')+'</span><code style="font-weight:700">'+vbEsc(x.mdp)+'</code></div>').join('')+'<div class="hint" style="margin-top:6px">Se modifie dans Vidéobooth › Réglages de la session.</div>':'';})()+'</div>';
   z.innerHTML=h; vbAppliCharger(); lgStock('lgStock');
 }
@@ -2945,7 +2953,7 @@ async function vbAppliCharger(){
     c.innerHTML='<div style="margin-bottom:10px">'+(e.defini?'Mot de passe de téléchargement défini'+(e.maj?' le '+new Date(e.maj).toLocaleDateString('fr-FR'):'')+'.':'<b style="color:#b03a2a">Aucun mot de passe défini : personne ne peut télécharger l’application.</b>')+'</div>'
       +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn" onclick="vbAppliMdp()">'+(e.defini?'Changer le mot de passe':'Créer le mot de passe')+'</button><a class="btn btn-ghost" href="/videobooth/telecharger.html" target="_blank" rel="noopener">Ouvrir la page de téléchargement</a></div>'
       +'<div id="vbAppliMdp"></div>'
-      +'<div style="margin-top:12px;line-height:1.6">Donnez à la personne qui installe : l’adresse <b>'+location.origin+'/telecharger</b> et le mot de passe. Android : le fichier se télécharge directement. Windows (photobooth) : déposez une fois le fichier <code>photobooth-windows.zip</code> dans Cloudflare R2, dossier <code>appli</code>'+(e.r2?'':' <b>(R2 n’est pas encore configuré)</b>')+'.</div>';
+      +'<div style="margin-top:12px;line-height:1.6">Donnez à la personne qui installe : l’adresse <b>'+location.origin+'/telecharger</b> et le mot de passe. Android : le fichier se télécharge directement. Windows (photobooth) : déposez une fois le fichier <code>photobooth-windows.zip</code> dans Cloudflare R2, dossier <code>Application</code>'+(e.r2?'':' <b>(R2 n’est pas encore configuré)</b>')+'.</div>';
   }catch(x){ c.textContent='Indisponible : '+x.message; }
 }
 async function vbAppliMdp(){

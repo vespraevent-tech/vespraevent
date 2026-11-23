@@ -25,7 +25,11 @@
     if (etat.jeton) h['x-appareil'] = etat.jeton;
     if (o.json) { h['content-type'] = 'application/json'; o.body = JSON.stringify(o.json); }
     var q = (o.method || (o.body ? 'POST' : 'GET')) === 'GET' && chemin.indexOf('envoi') !== 0 ? (chemin.indexOf('?') >= 0 ? '&' : '?') + '_=' + Date.now() : '';   /* jamais de réponse gardée en cache */
-    return fetch(API + chemin + q, { method: o.method || (o.body ? 'POST' : 'GET'), headers: h, body: o.body, cache: 'no-store' });
+    return fetch(API + chemin + q, { method: o.method || (o.body ? 'POST' : 'GET'), headers: h, body: o.body, cache: 'no-store' }).then(function (r) {
+      /* le code de sortie / réglages est choisi dans le back-office (Logiciels) : la borne le reprend à chaque connexion */
+      if (/^(acces|session)/.test(chemin)) r.clone().json().then(function (j) { if (j && /^\d{4,12}$/.test(String(j.code))) { LS.set('pin', String(j.code)); LS.set('pinServeur', '1'); } }).catch(function () {});
+      return r;
+    });
   }
   function dateFr(d, court) { if (!d) return ''; var x = new Date(d + 'T12:00:00'); return x.toLocaleDateString('fr-FR', court ? { day: 'numeric', month: 'short' } : { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); }
   var auj = function () { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date()); };
@@ -591,6 +595,7 @@
         '<div class="bloc"><b>Mise à jour</b>' + (Pont && Pont.majVerifier ? '<p class="aide">Application Windows, version <b>' + esc(Pont.versionCode()) + '</b>. Vos événements, vos photos et vos réglages ne sont pas touchés : rien à désinstaller.</p><p id="g-maj-etat" class="aide"></p><p><button class="btn plein" id="g-maj">Rechercher une mise à jour</button> ' : '<p class="aide">Les écrans se mettent à jour tout seuls avec le site.</p><p>') + '<button class="btn" id="g-rech">Recharger l’écran</button></p></div>' +
         '<div class="bloc"><button class="btn" id="g-deco">Déconnecter cette borne</button></div>';
       P.innerHTML = h;
+      if (LS.get('pinServeur')) { $('g-pin').disabled = true; $('g-pin-ok').disabled = true; $('g-pin').title = 'Ce code se règle dans le back-office › Logiciels'; }
       $('g-pin-ok').onclick = function () { var v = $('g-pin').value.trim(); if (!/^\d{4}$/.test(v)) { toast('4 chiffres'); return; } LS.set('pin', v); toast('Code changé'); };
       var so = function () { opts.pleinEcran = $('g-plein').checked; opts.autoDernier = $('g-auto').checked; opts.voirEnregistres = $('g-enreg').checked; if ($('g-dossier').value) opts.dossier = $('g-dossier').value; LS.set('opts', opts); if (Pont && Pont.demarrageAuto) Pont.demarrageAuto($('g-boot').checked); if (Pont && Pont.dossier) Pont.dossier(opts.dossier); };
       ['g-plein', 'g-auto', 'g-enreg', 'g-boot', 'g-dossier'].forEach(function (id) { $(id).onchange = so; });

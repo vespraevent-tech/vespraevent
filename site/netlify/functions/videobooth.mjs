@@ -16,7 +16,7 @@ import { createHmac, createHash, randomBytes, timingSafeEqual } from 'node:crypt
 import { getStore } from './_blobs.mjs';
 import { binEcrire, binLire, binSupprimer, r2Actif, r2Existe, r2LienTemporaire } from './_r2.mjs';
 import { htmlVideo } from './_mails-auto.mjs';
-import { appOk } from './_appli.mjs';
+import { appOk, codeLire } from './_appli.mjs';
 
 export const config = { path: '/api/videobooth/*' };
 
@@ -238,7 +238,7 @@ async function traiter(request) {
       }
       await noter('contact', 'accès tablette');
       const ses = await sessionsLire(st);
-      return rep({ ok: true, libre: !!a.libre, acces: signer({ t: 'acces', exp: Date.now() + 12 * 3600e3 }), sessions: ses.filter(visible).map(carte) });
+      return rep({ ok: true, code: await codeLire(store()), libre: !!a.libre, acces: signer({ t: 'acces', exp: Date.now() + 12 * 3600e3 }), sessions: ses.filter(visible).map(carte) });
     }
     if (!lireJeton(d.acces, 'acces') && !lireJeton(d.acces, 'session')) return rep({ ok: false, erreur: 'Accès expiré : saisissez de nouveau le mot de passe.', expire: true }, 401);
     if (route === 'sessions') { const ses = await sessionsLire(st); return rep({ ok: true, sessions: ses.filter(visible).map(carte) }); }
@@ -257,7 +257,7 @@ async function traiter(request) {
     if (!cle || !jt) return rep({ ok: false, erreur: 'Session expirée' }, 403);
     const ses = (await sessionsLire(store())).find((e) => e.id === jt.id);
     if (!ses || !visible(ses)) return rep({ ok: false, erreur: 'Session introuvable ou terminée.' }, 404);
-    return rep({ ok: true, session: vueSession(ses) });
+    return rep({ ok: true, code: await codeLire(store()), session: vueSession(ses) });
   }
 
   /* ── test de connexion depuis les réglages de la tablette ── */

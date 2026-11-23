@@ -21,3 +21,16 @@ export function appOk(request, quoi) {
   const h = Buffer.from(createHash('sha256').update(k).digest('hex'));
   return (EMPREINTES[quoi] || []).some((e) => { const b = Buffer.from(e); return b.length === h.length && timingSafeEqual(b, h); });
 }
+
+/* ── code de sortie / réglages des applications (le même pour le vidéobooth et le photobooth), réglé dans le back-office › Logiciels ── */
+export const CODE_DEFAUT = '0104';
+export async function codeLire(st) {
+  const c = await st.get('config/codesortie', { type: 'json' }).catch(() => null);
+  return c && /^\d{4,12}$/.test(String(c.code)) ? String(c.code) : CODE_DEFAUT;
+}
+export async function codeEcrire(st, code) {
+  const v = String(code || '').trim();
+  if (!/^\d{4,12}$/.test(v)) throw new Error('Le code doit comporter de 4 à 12 chiffres.');
+  await st.setJSON('config/codesortie', { code: v, maj: new Date().toISOString() });
+  return v;
+}

@@ -7,7 +7,7 @@
    Le mot de passe est créé dans le back-office (onglet Vidéobooth) : généré au hasard (100 bits), jamais choisi à la main,
    et seule son empreinte (scrypt + sel) est conservée. Les essais sont limités : 8 erreurs, puis 15 minutes d'attente.
    Le fichier Android est rangé dans _appli/ (non public). Le logiciel Windows, trop gros pour une fonction, est déposé
-   dans l'espace Cloudflare R2 sous « appli/photobooth-windows.zip ».
+   dans l'espace Cloudflare R2 sous « Application/photobooth-windows.zip ».
    ════════════════════════════════════════════════════ */
 import { scryptSync, randomBytes, randomInt, timingSafeEqual, createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
@@ -21,7 +21,7 @@ export const config = { path: '/api/appli/*' };
 
 const FICHIERS = {
   'videobooth-android': { nom: 'vespra-videobooth.apk', type: 'application/vnd.android.package-archive', local: '_appli/vespra-videobooth.apk' },
-  'photobooth-windows': { nom: 'Vespra-Event-Photobooth-Windows.zip', type: 'application/zip', r2: 'appli/photobooth-windows.zip', r2alt: ['Application/photobooth-windows.zip', 'application/photobooth-windows.zip', 'Appli/photobooth-windows.zip', 'photobooth-windows.zip'] },
+  'photobooth-windows': { nom: 'Vespra-Event-Photobooth-Windows.zip', type: 'application/zip', r2: 'Application/photobooth-windows.zip', r2alt: ['appli/photobooth-windows.zip', 'application/photobooth-windows.zip', 'Appli/photobooth-windows.zip', 'photobooth-windows.zip'] },
 };
 const ESSAIS_MAX = 8, FENETRE = 15 * 60e3;
 const SECURITE = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer' };
@@ -93,7 +93,7 @@ export default async (request) => {
       return new Response(buf, { headers: { 'Content-Type': f.type, 'Content-Disposition': 'attachment; filename="' + f.nom + '"', 'Content-Length': String(buf.length), ...SECURITE } });
     }
     const cleF = r2Actif() ? await cleR2(f) : '';
-    if (!cleF) return rep({ ok: false, erreur: 'Ce logiciel n’a pas encore été déposé (Cloudflare R2, dossier « appli »).' }, 404);
+    if (!cleF) return rep({ ok: false, erreur: 'Ce logiciel n’a pas encore été déposé (Cloudflare R2, dossier « Application »).' }, 404);
     return rep({ ok: true, url: r2LienTemporaire(cleF, 600, f.nom), valide: '10 minutes' });
   }
   return rep({ ok: false, erreur: 'Introuvable' }, 404);

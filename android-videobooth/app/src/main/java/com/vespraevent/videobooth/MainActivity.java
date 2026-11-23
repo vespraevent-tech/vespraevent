@@ -85,6 +85,7 @@ public class MainActivity extends Activity {
         web.addJavascriptInterface(new Object() {
             /* clé d'application : prouve au site que c'est bien cette application (et non un navigateur) */
             @JavascriptInterface public String cle() { return BuildConfig.APP_KEY; }
+            @JavascriptInterface public void code(String c) { if (c != null && c.matches("\\d{4,12}")) getSharedPreferences("vb", MODE_PRIVATE).edit().putString("code", c).apply(); }
             @JavascriptInterface public void quitter() { runOnUiThread(new Runnable() { @Override public void run() { MainActivity.this.quitter(); } }); }
             @JavascriptInterface public void admin(final boolean on) {
                 runOnUiThread(new Runnable() { @Override public void run() { admin = on; plein(); } });
@@ -151,17 +152,17 @@ public class MainActivity extends Activity {
         code.setHint("Code");
         new AlertDialog.Builder(this).setTitle("Sortie du vidéobooth").setView(code)
             .setPositiveButton("Réglages Android", new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface d, int w) {
-                if (!CODE_SORTIE.equals(code.getText().toString().trim())) { Toast.makeText(MainActivity.this, "Code incorrect", Toast.LENGTH_SHORT).show(); return; }
+                if (!codeSortie().equals(code.getText().toString().trim())) { Toast.makeText(MainActivity.this, "Code incorrect", Toast.LENGTH_SHORT).show(); return; }
                 try { if (epingle()) stopLockTask(); } catch (Exception e) { }
                 startActivity(new Intent(Settings.ACTION_SETTINGS));
             } })
             .setNeutralButton("Application d'accueil", new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface d, int w) {
-                if (!CODE_SORTIE.equals(code.getText().toString().trim())) { Toast.makeText(MainActivity.this, "Code incorrect", Toast.LENGTH_SHORT).show(); return; }
+                if (!codeSortie().equals(code.getText().toString().trim())) { Toast.makeText(MainActivity.this, "Code incorrect", Toast.LENGTH_SHORT).show(); return; }
                 try { if (epingle()) stopLockTask(); } catch (Exception e) { }
                 try { startActivity(new Intent(Settings.ACTION_HOME_SETTINGS)); } catch (Exception e) { startActivity(new Intent(Settings.ACTION_SETTINGS)); }
             } })
             .setNegativeButton("Quitter l'application", new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface d, int w) {
-                if (!CODE_SORTIE.equals(code.getText().toString().trim())) { Toast.makeText(MainActivity.this, "Code incorrect", Toast.LENGTH_SHORT).show(); return; }
+                if (!codeSortie().equals(code.getText().toString().trim())) { Toast.makeText(MainActivity.this, "Code incorrect", Toast.LENGTH_SHORT).show(); return; }
                 quitter();
             } })
             .show();
@@ -181,6 +182,9 @@ public class MainActivity extends Activity {
             try { startActivity(new Intent(Settings.ACTION_SETTINGS)); } catch (Exception e2) { }
         }
     }
+
+    /* code choisi dans le back-office (Logiciels), mémorisé à chaque connexion ; 0104 tant qu'il n'a jamais été reçu */
+    private String codeSortie() { return getSharedPreferences("vb", MODE_PRIVATE).getString("code", CODE_SORTIE); }
 
     private boolean epingle() {
         try { return ((ActivityManager) getSystemService(ACTIVITY_SERVICE)).getLockTaskModeState() != ActivityManager.LOCK_TASK_MODE_NONE; }
