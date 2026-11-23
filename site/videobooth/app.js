@@ -254,7 +254,7 @@
   function ouvrirCam() {
     montrer('s-cam'); $('s-cam').classList.remove('flou'); $('cam-err').hidden = true; $('compte').hidden = true; $('rec').hidden = true; $('barre').hidden = true;
     $('b-go').hidden = true; $('b-stop').hidden = true; $('fmt').hidden = true; enregistrement = false;
-    var contraintes = { audio: Object.assign({ echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1, sampleRate: 48000 }, cfg.mic ? { deviceId: { exact: cfg.mic } } : {}), video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, (paysage() ? { width: { ideal: 1920 }, height: { ideal: 1440 }, aspectRatio: { ideal: 4 / 3 } } : { width: { ideal: 1440 }, height: { ideal: 1920 }, aspectRatio: { ideal: 3 / 4 } })) };   /* 4:3 : tout le capteur, donc le champ de vision le plus large */
+    var contraintes = { audio: Object.assign({ echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1, sampleRate: 48000 }, cfg.mic ? { deviceId: { exact: cfg.mic } } : {}), video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, (paysage() ? { width: { ideal: 1920 }, height: { ideal: 1440 }, aspectRatio: { ideal: 4 / 3 }, frameRate: { ideal: 30 } } : { width: { ideal: 1440 }, height: { ideal: 1920 }, aspectRatio: { ideal: 3 / 4 }, frameRate: { ideal: 30 } })) };   /* 4:3 : tout le capteur, donc le champ de vision le plus large */
     arreterCam();
     var garde = !camSuspecte && fluxGarde && fluxGarde.getTracks().length && fluxGarde.getTracks().every(function (t) { return t.readyState === 'live'; }) ? fluxGarde : null;
     if (garde) { fluxGarde = null; clearTimeout(minuteurGarde); } else libererCamera();
@@ -310,11 +310,11 @@
     var n = 3; $('compte-n').textContent = n; decompte = setInterval(function () { n--; if (n > 0) { $('compte-n').textContent = n; } else { clearInterval(decompte); decompte = null; $('compte').hidden = true; $('s-cam').classList.remove('flou'); demarrer(); } }, 1000);
   };
   /* qualité choisie sur la session : haute 3,5 Mbit/s, standard 2,5, économique 1,8 (vidéos plus légères, moins de stockage et de données mobiles) */
-  function debitVideo() { return { eco: 1800000, haute: 3500000 }[cfg.qualite] || 2500000; }
+  function debitVideo() { return { eco: 3500000, haute: 9000000 }[cfg.qualite] || 6000000; }
   function demarrer() {
     morceaux = []; blobFinal = null; mime = meilleurMime(); niveauMax = 0;
     var flot = new MediaStream(cv.captureStream(30).getVideoTracks().concat(flux.getAudioTracks()));
-    try { rec = mime ? new MediaRecorder(flot, { mimeType: mime, videoBitsPerSecond: debitVideo(), audioBitsPerSecond: 128000 }) : new MediaRecorder(flot); } catch (e) { rec = new MediaRecorder(flot); }
+    try { rec = mime ? new MediaRecorder(flot, { mimeType: mime, videoBitsPerSecond: debitVideo(), audioBitsPerSecond: 160000 }) : new MediaRecorder(flot); } catch (e) { rec = new MediaRecorder(flot); }
     mime = rec.mimeType || mime || 'video/webm';
     rec.ondataavailable = function (e) { if (e.data && e.data.size) morceaux.push(e.data); };
     rec.onstop = function () {

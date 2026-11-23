@@ -474,7 +474,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
     await noter('contact', 'morceau ' + (Number(url.searchParams.get('i')) + 1) + '/' + url.searchParams.get('n'));
     const q = url.searchParams, id = q.get('id') || '';
     const i = Number(q.get('i')), n = Number(q.get('n'));
-    if (!idOk(id) || !(n >= 1 && n <= 40) || !(i >= 0 && i < n)) return rep({ ok: false, erreur: 'Paramètres invalides' }, 400);
+    if (!idOk(id) || !(n >= 1 && n <= 60) || !(i >= 0 && i < n)) return rep({ ok: false, erreur: 'Paramètres invalides' }, 400);
     /* l'adresse e-mail est facultative : l'invité peut ne vouloir que le QR code (les organisateurs reçoivent toutes les vidéos de toute façon) */
     const email = String(q.get('email') || '').trim(), plusEmail = String(q.get('plusEmail') || '').trim();
     const mailOk = (x) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(x) && x.length <= 200;

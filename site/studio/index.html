@@ -2820,7 +2820,7 @@ function vbFormSession(){
     '<div class="ssT">Carte sur l’écran d’accueil</div>'+t('m1n','Nom du mode')+t('m1d','Description')+
     '<div class="ssT">Enregistrement (valable pour tous les modes)</div>'+
     f('max','Durée maximale (secondes)',e.max,'30','number')+
-    sel('qualite','Qualité de la vidéo',[['haute','Haute (≈ 26 Mo/min)'],['standard','Standard (≈ 19 Mo/min)'],['eco','Économique (≈ 13 Mo/min)']],e.qualite||'standard')+
+    sel('qualite','Qualité de la vidéo',[['haute','Haute (≈ 68 Mo/min)'],['standard','Standard (≈ 45 Mo/min)'],['eco','Économique (≈ 26 Mo/min)']],e.qualite||'standard')+
     sel('format','Format de la vidéo',[['auto','Automatique'],['16:9','Paysage 16:9'],['4:3','Paysage 4:3'],['9:16','Story 9:16'],['3:4','Portrait 3:4']],e.format)+
     '<div class="ligne" style="align-self:end;padding-bottom:8px">'+sw('vs-choixformat',e.choixFormat!==false)+'<span>L’invité peut choisir vertical ou horizontal</span></div>'+
     '<div class="ssT">Avant d’enregistrer</div>'+t('pretT','Titre')+t('pretB','Bouton pour lancer')+f('cadrage','Message de cadrage',e.cadrage,'Vous pouvez incliner doucement la tablette pour vous cadrer','text','plein')+
