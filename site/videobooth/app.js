@@ -184,14 +184,30 @@
     if (f === 'auto') f = paysage() ? '16:9' : '9:16';
     return { '9:16': 0.5625, '3:4': 0.75, '4:3': 1.3333, '16:9': 1.7778 }[f] || 0.5625;
   }
+  var fondFlou = null;
   function dessiner() {
     var v = $('v-src');
     if (v.videoWidth) {
       var vw = v.videoWidth, vh = v.videoHeight, W, H, R = ratioFormat();
-      if (vw / vh > R) { H = Math.min(vh, 1920); W = Math.round(H * R / 2) * 2; } else { W = Math.min(vw, 1920); H = Math.round(W / R / 2) * 2; }
+      /* Format vertical (story) avec une caméra plus large que haute : on garde TOUTE la largeur de l'image (2 ou 3 personnes tiennent),
+         au lieu de la rogner à gauche et à droite. Les bandes du haut et du bas reprennent l'image, floutée. */
+      var large = R < 1 && vw / vh > R;
+      if (large) { W = Math.round(Math.min(vw, 1080) / 2) * 2; H = Math.round(W / R / 2) * 2; }
+      else if (vw / vh > R) { H = Math.min(vh, 1920); W = Math.round(H * R / 2) * 2; } else { W = Math.min(vw, 1920); H = Math.round(W / R / 2) * 2; }
       if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
-      var sc = Math.max(W / vw, H / vh), sw = W / sc, sh = H / sc;
-      cx.drawImage(v, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, W, H); cv.classList.remove('vide');
+      if (large) {
+        var fl = fondFlou || (fondFlou = document.createElement('canvas')), fw = 40, fh = Math.max(2, Math.round(fw / R));
+        if (fl.width !== fw || fl.height !== fh) { fl.width = fw; fl.height = fh; }
+        var sf0 = Math.max(fw / vw, fh / vh), sfw = fw / sf0, sfh = fh / sf0;
+        fl.getContext('2d').drawImage(v, (vw - sfw) / 2, (vh - sfh) / 2, sfw, sfh, 0, 0, fw, fh);
+        cx.imageSmoothingEnabled = true; cx.imageSmoothingQuality = 'high';
+        cx.drawImage(fl, 0, 0, W, H); cx.fillStyle = 'rgba(0,0,0,.28)'; cx.fillRect(0, 0, W, H);
+        var dh = vh * (W / vw); cx.drawImage(v, 0, 0, vw, vh, 0, (H - dh) / 2, W, dh);
+      } else {
+        var sc = Math.max(W / vw, H / vh), sw = W / sc, sh = H / sc;
+        cx.drawImage(v, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, W, H);
+      }
+      cv.classList.remove('vide');
       /* image figée plus de 5 s alors que la caméra est ouverte : la caméra a décroché */
       if (v.currentTime !== derniereImage) { derniereImage = v.currentTime; tFige = Date.now(); } else if (tFige && Date.now() - tFige > 5000) { tFige = 0; perteCapteur('cam'); }
     }

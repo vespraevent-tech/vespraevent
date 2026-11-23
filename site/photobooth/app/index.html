@@ -7,14 +7,14 @@
 <meta name="theme-color" content="#FFFFFF">
 <title>Vespra Event Photobooth</title>
 <link rel="icon" type="image/png" sizes="32x32" href="/videobooth/icones/favicon-32.png?v=3">
-<link rel="stylesheet" href="app.css?v=6">
+<link rel="stylesheet" href="app.css?v=7">
 </head>
 <body>
 <!-- 1. connexion de la borne (une seule fois : elle reste connectée 1 an) -->
 <section id="s-connexion" class="ecran">
   <div class="carte-centre">
     <div class="marque">Vespra Event <b>Photobooth</b></div>
-    <p class="aide">Mot de passe d’accès des bornes (le même que pour le vidéobooth).</p>
+    <p class="aide">Saisissez le mot de passe d’accès de la borne.</p>
     <input id="c-mdp" type="text" class="secret" placeholder="Mot de passe" autocomplete="off" autocapitalize="off" spellcheck="false">
     <button id="c-ok" class="btn plein">Connecter cette borne</button>
     <p id="c-err" class="err"></p>
@@ -36,7 +36,9 @@
       <input id="l-filtre" type="search" placeholder="Rechercher un événement">
       <div id="l-evts"></div>
     </div>
-    <aside class="liste-d" id="l-apercu"><p class="vide">Choisissez un événement.</p></aside>
+  </div>
+  <div id="l-modal" class="voile-ap" hidden>
+    <div class="boite-ap"><button type="button" class="fermer-ap" id="ap-fermer" aria-label="Fermer">✕</button><div id="l-apercu"></div></div>
   </div>
 </section>
 
@@ -138,6 +140,6 @@
 <iframe id="impr" title="impression" aria-hidden="true"></iframe>
 
 <script src="/videobooth/qr.js?v=1"></script>
-<script src="app.js?v=15"></script>
+<script src="app.js?v=16"></script>
 </body>
 </html>

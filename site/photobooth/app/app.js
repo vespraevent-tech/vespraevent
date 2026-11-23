@@ -114,19 +114,33 @@
   function dessinerListe() {
     var f = $('l-filtre').value.trim().toLowerCase(), j = auj(), dernier = LS.get('dernier', '');
     var l = etat.evts.filter(function (e) { return !f || String(e.nom).toLowerCase().indexOf(f) >= 0; });
-    if (!opts.voirEnregistres) l = l.filter(function (e) { return !e.date || e.date >= j || e.id === dernier; });
-    $('l-evts').innerHTML = l.length ? l.map(function (e) {
-      var d = e.date ? new Date(e.date + 'T12:00:00') : null;
-      var et = e.id === dernier ? '<span class="etat der">Dernier événement lancé</span>' : (e.date === j ? '<span class="etat auj">Aujourd’hui</span>' : (e.date && e.date < j ? '<span class="etat">Passé</span>' : '<span class="etat">' + (e.misesEnPage || []).length + ' cadre(s)</span>'));
-      return '<div class="evt' + (etat.sel && etat.sel.id === e.id ? ' sel' : '') + '" data-id="' + e.id + '"><div class="jour">' + (d ? d.getDate() + '<small>' + d.toLocaleDateString('fr-FR', { month: 'short' }) + '</small>' : '—') + '</div><div><div class="nom">' + esc(e.nom) + '</div>' + et + '</div></div>';
-    }).join('') : '<p class="vide">Aucun événement. Créez-le dans le back-office.</p>';
-    $('l-evts').querySelectorAll('.evt').forEach(function (n) { n.onclick = function () { etat.sel = etat.evts.find(function (e) { return e.id === n.dataset.id; }); dessinerListe(); apercu(etat.sel); }; n.ondblclick = function () { lancer(n.dataset.id); }; });
-    if (!etat.sel && l[0]) { etat.sel = l[0]; dessinerListe(); apercu(l[0]); }
+    if (!opts.voirEnregistres) l = l.filter(function (e) { return !e.date || e.date >= j || (e.fin && e.fin >= j) || e.id === dernier; });
+    var d0 = function (e) { return e.date || e.fin || ''; };
+    var croiss = function (a, b) { return !d0(a) ? 1 : !d0(b) ? -1 : d0(a).localeCompare(d0(b)); };
+    var passe = function (e) { var x = e.fin || e.date; return !!x && x < j; };
+    var encours = function (e) { return !passe(e) && !!e.date && e.date <= j; };
+    var gP = l.filter(passe).sort(function (a, b) { return -croiss(a, b); }), gC = l.filter(function (e) { return !passe(e) && encours(e); }).sort(croiss), gV = l.filter(function (e) { return !passe(e) && !encours(e); }).sort(croiss);
+    var carte = function (e) {
+      var d = e.date ? new Date(e.date + 'T12:00:00') : null, n = (e.misesEnPage || []).length;
+      var chip = e.id === dernier ? '<span class="chip der">Dernier lancé</span>' : (passe(e) ? '<span class="chip pa">Passé</span>' : (encours(e) ? '<span class="chip on">En cours</span>' : '<span class="chip av">À venir</span>'));
+      return '<div class="evc" data-id="' + e.id + '"><div class="jour">' + (d ? d.getDate() + '<small>' + d.toLocaleDateString('fr-FR', { month: 'short' }) + '</small>' : '—') + '</div>'
+        + '<div class="evc-t"><div class="nom">' + esc(e.nom) + '</div><div class="evc-m">' + (e.date ? esc(dateFr(e.date)) : 'Date à préciser') + ' · ' + n + ' cadre' + (n > 1 ? 's' : '') + '</div></div>' + chip
+        + '<div class="evc-a"><button type="button" class="btn" data-ap="1">Aperçu</button><button type="button" class="btn plein" data-go="1">Lancer</button></div></div>';
+    };
+    var groupe = function (titre, tab) { return tab.length ? '<div class="gr-t">' + titre + ' <span>' + tab.length + '</span></div><div class="gr-g">' + tab.map(carte).join('') + '</div>' : ''; };
+    $('l-evts').innerHTML = l.length ? groupe('À venir', gV) + groupe('En cours', gC) + groupe('Événements passés', gP) : '<p class="vide">Aucun événement. Créez-le dans le back-office.</p>';
+    $('l-evts').querySelectorAll('.evc').forEach(function (n) {
+      var e = etat.evts.find(function (x) { return x.id === n.dataset.id; });
+      n.querySelector('[data-ap]').onclick = function (ev) { ev.stopPropagation(); etat.sel = e; apercu(e); };
+      n.querySelector('[data-go]').onclick = function (ev) { ev.stopPropagation(); etat.sel = e; lancer(e.id); };
+      n.onclick = function () { etat.sel = e; apercu(e); };
+    });
   }
   $('l-filtre').oninput = dessinerListe;
   function apercu(e) {
     if (!e) return;
     var mps = e.misesEnPage || [];
+    $('l-modal').hidden = false;
     $('l-apercu').innerHTML = '<div class="ap-titre"><div><h2>' + esc(e.nom) + '</h2><p class="aide">' + esc(dateFr(e.date)) + '</p></div><button class="btn plein grand" id="ap-lancer">Lancer l’événement</button></div>' +
       '<div class="apercus"><div class="apercu"><h3>Écran d’accueil</h3><div class="mini-scene" id="ap-acc"></div></div>' +
       '<div class="apercu"><h3>Validation de la photo</h3><div class="mini-scene" id="ap-val"></div></div>' + '<div class="apercu"><h3>Écran de partage</h3><div class="mini-scene" id="ap-par"></div></div>' +
@@ -274,7 +288,7 @@
       if (!d || !d.evenements) return; etat.evts = d.evenements; LS.set('evts', etat.evts);
       if (JSON.stringify(etat.evts.map(function (e) { return e.id + e.maj; })) === avant) return;
       if (etat.sel) etat.sel = etat.evts.find(function (e) { return e.id === etat.sel.id; }) || null;
-      dessinerListe(); if (etat.sel) apercu(etat.sel);
+      dessinerListe(); if (etat.sel && !$('l-modal').hidden) apercu(etat.sel);
     }).catch(function () {});
   }, 4000);
 
@@ -525,7 +539,9 @@
     c.onpointerup = c.onpointerleave = function () { clearTimeout(long); };
     c.onclick = function () { var t = Date.now(); n = t - t0 < 600 ? n + 1 : 1; t0 = t; if (n >= 5) { n = 0; demanderPin(ouvrirMenu); } };
   })();
-  $('l-reg').onclick = function () { demanderPin(function () { if (etat.sel) { lancer(etat.sel.id).then(function () { ouvrirMenu('general'); }); } }); };
+  $('l-reg').onclick = function () { demanderPin(function () { var e = etat.sel || etat.evts.find(function (x) { return x.id === LS.get('dernier', ''); }) || etat.evts[0]; if (e) { lancer(e.id).then(function () { ouvrirMenu('general'); }); } else toast('Aucun événement : créez-en un dans le back-office.', true); }); };
+  $('ap-fermer').onclick = function () { $('l-modal').hidden = true; };
+  $('l-modal').onclick = function (ev) { if (ev.target === $('l-modal')) $('l-modal').hidden = true; };
 
   /* ── menu de l'événement (comme l'appli PC) ── */
   var PANNEAUX = [['general', 'Général'], ['capture', 'Paramètres de capture'], ['appareil', 'Paramètres de l’appareil photo'], ['mise', 'Mise en page des photos'], ['partage', 'Paramètres de partage'], ['impression', 'Paramètres d’impression'], ['dossier', 'Dossier d’événement']];
