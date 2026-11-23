@@ -184,29 +184,16 @@
     if (f === 'auto') f = paysage() ? '16:9' : '9:16';
     return { '9:16': 0.5625, '3:4': 0.75, '4:3': 1.3333, '16:9': 1.7778 }[f] || 0.5625;
   }
-  var fondFlou = null;
   function dessiner() {
     var v = $('v-src');
     if (v.videoWidth) {
       var vw = v.videoWidth, vh = v.videoHeight, W, H, R = ratioFormat();
-      /* Format vertical (story) avec une caméra plus large que haute : on garde TOUTE la largeur de l'image (2 ou 3 personnes tiennent),
-         au lieu de la rogner à gauche et à droite. Les bandes du haut et du bas reprennent l'image, floutée. */
-      var large = R < 1 && vw / vh > R;
-      if (large) { W = Math.round(Math.min(vw, 1080) / 2) * 2; H = Math.round(W / R / 2) * 2; }
-      else if (vw / vh > R) { H = Math.min(vh, 1920); W = Math.round(H * R / 2) * 2; } else { W = Math.min(vw, 1920); H = Math.round(W / R / 2) * 2; }
+      /* l'image remplit toujours le format choisi (vertical = vraie vidéo de haut en bas) : le champ de vision se règle à la caméra (grand angle, orientation de la tablette) */
+      if (vw / vh > R) { H = Math.min(vh, 1920); W = Math.round(H * R / 2) * 2; } else { W = Math.min(vw, 1920); H = Math.round(W / R / 2) * 2; }
       if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
-      if (large) {
-        var fl = fondFlou || (fondFlou = document.createElement('canvas')), fw = 40, fh = Math.max(2, Math.round(fw / R));
-        if (fl.width !== fw || fl.height !== fh) { fl.width = fw; fl.height = fh; }
-        var sf0 = Math.max(fw / vw, fh / vh), sfw = fw / sf0, sfh = fh / sf0;
-        fl.getContext('2d').drawImage(v, (vw - sfw) / 2, (vh - sfh) / 2, sfw, sfh, 0, 0, fw, fh);
-        cx.imageSmoothingEnabled = true; cx.imageSmoothingQuality = 'high';
-        cx.drawImage(fl, 0, 0, W, H); cx.fillStyle = 'rgba(0,0,0,.28)'; cx.fillRect(0, 0, W, H);
-        var dh = vh * (W / vw); cx.drawImage(v, 0, 0, vw, vh, 0, (H - dh) / 2, W, dh);
-      } else {
-        var sc = Math.max(W / vw, H / vh), sw = W / sc, sh = H / sc;
-        cx.drawImage(v, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, W, H);
-      }
+      cx.imageSmoothingEnabled = true; cx.imageSmoothingQuality = 'high';
+      var sc = Math.max(W / vw, H / vh), sw = W / sc, sh = H / sc;
+      cx.drawImage(v, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, W, H);
       cv.classList.remove('vide');
       /* image figée plus de 5 s alors que la caméra est ouverte : la caméra a décroché */
       if (v.currentTime !== derniereImage) { derniereImage = v.currentTime; tFige = Date.now(); } else if (tFige && Date.now() - tFige > 5000) { tFige = 0; perteCapteur('cam'); }
@@ -267,7 +254,7 @@
   function ouvrirCam() {
     montrer('s-cam'); $('s-cam').classList.remove('flou'); $('cam-err').hidden = true; $('compte').hidden = true; $('rec').hidden = true; $('barre').hidden = true;
     $('b-go').hidden = true; $('b-stop').hidden = true; $('fmt').hidden = true; enregistrement = false;
-    var contraintes = { audio: Object.assign({ echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1, sampleRate: 48000 }, cfg.mic ? { deviceId: { exact: cfg.mic } } : {}), video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, { width: { ideal: 1920 }, height: { ideal: 1440 }, aspectRatio: { ideal: 4 / 3 } }) };   /* 4:3 : tout le capteur, donc le champ de vision le plus large */
+    var contraintes = { audio: Object.assign({ echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1, sampleRate: 48000 }, cfg.mic ? { deviceId: { exact: cfg.mic } } : {}), video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, (paysage() ? { width: { ideal: 1920 }, height: { ideal: 1440 }, aspectRatio: { ideal: 4 / 3 } } : { width: { ideal: 1440 }, height: { ideal: 1920 }, aspectRatio: { ideal: 3 / 4 } })) };   /* 4:3 : tout le capteur, donc le champ de vision le plus large */
     arreterCam();
     var garde = !camSuspecte && fluxGarde && fluxGarde.getTracks().length && fluxGarde.getTracks().every(function (t) { return t.readyState === 'live'; }) ? fluxGarde : null;
     if (garde) { fluxGarde = null; clearTimeout(minuteurGarde); } else libererCamera();
@@ -289,7 +276,7 @@
   var testCam = false;
   function infoCamera(s) {
     var tr = s.getVideoTracks()[0], st = tr.getSettings ? tr.getSettings() : {}, caps = tr.getCapabilities ? tr.getCapabilities() : {}, au = s.getAudioTracks()[0];
-    var l = ['Caméra : ' + (tr.label || '(nom inconnu)'), 'Image reçue : ' + st.width + ' × ' + st.height + ' à ' + Math.round(st.frameRate || 0) + ' i/s',
+    var vv = $('v-src'), l = ['Caméra : ' + (tr.label || '(nom inconnu)'), 'Écran : ' + (paysage() ? 'paysage' : 'portrait') + ' (' + window.innerWidth + ' × ' + window.innerHeight + ') — image affichée : ' + vv.videoWidth + ' × ' + vv.videoHeight, 'Image reçue : ' + st.width + ' × ' + st.height + ' à ' + Math.round(st.frameRate || 0) + ' i/s',
       'Zoom : ' + (caps.zoom ? ('min ' + caps.zoom.min + ' · max ' + caps.zoom.max + ' · actuel ' + (st.zoom || '?')) : 'non réglable par le navigateur'),
       'Format enregistré : ' + (cfg.format === 'auto' || !cfg.format ? 'auto (' + (paysage() ? '16:9' : '9:16') + ')' : cfg.format),
       'Micro : ' + (au ? (au.label || '(nom inconnu)') : 'aucun')];
@@ -306,7 +293,8 @@
     try {
       var tr = s.getVideoTracks()[0], caps = tr && tr.getCapabilities ? tr.getCapabilities() : {};
       var larg = function () { try { var c2 = tr.getCapabilities ? tr.getCapabilities() : {}; if (c2.zoom && typeof c2.zoom.min === 'number') tr.applyConstraints({ zoom: c2.zoom.min }).catch(function () { tr.applyConstraints({ advanced: [{ zoom: c2.zoom.min }] }).catch(function () {}); }); } catch (e) {} };
-      larg(); setTimeout(larg, 600); setTimeout(larg, 2000);   /* certaines tablettes n'acceptent le zoom qu'une fois la caméra lancée */
+      var pousser = function () { try { var c3 = tr.getCapabilities ? tr.getCapabilities() : {}; if (!(c3.zoom && c3.zoom.min < 1)) { [0.6, 0.5, 0.7].some(function (z) { tr.applyConstraints({ advanced: [{ zoom: z }] }).catch(function () {}); return false; }); } } catch (e) {} };
+      larg(); pousser(); setTimeout(larg, 600); setTimeout(larg, 2000);   /* certaines tablettes n'acceptent le zoom qu'une fois la caméra lancée */
     } catch (e) {}
     if (angleEssaye || cfg.cam || !navigator.mediaDevices.enumerateDevices) return;
     angleEssaye = true;
