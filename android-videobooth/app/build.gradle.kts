@@ -7,8 +7,8 @@ android {
         applicationId = "com.vespraevent.videobooth"
         minSdk = 24
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = 3
+        versionName = "1.0.2"
     }
     /* Signature : la clé n'est jamais dans le code. Elle vient de variables d'environnement au moment de compiler. */
     val ks = System.getenv("VB_KEYSTORE")

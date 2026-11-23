@@ -58,7 +58,9 @@
 
   /* ───────── écrans ───────── */
   function montrer(id) {
-    if (id !== 's-revoir') { var vr = $('v-revoir'); try { vr.pause(); vr.removeAttribute('src'); vr.load(); } catch (e) {} } document.querySelectorAll('.ecran').forEach(function (e) { e.classList.toggle('on', e.id === id); }); }
+    if (id !== 's-revoir') { var vr = $('v-revoir'); try { vr.pause(); vr.removeAttribute('src'); vr.load(); } catch (e) {} } document.querySelectorAll('.ecran').forEach(function (e) { e.classList.toggle('on', e.id === id); });
+    /* application Android : la barre du système n'apparaît que dans les réglages (après le code), jamais devant les invités */
+    try { if (window.VespraAndroid) window.VespraAndroid.admin(id === 's-admin'); } catch (e) {} }
   var inactif = null;
   function veille() { clearTimeout(inactif); inactif = setTimeout(function () { if (!$('s-accueil').classList.contains('on') && !$('s-admin').classList.contains('on') && !$('s-pin').classList.contains('on') && !enregistrement) { arreterCam(); accueil(); } }, 120000); }
   ['pointerdown', 'keydown'].forEach(function (t) { document.addEventListener(t, veille, { passive: true }); });
