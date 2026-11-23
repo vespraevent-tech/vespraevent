@@ -41,11 +41,11 @@
       var nom = String((source === 'demande' ? r.nom : r.client) || '').trim();
       if (!nom) return;
       var c = ficheClientDe(r, source);
-      var maj = { pro: !!v.pro, siret: v.pro ? (v.siret || '') : '', tva: v.pro ? (v.tvaClient || '') : '', billAdresse: v.adresse || '', _maj: Date.now() };
-      var change = !c || ['pro', 'siret', 'tva', 'billAdresse'].some(function (k) { return String(c[k] == null ? '' : c[k]) !== String(maj[k]); });
+      var maj = { pro: !!v.pro, siret: v.pro ? (v.siret || '') : '', rna: v.pro ? (v.rna || '') : '', tva: v.pro ? (v.tvaClient || '') : '', billAdresse: v.adresse || '', _maj: Date.now() };
+      var change = !c || ['pro', 'siret', 'rna', 'tva', 'billAdresse'].some(function (k) { return String(c[k] == null ? '' : c[k]) !== String(maj[k]); });
       if (!change) return;
       /* rien de saisi et pas de fiche : on ne crée pas une fiche vide */
-      if (!c && !maj.pro && !maj.siret && !maj.tva && !maj.billAdresse) return;
+      if (!c && !maj.pro && !maj.siret && !maj.rna && !maj.tva && !maj.billAdresse) return;
       var mots = nom.split(/\s+/);
       var fiche = c ? Object.assign({ id: c.id, fullName: c.fullName }, maj)
         : Object.assign({ id: 'c' + Date.now(), fullName: nom, firstName: mots[0] || '', lastName: mots.slice(1).join(' '),
@@ -79,6 +79,7 @@
         r.devisAdresse = v.adresse || '';
         r.devisPro = !!v.pro;
         r.devisSiret = v.siret || '';
+        r.devisRna = v.rna || '';
         r.devisTva = v.tvaClient || '';
         r.devisAvecAcompte = !!v.avecAcompte;
         r.devisCond = v.cond || null;
@@ -97,7 +98,7 @@
           if (typeof showToast === 'function') showToast('Saisies non enregistrées : ' + e.message, true);
         });
       }
-      r.factureClient = { adresse: v.adresse || '', pro: !!v.pro, siret: v.siret || '', tvaClient: v.tvaClient || '', avecAcompte: !!v.avecAcompte, acomptePct: v.acomptePct || 30, cond: v.cond || null, societe: (r.factureClient && r.factureClient.societe) || r.societe || '' };
+      r.factureClient = { adresse: v.adresse || '', pro: !!v.pro, siret: v.siret || '', rna: v.rna || '', tvaClient: v.tvaClient || '', avecAcompte: !!v.avecAcompte, acomptePct: v.acomptePct || 30, cond: v.cond || null, societe: (r.factureClient && r.factureClient.societe) || r.societe || '' };
       if (typeof api === 'function') {
         return Promise.resolve(api('/data', { method: 'POST', body: JSON.stringify({ collection: 'reservations', item: { id: r.id, d: JSON.stringify(r) } }) }))
           .catch(function (e) { if (typeof showToast === 'function') showToast('Saisies non enregistrées : ' + e.message, true); });
@@ -259,8 +260,8 @@
     var depuisClient = function (d) {
       if (!d) return null;
       var pro = /entreprise|association|mairie|collectivit/i.test(String(d.clientType || ''));
-      var siret = String(d.siret || '').trim(), tva = String(d.tva || '').trim();
-      return (pro || siret || tva) ? { pro: pro || !!(siret || tva), siret: siret, tvaClient: tva } : null;
+      var siret = String(d.siret || '').trim(), rna = String(d.rna || '').trim(), tva = String(d.tva || '').trim();
+      return (pro || siret || rna || tva) ? { pro: pro || !!(siret || rna || tva), siret: siret, rna: rna, tvaClient: tva } : null;
     };
     var societeClient = societeDe(r, source);
     var vu;
@@ -270,24 +271,28 @@
       vu = { adresse: r.devisAdresse || undefined,
              pro: cl ? cl.pro : r.devisPro === true,
              siret: cl ? cl.siret : (r.devisSiret || ''),
+             rna: cl ? cl.rna : (r.devisRna || ''),
              tvaClient: cl ? cl.tvaClient : (r.devisTva || ''),
              avecAcompte: r.devisAvecAcompte === true ? true : undefined, acomptePct: Number(r.devisAcomptePct) || undefined, cond: r.devisCond || null };
     } else {
       vu = r.factureClient || {};
       /* rien de choisi sur la réservation (pas de type de client, ni SIRET ou RNA, ni TVA) : on reprend ce que le client a indiqué dans sa demande */
-      var cl2 = (vu.pro === undefined && !vu.siret && !vu.tvaClient) ? depuisClient(demandeLiee) : null;
-      if (cl2) vu = Object.assign({}, vu, { pro: cl2.pro, siret: cl2.siret, tvaClient: cl2.tvaClient, cond: (r.factureClient && r.factureClient.cond) || null });
+      var cl2 = (vu.pro === undefined && !vu.siret && !vu.rna && !vu.tvaClient) ? depuisClient(demandeLiee) : null;
+      if (cl2) vu = Object.assign({}, vu, { pro: cl2.pro, siret: cl2.siret, rna: cl2.rna, tvaClient: cl2.tvaClient, cond: (r.factureClient && r.factureClient.cond) || null });
     }
     /* fiche de la base clients : reprise de ce qui est déjà connu */
     clientsCharger();
     var fclient = ficheClientDe(r, source);
     if (fclient) {
       vu = Object.assign({}, vu);
-      if (vu.pro !== true && !vu.siret && !vu.tvaClient && (fclient.pro || fclient.siret || fclient.tva)) {
-        vu.pro = true; vu.siret = fclient.siret || ''; vu.tvaClient = fclient.tva || '';
+      if (vu.pro !== true && !vu.siret && !vu.rna && !vu.tvaClient && (fclient.pro || fclient.siret || fclient.rna || fclient.tva)) {
+        vu.pro = true; vu.siret = fclient.siret || ''; vu.rna = fclient.rna || ''; vu.tvaClient = fclient.tva || '';
       }
       if (vu.adresse === undefined && fclient.billAdresse) vu.adresse = fclient.billAdresse;
     }
+    /* ancienne saisie : un numéro RNA (W + 9 chiffres) rangé dans le champ SIRET est remis dans son propre champ */
+    vu = Object.assign({}, vu);
+    if (/^w\d{9}$/i.test(String(vu.siret || '').replace(/\s+/g, '')) && !vu.rna) { vu.rna = String(vu.siret).replace(/\s+/g, '').toUpperCase(); vu.siret = ''; }
     var adresse = (vu.adresse !== undefined) ? vu.adresse : (depuisDemande ? (r.adresse || '') : (r.place || ''));
     var pro = vu.pro === true;
     /* Une réservation porte un booléen « acompte » : il signifie que
@@ -360,8 +365,10 @@
 
       /* SIRET ou RNA et TVA : repris de la fiche client, modifiables ici (une association peut n'avoir qu'un numéro RNA) */
       '<div id="fcBlocPro"' + (pro ? '' : ' hidden') + '>' +
-        '<div class="fc-champ"><label class="fc-l" for="fcSiret">SIRET ou n° RNA</label>' +
-          '<input class="fc-input" id="fcSiret" type="text" autocomplete="off" placeholder="SIRET (14 chiffres) ou RNA (W123456789)" value="' + txt(vu.siret || '') + '"></div>' +
+        '<div class="fc-champ"><label class="fc-l" for="fcSiret">SIRET <small>(entreprise)</small></label>' +
+          '<input class="fc-input" id="fcSiret" type="text" autocomplete="off" placeholder="14 chiffres" value="' + txt(vu.siret || '') + '"></div>' +
+        '<div class="fc-champ"><label class="fc-l" for="fcRna">N° RNA <small>(association)</small></label>' +
+          '<input class="fc-input" id="fcRna" type="text" autocomplete="off" placeholder="W123456789" value="' + txt(vu.rna || '') + '"></div>' +
         '<div class="fc-champ"><label class="fc-l" for="fcTvaClient">N° de TVA <small>(facultatif)</small></label>' +
           '<input class="fc-input" id="fcTvaClient" type="text" autocomplete="off" placeholder="FR00 000000000" value="' + txt(vu.tvaClient || '') + '"></div>' +
       '</div>' +
@@ -470,7 +477,7 @@
       return {
         adresse: ((q('#fcAdresse') || {}).value || '').trim(),
         pro: !!(q('input[name="fcType"][value="pro"]') || {}).checked,
-        siret: (q('#fcSiret') || {}).value || '', tvaClient: (q('#fcTvaClient') || {}).value || '',
+        siret: (q('#fcSiret') || {}).value || '', rna: (q('#fcRna') || {}).value || '', tvaClient: (q('#fcTvaClient') || {}).value || '',
         avecAcompte: !!(q('#fcAvecAcompte') || {}).checked, acomptePct: Number((q('#fcPct') || {}).value) || 30,
         cond: condSaisie(),
         livraison: nombreOuNul(q('#fcLivraison')), montage: nombreOuNul(q('#fcMontage')),
@@ -534,6 +541,7 @@
     var adresse = (zone.querySelector('#fcAdresse').value || '').trim();
     var pro = zone.querySelector('input[name="fcType"][value="pro"]').checked;
     var siret = pro ? ((zone.querySelector('#fcSiret') || {}).value || '').trim() : '';
+    var rna = pro ? ((zone.querySelector('#fcRna') || {}).value || '').trim().toUpperCase() : '';
     var tvaClient = pro ? ((zone.querySelector('#fcTvaClient') || {}).value || '').trim() : '';
     var avecAcompte = zone.querySelector('#fcAvecAcompte').checked;
     var cond = (function () {
@@ -571,7 +579,7 @@
       alert('Le prix de la prestation n’est pas encore saisi : le devis ne peut pas être envoyé.');
       return;
     }
-    sauvegarderSaisies(id, source, r, { adresse: adresse, pro: pro, siret: siret, tvaClient: tvaClient,
+    sauvegarderSaisies(id, source, r, { adresse: adresse, pro: pro, siret: siret, rna: rna, tvaClient: tvaClient,
                   avecAcompte: avecAcompte, acomptePct: pctAc, cond: cond, livraison: livraison, montage: montage, retour: retour });
 
     bouton.disabled = true;
@@ -613,6 +621,7 @@
             tel: (r && r.telephone) || '',
             email: (r && r.email) || '',
             siret: siret,
+            rna: rna,
             tvaClient: tvaClient,
           },
           lignes: toutes,
@@ -626,6 +635,7 @@
         + (cond ? '&cm=' + encodeURIComponent(cond.mode) + '&cj=' + cond.jours + '&cn=' + encodeURIComponent(cond.note) : '')
         + (societeClient ? '&societe=' + encodeURIComponent(societeClient) : '')
         + (siret ? '&siret=' + encodeURIComponent(siret) : '')
+        + (rna ? '&rna=' + encodeURIComponent(rna) : '')
         + (tvaClient ? '&tvaclient=' + encodeURIComponent(tvaClient) : ''),
         { credentials: 'same-origin' });
     }

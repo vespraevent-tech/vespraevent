@@ -992,9 +992,14 @@ transform:none!important;stroke-dashoffset:0!important}}
                 <input class="form-input" type="text" name="societe" placeholder="Nom de la structure" disabled>
               </div>
               <div class="form-group">
-                <label class="form-label">SIRET ou n° RNA *</label>
-                <input class="form-input" type="text" name="siret" autocapitalize="characters" placeholder="SIRET (14 chiffres) ou RNA (W123456789)" pattern="([0-9 ]{14,17}|[Ww][0-9]{9})" title="SIRET : 14 chiffres. Association : numéro RNA, la lettre W suivie de 9 chiffres (ex. W123456789)" disabled>
+                <label class="form-label">SIRET <span style="font-weight:400;color:var(--g2)">(entreprise)</span></label>
+                <input class="form-input" type="text" name="siret" inputmode="numeric" placeholder="14 chiffres" pattern="[0-9 ]{14,17}" title="14 chiffres" disabled>
               </div>
+              <div class="form-group">
+                <label class="form-label">N° RNA <span style="font-weight:400;color:var(--g2)">(association)</span></label>
+                <input class="form-input" type="text" name="rna" autocapitalize="characters" placeholder="W123456789" pattern="[Ww][0-9]{9}" title="Numéro RNA : la lettre W suivie de 9 chiffres (ex. W123456789)" disabled>
+              </div>
+              <p class="intent-hint" style="grid-column:1/-1;margin:-4px 0 0">Entreprise : indiquez votre SIRET. Association : votre numéro RNA (ou votre SIRET si vous en avez un).</p>
             </div>
             <div class="form-group">
               <label class="form-label">N° de TVA intracommunautaire <span style="font-weight:400;color:var(--g2)">(si vous y êtes assujetti)</span></label>
@@ -2258,6 +2263,11 @@ function submitRes(e){
   const _ok=document.getElementById('savoirOk'),_ok2=document.getElementById('savoirOk2');
   if(_ok&&!_ok.checked){document.getElementById('savoirBox').classList.add('err');_ok.focus();return;}
   if(_ok2&&!_ok2.checked){document.getElementById('savoirBox').classList.add('err');_ok2.focus();return;}
+  // entreprise ou association : un SIRET ou un numéro RNA est demandé
+  if((form.querySelector('input[name="client_type"]:checked')||{}).value==='Entreprise ou association'){
+    const sv=((form.querySelector('input[name="siret"]')||{}).value||'').trim(), rv=((form.querySelector('input[name="rna"]')||{}).value||'').trim();
+    if(!sv&&!rv){alert('Indiquez votre SIRET (entreprise) ou votre numéro RNA (association).');const f0=form.querySelector('input[name="rna"]');if(f0)f0.focus();return;}
+  }
   // adresse obligatoire dès qu'une livraison est demandée
   const wantsLivr=(form.querySelector('input[name="livraison"]:checked')||{}).value==='oui';
   const adr=document.getElementById('adresseLivraison');
@@ -2433,7 +2443,7 @@ function setQui(v){
   const sg = document.querySelector('.qui-seg'); if(sg) sg.classList.toggle('pro', pro);
   const z = document.getElementById('quiPro'); if(!z) return;
   z.hidden = !pro;
-  z.querySelectorAll('input').forEach(i=>{ i.disabled = !pro; if(i.name !== 'tva') i.required = pro; });
+  z.querySelectorAll('input').forEach(i=>{ i.disabled = !pro; i.required = pro && i.name === 'societe'; });
 }
 function setIntent(el){
   const dispo = el && el.value.indexOf('Disponibilit')===0;

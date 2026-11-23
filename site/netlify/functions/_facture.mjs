@@ -363,7 +363,11 @@ export function construireFacture({ emetteur, client, facture, lignes, reglages 
   const XC = 322;
   const lignesClient = [[client.nom, true]];
   (client.adresse || []).forEach((l) => lignesClient.push([l, false]));
-  if (client.siret) lignesClient.push([(/^w\d{9}$/i.test(String(client.siret).replace(/\s+/g, '')) ? 'N° RNA ' + String(client.siret).replace(/\s+/g, '').toUpperCase() : 'SIRET ' + client.siret), false]);
+  /* un numéro RNA (association) n'est ni un SIRET ni un numéro de TVA : lignes séparées. Ancienne saisie « W123456789 » dans le champ SIRET : reconnue comme RNA. */
+  { const nr = String(client.rna || '').replace(/\s+/g, '').toUpperCase(), ns = String(client.siret || '').trim(), siretEstRna = /^w\d{9}$/i.test(ns.replace(/\s+/g, ''));
+    if (ns && !siretEstRna) lignesClient.push(['SIRET ' + ns, false]);
+    const rna = nr || (siretEstRna ? ns.replace(/\s+/g, '').toUpperCase() : '');
+    if (rna) lignesClient.push(['N° RNA ' + rna, false]); }
   if (client.tvaClient) lignesClient.push(['TVA ' + client.tvaClient, false]);
   if (client.tel) lignesClient.push([client.tel, false]);
   if (client.email) lignesClient.push([client.email, false]);

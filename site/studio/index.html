@@ -5105,7 +5105,7 @@ function ficheDemande(id, relu){
 
     modifsBloc(['d:' + d.id].concat(d.resaId ? ['r:' + d.resaId] : [])) +
     bloc('', champ('Téléphone', tel) + champ('Email', mail) +
-      (d.clientType === 'Entreprise ou association' ? champ('Société', esc(d.societe)) + champ('SIRET / RNA', esc(d.siret)) + champ('N° de TVA', esc(d.tva)) : '') +
+      (d.clientType === 'Entreprise ou association' ? champ('Société', esc(d.societe)) + champ('SIRET', esc(d.siret)) + champ('N° RNA', esc(d.rna)) + champ('N° de TVA', esc(d.tva)) : '') +
       champ('Date', d.date ? esc(d.date) : '<span class="fd-manque">à préciser</span>')) +
 
     bloc('Logistique',
@@ -5470,7 +5470,8 @@ function modifierDemande(id){
       champ('clienttype', 'Type de client', '<select id="m-clienttype" onchange="mdPro()"><option value="Particulier"' + (iniPro ? '' : ' selected') + '>Particulier</option><option value="Entreprise ou association"' + (iniPro ? ' selected' : '') + '>Entreprise, association, mairie…</option></select>', true) +
       '<div class="pm-cond" id="m-proWrap"' + (iniPro ? '' : ' style="display:none"') + '>' +
         saisie('societe', 'Nom de l\u2019entreprise ou de l\u2019association', d.societe, 'Ex : Comité des fêtes de Vitré', 'text', true) +
-        saisie('siret', 'SIRET ou n° RNA', d.siret, '123 456 789 00012 ou W123456789') +
+        saisie('siret', 'SIRET (entreprise)', d.siret, '123 456 789 00012') +
+        saisie('rna', 'N° RNA (association)', d.rna, 'W123456789') +
         saisie('tva', 'N° de TVA (facultatif)', d.tva, 'FR00123456789') +
       '</div>' +
       saisie('date', 'Date de début', iniDebut, '', 'date') +
@@ -6131,6 +6132,7 @@ async function enregistrerDemande(id, bouton){
     clienttype: lire('clienttype') || 'Particulier',
     societe: /entreprise|association/i.test(lire('clienttype')) ? lire('societe') : '',
     siret: /entreprise|association/i.test(lire('clienttype')) ? lire('siret') : '',
+    rna: /entreprise|association/i.test(lire('clienttype')) ? lire('rna').toUpperCase() : '',
     tva: /entreprise|association/i.test(lire('clienttype')) ? lire('tva') : '',
     /* le matériel n'est plus du texte libre : on enregistre le panier
        corrigé, et on efface l'ancienne correction en texte */
@@ -6183,8 +6185,8 @@ async function enregistrerDemande(id, bouton){
     /* le devis et la facture reprennent ces informations : type de client, SIRET, TVA */
     const proNouveau = /entreprise|association/i.test(corrections.clienttype);
     const proAvant = /entreprise|association|mairie|collectivit/i.test(String(d.clientType || ''));
-    if(proNouveau !== proAvant || (corrections.siret || '') !== String(d.siret || '') || (corrections.tva || '') !== String(d.tva || '')){
-      d.devisPro = proNouveau; d.devisSiret = corrections.siret; d.devisTva = corrections.tva;
+    if(proNouveau !== proAvant || (corrections.siret || '') !== String(d.siret || '') || (corrections.rna || '') !== String(d.rna || '') || (corrections.tva || '') !== String(d.tva || '')){
+      d.devisPro = proNouveau; d.devisSiret = corrections.siret; d.devisRna = corrections.rna; d.devisTva = corrections.tva;
     }
     try{ await enregistrerSuivi(d, { corrections }); }
     catch(err){ d.optsRetirees = retiresAvant; Object.assign(d, avantSuivi); throw err; }
@@ -6255,8 +6257,8 @@ async function reporterAuPlanning(d, avant, chg){
     {
       const proD = /entreprise|association|mairie|collectivit/i.test(String(d.clientType || ''));
       r.clientType = proD ? 'Entreprise ou association' : '';
-      r.societe = proD ? (d.societe || '') : ''; r.siret = proD ? (d.siret || '') : ''; r.tva = proD ? (d.tva || '') : '';
-      r.factureClient = Object.assign({}, r.factureClient || {}, {pro: proD, siret: r.siret, tvaClient: r.tva, societe: r.societe});
+      r.societe = proD ? (d.societe || '') : ''; r.siret = proD ? (d.siret || '') : ''; r.rna = proD ? (d.rna || '') : ''; r.tva = proD ? (d.tva || '') : '';
+      r.factureClient = Object.assign({}, r.factureClient || {}, {pro: proD, siret: r.siret, rna: r.rna, tvaClient: r.tva, societe: r.societe});
     }
 
     /* Matériel : on retire et on ajoute seulement les lignes que la fiche
@@ -7857,7 +7859,7 @@ async function ouvrirFicheClient(nom, tel, email){
     + '<div class="g2"><div>'+ch('tel','Téléphone',fiche.phone)+'</div><div>'+ch('mail','E-mail',fiche.email,'','email')+'</div></div>'
     + '<label class="l" for="fcl-adr">Adresse de facturation</label><textarea id="fcl-adr" rows="2" placeholder="Rue, code postal, ville">'+esc(fiche.billAdresse||'')+'</textarea>'
     + '<div class="ty"><label><input type="radio" name="fcl-type" value="part" onchange="fclTypeBo()"'+(pro?'':' checked')+'> Particulier</label><label><input type="radio" name="fcl-type" value="pro" onchange="fclTypeBo()"'+(pro?' checked':'')+'> Entreprise / association</label></div>'
-    + '<div id="fcl-pro" style="display:'+(pro?'':'none')+'">'+ch('soc','Société',fiche.societe,'Raison sociale')+'<div class="g2"><div>'+ch('siret','SIRET ou n° RNA',fiche.siret,'123 456 789 00012 ou W123456789')+'</div><div>'+ch('tva','N° de TVA',fiche.tva,'FR 00 123456789')+'</div></div></div>'
+    + '<div id="fcl-pro" style="display:'+(pro?'':'none')+'">'+ch('soc','Société',fiche.societe,'Raison sociale')+'<div class="g2"><div>'+ch('siret','SIRET (entreprise)',fiche.siret,'123 456 789 00012')+'</div><div>'+ch('rna','N° RNA (association)',fiche.rna,'W123456789')+'</div><div>'+ch('tva','N° de TVA',fiche.tva,'FR 00 123456789')+'</div></div></div>'
     + '<label class="l" for="fcl-notes">Notes</label><textarea id="fcl-notes" rows="2">'+esc(fiche.notes||'')+'</textarea>'
     + '<label class="l" style="margin-top:18px">Réservations et demandes (<span id="fcl-nb">'+ds.length+'</span>)</label><div id="fcl-liste" style="max-height:210px;overflow:auto">'+_fclListe(ds)+'</div>'
     + '<div class="pied"><span>'+(fiche.email ? '<button type="button" class="lien" onclick="fclEspace()">Son espace client</button>' : '')+'</span>'
@@ -7897,7 +7899,7 @@ async function fclEnregistrerBo(){
   const pro = document.querySelector('input[name="fcl-type"][value="pro"]').checked;
   const nom = (v('nom') || f.fullName).trim(), mots = nom.split(/\s+/);
   const nv = {fullName:nom, firstName:mots[0]||'', lastName:mots.slice(1).join(' '), phone:v('tel').trim(), email:v('mail').trim(), notes:v('notes').trim(),
-    billAdresse:v('adr').trim(), pro, societe:pro?v('soc').trim():'', siret:pro?v('siret').trim():'', tva:pro?v('tva').trim():'', _maj:Date.now()};
+    billAdresse:v('adr').trim(), pro, societe:pro?v('soc').trim():'', siret:pro?v('siret').trim():'', rna:pro?v('rna').trim().toUpperCase():'', tva:pro?v('tva').trim():'', _maj:Date.now()};
   const ancien = {nom:f.fullName||'', tel:f.phone||'', email:f.email||''};
   const clefAncienne = window._fclClef;
   try{
@@ -10506,7 +10508,7 @@ checkSession();
 <script src="/studio/notefrais.js"></script>
 <script src="/studio/ik.js"></script>
 <script src="/adresse-autocomplete.js"></script>
-<script src="/studio/facture.js?v=3"></script>
+<script src="/studio/facture.js?v=4"></script>
 <script>
 /* ── Accueil ── */
 function acFr(iso){ if(!iso) return ''; const d=new Date(iso+'T12:00:00'); return isNaN(d)?'':d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); }

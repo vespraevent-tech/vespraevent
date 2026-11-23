@@ -752,7 +752,7 @@ html body input, html body select, html body textarea { max-width: 100%; }
       <div class="field"><label>Téléphone</label><input id="phone" type="tel" placeholder="06 00 00 00 00"></div>
       <div class="field"><label>Email</label><input id="email" type="email" placeholder="client@email.com"></div>
       <div class="field"><label>Type de client</label><select id="clientType" onchange="majTypeClient()"><option value="">Particulier</option><option value="pro">Entreprise, association, mairie…</option></select></div>
-      <div class="field" id="proWrap" style="display:none;grid-column:1/-1"><label>Nom de l’entreprise ou de l’association</label><input id="societe" placeholder="Ex : Comité des fêtes de Vitré" autocomplete="off"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><div><label>SIRET</label><input id="siret" placeholder="123 456 789 00012" autocomplete="off"></div><div><label>N° de TVA (facultatif)</label><input id="tvaClient" placeholder="FR00123456789" autocomplete="off"></div></div></div>
+      <div class="field" id="proWrap" style="display:none;grid-column:1/-1"><label>Nom de l’entreprise ou de l’association</label><input id="societe" placeholder="Ex : Comité des fêtes de Vitré" autocomplete="off"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px"><div><label>SIRET <small style="font-weight:400">(entreprise)</small></label><input id="siret" placeholder="123 456 789 00012" autocomplete="off"></div><div><label>N° RNA <small style="font-weight:400">(association)</small></label><input id="rna" placeholder="W123456789" autocomplete="off"></div><div><label>N° de TVA (facultatif)</label><input id="tvaClient" placeholder="FR00123456789" autocomplete="off"></div></div></div>
       <div class="field"><label>Date de début</label><input id="dateStart" type="date"></div>
       <div class="field"><label>Date de fin</label><input id="dateEnd" type="date"></div>
       <div class="field"><label>Nombre de convives</label><select id="convives"></select></div>
@@ -2618,8 +2618,8 @@ function clientsDuPlanning(existants){
     /* infos d'entreprise saisies par le client dans sa demande */
     try{
       var dem=((window.parent&&window.parent.cache&&window.parent.cache.demandes)||[]).find(function(x){return x&&x.resaId&&String(x.resaId)===String(r.id);});
-      if(dem&&!c.siret&&!c.tva&&(dem.siret||dem.tva||/entreprise|association|mairie|collectivit/i.test(String(dem.clientType||'')))){
-        c.pro=true;c.societe=dem.societe||'';c.siret=dem.siret||'';c.tva=dem.tva||'';
+      if(dem&&!c.siret&&!c.rna&&!c.tva&&(dem.siret||dem.rna||dem.tva||/entreprise|association|mairie|collectivit/i.test(String(dem.clientType||'')))){
+        c.pro=true;c.societe=dem.societe||'';c.siret=dem.siret||'';c.rna=dem.rna||'';c.tva=dem.tva||'';
       }
     }catch(e){}
     c.reservations++;
@@ -2767,7 +2767,7 @@ window.editClient=function(id){
         +'<label style="cursor:pointer;display:inline-flex;align-items:center;gap:7px"><input type="radio" name="fcl-type" style="width:auto;margin:0" value="pro" onchange="fclType()"'+(pro?' checked':'')+'> Entreprise / association</label></div>'
       +'<div id="fcl-pro" style="display:'+(pro?'':'none')+'">'
         +champ('soc','Société',c.societe,'Raison sociale')
-        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div>'+champ('siret','SIRET',c.siret,'123 456 789 00012')+'</div><div>'+champ('tva','N° de TVA',c.tva,'FR 00 123456789')+'</div></div></div>'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div>'+champ('siret','SIRET (entreprise)',c.siret,'123 456 789 00012')+'</div><div>'+champ('rna','N° RNA (association)',c.rna,'W123456789')+'</div></div><div>'+champ('tva','N° de TVA',c.tva,'FR 00 123456789')+'</div></div>'
       +'<label style="'+lab+'" for="fcl-notes">Notes</label><textarea id="fcl-notes" rows="2" style="'+inp+';resize:vertical">'+_fcEsc(c.notes||'')+'</textarea>'
       +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin:20px 0 2px"><span style="font:600 11px Inter,system-ui,sans-serif;color:#8a8577;letter-spacing:.2px">Réservations (<span id="fcl-nb">'+_fcResas(ancienneClef).length+'</span>)</span></div>'
       +'<div id="fcl-resas" style="max-height:200px;overflow:auto">'+_fcListeResas(ancienneClef)+'</div>'
@@ -2783,7 +2783,7 @@ window.fclEnregistrer=function(id){
   var v=function(i){return (document.getElementById('fcl-'+i)||{}).value||'';};
   var pro=document.querySelector('input[name="fcl-type"][value="pro"]').checked;
   var nv={fullName:(v('nom')||c.fullName).trim(),phone:v('tel').trim(),email:v('mail').trim(),notes:v('notes').trim(),
-    billAdresse:v('adr').trim(),pro:pro,societe:pro?v('soc').trim():'',siret:pro?v('siret').trim():'',tva:pro?v('tva').trim():''};
+    billAdresse:v('adr').trim(),pro:pro,societe:pro?v('soc').trim():'',siret:pro?v('siret').trim():'',rna:pro?v('rna').trim().toUpperCase():'',tva:pro?v('tva').trim():''};
   var touchees=0;
   (window.R||[]).forEach(function(r){
     if(!r||r._deleted||clefClient(r.client,r.phone)!==ancienneClef)return;
@@ -6067,7 +6067,7 @@ function remplirTypeClient(r){
   var fc=(r&&r.factureClient)||{};
   var pro=!!(r&&(/entreprise|association|mairie|collectivit/i.test(String(r.clientType||''))||fc.pro===true));
   var set=function(id,v){var e=document.getElementById(id);if(e)e.value=v||'';};
-  set('clientType',pro?'pro':'');set('societe',(r&&r.societe)||fc.societe||'');set('siret',(r&&r.siret)||fc.siret||'');set('tvaClient',(r&&r.tva)||fc.tvaClient||'');
+  set('clientType',pro?'pro':'');set('societe',(r&&r.societe)||fc.societe||'');set('siret',(r&&r.siret)||fc.siret||'');set('rna',(r&&r.rna)||fc.rna||'');set('tvaClient',(r&&r.tva)||fc.tvaClient||'');
   majTypeClient();
 }
 /* type de client, société, SIRET et TVA : repris par le devis et la facture */
@@ -6076,8 +6076,8 @@ function appliquerTypeClient(o){
   var pro=document.getElementById('clientType').value==='pro';
   var v=function(id){return (document.getElementById(id).value||'').trim();};
   o.clientType=pro?'Entreprise ou association':'';
-  o.societe=pro?v('societe'):'';o.siret=pro?v('siret'):'';o.tva=pro?v('tvaClient'):'';
-  o.factureClient=Object.assign({},o.factureClient||{},{pro:pro,siret:o.siret,tvaClient:o.tva,societe:o.societe});
+  o.societe=pro?v('societe'):'';o.siret=pro?v('siret'):'';o.rna=pro?v('rna').toUpperCase():'';o.tva=pro?v('tvaClient'):'';
+  o.factureClient=Object.assign({},o.factureClient||{},{pro:pro,siret:o.siret,rna:o.rna,tvaClient:o.tva,societe:o.societe});
 }
 function openModal(){
   editMode=false;currentDetailId=null;
@@ -6944,7 +6944,7 @@ function openModalEdit(id) {
   document.getElementById('client').value = r.client||'';
   populateValidatedBy(typeof r.validatedBy==='string'?r.validatedBy:(r.validatedBy?r.validatedBy.firstName:null));
   document.getElementById('phone').value = r.phone||'';
-  try{ var _dl=(window.parent&&window.parent.cache&&window.parent.cache.demandes||[]).find(function(x){return x&&x.resaId&&String(x.resaId)===String(r.id);}); var _src=Object.assign({},_dl&&{clientType:_dl.clientType,societe:_dl.societe,siret:_dl.siret,tva:_dl.tva});['clientType','societe','siret','tva'].forEach(function(k){if(r[k])_src[k]=r[k];});if(r.factureClient)_src.factureClient=r.factureClient;remplirTypeClient(_src); }catch(e){ remplirTypeClient(r); }
+  try{ var _dl=(window.parent&&window.parent.cache&&window.parent.cache.demandes||[]).find(function(x){return x&&x.resaId&&String(x.resaId)===String(r.id);}); var _src=Object.assign({},_dl&&{clientType:_dl.clientType,societe:_dl.societe,siret:_dl.siret,rna:_dl.rna,tva:_dl.tva});['clientType','societe','siret','rna','tva'].forEach(function(k){if(r[k])_src[k]=r[k];});if(r.factureClient)_src.factureClient=r.factureClient;remplirTypeClient(_src); }catch(e){ remplirTypeClient(r); }
   document.getElementById('email').value = r.email||'';
   document.getElementById('dateStart').value = r.dateStart||'';
   document.getElementById('dateEnd').value = r.dateEnd||r.dateStart||'';

@@ -1005,7 +1005,7 @@ function envoiDevisDemande(d, lignes, fact) {
   const aF = fact && fact.adresse && fact.adresse.length ? fact : null;
   if (aF && !String(d.devisAdresse || '').trim()) adr = aF.adresse;      /* adresse de facturation du compte, sauf si Thomas en a saisi une */
   return { ref: d.id, pro: d.devisPro === true || (!!aF && aF.pro && d.devisPro !== false), acompte: d.devisAvecAcompte ? Math.round(total * (Number(d.devisAcomptePct) || 30)) / 100 : 0, acomptePct: Number(d.devisAcomptePct) || 30, cond: d.devisCond || null, dateEvenement: d.date || '', dateFinEvenement: d.dateFin || d.datefin || '',
-    client: { nom: (d.clientType === 'Entreprise ou association' && String(d.societe || '').trim()) || d.nom || 'Client', adresse: adr, tel: d.telephone || '', email: d.email || '', siret: d.devisSiret || (aF && aF.siret) || '', tvaClient: d.devisTva || (aF && aF.tva) || '' }, lignes: l };
+    client: { nom: (d.clientType === 'Entreprise ou association' && String(d.societe || '').trim()) || d.nom || 'Client', adresse: adr, tel: d.telephone || '', email: d.email || '', siret: d.devisSiret || (aF && aF.siret) || '', rna: d.devisRna || (aF && aF.rna) || '', tvaClient: d.devisTva || (aF && aF.tva) || '' }, lignes: l };
 }
 
 async function dossiersDuClient(compte, requete, secret, gestionnaire) {
@@ -1161,12 +1161,12 @@ async function nomActuel(email, requete, secret, gestionnaire) {
 /* adresse de facturation d'un client (facultative) : champ par champ, longueurs bornées */
 function factureCompte(c) {
   const f = (c && c.facturation) || {};
-  return { societe: texte(f.societe, 100), adresse: texte(f.adresse, 160), cp: texte(f.cp, 10), ville: texte(f.ville, 80), siret: texte(f.siret, 20), tva: texte(f.tva, 20) };
+  return { societe: texte(f.societe, 100), adresse: texte(f.adresse, 160), cp: texte(f.cp, 10), ville: texte(f.ville, 80), siret: texte(f.siret, 20), rna: texte(f.rna, 20), tva: texte(f.tva, 20) };
 }
 function adresseFacture(c) {
   const f = factureCompte(c);
   const l = [f.societe, f.adresse, [f.cp, f.ville].filter(Boolean).join(' ')].filter(Boolean);
-  return { adresse: l, siret: f.siret, tva: f.tva, pro: !!f.societe };
+  return { adresse: l, siret: f.siret, rna: f.rna, tva: f.tva, pro: !!f.societe };
 }
 const motsNom = (t) => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
 const memeNom = (a, b) => { const x = motsNom(a).sort().join(' '), y = motsNom(b).sort().join(' '); return !!x && x === y; };
@@ -1545,7 +1545,7 @@ async function espace(request, url, secret, gestionnaire) {
       const cp = nettoie(f.cp, 10);
       if (cp && !/^[0-9A-Za-z -]{3,10}$/.test(cp)) return json({ error: 'Code postal invalide.' }, 400);
       compte.facturation = { societe: nettoie(f.societe, 100), adresse: nettoie(f.adresse, 160), cp, ville: nettoie(f.ville, 80),
-        siret: nettoie(f.siret, 20), tva: nettoie(f.tva, 20) };
+        siret: nettoie(f.siret, 20), rna: nettoie(f.rna, 20), tva: nettoie(f.tva, 20) };
     }
     compte.modifie = new Date().toISOString();
     try { await ecrireCompte(compte); } catch (e) { console.error('Profil non enregistré :', e.message); return json({ error: 'Enregistrement impossible, réessayez.' }, 500); }
@@ -2222,6 +2222,7 @@ const gestionnaire = async (request) => {
           nom: String((url.searchParams.get('societe') || '')).trim().slice(0, 120) || r.client,
           adresse,
           siret: (envoi ? (envoi.client && envoi.client.siret) : url.searchParams.get('siret')) || '',
+          rna: (envoi ? (envoi.client && envoi.client.rna) : url.searchParams.get('rna')) || '',
           tvaClient: (envoi ? (envoi.client && envoi.client.tvaClient) : url.searchParams.get('tvaclient')) || '',
           tel: r.phone || '',
           email: r.email || '',
@@ -3015,7 +3016,7 @@ const gestionnaire = async (request) => {
           materiel: suivi.c_materiel || '',
           categories: d.catsData || '',
           origine: d.origine || d.connu || '',
-          clientType: corrige(suivi, 'clienttype', d.client_type || ''), societe: corrige(suivi, 'societe', d.societe || ''), siret: corrige(suivi, 'siret', d.siret || ''), tva: corrige(suivi, 'tva', d.tva || ''),
+          clientType: corrige(suivi, 'clienttype', d.client_type || ''), societe: corrige(suivi, 'societe', d.societe || ''), siret: corrige(suivi, 'siret', d.siret || ''), rna: corrige(suivi, 'rna', d.rna || ''), tva: corrige(suivi, 'tva', d.tva || ''),
           /* les catégories cochées sur le formulaire court de l'accueil :
              sans panier, c'est la seule indication de matériel */
           interets: d.interets || d.materiel || '',
@@ -3125,13 +3126,13 @@ const gestionnaire = async (request) => {
          jamais se confondre avec les champs de suivi */
       const CORRIGEABLES = ['nom', 'telephone', 'email', 'date', 'convives',
                             'type', 'livraison', 'adresse', 'message', 'materiel',
-                            'datefin', 'source', 'validepar', 'clienttype', 'societe', 'siret', 'tva'];
+                            'datefin', 'source', 'validepar', 'clienttype', 'societe', 'siret', 'rna', 'tva'];
       if (body.corrections && typeof body.corrections === 'object') {
         for (const champ of CORRIGEABLES) {
           const v = body.corrections[champ];
           if (v !== undefined && v !== null) {
             /* un champ vidé est marqué : un envoi vide pourrait être perdu en route et l'ancienne valeur reviendrait */
-            champs['c_' + champ] = (String(v) === '' && ['telephone', 'email', 'message', 'adresse', 'convives', 'type', 'datefin', 'societe', 'siret', 'tva'].includes(champ))
+            champs['c_' + champ] = (String(v) === '' && ['telephone', 'email', 'message', 'adresse', 'convives', 'type', 'datefin', 'societe', 'siret', 'rna', 'tva'].includes(champ))
               ? '__vide__' : String(v).slice(0, 1200);
           }
         }
@@ -3168,7 +3169,7 @@ const gestionnaire = async (request) => {
           }
           for (const [k, v] of Object.entries(precedent)) {
             if (!k.startsWith('c_') || champs[k] !== undefined || v === undefined || v === null) continue;
-            if (v === '' && !['c_telephone', 'c_email', 'c_message', 'c_adresse', 'c_convives', 'c_type', 'c_datefin', 'c_societe', 'c_siret', 'c_tva'].includes(k)) continue;
+            if (v === '' && !['c_telephone', 'c_email', 'c_message', 'c_adresse', 'c_convives', 'c_type', 'c_datefin', 'c_societe', 'c_siret', 'c_rna', 'c_tva'].includes(k)) continue;
             champs[k] = v;
           }
         }
