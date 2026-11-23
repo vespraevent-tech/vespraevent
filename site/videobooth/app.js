@@ -740,7 +740,14 @@ $('b-stop').onclick = arreterRec;
   function versAcces() {
     cfg.session = null; cfg.jeton = ''; ecrireCfg(cfg);
     appelApi('acces', { mdp: '' }).then(function (j) {
-      if (j.ok) { memoriserAcces(j); rendreSessions(j.sessions || []); } else ecranMdpAcces();
+      if (j.ok) {
+        memoriserAcces(j);
+        /* accès libre : la tablette rouvre toute seule sa dernière session (sans mot de passe de session), sauf si on vient de demander à en changer */
+        var der = ''; try { der = localStorage.getItem('vb-derniere') || ''; } catch (x) {}
+        var e = j.libre && der && !sessionStorage.getItem('vb-manuel') ? (j.sessions || []).filter(function (x) { return x.id === der && x.prot === false; })[0] : null;
+        if (e) { connecter(e, '').then(function (r) { if (!r || !r.ok) rendreSessions(j.sessions || []); }).catch(function () { rendreSessions(j.sessions || []); }); return; }
+        rendreSessions(j.sessions || []);
+      } else ecranMdpAcces();
     }).catch(function () { ecranMdpAcces(); });
   }
   function connecter(e, mdp) {
@@ -748,7 +755,7 @@ $('b-stop').onclick = arreterRec;
     return appelApi('session', { acces: a.acces, id: e.id, mdp: mdp }).then(function (j) {
       if (!j.ok) return j;
       var s = { jeton: j.jeton, session: j.session, exp: (Number(j.exp) || (Date.now() + 60 * 86400e3)) - 86400e3 };
-      try { localStorage.setItem('vb-sess', JSON.stringify(s)); } catch (x) {}
+      try { localStorage.setItem('vb-sess', JSON.stringify(s)); localStorage.setItem('vb-derniere', String(e.id)); sessionStorage.removeItem('vb-manuel'); } catch (x) {}
       ouvrirSession(s); return j;
     });
   }
@@ -793,7 +800,7 @@ $('b-stop').onclick = arreterRec;
     }).catch(function () { $('sm-ok').disabled = false; $('sm-err').textContent = 'Pas de réseau : réessayez.'; });
   };
   $('sm-in').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('sm-ok').click(); });
-  $('a-chsess').onclick = function () { if (!confirm('Fermer la session en cours et en choisir une autre ? Les vidéos déjà enregistrées restent sur la tablette.')) return; try { localStorage.removeItem('vb-sess'); } catch (e) {} cfg.session = null; cfg.jeton = ''; appliquerActif(); if (accesStocke()) listerSessions(); else versAcces(); };
+  $('a-chsess').onclick = function () { if (!confirm('Fermer la session en cours et en choisir une autre ? Les vidéos déjà enregistrées restent sur la tablette.')) return; try { localStorage.removeItem('vb-sess'); sessionStorage.setItem('vb-manuel', '1'); } catch (e) {} cfg.session = null; cfg.jeton = ''; appliquerActif(); if (accesStocke()) listerSessions(); else versAcces(); };
   /* tablette allumée toute la journée : rechargement discret (écran d'accueil, personne en train d'enregistrer) au bout de 8 h,
      pour repartir d'une mémoire propre et récupérer les mises à jour de l'appli */
   var debutPage = Date.now();
