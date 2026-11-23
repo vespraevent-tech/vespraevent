@@ -2221,9 +2221,10 @@ const gestionnaire = async (request) => {
           /* une société : son nom figure sur le document, pas celui de la personne qui a rempli le formulaire */
           nom: String((url.searchParams.get('societe') || '')).trim().slice(0, 120) || r.client,
           adresse,
-          siret: (envoi ? (envoi.client && envoi.client.siret) : url.searchParams.get('siret')) || '',
-          rna: (envoi ? (envoi.client && envoi.client.rna) : url.searchParams.get('rna')) || '',
-          tvaClient: (envoi ? (envoi.client && envoi.client.tvaClient) : url.searchParams.get('tvaclient')) || '',
+          /* le numéro RNA / SIRET / TVA : ce que l'écran envoie, sinon ce qui est enregistré sur la réservation elle-même. Dès qu'un RNA existe quelque part sur la réservation, il figure sur le document. */
+          siret: (envoi ? (envoi.client && envoi.client.siret) : url.searchParams.get('siret')) || (r.factureClient && r.factureClient.siret) || r.siret || '',
+          rna: (envoi ? (envoi.client && envoi.client.rna) : url.searchParams.get('rna')) || (r.factureClient && r.factureClient.rna) || r.rna || '',
+          tvaClient: (envoi ? (envoi.client && envoi.client.tvaClient) : url.searchParams.get('tvaclient')) || (r.factureClient && r.factureClient.tvaClient) || r.tva || '',
           tel: r.phone || '',
           email: r.email || '',
         },
