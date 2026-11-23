@@ -778,3 +778,13 @@
   chercher();
   new MutationObserver(chercher).observe(document.documentElement, { childList: true, subtree: true });
 })();
+
+/* Fiches produits : volets Description / Tarifs / Livraison et retrait */
+(function () {
+  function go() {
+    if (!document.querySelector('.prod-info-col') || document.getElementById('fa-js')) return;
+    var s = document.createElement('script'); s.id = 'fa-js'; s.src = '/fiche-accordeons.js?v=1'; s.defer = true;
+    document.head.appendChild(s);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+})();
