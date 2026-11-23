@@ -258,9 +258,18 @@
     arreterCam();
     var garde = !camSuspecte && fluxGarde && fluxGarde.getTracks().length && fluxGarde.getTracks().every(function (t) { return t.readyState === 'live'; }) ? fluxGarde : null;
     if (garde) { fluxGarde = null; clearTimeout(minuteurGarde); } else libererCamera();
-    /* haute définition exigée d'abord (au moins 1280 px) ; si la caméra la refuse, on retombe sur la demande souple */
+    /* haute définition exigée d'abord (au moins 1280 px) ; si la caméra la refuse, demande souple ; si la caméra choisie est introuvable ou inutilisable, retour à la caméra avant par défaut */
     var dur = JSON.parse(JSON.stringify(contraintes)); dur.video = Object.assign({}, dur.video, paysage() ? { width: { min: 1280, ideal: 1920 }, height: { min: 720, ideal: 1440 } } : { width: { min: 720, ideal: 1440 }, height: { min: 1280, ideal: 1920 } });
-    (garde ? Promise.resolve(garde) : navigator.mediaDevices.getUserMedia(dur).catch(function (e) { if (e && (e.name === 'OverconstrainedError' || e.name === 'ConstraintNotSatisfiedError')) return navigator.mediaDevices.getUserMedia(contraintes); throw e; })).then(function (s) {
+    var choisie = '';
+    var viser = function (id) { [contraintes, dur].forEach(function (c) { delete c.video.deviceId; delete c.video.facingMode; if (id) c.video.deviceId = { exact: id }; else c.video.facingMode = 'user'; }); };
+    (garde ? Promise.resolve(garde) : resoudreCam().then(function (id) {
+      choisie = id; viser(id);
+      return navigator.mediaDevices.getUserMedia(dur).catch(function () { return navigator.mediaDevices.getUserMedia(contraintes); }).catch(function (e) {
+        if (!id) throw e;
+        cfg.cam = ''; cfg.camLabel = ''; ecrireCfg(cfg); viser('');
+        return navigator.mediaDevices.getUserMedia(contraintes).catch(function () { return navigator.mediaDevices.getUserMedia({ audio: contraintes.audio, video: true }); });
+      });
+    })).then(function (s) {
       flux = s; $('b-go').hidden = false; montrerPret(); $('fmt').hidden = !(cfg.choixFormat !== false) || testCam; majFormat(); $('cadrage').textContent = cfg.cadrage || ''; $('cadrage').hidden = !cfg.cadrage; $('v-src').srcObject = s; $('v-src').play().catch(function () {}); boucle = requestAnimationFrame(dessiner);
       grandAngle(s);
       camSuspecte = false; camEtat = 'ok'; tFige = Date.now(); brancherMicro(s); $('mic').hidden = false;
@@ -301,11 +310,21 @@
         if (l.length < 2) { b.textContent = 'Une seule caméra avant sur cette tablette'; return; }
         var cur = (flux && flux.getVideoTracks()[0] && flux.getVideoTracks()[0].getSettings().deviceId) || cfg.cam, i = 0;
         l.forEach(function (x, k) { if (x.deviceId === cur) i = k; });
-        cfg.cam = l[(i + 1) % l.length].deviceId; ecrireCfg(cfg); ouvrirCam();
+        memoCam(l[(i + 1) % l.length]); setTimeout(ouvrirCam, 400);
       }).catch(function () {});
     };
   }
   /* GRAND ANGLE : zoom au minimum, et caméra « ultra grand-angle » si la tablette en a une */
+  /* la caméra choisie est retrouvée par son identifiant, sinon par son nom (« camera 2, facing front ») : les identifiants peuvent changer d'un démarrage à l'autre */
+  function resoudreCam() {
+    if (!cfg.cam && !cfg.camLabel) return Promise.resolve('');
+    return navigator.mediaDevices.enumerateDevices().then(function (d) {
+      var v = d.filter(function (x) { return x.kind === 'videoinput'; });
+      var t = v.filter(function (x) { return x.deviceId === cfg.cam; })[0] || (cfg.camLabel ? v.filter(function (x) { return x.label === cfg.camLabel; })[0] : null);
+      return t ? t.deviceId : '';
+    }).catch(function () { return ''; });
+  }
+  function memoCam(x) { cfg.cam = x.deviceId; cfg.camLabel = x.label || ''; ecrireCfg(cfg); }
   var angleEssaye = false;
   function grandAngle(s) {
     try {
@@ -321,7 +340,7 @@
       var cur = (s.getVideoTracks()[0].getSettings() || {}).deviceId;
       var avant = d.filter(function (x) { return x.kind === 'videoinput' && !/back|arri/i.test(x.label || ''); });
       var w = d.filter(function (x) { return x.kind === 'videoinput' && /ultra|wide|large|0\.5/i.test(x.label || ''); })[0] || (avant.length >= 2 ? avant[avant.length - 1] : null);
-      if (w && w.deviceId !== cur) { cfg.cam = w.deviceId; ecrireCfg(cfg); ouvrirCam(); }
+      if (w && w.deviceId !== cur) { memoCam(w); setTimeout(ouvrirCam, 500); }
     }).catch(function () {});
   }
   $('b-go').onclick = function () {
@@ -677,7 +696,7 @@ $('b-stop').onclick = arreterRec;
     edite.nom = $('e-nom').value.trim(); edite.date = $('e-date').value.trim(); edite.titre = $('e-titre').value.trim() || CFG0.titre; edite.sous = $('e-sous').value.trim();
     edite.max = Math.min(120, Math.max(5, Number($('e-max').value) || 30)); edite.cam = $('e-cam').value; edite.noel = $('e-noel').checked; edite.cadrage = $('e-cadrage').value.trim(); edite.format = $('e-format').value; edite.fmtV = 2; edite.mic = $('e-mic').value;
   }
-  function sauverConnexion() { cfg.serveur = $('a-serveur').value.trim(); cfg.cam = $('a-cam').value; cfg.mic = $('a-mic').value; ecrireCfg(cfg); }
+  function sauverConnexion() { cfg.serveur = $('a-serveur').value.trim(); cfg.cam = $('a-cam').value; cfg.camLabel = $('a-cam').selectedOptions && $('a-cam').selectedOptions[0] && $('a-cam').value ? $('a-cam').selectedOptions[0].textContent : ''; cfg.mic = $('a-mic').value; ecrireCfg(cfg); }
   $('a-serveur').onchange = $('a-cam').onchange = $('a-mic').onchange = sauverConnexion;
   /* mise à jour de l'application Android sans la retélécharger : le site garde la dernière version, l'application la récupère elle-même */
   try {
