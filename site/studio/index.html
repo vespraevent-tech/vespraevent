@@ -4038,6 +4038,20 @@ async function loadDemandes(silencieux){
       if(Number(r.livraisonPrice) > 0 && Number(d.livraisonPrix) !== Number(r.livraisonPrice)) d.livraisonPrix = Number(r.livraisonPrice);
       if(Number(r.montage) > 0 && Number(d.montagePrix) !== Number(r.montage)) d.montagePrix = Number(r.montage);
       if(r.livraisonRetour !== undefined && d.livraisonRetour !== !!r.livraisonRetour) d.livraisonRetour = !!r.livraisonRetour;
+      /* client professionnel : la réservation et la demande se complètent l'une l'autre, sans jamais rien effacer */
+      {
+        const pd = proInfosDe(d), pr = proInfosDe(r);
+        if(pd.pro && !pr.pro || (pd.pro && ((pd.societe && !pr.societe) || (pd.siret && !pr.siret) || (pd.rna && !pr.rna) || (pd.tva && !pr.tva)))){
+          const fc = Object.assign({}, r.factureClient || {});
+          if(!RE_PRO_BO.test(String(r.clientType || ''))) r.clientType = 'Entreprise ou association';
+          [['societe','societe'],['siret','siret'],['rna','rna'],['tva','tvaClient']].forEach(([k,fk]) => { if(pd[k] && !pr[k]){ r[k] = pd[k]; fc[fk] = pd[k]; } else if(r[k] && !fc[fk]) fc[fk] = r[k]; });
+          fc.pro = true; r.factureClient = fc; chg = true;
+        }
+        if(pr.pro){
+          if(!RE_PRO_BO.test(String(d.clientType || ''))) d.clientType = 'Entreprise ou association';
+          ['societe','siret','rna','tva'].forEach(k => { if(!d[k] && pr[k]) d[k] = pr[k]; });
+        }
+      }
       if(chg) aMettreAJour.push(r);
     });
     if(aMettreAJour.length) (async () => {
@@ -4076,6 +4090,8 @@ async function loadDemandes(silencieux){
         /* date d'entrée : celle enregistrée à la création, sinon lue dans l'identifiant « r<horodatage> » des réservations saisies à la main */
         recue: r._created || (function(id){ const m = /^r(\d{12,13})$/.exec(String(id || '')); return m ? new Date(Number(m[1])).toISOString() : ''; })(r.id),
         nom: r.client || r.nom || 'Client',
+        clientType: proInfosDe(r).pro ? 'Entreprise ou association' : '',
+        societe: proInfosDe(r).societe, siret: proInfosDe(r).siret, rna: proInfosDe(r).rna, tva: proInfosDe(r).tva,
         email: r.email || '',
         telephone: r.phone || r.telephone || '',
         date: (/^(\d{4})-(\d{2})-(\d{2})$/.exec(r.dateStart || '') ? r.dateStart.split('-').reverse().join('/') : (r.dateStart || '')),
@@ -5440,7 +5456,11 @@ function modifierDemande(id){
     ? (Number(resa.montage) > 0 ? Number(resa.montage) : (d.montagePrix === null || d.montagePrix === undefined || d.montagePrix === '' ? null : 0))
     : ((d.montagePrix === null || d.montagePrix === undefined || d.montagePrix === '') ? null : (Number(d.montagePrix) || 0));
   const iniRetour = resa ? (resa.livraisonRetour !== false) : (d.livraisonRetour !== false);
-  const iniPro = /entreprise|association|mairie|collectivit/i.test(String(d.clientType || ''));
+  /* un client déjà connu (compte créé par une demande précédente) est reconnu : ses numéros se remplissent tout seuls */
+  const fp = ficheClientPro(d.nom, d.telephone) || {};
+  const pro0 = proInfosDe(Object.assign({}, resa || {}, d));
+  const iniPro = RE_PRO_BO.test(String(d.clientType || '')) || pro0.pro || !!fp.pro;
+  const ini_societe = d.societe || pro0.societe || fp.societe || '', ini_siret = d.siret || pro0.siret || fp.siret || '', ini_rna = d.rna || pro0.rna || fp.rna || '', ini_tva = d.tva || pro0.tva || fp.tva || '';
   let sources = ['Instagram','Facebook','Google','Site web','Bouche-à-oreille','Autre'];
   try{ const l = JSON.parse(localStorage.getItem('vespraSrc') || 'null'); if(Array.isArray(l) && l.length) sources = l; }catch(e){}
   const iniSource = (resa && resa.source) ? (resa.source === 'Site internet' ? 'Site web' : resa.source) : (d.source || 'Site web');
@@ -5471,10 +5491,10 @@ function modifierDemande(id){
       saisie('email', 'Email', d.email, 'client@email.com', 'email') +
       champ('clienttype', 'Type de client', '<select id="m-clienttype" onchange="mdPro()"><option value="Particulier"' + (iniPro ? '' : ' selected') + '>Particulier</option><option value="Entreprise ou association"' + (iniPro ? ' selected' : '') + '>Entreprise, association, mairie…</option></select>', true) +
       '<div class="pm-cond" id="m-proWrap"' + (iniPro ? '' : ' style="display:none"') + '>' +
-        saisie('societe', 'Nom de l\u2019entreprise ou de l\u2019association', d.societe, 'Ex : Comité des fêtes de Vitré', 'text', true) +
-        saisie('siret', 'SIRET (entreprise)', d.siret, '123 456 789 00012') +
-        saisie('rna', 'N° RNA (association)', d.rna, 'W123456789') +
-        saisie('tva', 'N° de TVA (facultatif)', d.tva, 'FR00123456789') +
+        saisie('societe', 'Nom de l\u2019entreprise ou de l\u2019association', ini_societe, 'Ex : Comité des fêtes de Vitré', 'text', true) +
+        saisie('siret', 'SIRET (entreprise)', ini_siret, '123 456 789 00012') +
+        saisie('rna', 'N° RNA (association)', ini_rna, 'W123456789') +
+        saisie('tva', 'N° de TVA (facultatif)', ini_tva, 'FR00123456789') +
       '</div>' +
       saisie('date', 'Date de début', iniDebut, '', 'date') +
       saisie('datefin', 'Date de fin', iniFin, '', 'date') +
@@ -6194,6 +6214,7 @@ async function enregistrerDemande(id, bouton){
     catch(err){ d.optsRetirees = retiresAvant; Object.assign(d, avantSuivi); throw err; }
     const avantD = Object.assign({}, d, { optsRetirees: retiresAvant }, avantSuivi);
     Object.assign(d, corrections, {dateFin: corrections.datefin, validePar: corrections.validepar, clientType: corrections.clienttype === 'Particulier' ? '' : corrections.clienttype});
+    majFicheClientPro(d);
 
     /* si la réservation est déjà au planning, elle suit UNIQUEMENT ce que
        vous venez de changer ici : le reste de la réservation n'est pas touché */
@@ -7684,6 +7705,8 @@ async function ajouterAuPlanning(d){
     typeEvenement: d.type || '',
     messageClient: d.message || '',
     place: d.adresse || '',
+    /* client professionnel : type, société, SIRET, RNA, TVA suivent la demande (sinon la réservation arrivait en « particulier ») */
+    ...(function(){ const pd = proInfosDe(d); if(!pd.pro) return {}; return { clientType: 'Entreprise ou association', societe: pd.societe, siret: pd.siret, rna: pd.rna, tva: pd.tva, factureClient: { pro: true, siret: pd.siret, rna: pd.rna, tvaClient: pd.tva, societe: pd.societe } }; })(),
     notes,
     noteSync: true,
     products: produitsDepuisDemande(d, leJour, periode.fin),
@@ -7774,6 +7797,22 @@ async function supprimerDemande(id){
    (planning ou liste), ou dans Paramètres › Base clients. Elle se crée toute seule dès
    qu'une demande arrive ; supprimer la dernière demande ou réservation d'un client
    supprime aussi sa fiche. */
+/* ── clients professionnels : type, société, SIRET, RNA, TVA — lus partout au même endroit ── */
+const RE_PRO_BO = /entreprise|association|mairie|collectivit/i;
+function proInfosDe(x){
+  const fc = (x && x.factureClient) || {};
+  const o = { societe: String((x && x.societe) || fc.societe || '').trim(), siret: String((x && x.siret) || fc.siret || '').trim(), rna: String((x && x.rna) || fc.rna || '').trim(), tva: String((x && x.tva) || fc.tvaClient || '').trim() };
+  o.pro = RE_PRO_BO.test(String((x && x.clientType) || '')) || fc.pro === true || !!(o.societe || o.siret || o.rna || o.tva);
+  return o;
+}
+/* la fiche client déjà connue (par nom + téléphone, sinon par nom) : un client qui revient est reconnu avec ses numéros */
+function ficheClientPro(nom, tel){
+  try{
+    const clef = _cClef(nom, tel);
+    const c = (_clientsBase||[]).find(x => !x._deleted && _cClef(x.fullName, x.phone) === clef) || (_clientsBase||[]).find(x => !x._deleted && _cNorm(x.fullName) === _cNorm(nom));
+    return c ? proInfosDe(c) : null;
+  }catch(e){ return null; }
+}
 let _clientsBase = [];
 const _cNorm = v => String(v||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const _cClef = (n, t) => _cNorm(n) + '|' + String(t||'').replace(/\D/g,'').slice(-9);
@@ -7781,6 +7820,19 @@ function _cMemo(){ try{ localStorage.setItem('vespraClients', JSON.stringify(_cl
 async function clientsLire(){
   try{ const r = await api('/clients'); if(r && Array.isArray(r.clients)) _clientsBase = r.clients; }catch(e){}
   return _clientsBase;
+}
+/* le compte du client retient ses numéros : s'il revient (nouvelle demande, nouvelle réservation), il est reconnu avec son type, sa société, son SIRET, son RNA et sa TVA */
+async function majFicheClientPro(d){
+  try{
+    const pi = proInfosDe(d); if(!pi.pro) return;
+    const clef = _cClef(d.nom, d.telephone);
+    const c = (_clientsBase||[]).find(x => !x._deleted && _cClef(x.fullName, x.phone) === clef) || (_clientsBase||[]).find(x => !x._deleted && _cNorm(x.fullName) === _cNorm(d.nom));
+    if(!c) return;
+    const nv = Object.assign({}, c, { pro: true, _maj: Date.now() });
+    let change = c.pro !== true;
+    ['societe','siret','rna','tva'].forEach(k => { if(pi[k] && String(c[k] || '') !== pi[k]){ nv[k] = pi[k]; change = true; } });
+    if(change) await clientsEcrire([nv]);
+  }catch(e){ console.error('fiche client non mise à jour', e); }
 }
 async function clientsEcrire(liste){
   const r = await api('/clients', {method:'POST', body: JSON.stringify({clients: liste})});

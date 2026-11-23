@@ -6211,6 +6211,14 @@ document.getElementById('saveM').onclick=function(){
     phone:document.getElementById('phone').value.trim(),
     email:document.getElementById('email').value.trim()
   }, !editMode);
+  /* le compte du client retient ses numéros pour la prochaine fois */
+  try{
+    var _rp=_sv, _fc=(_rp&&_rp.factureClient)||{};
+    if(_rp&&(/entreprise|association|mairie|collectivit/i.test(String(_rp.clientType||''))||_fc.pro===true)){
+      var _cls=getClients(), _kk=clefClient(_rp.client,_rp.phone), _ci=_cls.findIndex(function(x){return !x._deleted&&clefClient(x.fullName,x.phone)===_kk;});
+      if(_ci>=0){ var _c=_cls[_ci]; _c.pro=true; ['societe','siret','rna','tva'].forEach(function(k){ var v=String(_rp[k]||'').trim(); if(v)_c[k]=v; }); _c._maj=Date.now(); saveClients(_cls); }
+    }
+  }catch(e){}
   editMode=false;currentDetailId=null;
   closeModal();planning();
   if(!editMode0){ try{ window.parent.postMessage({type:'vespra-resa-creee'},location.origin); }catch(e){} }
