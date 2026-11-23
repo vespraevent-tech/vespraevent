@@ -98,9 +98,28 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
 .pc-c{font-size:11px;color:var(--g2)}
 .pc-n{font-size:13.5px;font-weight:800;text-transform:uppercase;color:var(--navy);line-height:1.25}
 .pc-p{font-size:12.5px;color:var(--g1);margin-top:auto}
-.pc-add{margin-top:8px;height:36px;border-radius:999px;border:1px solid var(--navy);background:#fff;color:var(--navy);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
-.pc-add:hover{background:var(--navy);color:#fff}
-.pc-add.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.pc-bas{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:6px}
+.pc-bas .pc-p{margin:0}
+.fen{position:fixed;inset:0;z-index:50;background:rgba(12,15,20,.42);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;transition:opacity .2s}
+.fen.on{opacity:1}
+.fen-b{position:relative;width:100%;max-width:460px;max-height:88vh;overflow:auto;background:#fff;border-radius:22px;padding:24px;box-shadow:0 24px 70px rgba(12,15,20,.25);transform:translateY(10px);transition:transform .25s}
+.fen.on .fen-b{transform:none}
+.fen-x{position:absolute;top:14px;right:14px;width:30px;height:30px;border:0;border-radius:50%;background:var(--g4);color:var(--g1);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.fen-x svg{width:14px;height:14px}
+.fen-h{display:flex;gap:14px;align-items:center;margin:0 34px 18px 0}
+.fen-h img{width:64px;height:64px;border-radius:12px;object-fit:cover;background:var(--g4)}
+.fen-n{font-size:15px;font-weight:800;text-transform:uppercase;color:var(--navy);line-height:1.25}
+.fen-t{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--g2);margin:16px 0 8px}
+.fen-l{display:flex;flex-direction:column;gap:6px}
+.fen-o{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid rgba(12,15,20,.12);border-radius:12px;font-size:13.5px;cursor:pointer}
+.fen-o:has(input:checked){border-color:var(--navy);background:rgba(43,74,107,.04)}
+.fen-o input{accent-color:var(--navy);margin:0}.fen-o span{flex:1}.fen-o b{font-weight:600;white-space:nowrap;font-size:13px}
+.fen-i{width:100%;font:inherit;font-size:14px;border:1px solid rgba(12,15,20,.14);border-radius:12px;padding:11px 13px;margin-bottom:8px}
+.fen-ok{width:100%;margin-top:18px}
+.pc-add-old{margin-top:8px;height:36px;border-radius:999px;border:1px solid var(--navy);background:#fff;color:var(--navy);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.pc-add{flex:none;height:28px;padding:0 11px;border-radius:999px;border:1px solid rgba(12,15,20,.14);background:#fff;color:var(--navy);font-size:11.5px;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s}
+.pc-add:hover{border-color:var(--navy)}
+.pc-add.ok{background:rgba(21,128,61,.08);border-color:rgba(21,128,61,.35);color:var(--ok)}
 .vars{display:flex;flex-direction:column;gap:6px;margin-top:8px}
 .var{display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid rgba(12,15,20,.12);border-radius:10px;background:#fff;font-size:12px;cursor:pointer;text-align:left}
 .var:hover{border-color:var(--navy)}.var b{white-space:nowrap}
@@ -115,8 +134,17 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
 .merci{text-align:center;padding:40px 10px}
 .merci svg{width:54px;height:54px;color:var(--ok)}
 [hidden]{display:none!important}
+.barre-m{display:none}
+@media(max-width:960px){
+  .barre-m{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:20;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid rgba(12,15,20,.08)}
+  .barre-m small{display:block;font-size:11px;color:var(--g2)}.barre-m b{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:26px;color:var(--navy);line-height:1}
+  .barre-m .btn{height:42px;padding:0 22px}
+  .wrap{padding-bottom:110px}
+  .pc-sub-d{display:none}
+}
+@media(max-width:560px){h1{font-size:34px}.sub{font-size:13.5px;margin-bottom:18px}.top{padding:12px 16px}.logo{font-size:22px}.top small{display:none}.steps{margin-bottom:22px}.cherche{height:40px;font-size:13.5px}.ch{height:30px;font-size:11.5px}}
 @media(max-width:960px){.grid{grid-template-columns:1fr}.rec{position:static}.mois{grid-template-columns:1fr}.mois .m2{display:none}}
-@media(max-width:560px){.prods{grid-template-columns:1fr 1fr;gap:10px}.pc-b{padding:10px}.pc-n{font-size:12px}.pc-add{font-size:10px;height:34px}.modes,.f,.dates{grid-template-columns:1fr}.card{padding:18px}.st{font-size:11.5px}.st span{display:none}.st.on span{display:inline}}
+@media(max-width:560px){.prods{grid-template-columns:1fr 1fr;gap:8px}.pc{border-radius:14px}.pc img{aspect-ratio:4/3}.pc-b{padding:8px 10px 10px;gap:3px}.pc-c{font-size:10px}.pc-n{font-size:11px}.pc-p{font-size:11px}.pc-bas{flex-direction:column;align-items:stretch;gap:6px}.pc-add{height:26px;font-size:11px}.modes,.f,.dates{grid-template-columns:1fr}.card{padding:18px}.st{font-size:11.5px}.st span{display:none}.st.on span{display:inline}}
 </style>
 </head>
 <body>
@@ -127,6 +155,9 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
   <div class="grid">
     <section id="zone"></section>
     <aside class="card rec" id="rec" aria-live="polite"></aside>
+  </div>
+  <div class="barre-m" id="barreM" hidden></div>
+  <div>
   </div>
 </main>
 
@@ -183,13 +214,33 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
       '<button type="button" class="dt'+(S.choix==='fin'?' on':'')+'" data-c="fin"><small>Fin de location</small><b class="'+(S.fin?'':'ph')+'">'+(S.fin?fmt(S.fin,1):'Choisir une date')+'</b></button></div>'+
       '<div class="cal-h"><button type="button" class="nav" data-m="-1" aria-label="Mois précédent"'+(premierMois?' disabled':'')+'>'+ico.gauche+'</button><b></b><button type="button" class="nav" data-m="1" aria-label="Mois suivant">'+ico.droite+'</button></div>'+
       '<div class="mois">'+moisHTML(S.mois,'m1')+moisHTML(m2,'m2')+'</div>'+
-      '<p class="aide">'+(S.deb&&S.fin?'Location de '+nbJours()+' jour'+(nbJours()>1?'s':'')+'.':S.deb?'Choisissez maintenant la date de fin.':'Une date de début et une date de fin sont nécessaires.')+'</p>'+
+      '<p class="aide">'+(S.deb&&S.fin?'Location de '+nbJours()+' jour'+(nbJours()>1?'s':'')+(weekend()?'.':' : en dehors d’un week-end, le tarif est établi sur devis.'):S.deb?'Choisissez maintenant la date de fin.':'Une date de début et une date de fin sont nécessaires.')+'</p>'+
       '<div class="sec-t">Retrait ou livraison</div>'+
-      '<div class="modes"><button type="button" class="mode'+(S.mode==='retrait'?' on':'')+'" data-mode="retrait">'+ico.depot+'<div><b>Retrait au dépôt de Vitré</b><span>Vous venez chercher le matériel, avec une prise en main sur place.</span></div></button>'+
-      '<button type="button" class="mode'+(S.mode==='livraison'?' on':'')+'" data-mode="livraison">'+ico.camion+'<div><b>Livraison et installation</b><span>Sur le lieu de votre événement, dans tout le Grand Ouest. Tarif selon la distance.</span></div></button></div>'+
+      '<div class="modes">'+modesHTML()+'</div>'+
       '<div class="actions"><span></span><button type="button" class="btn" id="suiv1"'+(S.deb&&S.fin&&S.mode?'':' disabled')+'>Choisir mon matériel</button></div>'+
     '</div>';
   }
+  function modesHTML(){
+    var M={retrait:'<button type="button" class="mode'+(S.mode==='retrait'?' on':'')+'" data-mode="retrait">'+ico.depot+'<div><b>Retrait au dépôt de Vitré</b><span>Vous venez chercher le matériel, avec une prise en main sur place.</span></div></button>',
+      livraison:'<button type="button" class="mode'+(S.mode==='livraison'?' on':'')+'" data-mode="livraison">'+ico.camion+'<div><b>Livraison et installation</b><span>Sur le lieu de votre événement, dans tout le Grand Ouest. Tarif selon la distance.</span></div></button>'};
+    /* l'option choisie passe à gauche, l'autre reste proposée à droite */
+    return S.mode==='livraison'?M.livraison+M.retrait:M.retrait+M.livraison;
+  }
+  /* glissement des deux cartes quand elles échangent leur place */
+  function choisirMode(m){
+    var avant={};document.querySelectorAll('.mode').forEach(function(b){avant[b.dataset.mode]=b.getBoundingClientRect().left});
+    S.mode=m;rendre();
+    document.querySelectorAll('.mode').forEach(function(b){var dx=avant[b.dataset.mode]-b.getBoundingClientRect().left;if(!dx)return;
+      b.style.transition='none';b.style.transform='translateX('+dx+'px)';void b.offsetWidth;b.style.transition='transform .45s cubic-bezier(.2,.8,.2,1)';b.style.transform='';});
+  }
+  /* Tarif affiché : seulement pour une location de week-end (du vendredi au lundi au plus).
+     Toute autre période (jeudi-lundi, en semaine, un mois…) est établie sur devis. */
+  function weekend(){
+    if(!S.deb||!S.fin)return true;
+    var a=S.deb.getDay(),b=S.fin.getDay(),n=nbJours();
+    return n<=4&&[5,6,0].indexOf(a)>=0&&[6,0,1].indexOf(b)>=0&&!(a===0&&b!==0&&b!==1);
+  }
+  function prixTxt(n){return weekend()?eur(n):'Sur devis'}
   function clicJour(t){
     var d=new Date(t);
     if(S.choix==='deb'||!S.deb||d<S.deb){S.deb=d;if(S.fin&&S.fin<d)S.fin=null;S.choix='fin';}
@@ -202,28 +253,50 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
   function norm(t){return String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')}
   function etape2(){
     var l=PRODUITS.filter(function(p){return (S.cat==='Tout'||(p.cats||[p.cat]).indexOf(S.cat)>=0)&&(!S.q||norm(p.name+' '+p.cat).indexOf(norm(S.q))>=0)});
-    return '<p class="kick">Étape 2 sur 3</p><h1>VOTRE <em>matériel</em></h1><p class="sub">Du '+fmt(S.deb,1)+' au '+fmt(S.fin,1)+'. Ajoutez ce dont vous avez besoin : le total se met à jour à droite.</p>'+
+    return '<p class="kick">Étape 2 sur 3</p><h1>VOTRE <em>matériel</em></h1><p class="sub">Du '+fmt(S.deb,1)+' au '+fmt(S.fin,1)+'. <span class="pc-sub-d">Ajoutez ce dont vous avez besoin : le total se met à jour à droite.</span></p>'+
     '<input class="cherche" id="q" type="search" placeholder="Rechercher un produit" value="'+esc(S.q)+'">'+
     '<div class="filtres">'+cats().map(function(c){return '<button type="button" class="ch'+(c===S.cat?' on':'')+'" data-cat="'+esc(c)+'">'+esc(c)+'</button>'}).join('')+'</div>'+
     (PRODUITS.length?'<div class="prods">'+l.map(carte).join('')+'</div>':'<p class="aide">Chargement du catalogue…</p>')+
     '<div class="actions"><button type="button" class="lien" data-go="1">← Modifier les dates</button><button type="button" class="btn" id="suiv2"'+(S.panier.length?'':' disabled')+'>Continuer</button></div>';
   }
   function carte(p){
-    var dans=S.panier.some(function(x){return x.pid===p.id});
-    var vars=(p.variants||[]).length>1&&S.ouvert===p.id;
+    var n=S.panier.filter(function(x){return x.pid===p.id}).reduce(function(a,x){return a+x.qty},0);
     return '<div class="pc"><img src="/'+esc(p.img)+'" alt="" loading="lazy"><div class="pc-b"><div class="pc-c">'+esc(p.cat)+'</div><div class="pc-n">'+esc(p.name)+'</div>'+
-      '<div class="pc-p">'+(p.devis?'Sur devis':((p.variants||[]).length>1?'À partir de ':'')+eur(p.price))+'</div>'+
-      (vars?'<div class="vars">'+p.variants.map(function(v,i){return '<button type="button" class="var" data-add="'+esc(p.id)+'" data-v="'+i+'"><span>'+esc(v.label)+'</span><b>'+eur(v.price)+'</b></button>'}).join('')+'</div>'
-        :'<button type="button" class="pc-add'+(dans?' ok':'')+'" data-add="'+esc(p.id)+'">'+(dans?'Ajouté ✓':'Ajouter')+'</button>')+
+      '<div class="pc-bas"><div class="pc-p">'+(p.devis||!weekend()?'Sur devis':((p.variants||[]).length>1?'Dès ':'')+eur(p.price))+'</div>'+
+      '<button type="button" class="pc-add'+(n?' ok':'')+'" data-add="'+esc(p.id)+'" aria-label="Ajouter '+esc(p.name)+'">'+(n?'✓ '+n:'+ Ajouter')+'</button></div>'+
     '</div></div>';
   }
   function ajouter(id,v){
     var p=PRODUITS.find(function(x){return x.id===id});if(!p)return;
-    if((p.variants||[]).length>1&&v==null){S.ouvert=id;rendre();return}
-    var va=v!=null?p.variants[v]:null,cle=id+(v!=null?'_'+v:'');
+    /* produit à personnaliser (formule, options, texte) : petite fenêtre de choix */
+    if(v==null&&((p.variants||[]).length>1||(p.options||[]).length||(p.perso||[]).length)){fenetre(p);return}
+    var va=v!=null&&v>=0&&p.variants?p.variants[v]:null;
+    var opts=(arguments[2]||[]),txt=(arguments[3]||'');
+    var cle=id+(va?'_'+v:'')+(opts.length?'_'+opts.map(function(o){return o.id}).join('-'):'')+(txt?'_'+txt:'');
+    var prix=(va?va.price:(p.devis?0:p.price))+opts.reduce(function(a,o){return a+(Number(o.price)||0)},0);
+    var label=[va?va.label:''].concat(opts.map(function(o){return o.label})).concat(txt?['« '+txt+' »']:[]).filter(Boolean).join(' · ');
     var ex=S.panier.find(function(x){return x.cle===cle});
-    if(ex)ex.qty++;else S.panier.push({cle:cle,pid:id,nom:p.name,label:va?va.label:'',price:va?va.price:(p.devis?0:p.price),devis:!!p.devis,qty:1,img:p.img});
-    S.ouvert=null;rendre();
+    if(ex)ex.qty++;else S.panier.push({cle:cle,pid:id,nom:p.name,label:label,price:prix,devis:!!p.devis,qty:1,img:p.img});
+    rendre();
+  }
+
+  function fenetre(p){
+    var f=document.createElement('div');f.className='fen';f.setAttribute('role','dialog');f.setAttribute('aria-modal','true');
+    var vs=(p.variants||[]),os=(p.options||[]),ps=(p.perso||[]);
+    f.innerHTML='<div class="fen-b"><button type="button" class="fen-x" aria-label="Fermer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'+
+      '<div class="fen-h"><img src="/'+esc(p.img)+'" alt=""><div><div class="pc-c">'+esc(p.cat)+'</div><div class="fen-n">'+esc(p.name)+'</div></div></div>'+
+      (vs.length>1?'<div class="fen-t">'+esc(p.varTitre||'Formule')+'</div><div class="fen-l">'+vs.map(function(v,i){return '<label class="fen-o"><input type="radio" name="fv" value="'+i+'"'+(i===(p.vdef||0)?' checked':'')+'><span>'+esc(v.label)+'</span><b>'+prixTxt(v.price)+'</b></label>'}).join('')+'</div>':'')+
+      (os.length?'<div class="fen-t">'+esc(p.optTitre||'Options')+'</div><div class="fen-l">'+os.map(function(o,i){return '<label class="fen-o"><input type="checkbox" value="'+i+'"><span>'+esc(o.label)+'</span><b>'+(o.price?(weekend()?'+ '+eur(o.price):'Sur devis'):'Sur devis')+'</b></label>'}).join('')+'</div>':'')+
+      (ps.length?'<div class="fen-t">Personnalisation</div>'+ps.map(function(x){return '<input class="fen-i" data-p="'+esc(x.id)+'" maxlength="'+(x.max||60)+'" placeholder="'+esc(x.label)+(x.ph?' — '+esc(x.ph):'')+'">'}).join(''):'')+
+      '<button type="button" class="btn fen-ok">Ajouter au devis</button></div>';
+    document.body.appendChild(f);requestAnimationFrame(function(){f.classList.add('on')});
+    function fermer(){f.classList.remove('on');setTimeout(function(){f.remove()},200)}
+    f.addEventListener('click',function(e){if(e.target===f||e.target.closest('.fen-x'))fermer()});
+    f.querySelector('.fen-ok').addEventListener('click',function(){
+      var r=f.querySelector('input[name=fv]:checked'),opts=[].map.call(f.querySelectorAll('.fen-l input[type=checkbox]:checked'),function(c){return os[+c.value]});
+      var txt=[].map.call(f.querySelectorAll('.fen-i'),function(i){return i.value.trim()}).filter(Boolean).join(' / ');
+      fermer();ajouter(p.id,r?+r.value:(vs.length?0:-1),opts,txt);
+    });
   }
 
   /* ── étape 3 : coordonnées ── */
@@ -247,16 +320,17 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
   function recap(){
     var tot=0,devis=false;
     var items=S.panier.map(function(x,i){tot+=x.price*x.qty;if(x.devis)devis=true;
-      return '<li class="it"><span>'+esc(x.nom)+'</span><span class="px">'+(x.devis?'Sur devis':eur(x.price*x.qty))+'</span>'+(x.label?'<small>'+esc(x.label)+'</small>':'')+
+      return '<li class="it"><span>'+esc(x.nom)+'</span><span class="px">'+(x.devis?'Sur devis':prixTxt(x.price*x.qty))+'</span>'+(x.label?'<small>'+esc(x.label)+'</small>':'')+
       '<span class="qte"><button type="button" data-q="'+i+'" data-d="-1" aria-label="Retirer un">−</button><span>'+x.qty+'</span><button type="button" data-q="'+i+'" data-d="1" aria-label="Ajouter un">+</button></span></li>'}).join('');
     $('#rec').innerHTML='<h3>VOTRE RÉSERVATION</h3>'+
       '<div class="rl"><span>Début</span><b>'+(S.deb?fmt(S.deb):'—')+'</b></div>'+
       '<div class="rl"><span>Fin</span><b>'+(S.fin?fmt(S.fin):'—')+'</b></div>'+
       '<div class="rl"><span>Mode</span><b>'+(S.mode==='retrait'?'Retrait à Vitré':S.mode==='livraison'?'Livraison et installation':'—')+'</b></div>'+
       (S.panier.length?'<ul class="items">'+items+'</ul>':'<p class="vide-r">Aucun produit pour l’instant.</p>')+
-      '<div class="tot"><span>Total estimé</span><b>'+eur(tot)+'</b></div>'+
+      (weekend()?'<div class="tot"><span>Total estimé</span><b>'+eur(tot)+'</b></div>':'<div class="tot"><span>Total</span><b style="font-size:26px">Sur devis</b></div><p class="aide">Location hors week-end : le tarif dépend de la durée et du matériel, nous vous l’envoyons sous 24 h.</p>')+
       (devis||S.mode==='livraison'?'<p class="aide">'+(S.mode==='livraison'?'+ livraison selon la distance':'')+(devis?(S.mode==='livraison'?' · ':'')+'+ éléments sur devis':'')+'</p>':'');
   }
+  $('#barreM').addEventListener('click',function(e){if(e.target.closest('[data-suiv]'))aller(3)});
   $('#rec').addEventListener('click',function(e){var b=e.target.closest('[data-q]');if(!b)return;var x=S.panier[+b.dataset.q];x.qty+=+b.dataset.d;if(x.qty<1)S.panier.splice(+b.dataset.q,1);rendre()});
 
   /* ── rendu ── */
@@ -265,13 +339,18 @@ h1 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--gold);tex
     var z=$('#zone');
     z.innerHTML=S.etape===1?etape1():S.etape===2?etape2():S.etape===3?etape3():merci();
     recap();
+    /* téléphone : total et bouton « Continuer » toujours visibles en bas de l'écran */
+    var bm=$('#barreM');
+    if(S.etape===2){var tot=S.panier.reduce(function(a,x){return a+x.price*x.qty},0),n=S.panier.reduce(function(a,x){return a+x.qty},0);
+      bm.innerHTML='<div><small>'+n+' produit'+(n>1?'s':'')+'</small><b>'+(weekend()?eur(tot):'Sur devis')+'</b></div><button type="button" class="btn" data-suiv'+(n?'':' disabled')+'>Continuer</button>';bm.hidden=false;}
+    else bm.hidden=true;
   }
   $('#zone').addEventListener('click',function(e){
     var t=e.target.closest('button');if(!t)return;
     if(t.dataset.t){clicJour(+t.dataset.t);return}
     if(t.dataset.c){S.choix=t.dataset.c;rendre();return}
     if(t.dataset.m){S.mois=new Date(S.mois.getFullYear(),S.mois.getMonth()+(+t.dataset.m),1);rendre();return}
-    if(t.dataset.mode){S.mode=t.dataset.mode;rendre();return}
+    if(t.dataset.mode){choisirMode(t.dataset.mode);return}
     if(t.id==='suiv1'){aller(2);return}
     if(t.id==='suiv2'){aller(3);return}
     if(t.dataset.go){aller(+t.dataset.go);return}
