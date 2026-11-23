@@ -42,6 +42,7 @@ import { createHmac, timingSafeEqual, createHash, randomUUID, randomBytes, rando
 import { getStore, stockageActif, stats as stockStats } from './_stockage.mjs';
 import { evenementLire as pbLire, evenementEcrire as pbEcrire, evenementsLister as pbLister, evenementSupprimer as pbSupprimer, imageAjouter as pbImageAjouter, imageLire as pbImageLire, FORMATS as PB_FORMATS, vuLire as pbVuLire, compteurs as pbCompteurs, prisesLister as pbPrises, photoLire as pbPhoto, priseSupprimer as pbPriseSuppr } from './_photobooth.mjs';
 import { jetonGalerie as pbJetonGalerie } from './photobooth.mjs';
+import { binLire, binSupprimer, r2Actif, r2Put, r2Get, r2Delete } from './_r2.mjs';
 import { lireMetas as vbLireMetas, videoStore, envoyerMail as vbEnvoyerMail, jetonEvt as vbJetonEvt, galLire as vbGalLire, galEcrire as vbGalEcrire, genMdp as vbGenMdp, accesLire as vbAccesLire, accesEcrire as vbAccesEcrire, sessionsLire as vbSessionsLire, sessionsEcrire as vbSessionsEcrire } from './videobooth.mjs';
 import * as secu from './_sauvegarde.mjs';
 /* Fabrication du PDF de facture : écrite à la main, sans dépendance,
@@ -2377,6 +2378,19 @@ const gestionnaire = async (request) => {
     return json({ url: `${site}/api/videobooth/evenement?e=${encodeURIComponent(e)}&t=${vbJetonEvt(e)}`, mdp: g ? g.mdp : '' });
   }
   /* ── Photobooth : événements, mises en page, images ── */
+  /* contrôle du stockage Cloudflare R2 : écrit, relit et supprime un petit fichier d'essai */
+  if (path === '/stockage/r2' && request.method === 'GET') {
+    if (!r2Actif()) return json({ actif: false, message: 'Cloudflare R2 n’est pas configuré : les photos et vidéos restent dans Netlify.' });
+    try {
+      const cle = 'essai/' + Date.now(), contenu = new TextEncoder().encode('vespra-' + cle);
+      await r2Put(cle, contenu);
+      const relu = await r2Get(cle); await r2Delete(cle);
+      const ok = relu && new TextDecoder().decode(relu) === 'vespra-' + cle;
+      return json({ actif: true, ok: !!ok, message: ok ? 'Cloudflare R2 fonctionne : les nouvelles photos et vidéos y sont enregistrées.' : 'Cloudflare R2 répond, mais la relecture a échoué.' });
+    } catch (e) {
+      return json({ actif: true, ok: false, message: 'Cloudflare R2 est configuré mais refuse la connexion : ' + String(e.message || e).slice(0, 160) });
+    }
+  }
   if (path === '/photobooth' && request.method === 'GET') {
     const l = await pbLister();
     const cs = await Promise.all(l.map((e) => pbCompteurs(e.id).catch(() => ({ photos: 0, imprimees: 0, scans: 0 }))));
@@ -2468,7 +2482,7 @@ const gestionnaire = async (request) => {
       if (path === '/videobooth/video' && request.method === 'GET') {
         const id = String(url.searchParams.get('id') || '').replace(/[^A-Za-z0-9_-]/g, '');
         const m = await st.get('meta/' + id, { type: 'json' }).catch(() => null);
-        const buf = m && await st.get('video/' + id, { type: 'arrayBuffer' }).catch(() => null);
+        const buf = m && await binLire(st, 'video/' + id);
         if (!buf) return json({ error: 'Vidéo introuvable ou expirée' }, 404);
         return new Response(buf, { headers: { 'Content-Type': m.type || 'video/mp4', 'Content-Disposition': `attachment; filename="${String(m.fichier).replace(/"/g, '')}"`, 'Cache-Control': 'private, no-store' } });
       }
@@ -2488,7 +2502,7 @@ const gestionnaire = async (request) => {
         if (adresseDonnee) m.email = String(body.email).trim();
         /* une vidéo peut n'avoir aucune adresse (l'invité n'a pris que le QR code) : il faut alors en saisir une */
         if (!m.email && !(m.autres || []).length) return json({ error: 'Aucune adresse e-mail pour cette vidéo : saisissez-en une.' }, 400);
-        const buf = await st.get('video/' + id, { type: 'arrayBuffer' }).catch(() => null);
+        const buf = await binLire(st, 'video/' + id);
         if (!buf) return json({ error: 'Fichier vidéo expiré' }, 410);
         const site = (process.env.URL || 'https://www.vespraevent.fr').replace(/\/$/, '');
         let ok = true, erreur = '';
@@ -2517,12 +2531,12 @@ const gestionnaire = async (request) => {
         const jusque = /^\d{4}-\d{2}-\d{2}$/.test(String(url.searchParams.get('jusqua') || '')) ? String(url.searchParams.get('jusqua')) : '';
         const jourParis = (iso) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date(iso));
         const cibles = await vbLireMetas(st, (m) => (m.event || SANS) === ev && (!jusque || jourParis(m.cree) <= jusque));
-        for (const m of cibles) { await st.delete('video/' + m.id).catch(() => {}); await st.delete('meta/' + m.id).catch(() => {}); }
+        for (const m of cibles) { await binSupprimer(st, 'video/' + m.id); await st.delete('meta/' + m.id).catch(() => {}); }
         return json({ ok: true, supprimees: cibles.length });
       }
       if (request.method === 'DELETE') {
         const id = String(url.searchParams.get('id') || '').replace(/[^A-Za-z0-9_-]/g, '');
-        await st.delete('video/' + id).catch(() => {}); await st.delete('meta/' + id).catch(() => {});
+        await binSupprimer(st, 'video/' + id); await st.delete('meta/' + id).catch(() => {});
         return json({ ok: true });
       }
     } catch (e) { return json({ error: e.message }, 500); }

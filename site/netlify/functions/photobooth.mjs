@@ -16,6 +16,7 @@
      GET  /api/photobooth/f/<prise>/<nom>    une photo, si le navigateur y a droit
    ════════════════════════════════════════════════════ */
 import { createHmac, createHash, randomBytes, timingSafeEqual } from 'node:crypto';
+import { binEcrire } from './_r2.mjs';
 import { pbStore, vuEcrire, evenementEcrire, evenementLire, evenementsLister, imageLire, priseOk, priseEvenement, priseLire, priseEcrire, prisesLister, photoLire, compteurs, NOMS_FICHIERS } from './_photobooth.mjs';
 import { accesLire } from './videobooth.mjs';
 
@@ -183,7 +184,7 @@ async function traiter(request) {
     const morceaux = [];
     for (let k = 0; k < n; k++) { const b = await st.get(`pchunk/${prise}/${nom}/${k}`, { type: 'arrayBuffer' }).catch(() => null); if (!b) return rep({ ok: false, erreur: 'Morceau manquant : ' + k, manquant: k }, 409); morceaux.push(new Uint8Array(b)); }
     const total = morceaux.reduce((t, p) => t + p.length, 0), tout = new Uint8Array(total); let o = 0; for (const p of morceaux) { tout.set(p, o); o += p.length; }
-    await st.set(`photo/${evt}/${prise}/${nom}`, tout.buffer);
+    await binEcrire(st, `photo/${evt}/${prise}/${nom}`, tout.buffer);
     for (let k = 0; k < n; k++) await st.delete(`pchunk/${prise}/${nom}/${k}`).catch(() => {});
     m = (await priseLire(evt, prise)) || { id: prise, evt, cree: new Date().toISOString(), fichiers: {}, imprimees: 0 };
     const rk = String(q.get('rk') || '').replace(/[^a-f0-9]/g, '').slice(0, 48); if (rk.length >= 24 && !m.rk) m.rk = rk;

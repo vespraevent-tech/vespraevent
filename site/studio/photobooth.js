@@ -122,6 +122,7 @@
       '.pbx-liste{display:none;position:absolute;top:38px;min-width:190px;padding:6px;background:#fff;border:1px solid var(--l);border-radius:14px;box-shadow:0 18px 40px rgba(12,15,20,.18)}.pbx-mn.g .pbx-liste{left:0}.pbx-mn.d .pbx-liste{right:0}.pbx-mn.ouvert .pbx-liste{display:block}',
       '.pbx-liste button{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:0;border-radius:9px;background:none;font:500 13px Inter,sans-serif;color:#3D4452;cursor:pointer;text-align:left}.pbx-liste button svg{width:16px;height:16px;flex:none;color:#8a94a3}',
       '.pbx-liste button:hover:not(:disabled){background:#F0F2F5;color:var(--t)}.pbx-liste button:disabled{opacity:.38;cursor:default}.pbx-liste button.d,.pbx-liste button.d svg{color:#B91C1C}.pbx-liste button.d:hover{background:#FEF2F2}',
+      '.pbx-stock{display:inline-flex;align-items:center;gap:8px;margin:0 0 6px;padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:600;background:#F0F2F5;color:#646D7C}.pbx-stock::before{content:"";width:8px;height:8px;border-radius:50%;background:#8a94a3}.pbx-stock.ok{background:#E8F5EC;color:#15803D}.pbx-stock.ok::before{background:#34D27B}.pbx-stock.ko{background:#FEF2F2;color:#B91C1C}.pbx-stock.ko::before{background:#EF4444}',
       '@media(max-width:1000px){.pbx-haut{grid-template-columns:1fr}}',
       '@media(max-width:860px){.pbx-corps{grid-template-columns:1fr}.pbx-nav{position:static;display:flex;gap:4px;overflow-x:auto;padding:8px}.pbx-nav .g{display:none}.pbx-nav button{white-space:nowrap;width:auto;padding:9px 12px}.pbx-nav button.on::before{display:none}.pbx-act{margin-left:0;width:100%}.pbx-b{flex:1;justify-content:center}.pbx-date{display:none}}'
     ].join('');
@@ -154,6 +155,16 @@
       + '<div class="pb-titre-g">En cours</div>' + (enCours.length ? '<div class="pb-grille">' + enCours.map(carte).join('') + '</div>' : '<div class="pb-vide">Aucun événement en cours aujourd’hui.</div>')
       + '<div class="pb-titre-g">Événements passés</div>' + (passes.length ? '<div class="pb-grille">' + passes.map(carte).join('') + '</div>' : '<div class="pb-vide">Aucun événement passé.</div>');
     if (PB.nouveau) { setTimeout(function () { var n = $('pbn-q'); if (n) n.focus(); }, 50); pbFiltrer(); }
+    pbStockage();
+  }
+  /* état du stockage des photos et vidéos (Cloudflare R2 ou Netlify) */
+  async function pbStockage() {
+    var z = $('pbZone'); if (!z || PB.evt) return;
+    try {
+      var r = await api('/stockage/r2'), d = document.getElementById('pbStock');
+      if (!d) { d = document.createElement('div'); d.id = 'pbStock'; var t = z.querySelector('.pb-tete'); if (t) t.insertAdjacentElement('afterend', d); else return; }
+      d.className = 'pbx-stock ' + (r.actif ? (r.ok ? 'ok' : 'ko') : 'off'); d.textContent = r.message;
+    } catch (e) {}
   }
   /* liste des clientes du planning, pour pré-remplir un nouvel événement */
   async function chargerClientes() {

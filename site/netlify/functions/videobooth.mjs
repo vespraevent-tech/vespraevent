@@ -14,6 +14,7 @@
    ════════════════════════════════════════════════════ */
 import { createHmac, createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { getStore } from './_blobs.mjs';
+import { binEcrire, binLire, binSupprimer } from './_r2.mjs';
 import { htmlVideo } from './_mails-auto.mjs';
 
 export const config = { path: '/api/videobooth/*' };
@@ -66,7 +67,7 @@ async function nettoyer(st) {
     if (dern && Date.now() - Date.parse(dern.date) < 6 * 3600e3) return;
     await st.setJSON('etat/nettoyage', { date: new Date().toISOString() });
     const vieilles = await lireMetas(st, perimee);
-    for (const m of vieilles) { await st.delete('video/' + m.id).catch(() => {}); await st.delete('meta/' + m.id).catch(() => {}); }
+    for (const m of vieilles) { await binSupprimer(st, 'video/' + m.id); await st.delete('meta/' + m.id).catch(() => {}); }
   } catch (e) { console.error('Videobooth : nettoyage impossible', e.message); }
 }
 
@@ -319,7 +320,7 @@ async function traiter(request) {
     const site = (process.env.URL || `${url.protocol}//${url.host}`).replace(/\/$/, '');
     let envoyes = 0, stop = false;
     for (const { m, a } of taches.slice(0, 25)) {
-      const buf = await st.get('video/' + m.id, { type: 'arrayBuffer' }).catch(() => null);
+      const buf = await binLire(st, 'video/' + m.id);
       const maintenant = new Date().toISOString();
       if (a) { a.essais = (Number(a.essais) || 0) + 1; a.essaiLe = maintenant; } else { m.mailEssais = (Number(m.mailEssais) || 0) + 1; m.mailEssaiLe = maintenant; }
       if (!buf) { if (a) a.mailErreur = 'Fichier vidéo expiré'; else m.mailErreur = 'Fichier vidéo expiré'; await st.setJSON('meta/' + m.id, m); continue; }
@@ -427,7 +428,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
       return new Response(null, { status: 303, headers: { Location: url.pathname + url.search, 'Set-Cookie': ck, 'Cache-Control': 'private, no-store' } });
     }
     if (request.method !== 'GET') return new Response('Méthode non autorisée', { status: 405 });
-    const buf = await st.get('video/' + id, { type: 'arrayBuffer' }).catch(() => null);
+    const buf = await binLire(st, 'video/' + id);
     if (!buf) return new Response('Vidéo introuvable', { status: 404 });
     const lecture = url.searchParams.get('lecture') === '1', dl = url.searchParams.get('dl') === '1';
     /* lien de l'e-mail sans option : une page avec le lecteur et le bouton de téléchargement */
@@ -504,7 +505,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
     { const rk = String(q.get('rk') || '').replace(/[^A-Za-z0-9]/g, '').slice(0, 40); if (rk.length >= 12) m.rk = rk; }
     /* durée de conservation propre à la session de cette vidéo */
     try { const ses = (await sessionsLire(st)).find((e) => labelSession(e) === m.event); if (ses) m.garde = ses.conserv || 0; } catch {}
-    await st.set('video/' + id, tout.buffer);
+    await binEcrire(st, 'video/' + id, tout.buffer);
     for (let k = 0; k < n; k++) await st.delete(`chunk/${id}/${k}`).catch(() => {});
     /* la fiche est écrite AVANT l'e-mail : si l'envoi est interrompu, la vidéo reste visible dans le back-office */
     m.mail = m.email ? 'attente' : 'aucun'; m.mailErreur = '';

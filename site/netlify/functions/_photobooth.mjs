@@ -8,6 +8,7 @@
    ════════════════════════════════════════════════════ */
 import { randomBytes } from 'node:crypto';
 import { getStore } from './_blobs.mjs';
+import { binLire, binSupprimer, r2Actif, r2SupprimerPrefixe } from './_r2.mjs';
 
 /* lectures « fortes » : un enregistrement fait dans le back-office est lu tel quel, tout de suite, par les bornes (sans le délai de propagation d'environ une minute des lectures habituelles).
    Si l'environnement ne permet pas la lecture forte, on retombe sur la lecture habituelle. */
@@ -161,6 +162,7 @@ export async function evenementSupprimer(id) {
     const { blobs } = await st.list({ prefix: pre });
     for (const b of blobs) await st.delete(b.key).catch(() => {});
   }
+  if (r2Actif()) await r2SupprimerPrefixe('photo/' + id + '/').catch((e) => console.error('R2 :', e.message));
   await st.delete('evt/' + id);
   return true;
 }
@@ -212,12 +214,12 @@ export async function prisesLister(evt) {
 }
 export async function photoLire(evt, prise, nom) {
   if (!idOk(evt, 'pb') || !priseOk(prise) || !NOMS_FICHIERS.includes(nom)) return null;
-  return pbStore().get('photo/' + evt + '/' + prise + '/' + nom, { type: 'arrayBuffer' }).catch(() => null);
+  return binLire(pbStore(), 'photo/' + evt + '/' + prise + '/' + nom);
 }
 export async function priseSupprimer(evt, prise) {
   if (!idOk(evt, 'pb') || !priseOk(prise)) return false;
   const st = pbStore();
-  for (const n of NOMS_FICHIERS) await st.delete('photo/' + evt + '/' + prise + '/' + n).catch(() => {});
+  for (const n of NOMS_FICHIERS) await binSupprimer(st, 'photo/' + evt + '/' + prise + '/' + n);
   await st.delete('prise/' + evt + '/' + prise).catch(() => {});
   await st.delete('priseevt/' + prise).catch(() => {});
   return true;

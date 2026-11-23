@@ -249,7 +249,7 @@
   function ouvrirCam() {
     montrer('s-cam'); $('s-cam').classList.remove('flou'); $('cam-err').hidden = true; $('compte').hidden = true; $('rec').hidden = true; $('barre').hidden = true;
     $('b-go').hidden = true; $('b-stop').hidden = true; $('fmt').hidden = true; enregistrement = false;
-    var contraintes = { audio: Object.assign({ echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1, sampleRate: 48000 }, cfg.mic ? { deviceId: { exact: cfg.mic } } : {}), video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, { width: { ideal: 1920 }, height: { ideal: 1080 } }) };
+    var contraintes = { audio: Object.assign({ echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1, sampleRate: 48000 }, cfg.mic ? { deviceId: { exact: cfg.mic } } : {}), video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, { width: { ideal: 1920 }, height: { ideal: 1440 }, aspectRatio: { ideal: 4 / 3 } }) };   /* 4:3 : tout le capteur, donc le champ de vision le plus large */
     arreterCam();
     var garde = !camSuspecte && fluxGarde && fluxGarde.getTracks().length && fluxGarde.getTracks().every(function (t) { return t.readyState === 'live'; }) ? fluxGarde : null;
     if (garde) { fluxGarde = null; clearTimeout(minuteurGarde); } else libererCamera();
@@ -287,7 +287,8 @@
   function grandAngle(s) {
     try {
       var tr = s.getVideoTracks()[0], caps = tr && tr.getCapabilities ? tr.getCapabilities() : {};
-      if (caps.zoom && typeof caps.zoom.min === 'number') tr.applyConstraints({ advanced: [{ zoom: caps.zoom.min }] }).catch(function () {});
+      var larg = function () { try { var c2 = tr.getCapabilities ? tr.getCapabilities() : {}; if (c2.zoom && typeof c2.zoom.min === 'number') tr.applyConstraints({ zoom: c2.zoom.min }).catch(function () { tr.applyConstraints({ advanced: [{ zoom: c2.zoom.min }] }).catch(function () {}); }); } catch (e) {} };
+      larg(); setTimeout(larg, 600); setTimeout(larg, 2000);   /* certaines tablettes n'acceptent le zoom qu'une fois la caméra lancée */
     } catch (e) {}
     if (angleEssaye || cfg.cam || !navigator.mediaDevices.enumerateDevices) return;
     angleEssaye = true;
