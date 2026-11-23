@@ -344,8 +344,8 @@ res(){
  const rows=ids.map(id=>it(id));
  const on=rows.filter(r=>!S.off[r.id]);
  const sum=on.reduce((a,r)=>a+r.price,0);
- const rem=0;
- const nud=false?`<div class="nudge">Plus qu'un produit et la remise mariage de 10 % s'applique automatiquement (soit environ ${eur(Math.round(sum*.1))} sur votre sélection).</div>`:'';
+ const PKA=(window.vespraPackActif?window.vespraPackActif():true);const rem=(PKA&&S.type==='mariage'&&on.length>=5)?Math.round(sum*0.1):0;
+ const nud=(window.vespraPackActif?window.vespraPackActif():true)&&S.type==='mariage'&&on.length===4?`<div class="nudge">Plus qu'un produit et la remise mariage de 10 % s'applique automatiquement (soit environ ${eur(Math.round(sum*.1))} sur votre sélection).</div>`:'';
  const row=r=>`<div class="res-item ${S.off[r.id]?'off':''}"><img src="${IM[r.img]}" alt=""><span class="m"><b><a href="${PAGE[r.id]}.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">${r.n}</a></b><small>${r.v?r.v+'. ':''}${(r.v&&P[r.id].opt?'':(P[r.id].hook||'').slice(0,90)+((P[r.id].hook||'').length>90?'…':''))}</small></span><span class="p">${r.dès?'dès ':''}${eur(r.price)}</span>${P[r.id].opt?`<button class="x" title="Modifier" onclick="openSheet('${r.id}')" style="font-size:12px">✎</button>`:''}<button class="x" title="${S.off[r.id]?'Remettre':'Retirer'}" onclick="tg('${r.id}')">${S.off[r.id]?'+':'×'}</button></div>`;
  const ab=rows.filter(r=>r.id===S.abri),rest=rows.filter(r=>r.id!==S.abri);
  const sug=suggest(ids);

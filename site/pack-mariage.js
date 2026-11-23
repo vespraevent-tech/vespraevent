@@ -8,8 +8,8 @@
 (function(){
   'use strict';
   var SEUIL = 5, TAUX = 0.10;
-  /* Offre désactivée (positionnement premium). Remettre true pour la réactiver. */
-  var ACTIF = false;
+  /* Offre activée ou non depuis le back-office (Personnalisation › Offres), lue dans theme.js */
+  function offreActive() { return window.vespraPackActif ? window.vespraPackActif() : true; }
 
   function lire(){ try { return JSON.parse(localStorage.getItem('vespra_cart') || '[]'); } catch(e){ return []; } }
   /* « p4_1712345 » et « p4 » sont le même produit (formules, options, texte personnalisé) */
@@ -17,7 +17,7 @@
 
   function info(cart){
     cart = cart || lire();
-    if (!ACTIF) { var t = 0, k = 0; cart.forEach(function(it){ var q = (it && it.qty) || 1; t += (Number(it && it.price) || 0) * q; k += q; });
+    if (!offreActive()) { var t = 0, k = 0; cart.forEach(function(it){ var q = (it && it.qty) || 1; t += (Number(it && it.price) || 0) * q; k += q; });
       return { n: k, seuil: SEUIL, actif: false, restant: 0, brut: t, remise: 0, net: t, present: false, off: true }; }
     var n = 0, brut = 0;
     /* Tous les produits comptent, d'où qu'ils aient été ajoutés (2 barnums = 2 produits) */
@@ -79,5 +79,5 @@
     ex.innerHTML = ligneHTML(inf);
   }
 
-  window.VESPRA_PACK = { ACTIF: ACTIF, SEUIL: SEUIL, TAUX: TAUX, info: info, base: base, ligneHTML: ligneHTML, totalHTML: totalHTML, afficher: afficher, style: style };
+  window.VESPRA_PACK = { offreActive: offreActive, SEUIL: SEUIL, TAUX: TAUX, info: info, base: base, ligneHTML: ligneHTML, totalHTML: totalHTML, afficher: afficher, style: style };
 })();

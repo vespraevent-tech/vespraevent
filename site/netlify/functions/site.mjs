@@ -106,6 +106,8 @@ export default async (request) => {
       ambiance: expose(theme).find(x => x.id === 'ambiance') || {},
       /* bandeau défilant du haut : messages, liens, affichage (page « Bandeau » du back-office) */
       bandeau: expose(theme).find(x => x.id === 'bandeau') || {},
+      /* offres commerciales activables depuis le back-office (Personnalisation › Offres) */
+      offres: expose(theme).find(x => x.id === 'offres') || {},
       textes: expose(textes).filter(x => !page || x.page === page),
       notices: expose(notices).filter(x => !page || x.page === page),
       produits: expose(produits),
@@ -161,7 +163,7 @@ export default async (request) => {
   } catch (e) {
     console.error('API publique Vespra:', e.message);
     return json({
-      theme: {}, ambiance: {}, bandeau: {}, textes: [], notices: [], produits: [], google: [], images: [], miseEnPage: [], salles: [], prestataires: [], catalogue: [], categoriesCatalogue: [], categoriesSupprimees: [], categoriesConnus: [], entreprise: {},
+      theme: {}, ambiance: {}, bandeau: {}, offres: {}, textes: [], notices: [], produits: [], google: [], images: [], miseEnPage: [], salles: [], prestataires: [], catalogue: [], categoriesCatalogue: [], categoriesSupprimees: [], categoriesConnus: [], entreprise: {},
       error: 'Lecture Netlify Blobs impossible',
     }, 500);
   }

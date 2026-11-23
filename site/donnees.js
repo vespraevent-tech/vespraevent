@@ -63,7 +63,7 @@
     } catch (e) {}
     return '/.netlify/images?url=' + encodeURIComponent(s) + '&w=' + w + '&fm=webp&q=80';
   };
-  var VIDE = { theme: {}, ambiance: {}, bandeau: {}, textes: [], notices: [], produits: [], google: [],
+  var VIDE = { theme: {}, ambiance: {}, bandeau: {}, offres: {}, textes: [], notices: [], produits: [], google: [],
                images: [], miseEnPage: [], salles: [], prestataires: [], catalogue: [], entreprise: {} };
 
   /* une part inconnue vaut une liste vide : aucun script n'a ainsi à
@@ -189,6 +189,7 @@
   function normaliser(d) {
     return {
       theme: (d && d.theme) || {},
+      offres: (d && d.offres) || {},
       textes: pourPage((d && d.textes) || []),
       notices: pourPage((d && d.notices) || []),
       produits: (d && d.produits) || [],

@@ -1,3 +1,29 @@
+/* Offre −10 % dès 5 produits : activée ou non depuis le back-office (Personnalisation › Offres).
+   Le dernier réglage connu est posé tout de suite (pas de clignotement), puis celui du serveur.
+   Les éléments propres à l'offre portent la classe pk-on, leurs remplaçants la classe pk-off. */
+(function () {
+  try {
+    var css = document.createElement('style'); css.id = 'pk-css';
+    css.textContent = '.pk-c{display:contents}html.pack-off .pk-on{display:none!important}html:not(.pack-off) .pk-off{display:none!important}';
+    (document.head || document.documentElement).appendChild(css);
+  } catch (e) {}
+  function poser(t) {
+    var off = !!(t && t.pack === 'non');
+    document.documentElement.classList.toggle('pack-off', off);
+    var change = window.__packActif !== undefined && window.__packActif !== !off;
+    window.__packActif = !off;
+    if (change) { try { document.dispatchEvent(new Event('vespra-pack')); } catch (e) {} }
+  }
+  window.vespraPackActif = function () { return window.__packActif !== false; };
+  try { poser(JSON.parse(localStorage.getItem('vespra_offres') || 'null')); } catch (e) { poser(null); }
+  if (typeof window.VESPRA_DONNEES === 'function' && !/[?&]apercu=1/.test(location.search)) {
+    window.VESPRA_DONNEES('offres').then(function (o) {
+      try { localStorage.setItem('vespra_offres', JSON.stringify(o || {})); } catch (e) {}
+      poser(o);
+    }).catch(function () {});
+  }
+})();
+
 /* ─────────────────────────────────────────────────────────────
    Apparence du site — couleurs, polices, taille du texte.
 
