@@ -107,6 +107,13 @@ function lireCookie(request, nom) {
 }
 const appareilConnu = (request, m, type) => { const sec = lireCookie(request, nomCookie(m.id, type)); return !!sec && (m[APPAREILS[type].champ] || []).includes(sha(sec)); };
 /* nouvel appareil : accepté s'il reste une place ; renvoie l'en-tête Set-Cookie à poser, ou null */
+/* Écriture de la fiche après une opération longue (e-mail) : on reprend d'abord les appareils reconnus et le scan, qui ont pu être enregistrés pendant ce temps
+   (sinon l'invité qui ouvre sa vidéo pendant l'envoi de l'e-mail perdrait sa reconnaissance et verrait « Vidéo protégée »). */
+export async function metaEcrireSure(st, m) {
+  const f = await st.get('meta/' + m.id, { type: 'json' }).catch(() => null);
+  if (f) for (const k of ['appQr', 'appQrLe', 'appMail', 'appMailLe', 'scanne']) if (f[k] !== undefined) m[k] = f[k];
+  await st.setJSON('meta/' + m.id, m);
+}
 async function lierAppareil(st, m, type) {
   const a = APPAREILS[type], liste = Array.isArray(m[a.champ]) ? m[a.champ] : [];
   if (liste.length >= a.max) return null;
@@ -331,10 +338,10 @@ async function traiter(request) {
       const buf = await binLire(st, 'video/' + m.id);
       const maintenant = new Date().toISOString();
       if (a) { a.essais = (Number(a.essais) || 0) + 1; a.essaiLe = maintenant; } else { m.mailEssais = (Number(m.mailEssais) || 0) + 1; m.mailEssaiLe = maintenant; }
-      if (!buf) { if (a) a.mailErreur = 'Fichier vidéo expiré'; else m.mailErreur = 'Fichier vidéo expiré'; await st.setJSON('meta/' + m.id, m); continue; }
+      if (!buf) { if (a) a.mailErreur = 'Fichier vidéo expiré'; else m.mailErreur = 'Fichier vidéo expiré'; await metaEcrireSure(st, m); continue; }
       const r = await envoyerMail(a ? { ...m, email: a.email, pour: 'autre', dest: a.dest } : m, buf, site);
       if (a) { a.mail = r.ok ? 'envoye' : 'erreur'; a.mailErreur = r.erreur || ''; } else { m.mail = r.ok ? 'envoye' : 'erreur'; m.mailErreur = r.erreur || ''; m.pj = !!r.pj; if (r.ok) m.renvoye = new Date().toISOString(); }
-      await st.setJSON('meta/' + m.id, m);
+      await metaEcrireSure(st, m);
       if (r.ok) envoyes++; else { stop = true; break; }
       await new Promise((ok) => setTimeout(ok, 700));
     }
@@ -535,7 +542,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
       a.mail = r2.ok ? 'envoye' : 'erreur'; a.mailErreur = r2.erreur || ''; a.essais = 1;
       if (!r2.ok) { mailOkTout = false; mailErr = mailErr || r2.erreur || ''; }
     }
-    await st.setJSON('meta/' + id, m);
+    await metaEcrireSure(st, m);
     await nettoyer(st);
     return rep({ ok: true, termine: true, mail: mailOkTout, mailErreur: mailErr });
   }
