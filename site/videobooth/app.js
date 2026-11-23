@@ -671,6 +671,22 @@ $('b-stop').onclick = arreterRec;
   }
   function sauverConnexion() { cfg.serveur = $('a-serveur').value.trim(); cfg.cam = $('a-cam').value; cfg.mic = $('a-mic').value; ecrireCfg(cfg); }
   $('a-serveur').onchange = $('a-cam').onchange = $('a-mic').onchange = sauverConnexion;
+  /* mise à jour de l'application Android sans la retélécharger : le site garde la dernière version, l'application la récupère elle-même */
+  try {
+    if (window.VespraAndroid && window.VespraAndroid.majApk) {
+      var verInstallee = Number(window.VespraAndroid.versionApk()) || 0;
+      $('a-ver').textContent = 'Version installée : ' + verInstallee + '. Les écrans du vidéobooth se mettent à jour tout seuls ; ce bouton sert quand l’application elle-même change.';
+      $('a-maj').onclick = function () {
+        $('a-ver').textContent = 'Recherche d’une mise à jour…';
+        fetch(baseApi() + '/api/appli/version', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
+          if (!j || !j.code) { $('a-ver').textContent = 'Impossible de savoir si une mise à jour existe. Réessayez.'; return; }
+          if (j.code <= verInstallee) { $('a-ver').textContent = 'L’application est à jour (version ' + (j.nom || j.code) + ').'; return; }
+          if (confirm('Installer la version ' + (j.nom || j.code) + ' ?\n\nVos réglages et vos vidéos sont conservés. Android va demander de confirmer.')) { $('a-ver').textContent = 'Mise à jour en cours…'; window.VespraAndroid.majApk(baseApi() + '/api/appli/apk'); }
+          else $('a-ver').textContent = 'Version installée : ' + verInstallee + '.';
+        }).catch(function () { $('a-ver').textContent = 'Réseau indisponible. Réessayez.'; });
+      };
+    }
+  } catch (e) {}
   try { if (window.VespraAndroid && window.VespraAndroid.quitter) { $('adm-quitter').hidden = false; $('a-quitter').onclick = function () { if (confirm('Quitter le vidéobooth ?')) window.VespraAndroid.quitter(); }; } } catch (e) {}
   $('a-close').onclick = function () { sauverConnexion(); appliquerActif(); accueil(); synchro(); };
   $('e-retour').onclick = function () { lireEdition(); appliquerActif(); ouvrirAdmin(); };

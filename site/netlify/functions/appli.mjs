@@ -13,6 +13,7 @@ import { scryptSync, randomBytes, randomInt, timingSafeEqual, createHash } from 
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { getStore } from './_blobs.mjs';
+import { appOk } from './_appli.mjs';
 import { r2Actif, r2Existe, r2LienTemporaire } from './_r2.mjs';
 /* le fichier peut avoir été déposé dans un dossier nommé autrement (R2 distingue majuscules et minuscules) : on cherche aux emplacements usuels */
 async function cleR2(f) { for (const c of [f.r2].concat(f.r2alt || [])) { if (await r2Existe(c).catch(() => false)) return c; } return ''; }
@@ -65,6 +66,19 @@ export default async (request) => {
       dispo[id] = f.local ? !!(await lireFichierLocal(f.local)) : (r2Actif() ? !!(await cleR2(f)) : false);
     }
     return rep({ ok: true, defini: e.defini, dispo });
+  }
+
+  /* mise à jour de l'application Android depuis l'application elle-même (sans mot de passe : seule l'application, avec sa clé, peut récupérer le fichier) */
+  if (request.method === 'GET' && route === 'version') {
+    const v = await lireFichierLocal('_appli/version.json');
+    let j = {}; try { j = JSON.parse(String(v || '{}')); } catch {}
+    return rep({ ok: true, code: Number(j.code) || 0, nom: String(j.nom || '') });
+  }
+  if (request.method === 'GET' && route === 'apk') {
+    if (!appOk(request, 'videobooth')) return rep({ ok: false, erreur: 'Réservé à l’application.' }, 403);
+    const buf = await lireFichierLocal(FICHIERS['videobooth-android'].local);
+    if (!buf) return rep({ ok: false, erreur: 'Fichier indisponible.' }, 404);
+    return new Response(buf, { headers: { 'Content-Type': 'application/vnd.android.package-archive', 'Content-Length': String(buf.length), ...SECURITE } });
   }
 
   if (request.method === 'POST' && route === 'telecharger') {

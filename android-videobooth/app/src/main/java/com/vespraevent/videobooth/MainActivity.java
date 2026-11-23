@@ -6,6 +6,12 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.webkit.JavascriptInterface;
+import android.app.PendingIntent;
+import android.content.pm.PackageInstaller;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -86,6 +92,8 @@ public class MainActivity extends Activity {
             /* clé d'application : prouve au site que c'est bien cette application (et non un navigateur) */
             @JavascriptInterface public String cle() { return BuildConfig.APP_KEY; }
             @JavascriptInterface public void code(String c) { if (c != null && c.matches("\\d{4,12}")) getSharedPreferences("vb", MODE_PRIVATE).edit().putString("code", c).apply(); }
+            @JavascriptInterface public int versionApk() { try { return getPackageManager().getPackageInfo(getPackageName(), 0).versionCode; } catch (Exception e) { return 0; } }
+            @JavascriptInterface public void majApk(final String adresse) { new Thread(new Runnable() { @Override public void run() { telechargerMaj(adresse); } }).start(); }
             @JavascriptInterface public void quitter() { runOnUiThread(new Runnable() { @Override public void run() { MainActivity.this.quitter(); } }); }
             @JavascriptInterface public void admin(final boolean on) {
                 runOnUiThread(new Runnable() { @Override public void run() { admin = on; plein(); } });
@@ -185,6 +193,37 @@ public class MainActivity extends Activity {
 
     /* code choisi dans le back-office (Logiciels), mémorisé à chaque connexion ; 0104 tant qu'il n'a jamais été reçu */
     private String codeSortie() { return getSharedPreferences("vb", MODE_PRIVATE).getString("code", CODE_SORTIE); }
+
+    private void message(final String t) { runOnUiThread(new Runnable() { @Override public void run() { Toast.makeText(MainActivity.this, t, Toast.LENGTH_LONG).show(); } }); }
+
+    /* Mise à jour de l'application sans la retélécharger à la main : le fichier est récupéré sur le site (avec la clé de l'application)
+       puis remis au système, qui demande une confirmation. Les réglages et les vidéos de la tablette sont conservés. */
+    private void telechargerMaj(String adresse) {
+        try {
+            if (Build.VERSION.SDK_INT >= 26 && !getPackageManager().canRequestPackageInstalls()) {
+                message("Autorisez d'abord « Vespra Vidéobooth » à installer des applications, puis relancez la mise à jour.");
+                runOnUiThread(new Runnable() { @Override public void run() { try { startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + getPackageName()))); } catch (Exception e) { } } });
+                return;
+            }
+            URL u = new URL(adresse);
+            if (!"https".equals(u.getProtocol()) || u.getHost() == null || !(u.getHost().equals(HOTE) || u.getHost().endsWith("." + HOTE))) { message("Adresse de mise à jour refusée."); return; }
+            message("Téléchargement de la mise à jour…");
+            HttpURLConnection c = (HttpURLConnection) u.openConnection();
+            c.setRequestProperty("x-vespra-app", BuildConfig.APP_KEY);
+            c.setConnectTimeout(15000); c.setReadTimeout(60000);
+            if (c.getResponseCode() != 200) { message("Mise à jour indisponible (" + c.getResponseCode() + ")."); return; }
+            PackageInstaller pi = getPackageManager().getPackageInstaller();
+            PackageInstaller.SessionParams sp = new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);
+            int id = pi.createSession(sp);
+            PackageInstaller.Session se = pi.openSession(id);
+            InputStream in = c.getInputStream(); OutputStream out = se.openWrite("maj.apk", 0, -1);
+            byte[] b = new byte[65536]; int n; while ((n = in.read(b)) > 0) out.write(b, 0, n);
+            se.fsync(out); out.close(); in.close();
+            Intent r = new Intent(this, InstallReceiver.class);
+            int fl = PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= 31 ? PendingIntent.FLAG_MUTABLE : 0);
+            se.commit(PendingIntent.getBroadcast(this, id, r, fl).getIntentSender());
+        } catch (Exception e) { message("Mise à jour impossible : " + e.getMessage()); }
+    }
 
     private boolean epingle() {
         try { return ((ActivityManager) getSystemService(ACTIVITY_SERVICE)).getLockTaskModeState() != ActivityManager.LOCK_TASK_MODE_NONE; }
