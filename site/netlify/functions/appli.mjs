@@ -14,12 +14,14 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { getStore } from './_blobs.mjs';
 import { r2Actif, r2Existe, r2LienTemporaire } from './_r2.mjs';
+/* le fichier peut avoir été déposé dans un dossier nommé autrement (R2 distingue majuscules et minuscules) : on cherche aux emplacements usuels */
+async function cleR2(f) { for (const c of [f.r2].concat(f.r2alt || [])) { if (await r2Existe(c).catch(() => false)) return c; } return ''; }
 
 export const config = { path: '/api/appli/*' };
 
 const FICHIERS = {
   'videobooth-android': { nom: 'vespra-videobooth.apk', type: 'application/vnd.android.package-archive', local: '_appli/vespra-videobooth.apk' },
-  'photobooth-windows': { nom: 'Vespra-Event-Photobooth-Windows.zip', type: 'application/zip', r2: 'appli/photobooth-windows.zip' },
+  'photobooth-windows': { nom: 'Vespra-Event-Photobooth-Windows.zip', type: 'application/zip', r2: 'appli/photobooth-windows.zip', r2alt: ['Application/photobooth-windows.zip', 'application/photobooth-windows.zip', 'Appli/photobooth-windows.zip', 'photobooth-windows.zip'] },
 };
 const ESSAIS_MAX = 8, FENETRE = 15 * 60e3;
 const SECURITE = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer' };
@@ -60,7 +62,7 @@ export default async (request) => {
     const e = await appliEtat();
     const dispo = {};
     for (const [id, f] of Object.entries(FICHIERS)) {
-      dispo[id] = f.local ? !!(await lireFichierLocal(f.local)) : (r2Actif() ? await r2Existe(f.r2).catch(() => false) : false);
+      dispo[id] = f.local ? !!(await lireFichierLocal(f.local)) : (r2Actif() ? !!(await cleR2(f)) : false);
     }
     return rep({ ok: true, defini: e.defini, dispo });
   }
@@ -90,8 +92,9 @@ export default async (request) => {
       if (!buf) return rep({ ok: false, erreur: 'Le fichier n’est pas disponible pour le moment.' }, 404);
       return new Response(buf, { headers: { 'Content-Type': f.type, 'Content-Disposition': 'attachment; filename="' + f.nom + '"', 'Content-Length': String(buf.length), ...SECURITE } });
     }
-    if (!r2Actif() || !(await r2Existe(f.r2).catch(() => false))) return rep({ ok: false, erreur: 'Ce logiciel n’a pas encore été déposé (Cloudflare R2, dossier « appli »).' }, 404);
-    return rep({ ok: true, url: r2LienTemporaire(f.r2, 600, f.nom), valide: '10 minutes' });
+    const cleF = r2Actif() ? await cleR2(f) : '';
+    if (!cleF) return rep({ ok: false, erreur: 'Ce logiciel n’a pas encore été déposé (Cloudflare R2, dossier « appli »).' }, 404);
+    return rep({ ok: true, url: r2LienTemporaire(cleF, 600, f.nom), valide: '10 minutes' });
   }
   return rep({ ok: false, erreur: 'Introuvable' }, 404);
 };
