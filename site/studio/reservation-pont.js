@@ -291,10 +291,36 @@
        ci-dessous, et plus par Firebase */
     window.FIREBASE_URL = '/api/admin';
 
+    /* Après chaque enregistrement d'un professionnel (entreprise, association, mairie…), on relit la réservation sur le serveur et on dit ce qui a été gardé :
+       message vert si tout y est, rouge sinon. Fini le doute : on voit tout de suite si le type de client est bien enregistré. */
+    function estProLocal(r) { var fc = (r && r.factureClient) || {}; return /entreprise|association|mairie|collectivit/i.test(String((r && r.clientType) || '')) || fc.pro === true || !!(r && (r.societe || r.siret || r.rna || r.tva)); }
+    function bandeau(texte, ok) {
+      try {
+        var b = document.getElementById('vp-verif');
+        if (!b) { b = document.createElement('div'); b.id = 'vp-verif'; b.style.cssText = 'position:fixed;left:50%;top:16px;transform:translateX(-50%);z-index:99999;max-width:92vw;padding:12px 20px;border-radius:12px;font:600 14px Inter,system-ui,sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.25);cursor:pointer'; b.onclick = function () { b.remove(); }; document.body.appendChild(b); }
+        b.style.background = ok ? '#E8F5EC' : '#FEF2F2'; b.style.color = ok ? '#15803D' : '#B91C1C'; b.textContent = texte;
+        clearTimeout(b._t); b._t = setTimeout(function () { if (b.parentNode) b.remove(); }, ok ? 7000 : 60000);
+      } catch (e) {}
+    }
+    function verifierPro(r) {
+      if (!estProLocal(r)) return;
+      setTimeout(function () {
+        api('/data?collection=reservations').then(function (items) {
+          var ligne = null; (items || []).forEach(function (it) { if (it && String(it.id) === String(r.id) && it.d) ligne = it; });
+          if (!ligne) return;
+          var srv; try { srv = JSON.parse(ligne.d); } catch (e) { return; }
+          var fc = srv.factureClient || {};
+          var proSrv = /entreprise|association|mairie|collectivit/i.test(String(srv.clientType || '')) || fc.pro === true;
+          var nom = String(srv.societe || fc.societe || r.societe || r.client || '').trim();
+          if (proSrv) bandeau('✓ Enregistré : ' + nom + ' — ' + (/association/i.test(String(srv.clientType || '')) ? 'association' : 'entreprise') + (srv.rna ? ' · RNA ' + srv.rna : '') + (srv.siret ? ' · SIRET ' + srv.siret : '') + (srv.tva ? ' · TVA ' + srv.tva : ''), true);
+          else bandeau('⚠ « ' + nom + ' » est repassée en Particulier sur le serveur (réservation ' + r.id + '). Cliquez pour fermer, puis prévenez Claude avec une capture de ce message.', false);
+        }).catch(function () {});
+      }, 1500);
+    }
     window.fbPutRes = function (r) {
       badge('sync');
       resEnRoute++;
-      enregistrer(r).then(function () { resEnRoute--; badge('ok'); }).catch(function () { resEnRoute--; badge('err'); });
+      enregistrer(r).then(function () { resEnRoute--; badge('ok'); verifierPro(r); }).catch(function () { resEnRoute--; badge('err'); });
     };
     window.fbDeleteRes = function (id) { supprimer(id).catch(function () { badge('err'); }); };
     window.fbPutCfg = function () { badge('sync'); enregistrerConfig(); };
