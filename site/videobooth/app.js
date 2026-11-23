@@ -268,6 +268,7 @@
       s.getVideoTracks().forEach(function (t) { t.onended = function () { perteCapteur('cam'); }; });
       s.getAudioTracks().forEach(function (t) { t.onended = function () { perteCapteur('mic'); }; });
       if (testCam) infoCamera(s);
+      boutonCameraSuivante();
     }).catch(function (e) {
       camEtat = (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) ? 'refusee' : 'erreur';
       $('cam-err').textContent = testCam ? 'Impossible d’accéder à la caméra ou au micro. Autorisez-les dans les réglages de la tablette, puis réessayez.' : 'La caméra n’est pas disponible pour le moment.'; $('cam-err').hidden = false; $('b-go').hidden = true;
@@ -289,6 +290,21 @@
     $('guide').hidden = false; $('b-go').hidden = true; $('cadrage').hidden = true; $('fmt').hidden = true;
   }
   $('a-camtest').onclick = function () { testCam = true; ouvrirCam(); };
+  /* test de la caméra : bouton pour passer d'une caméra avant à l'autre (certaines tablettes en ont deux : normale et ultra grand-angle) ; le choix est mémorisé */
+  function boutonCameraSuivante() {
+    var b = $('cam-suiv'); if (!b) { b = document.createElement('button'); b.id = 'cam-suiv'; b.type = 'button'; b.style.cssText = 'position:absolute;z-index:9;left:50%;bottom:26px;transform:translateX(-50%);padding:14px 26px;border-radius:999px;border:0;background:#fff;color:#14304f;font:700 16px system-ui;box-shadow:0 8px 24px rgba(0,0,0,.35)'; $('s-cam').appendChild(b); }
+    b.hidden = !testCam; if (!testCam) return;
+    b.textContent = 'Essayer l’autre caméra avant';
+    b.onclick = function () {
+      navigator.mediaDevices.enumerateDevices().then(function (d) {
+        var l = d.filter(function (x) { return x.kind === 'videoinput' && !/back|arri/i.test(x.label || ''); });
+        if (l.length < 2) { b.textContent = 'Une seule caméra avant sur cette tablette'; return; }
+        var cur = (flux && flux.getVideoTracks()[0] && flux.getVideoTracks()[0].getSettings().deviceId) || cfg.cam, i = 0;
+        l.forEach(function (x, k) { if (x.deviceId === cur) i = k; });
+        cfg.cam = l[(i + 1) % l.length].deviceId; ecrireCfg(cfg); ouvrirCam();
+      }).catch(function () {});
+    };
+  }
   /* GRAND ANGLE : zoom au minimum, et caméra « ultra grand-angle » si la tablette en a une */
   var angleEssaye = false;
   function grandAngle(s) {
@@ -338,7 +354,7 @@
 $('b-stop').onclick = arreterRec;
   /* croix : on abandonne la prise et on revient au formulaire, les champs restent remplis */
   $('b-x').onclick = function () {
-    if (testCam) { testCam = false; $('guide').hidden = true; $('cam-info').hidden = true; arreterCam(true); ouvrirAdmin(); return; }
+    if (testCam) { testCam = false; $('guide').hidden = true; $('cam-info').hidden = true; if ($('cam-suiv')) $('cam-suiv').hidden = true; arreterCam(true); ouvrirAdmin(); return; }
     if (decompte) { clearInterval(decompte); decompte = null; }
     clearInterval(minuteur);
     if (rec && rec.state !== 'inactive') { rec.onstop = null; try { rec.stop(); } catch (e) {} }
