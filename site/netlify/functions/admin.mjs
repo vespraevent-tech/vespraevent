@@ -2122,7 +2122,7 @@ const gestionnaire = async (request) => {
       const pro = envoi ? envoi.pro === true : url.searchParams.get('pro') === '1';
       const adresse = (envoi
           ? ((envoi.client && envoi.client.adresse) || []).join('|')
-          : (url.searchParams.has('adresse') ? url.searchParams.get('adresse') : (r.place || '')))
+          : (url.searchParams.has('adresse') ? url.searchParams.get('adresse') : ((r.factureClient && r.factureClient.adresse) || r.adresseFact || '')))
         .split(/\s*\|\s*|\s*\n\s*/).map((s) => s.trim()).filter(Boolean);
 
       const fiche = await numeroDeFacture(id, r, type);
@@ -2230,7 +2230,7 @@ const gestionnaire = async (request) => {
         client: {
           /* une société : son nom figure sur le document, pas celui de la personne qui a rempli le formulaire */
           nom: String((url.searchParams.get('societe') || '')).trim().slice(0, 120) || r.client,
-          adresse,
+          adresse: adresse || premier(ficheClient && ficheClient.billAdresse, r.place),
           /* le numéro RNA / SIRET / TVA : ce que l'écran envoie, sinon ce qui est enregistré sur la réservation elle-même. Dès qu'un RNA existe quelque part sur la réservation, il figure sur le document. */
           siret: premier(envoi ? (envoi.client && envoi.client.siret) : url.searchParams.get('siret'), r.factureClient && r.factureClient.siret, r.siret, r.devisSiret, ficheClient && ficheClient.siret),
           rna: premier(envoi ? (envoi.client && envoi.client.rna) : url.searchParams.get('rna'), r.factureClient && r.factureClient.rna, r.rna, r.devisRna, ficheClient && ficheClient.rna),
@@ -2953,7 +2953,7 @@ const gestionnaire = async (request) => {
         const ancien = brut && typeof brut.d === 'string' ? JSON.parse(brut.d) : null;
         if (ancien && nouveau && typeof nouveau === 'object') {
           const RE = /entreprise|association|mairie|collectivit/i;
-          const lire = (r) => { const fc = (r && r.factureClient) || {}; return { type: String((r && r.clientType) || '').trim(), societe: String((r && r.societe) || fc.societe || '').trim(), siret: String((r && r.siret) || fc.siret || '').trim(), rna: String((r && r.rna) || fc.rna || '').trim(), tva: String((r && r.tva) || fc.tvaClient || '').trim(), pro: fc.pro === true }; };
+          const lire = (r) => { const fc = (r && r.factureClient) || {}; return { type: String((r && r.clientType) || '').trim(), societe: String((r && r.societe) || fc.societe || '').trim(), siret: String((r && r.siret) || fc.siret || '').trim(), rna: String((r && r.rna) || fc.rna || '').trim(), tva: String((r && r.tva) || fc.tvaClient || '').trim(), adresse: String((r && r.adresseFact) || fc.adresse || '').trim(), pro: fc.pro === true }; };
           const a = lire(ancien), n = lire(nouveau);
           const aPro = a.pro || RE.test(a.type) || !!(a.societe || a.siret || a.rna || a.tva);
           if (aPro) {
@@ -2963,6 +2963,7 @@ const gestionnaire = async (request) => {
             for (const [k, fk] of [['societe', 'societe'], ['siret', 'siret'], ['rna', 'rna'], ['tva', 'tvaClient']]) {
               if (!n[k] && a[k]) { nouveau[k] = a[k]; fc[fk] = a[k]; chg = true; } else if (n[k] && !fc[fk]) fc[fk] = n[k];
             }
+            if (!n.adresse && a.adresse) { nouveau.adresseFact = a.adresse; fc.adresse = a.adresse; chg = true; } else if (n.adresse && !fc.adresse) fc.adresse = n.adresse;
             if (fc.pro !== true) { fc.pro = true; chg = true; }
             if (chg) { nouveau.factureClient = fc; item.d = JSON.stringify(nouveau); }
           }
