@@ -62,9 +62,13 @@
     /* application Android : la barre du système n'apparaît que dans les réglages (après le code), jamais devant les invités */
     try { if (window.VespraAndroid) window.VespraAndroid.admin(id === 's-admin' || id === 's-appli'); } catch (e) {} }
   var inactif = null;
-  function veille() { clearTimeout(inactif); inactif = setTimeout(function () { if (!$('s-accueil').classList.contains('on') && !$('s-admin').classList.contains('on') && !$('s-pin').classList.contains('on') && !enregistrement) { arreterCam(); accueil(); } }, 120000); }
+  function veille() { clearTimeout(inactif); inactif = setTimeout(function () { /* jamais d'accueil invité sans session ouverte : les écrans d'accès, de choix de session et de réglages restent affichés (sinon les vidéos filmées ne pourraient pas partir) */
+      var sansSession = !(cfg.jeton || cfg.cle), ecransTech = ['s-admin', 's-pin', 's-acces', 's-sessions', 's-sess-mdp', 's-appli', 'adm-edit'].some(function (id) { var z = $(id); return z && z.classList.contains('on'); });
+      if (!$('s-accueil').classList.contains('on') && !ecransTech && !sansSession && !enregistrement) { arreterCam(); accueil(); } }, 120000); }
   ['pointerdown', 'keydown'].forEach(function (t) { document.addEventListener(t, veille, { passive: true }); });
   function accueil(garder) {
+    /* aucune session ouverte : on ne laisse pas filmer des invités dont les vidéos ne pourraient pas partir */
+    if (!(cfg.jeton || cfg.cle) && window.VespraAndroid) { arreterCam(); versAcces(); return; }
     if (videoEnCours) libererEnAttente();
     $('l-qr-img').innerHTML = '';   /* le QR code d'un invité ne reste jamais affiché pour le suivant */
     if (sessionMaj) { cfg.session = Object.assign({}, cfg.session, sessionMaj); sessionMaj = null; appliquerActif(); }
