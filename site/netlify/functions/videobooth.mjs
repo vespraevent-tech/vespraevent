@@ -14,7 +14,7 @@
    ════════════════════════════════════════════════════ */
 import { createHmac, createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { getStore } from './_blobs.mjs';
-import { binEcrire, binLire, binSupprimer, r2Actif, r2Existe, r2LienTemporaire } from './_r2.mjs';
+import { binEcrire, binLire, binSupprimer, r2Actif, r2Existe, r2LienTemporaire, r2Plage } from './_r2.mjs';
 import { htmlVideo } from './_mails-auto.mjs';
 import { appOk, codeLire } from './_appli.mjs';
 import { reparerSiBesoin } from './_mp4fix.mjs';
@@ -447,6 +447,10 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
     const lecture = url.searchParams.get('lecture') === '1', dl = url.searchParams.get('dl') === '1';
     /* Cloudflare actif : la vidéo part directement de R2 (lien signé court), sans passer par la fonction (pas de limite de taille, lecture fluide) */
     const direct = r2Actif() && await r2Existe('video/' + id).catch(() => false);
+    /* aperçu dans la page : le site relit la vidéo par morceaux chez Cloudflare et la sert lui-même (un lecteur ne charge pas toujours une adresse Cloudflare tierce) */
+    if (direct && lecture && !dl) {
+      return r2Plage('video/' + id, request.headers.get('range'), String(m.type || 'video/mp4').split(';')[0], { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', 'Content-Disposition': 'inline' });
+    }
     if (direct && (lecture || dl)) {
       return new Response(null, { status: 302, headers: { Location: r2LienTemporaire('video/' + id, dl ? 600 : 7200, dl ? m.fichier : '', m.type || 'video/mp4'), 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
     }
@@ -458,7 +462,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
       const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Votre vidéo — ${esc(m.event || 'Vespra Event')}</title>${STYLE_PAGES}
 <style>body{text-align:center}main{max-width:480px;margin:0 auto;padding:36px 16px 50px}h1{font-size:28px;margin:0;line-height:1.15}p{color:#6F655C;font-size:14px;margin:0 0 16px}video{width:100%;max-height:70vh;border-radius:16px;background:#000;box-shadow:0 24px 44px -28px rgba(0,0,0,.5)}.bt{margin-top:18px}.n{margin-top:22px;font-size:12.5px;color:#8a8076;line-height:1.6}.n a{color:#B8893B}</style></head><body><main>
 <h1>${type === 'galerie' ? esc(`${m.prenom} ${m.nom}`.trim()) : `${esc(m.prenom)}, voici votre message vidéo`}</h1><i class="filet"></i><p>${esc(m.event || '')}</p>
-<video id="lv" controls playsinline preload="metadata"><source src="${direct ? esc(r2LienTemporaire('video/' + id, 7200, '', m.type || 'video/mp4')) : `/api/videobooth/v/${esc(id)}${q}&amp;lecture=1`}" type="${esc(String(m.type || 'video/mp4').split(';')[0])}"></video>
+<video id="lv" controls playsinline preload="metadata"><source src="/api/videobooth/v/${esc(id)}${q}&amp;lecture=1" type="${esc(String(m.type || 'video/mp4').split(';')[0])}"></video>
 <p id="lerr" style="display:none;margin-top:14px">La lecture n’a pas démarré ici. Le bouton ci-dessous télécharge la vidéo : elle se lira dans la galerie de votre téléphone.<br><small id="lcode" style="opacity:.6"></small></p>
 <script>(function(){var v=document.getElementById('lv'),s=v.querySelector('source');function ko(){var e=document.getElementById('lerr');e.style.display='block';document.getElementById('lcode').textContent='Réf. '+(v.error?v.error.code:'?')+'/'+v.networkState+'/'+v.readyState;}s.addEventListener('error',ko);v.addEventListener('error',ko);if(v.error||v.networkState===3)ko();setTimeout(function(){if(v.readyState===0)ko();},5000);})();</script>
 <a class="bt" href="/api/videobooth/v/${esc(id)}${q}&amp;dl=1" download>${type === 'galerie' ? 'Télécharger la vidéo' : 'Télécharger ma vidéo'}</a>

@@ -45,7 +45,7 @@ export function signer({ method, host, path, query, headers, payloadHash, ak, sk
   return { amz, headers: h, authorization: 'AWS4-HMAC-SHA256 Credential=' + ak + '/' + portee + ', SignedHeaders=' + signed + ', Signature=' + signature };
 }
 
-async function appel(methode, cle, { query, corps } = {}) {
+async function appel(methode, cle, { query, corps, entetes: sup } = {}) {
   const e = env();
   const u = new URL(e.ep);
   const chemin = '/' + enc(e.bucket) + (cle ? '/' + encChemin(cle) : '');
@@ -54,6 +54,7 @@ async function appel(methode, cle, { query, corps } = {}) {
   const qs = Object.keys(query || {}).sort().map((k) => enc(k) + '=' + enc(query[k])).join('&');
   const entetes = { 'x-amz-content-sha256': s.headers['x-amz-content-sha256'], 'x-amz-date': s.amz, Authorization: s.authorization };
   if (octets) entetes['Content-Length'] = String(octets.length);
+  Object.assign(entetes, sup || {});
   return fetch(e.ep + chemin + (qs ? '?' + qs : ''), { method: methode, headers: entetes, body: octets || undefined });
 }
 
@@ -129,4 +130,29 @@ export async function binLire(st, cle) {
 export async function binSupprimer(st, cle) {
   if (r2Actif()) await r2Delete(cle).catch((e) => console.error('R2 suppression :', e.message));
   await st.delete(cle).catch(() => {});
+}
+
+/* Lecture d'une vidéo par morceaux (Range) servie par le site lui-même : le lecteur du navigateur ne dépend plus d'une adresse Cloudflare tierce.
+   Chaque réponse reste sous ~4 Mo (limite des fonctions) ; le navigateur redemande la suite tout seul. */
+const MORCEAU = 4 * 1024 * 1024;
+export async function r2Plage(cle, enteteRange, typeMime, enTetes = {}) {
+  const tete = await appel('HEAD', cle);
+  if (!tete.ok) return new Response('Vidéo introuvable', { status: tete.status === 404 ? 404 : 502 });
+  const total = Number(tete.headers.get('content-length')) || 0;
+  if (!total) return new Response('Vidéo vide', { status: 404 });
+  const rg = /^bytes=(\d*)-(\d*)$/.exec(String(enteteRange || ''));
+  let d1 = 0, f1 = Math.min(total - 1, MORCEAU - 1), partiel = false;
+  if (rg && (rg[1] !== '' || rg[2] !== '')) {
+    partiel = true;
+    if (rg[1] === '') { d1 = Math.max(0, total - Number(rg[2])); f1 = total - 1; }
+    else { d1 = Number(rg[1]); f1 = rg[2] === '' ? total - 1 : Math.min(Number(rg[2]), total - 1); }
+    if (d1 > f1 || d1 >= total) return new Response(null, { status: 416, headers: { 'Content-Range': 'bytes */' + total } });
+    f1 = Math.min(f1, d1 + MORCEAU - 1);
+  } else if (total > MORCEAU) partiel = true;
+  const r = await appel('GET', cle, { entetes: { Range: 'bytes=' + d1 + '-' + f1 } });
+  if (!r.ok) return new Response('Lecture impossible', { status: 502 });
+  const corps = new Uint8Array(await r.arrayBuffer());
+  const hd = { 'Content-Type': typeMime || 'video/mp4', 'Accept-Ranges': 'bytes', 'Content-Length': String(corps.length), ...enTetes };
+  if (!partiel && corps.length === total) return new Response(corps, { status: 200, headers: hd });
+  return new Response(corps, { status: 206, headers: { ...hd, 'Content-Range': 'bytes ' + d1 + '-' + (d1 + corps.length - 1) + '/' + total } });
 }
