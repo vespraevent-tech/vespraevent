@@ -460,7 +460,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
 <h1>${type === 'galerie' ? esc(`${m.prenom} ${m.nom}`.trim()) : `${esc(m.prenom)}, voici votre message vidéo`}</h1><i class="filet"></i><p>${esc(m.event || '')}</p>
 <video id="lv" controls playsinline preload="metadata"><source src="${direct ? esc(r2LienTemporaire('video/' + id, 7200, '', m.type || 'video/mp4')) : `/api/videobooth/v/${esc(id)}${q}&amp;lecture=1`}" type="${esc(String(m.type || 'video/mp4').split(';')[0])}"></video>
 <p id="lerr" style="display:none;margin-top:14px">La lecture n’a pas démarré ici. Le bouton ci-dessous télécharge la vidéo : elle se lira dans la galerie de votre téléphone.<br><small id="lcode" style="opacity:.6"></small></p>
-<script>(function(){var v=document.getElementById('lv'),s=v.querySelector('source');function ko(){var e=document.getElementById('lerr');e.style.display='block';document.getElementById('lcode').textContent='Réf. '+(v.error?v.error.code:'?')+'/'+v.networkState+'/'+v.readyState;}s.addEventListener('error',ko);v.addEventListener('error',ko);})();</script>
+<script>(function(){var v=document.getElementById('lv'),s=v.querySelector('source');function ko(){var e=document.getElementById('lerr');e.style.display='block';document.getElementById('lcode').textContent='Réf. '+(v.error?v.error.code:'?')+'/'+v.networkState+'/'+v.readyState;}s.addEventListener('error',ko);v.addEventListener('error',ko);if(v.error||v.networkState===3)ko();setTimeout(function(){if(v.readyState===0)ko();},5000);})();</script>
 <a class="bt" href="/api/videobooth/v/${esc(id)}${q}&amp;dl=1" download>${type === 'galerie' ? 'Télécharger la vidéo' : 'Télécharger ma vidéo'}</a>
 <div class="n">${type === 'galerie' ? '' : 'Cette vidéo ne s’ouvre que sur vos appareils, pendant une semaine : pensez à la télécharger pour la garder.<br>Un souci ? <a href="mailto:contact@vespraevent.com">contact@vespraevent.com</a>'}</div></main>${PIED}</body></html>`;
       return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
@@ -494,7 +494,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
     const deja = await st.get('meta/' + id, { type: 'json' }).catch(() => null);
     if (deja) return rep({ ok: true, termine: true, mail: deja.mail === 'envoye', mailErreur: deja.mailErreur || '', deja: true });
     /* garde-fou : le site ne se remplit pas sans limite */
-    if (i === 0) {
+    if (i === 0 && Math.random() < 0.05) {
       try {
         const { blobs } = await st.list({ prefix: 'meta/' });
         if (blobs.length > 8000) return rep({ ok: false, erreur: 'Trop de vidéos stockées sur le site : supprimez les anciennes dans le back-office' }, 429);
@@ -506,11 +506,12 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
     if (i < n - 1) return rep({ ok: true, recu: i });
 
     /* dernier morceau : on assemble */
+    /* lecture de tous les morceaux en même temps (le dernier vient d'arriver : inutile de le relire) */
+    const lus = await Promise.all(Array.from({ length: n }, (_, k) => k === i ? Promise.resolve(donnees) : st.get(`chunk/${id}/${k}`, { type: 'arrayBuffer' }).catch(() => null)));
     const parts = [];
     for (let k = 0; k < n; k++) {
-      const b = await st.get(`chunk/${id}/${k}`, { type: 'arrayBuffer' }).catch(() => null);
-      if (!b) return rep({ ok: false, erreur: 'Morceau manquant : ' + k, manquant: k }, 409);
-      parts.push(new Uint8Array(b));
+      if (!lus[k]) return rep({ ok: false, erreur: 'Morceau manquant : ' + k, manquant: k }, 409);
+      parts.push(new Uint8Array(lus[k]));
     }
     const total = parts.reduce((t, p) => t + p.length, 0);
     let tout = new Uint8Array(total); let o = 0; for (const p of parts) { tout.set(p, o); o += p.length; }
@@ -531,7 +532,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
     /* durée de conservation propre à la session de cette vidéo */
     try { const ses = (await sessionsLire(st)).find((e) => labelSession(e) === m.event); if (ses) m.garde = ses.conserv || 0; } catch {}
     await binEcrire(st, 'video/' + id, tout.buffer);
-    for (let k = 0; k < n; k++) await st.delete(`chunk/${id}/${k}`).catch(() => {});
+    await Promise.all(Array.from({ length: n }, (_, k) => st.delete(`chunk/${id}/${k}`).catch(() => {})));
     /* la fiche est écrite AVANT l'e-mail : si l'envoi est interrompu, la vidéo reste visible dans le back-office */
     m.mail = m.email ? 'attente' : 'aucun'; m.mailErreur = '';
     await st.setJSON('meta/' + id, m);

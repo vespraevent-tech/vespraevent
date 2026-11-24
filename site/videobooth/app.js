@@ -492,20 +492,27 @@ $('b-stop').onclick = arreterRec;
   /* ── aucune vidéo n'est jamais effacée de la tablette : elles y restent toutes, même une fois envoyées.
         C'est vous qui videz la tablette quand vous le décidez. ── */
   function liberer() { return Promise.resolve(0); }
-  var TAILLE = 3 * 1024 * 1024;
+  var TAILLE = 5 * 1024 * 1024;
   function envoyer(v) {
     var base = (cfg.serveur || location.origin).replace(/\/+$/, '');
-    var n = Math.max(1, Math.ceil(v.blob.size / TAILLE)), i = 0, dernier = {};
-    function suite() {
+    var n = Math.max(1, Math.ceil(v.blob.size / TAILLE));
+    function morceau(i) {
       var q = new URLSearchParams({ id: v.id, i: i, n: n, fichier: v.fichier, type: v.type || '', nom: v.nom, prenom: v.prenom, email: v.email || '', plusEmail: v.plusEmail || '', plusDest: v.plusDest || '', event: v.event || '', duree: v.duree || 0, son: (v.son == null ? '' : v.son), pour: v.pour || 'moi', dest: v.dest || '', rk: v.rk || '', mode: v.mode || 'video', qs: (v.qs || []).join('|') });
       return fetch(base + '/api/videobooth/chunk?' + q.toString(), { method: 'POST', headers: ent({ 'x-appareil': (cfg.jeton || cfg.cle), 'content-type': 'application/octet-stream' }), body: v.blob.slice(i * TAILLE, (i + 1) * TAILLE) }).then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (j) {
           if (!r.ok || j.ok === false) throw new Error(j.erreur || ('Serveur : ' + r.status));
-          dernier = j; i++; return i < n ? suite() : dernier;
+          return j;
         });
       });
     }
-    return suite();
+    /* les morceaux partent par groupes de 3 en même temps (bien plus rapide qu'un par un) ; le dernier part seul, une fois tous les autres reçus : c'est lui qui déclenche l'assemblage */
+    var prochain = 0, actifs = [];
+    function lot() {
+      var travail = function () { var i = prochain++; return i >= n - 1 ? null : morceau(i).then(travail); };
+      var l = []; for (var k = 0; k < 3; k++) { var p = travail(); if (p) l.push(p); }
+      return Promise.all(l);
+    }
+    return lot().then(function () { return morceau(n - 1); });
   }
   function synchro() {
     if (envoiEnCours || !(cfg.jeton || cfg.cle) || !navigator.onLine) { majEtat(); return Promise.resolve(); }
