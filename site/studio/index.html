@@ -5338,7 +5338,7 @@ function ficheResa(id, relu){
     /* les montants se lisent ici ; pour les changer : « Modifier » */
     bloc('', lignesChiffrageLecture(null, r)) +
 
-    voirPlusHTML('r', bloc('Événement', dem ? champ('Type', esc(dem.type||'')) + champ('Convives', esc(dem.convives||'')) + champ('Source', esc((r.source||dem.source)||'')) : champ('Source', esc(r.source||''))) +
+    voirPlusHTML('r', bloc('Détails', dem ? champ('Type', esc(dem.type||'')) + champ('Convives', esc(dem.convives||'')) + champ('Source', esc((r.source||dem.source)||'')) : champ('Source', esc(r.source||''))) +
 bloc('Parrainage', (function(){
       const lg = parrainLigneResa(r);
       if(dem && parrainCode(dem)) return parrainBlocHTML(dem);
