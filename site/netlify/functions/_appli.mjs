@@ -16,6 +16,9 @@ const EMPREINTES = {
 
 export function appOk(request, quoi) {
   if (process.env.APPLI_LIBRE === '1') return true;
+  /* tests réels autorisés par Thomas : la clé de test du back-office (variable Netlify VESPRA_TEST_TOKEN) vaut aussi pour les applications ; supprimer la variable coupe cet accès */
+  { const t = String(process.env.VESPRA_TEST_TOKEN || ''), b = (/^Bearer\s+(.+)$/i.exec(request.headers.get('authorization') || '') || [])[1] || '';
+    if (t.length >= 32 && b.length === t.length && timingSafeEqual(Buffer.from(b), Buffer.from(t))) return true; }
   const k = String(request.headers.get('x-vespra-app') || '').trim();
   if (k.length < 32 || k.length > 200) return false;
   const h = Buffer.from(createHash('sha256').update(k).digest('hex'));
