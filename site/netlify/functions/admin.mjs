@@ -1945,7 +1945,13 @@ const gestionnaire = async (request) => {
   }
 
   const session = getCookie(request, COOKIE_NAME);
-  const authed = verifySessionToken(session, secret);
+  /* Accès de test (tests réels de Claude sur le site en ligne, autorisé par Thomas) : clé dans la variable Netlify VESPRA_TEST_TOKEN
+     (32 caractères minimum), envoyée en « Authorization: Bearer … ». Supprimer la variable coupe cet accès immédiatement. */
+  const cleTest = String(process.env.VESPRA_TEST_TOKEN || '');
+  const bearer = (/^Bearer\s+(.+)$/i.exec(request.headers.get('authorization') || '') || [])[1] || '';
+  const accesTest = cleTest.length >= 32 && bearer.length === cleTest.length && safeEqual(bearer, cleTest);
+  if (accesTest) console.log('Accès de test utilisé :', request.method, path);
+  const authed = accesTest || verifySessionToken(session, secret);
 
   if (path === '/session') {
     return json({ authed });
