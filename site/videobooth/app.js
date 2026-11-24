@@ -64,7 +64,7 @@
   var inactif = null;
   function veille() { clearTimeout(inactif); inactif = setTimeout(function () { /* jamais d'accueil invité sans session ouverte : les écrans d'accès, de choix de session et de réglages restent affichés (sinon les vidéos filmées ne pourraient pas partir) */
       var sansSession = !(cfg.jeton || cfg.cle), ecransTech = ['s-admin', 's-pin', 's-acces', 's-sessions', 's-sess-mdp', 's-appli', 'adm-edit'].some(function (id) { var z = $(id); return z && z.classList.contains('on'); });
-      if (!$('s-accueil').classList.contains('on') && !ecransTech && !sansSession && !enregistrement) { arreterCam(); accueil(); } }, 120000); }
+      if (!$('s-accueil').classList.contains('on') && !ecransTech && !sansSession && !enregistrement) { arreterCam(); accueil(); } }, $('s-livraison').classList.contains('on') ? 45000 : 120000); }
   ['pointerdown', 'keydown'].forEach(function (t) { document.addEventListener(t, veille, { passive: true }); });
   function accueil(garder) {
     /* aucune session ouverte : on ne laisse pas filmer des invités dont les vidéos ne pourraient pas partir */
@@ -443,7 +443,8 @@ $('b-stop').onclick = arreterRec;
       $('l-qr-t').textContent = T('livQr'); $('l-qr-d').textContent = T('livQrT'); $('l-mail-t').textContent = T('livMail'); $('l-mail-d').textContent = T('livMailT');
       $('l-autre-q').textContent = T('livAutreQ'); $('l-oui').textContent = T('livOui'); $('l-non').textContent = T('livNon'); $('l-prenom-d').textContent = T('livPrenom'); $('l-email2-d').textContent = T('livEmail2'); $('l-fin').textContent = T('livFin');
       var svg = qrSvg(v); $('l-qr-img').innerHTML = svg; $('l-qr').hidden = !svg; $('l-mail').parentNode.style.gridTemplateColumns = svg ? '' : '1fr';
-      majPanneaux(); montrer('s-livraison'); $('s-livraison').scrollTop = 0;
+      majPanneaux(); montrer('s-livraison'); $('s-livraison').scrollTop = 0; veille();
+      synchro();   /* pré-envoi immédiat : l'essentiel de la vidéo part pendant que l'invité scanne ou saisit son e-mail */
     }).catch(function () { bt.disabled = false; alert('La vidéo n’a pas pu être enregistrée : la mémoire de la tablette est pleine. Prévenez l’équipe.'); });
   }
   function libererEnAttente() {
@@ -484,7 +485,7 @@ $('b-stop').onclick = arreterRec;
   }
 
   /* ───────── envoi au serveur ───────── */
-  var envoiEnCours = false, dernierMsg = ''; try { dernierMsg = localStorage.getItem('vb-err') || ''; } catch (e) {}
+  var envoiEnCours = false, envoiDebut = 0, synchroRepasse = false, dernierMsg = ''; try { dernierMsg = localStorage.getItem('vb-err') || ''; } catch (e) {}
   function noterMsg(m) { dernierMsg = m; try { localStorage.setItem('vb-err', m); } catch (e) {} }
   function majEtat() {
     toutes().then(function (l) {
@@ -497,13 +498,16 @@ $('b-stop').onclick = arreterRec;
   /* ── aucune vidéo n'est jamais effacée de la tablette : elles y restent toutes, même une fois envoyées.
         C'est vous qui videz la tablette quand vous le décidez. ── */
   function liberer() { return Promise.resolve(0); }
-  var TAILLE = 5 * 1024 * 1024;
+  var TAILLE = 5 * 1024 * 1024, preEnvoyes = {};
   function envoyer(v) {
     var base = (cfg.serveur || location.origin).replace(/\/+$/, '');
     var n = Math.max(1, Math.ceil(v.blob.size / TAILLE));
     function morceau(i) {
       var q = new URLSearchParams({ id: v.id, i: i, n: n, fichier: v.fichier, type: v.type || '', nom: v.nom, prenom: v.prenom, email: v.email || '', plusEmail: v.plusEmail || '', plusDest: v.plusDest || '', event: v.event || '', duree: v.duree || 0, son: (v.son == null ? '' : v.son), pour: v.pour || 'moi', dest: v.dest || '', rk: v.rk || '', mode: v.mode || 'video', qs: (v.qs || []).join('|') });
-      return fetch(base + '/api/videobooth/chunk?' + q.toString(), { method: 'POST', headers: ent({ 'x-appareil': (cfg.jeton || cfg.cle), 'content-type': 'application/octet-stream' }), body: v.blob.slice(i * TAILLE, (i + 1) * TAILLE) }).then(function (r) {
+      /* jamais d'envoi bloqué indéfiniment (réseau faible) : 90 s maximum par morceau, puis nouvel essai au tour suivant */
+      var ac = window.AbortController ? new AbortController() : null, minu = ac ? setTimeout(function () { ac.abort(); }, 90000) : null;
+      return fetch(base + '/api/videobooth/chunk?' + q.toString(), { method: 'POST', headers: ent({ 'x-appareil': (cfg.jeton || cfg.cle), 'content-type': 'application/octet-stream' }), body: v.blob.slice(i * TAILLE, (i + 1) * TAILLE), signal: ac ? ac.signal : undefined }).then(function (r) {
+        clearTimeout(minu);
         return r.json().catch(function () { return {}; }).then(function (j) {
           if (!r.ok || j.ok === false) throw new Error(j.erreur || ('Serveur : ' + r.status));
           return j;
@@ -517,21 +521,30 @@ $('b-stop').onclick = arreterRec;
       var l = []; for (var k = 0; k < 3; k++) { var p = travail(); if (p) l.push(p); }
       return Promise.all(l);
     }
-    return lot().then(function () { return morceau(n - 1); });
+    /* pré-envoi : pendant que l'invité choisit QR code / e-mail, tout part sauf le dernier morceau (celui qui porte l'adresse e-mail) ;
+       à la validation, il ne reste qu'un petit morceau à envoyer : la vidéo arrive presque aussitôt */
+    if (preEnvoyes[v.id]) v.preEnvoye = true;
+    if (v.retenue) return v.preEnvoye ? Promise.resolve(null) : lot().then(function () { v.preEnvoye = true; preEnvoyes[v.id] = true; return null; });
+    return (v.preEnvoye ? Promise.resolve() : lot()).then(function () { return morceau(n - 1); });
   }
   function synchro() {
+    if (envoiEnCours && Date.now() - envoiDebut > 300000) envoiEnCours = false;   /* garde-fou : un envoi bloqué ne bloque plus les suivants */
+    if (envoiEnCours) synchroRepasse = true;   /* demandé pendant un envoi : relancé juste après, sans attendre le tour suivant */
     if (envoiEnCours || !(cfg.jeton || cfg.cle) || !navigator.onLine) { majEtat(); return Promise.resolve(); }
-    envoiEnCours = true;
+    envoiEnCours = true; envoiDebut = Date.now(); synchroRepasse = false;
     return toutes().then(function (l) {
-      l = l.filter(function (v) { return !v.envoye && (!v.retenue || Date.now() - Date.parse(v.cree) > 600000); }).sort(function (a, b) { return a.cree < b.cree ? -1 : 1; });
+      /* une vidéo retenue (l'invité choisit encore QR code / e-mail) n'est que pré-envoyée ; au-delà de 10 min elle part entière */
+      l.forEach(function (v) { if (v.retenue && Date.now() - Date.parse(v.cree) > 600000) v.retenue = false; });
+      l = l.filter(function (v) { return !v.envoye && !(v.retenue && (v.preEnvoye || preEnvoyes[v.id])); }).sort(function (a, b) { return (a.retenue ? 1 : 0) - (b.retenue ? 1 : 0) || (a.cree < b.cree ? -1 : 1); });
       var suite = Promise.resolve();
       l.forEach(function (v) {
         suite = suite.then(function () {
+          if (v.retenue) return envoyer(v).catch(function () {});
           return envoyer(v).then(function (rep) { noterMsg((rep && rep.mail === false) ? 'vidéo reçue par le site, mais e-mail non parti : ' + (rep.mailErreur || '') : ''); v.envoye = true; v.envoyeLe = new Date().toISOString(); v.mail = !(rep && rep.mail === false); return ajouter(v); }).catch(function (e) { noterMsg('envoi impossible (' + (e.message || 'réseau') + '), nouvel essai automatique'); v.essais = (v.essais || 0) + 1; return ajouter(v); });
         });
       });
       return suite;
-    }).then(function () { envoiEnCours = false; return liberer(false); }).then(function () { majEtat(); }, function () { envoiEnCours = false; });
+    }).then(function () { envoiEnCours = false; return liberer(false); }).then(function () { majEtat(); if (synchroRepasse) { synchroRepasse = false; setTimeout(synchro, 300); } }, function () { envoiEnCours = false; if (synchroRepasse) { synchroRepasse = false; setTimeout(synchro, 300); } });
   }
   /* ── état de la tablette, envoyé toutes les 2 minutes au back-office (batterie, vidéos en attente, caméra, micro, place) ── */
   function battement() {
