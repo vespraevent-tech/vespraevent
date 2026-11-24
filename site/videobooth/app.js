@@ -432,7 +432,7 @@ $('b-stop').onclick = arreterRec;
     if (!blobFinal || !invite) return;
     var bt = $('f-suite'); bt.disabled = true;
     var v = { id: 'v' + Date.now() + Math.random().toString(36).slice(2, 7), rk: cleRecup(), event: cfg.event, nom: invite.nom, prenom: invite.prenom, email: '', consent: true,
-      son: sonNiveau, pour: 'moi', dest: '', fichier: nomFichier(), type: blobFinal.type, duree: dureeRec || Math.round((Date.now() - t0) / 1000), cree: new Date().toISOString(), essais: 0, mode: mode, qs: questionsMode.slice(), retenue: true, blob: blobFinal };
+      son: sonNiveau, pour: 'moi', dest: '', fichier: nomFichier(), type: blobFinal.type, duree: dureeRec || Math.round((Date.now() - t0) / 1000), cree: new Date().toISOString(), essais: 0, mode: mode, qs: questionsMode.slice(), retenue: false, blob: blobFinal };
     ajouter(v).then(function () {
       try { if (urlRevoir) URL.revokeObjectURL(urlRevoir); } catch (e) {} urlRevoir = null; blobFinal = null; invite = null; bt.disabled = false;
       videoEnCours = v; choix = { qr: false, mail: false, autre: false };
@@ -449,7 +449,7 @@ $('b-stop').onclick = arreterRec;
   }
   function libererEnAttente() {
     var v = videoEnCours; if (!v) return; videoEnCours = null; v.retenue = false;
-    ajouter(v).then(function () { synchro(); }).catch(function () {});
+    majVideo(v.id, function (cur) { cur.retenue = false; }, v).then(function () { synchro(); }).catch(function () {});
   }
   $('l-qr').onclick = function () { choix.qr = !choix.qr; majPanneaux(); };
   $('l-mail').onclick = function () { choix.mail = !choix.mail; majPanneaux(); if (choix.mail) setTimeout(function () { $('l-email').focus(); }, 80); };
@@ -470,7 +470,8 @@ $('b-stop').onclick = arreterRec;
     if (adresses.length && !confirmeAdresse) { $('l-conf-a').textContent = adresses.join('\n'); $('l-conf').hidden = false; $('l-fin').hidden = true; $('l-conf-ok').focus(); return; }
     confirmeAdresse = false; $('l-conf').hidden = true; $('l-fin').hidden = false;
     v.retenue = false; videoEnCours = null; $('l-fin').disabled = true;
-    ajouter(v).then(function () { $('l-fin').disabled = false; synchro(); afficherMerci(v); }).catch(function () { $('l-fin').disabled = false; videoEnCours = v; err('Enregistrement impossible : prévenez l’équipe.'); });
+    var compl = (v.email || v.plusEmail) ? { email: v.email || '', pour: v.pour || 'moi', dest: v.dest || '', plusEmail: v.plusEmail || '', plusDest: v.plusDest || '' } : null;
+    majVideo(v.id, function (cur) { Object.assign(cur, { email: v.email || '', pour: v.pour, dest: v.dest || '', plusEmail: v.plusEmail || '', plusDest: v.plusDest || '', retenue: false }); if (compl) cur.complement = compl; }, v).then(function () { $('l-fin').disabled = false; synchro(); afficherMerci(v); }).catch(function () { $('l-fin').disabled = false; videoEnCours = v; err('Enregistrement impossible : prévenez l’équipe.'); });
   };
   var confirmeAdresse = false;
   $('l-conf-ok').onclick = function () { confirmeAdresse = true; $('l-fin').click(); };
@@ -527,6 +528,19 @@ $('b-stop').onclick = arreterRec;
     if (v.retenue) return v.preEnvoye ? Promise.resolve(null) : lot().then(function () { v.preEnvoye = true; preEnvoyes[v.id] = true; return null; });
     return (v.preEnvoye ? Promise.resolve() : lot()).then(function () { return morceau(n - 1); });
   }
+  /* relit la vidéo telle qu'enregistrée sur la tablette, applique la modification, la réenregistre (aucune information écrasée) */
+  function majVideo(id, fn, defaut) {
+    return toutes().then(function (l) { var cur = l.filter(function (x) { return x.id === id; })[0] || defaut; fn(cur); return ajouter(cur); });
+  }
+  /* adresse e-mail ajoutée après l'envoi de la vidéo : seule l'adresse part, le site envoie l'e-mail */
+  function envoyerComplement(v) {
+    var c = v.complement; if (!c) return Promise.resolve();
+    var base = (cfg.serveur || location.origin).replace(/\/+$/, '');
+    return fetch(base + '/api/videobooth/complement', { method: 'POST', headers: ent({ 'x-appareil': (cfg.jeton || cfg.cle), 'content-type': 'application/json' }), body: JSON.stringify(Object.assign({ id: v.id }, c)) })
+      .then(function (r) { return r.json().catch(function () { return {}; }); })
+      .then(function (j) { if (!j.ok) { if (!j.attendre) noterMsg('e-mail non transmis : ' + (j.erreur || '')); return; } if (j.mail === false) noterMsg('vidéo reçue, mais e-mail non parti : ' + (j.mailErreur || '')); return majVideo(v.id, function (cur) { delete cur.complement; cur.mail = j.mail !== false; }, v); })
+      .catch(function () {});
+  }
   function synchro() {
     if (envoiEnCours && Date.now() - envoiDebut > 300000) envoiEnCours = false;   /* garde-fou : un envoi bloqué ne bloque plus les suivants */
     if (envoiEnCours) synchroRepasse = true;   /* demandé pendant un envoi : relancé juste après, sans attendre le tour suivant */
@@ -535,12 +549,13 @@ $('b-stop').onclick = arreterRec;
     return toutes().then(function (l) {
       /* une vidéo retenue (l'invité choisit encore QR code / e-mail) n'est que pré-envoyée ; au-delà de 10 min elle part entière */
       l.forEach(function (v) { if (v.retenue && Date.now() - Date.parse(v.cree) > 600000) v.retenue = false; });
-      l = l.filter(function (v) { return !v.envoye && !(v.retenue && (v.preEnvoye || preEnvoyes[v.id])); }).sort(function (a, b) { return (a.retenue ? 1 : 0) - (b.retenue ? 1 : 0) || (a.cree < b.cree ? -1 : 1); });
+      l = l.filter(function (v) { return (!v.envoye || v.complement) && !(v.retenue && (v.preEnvoye || preEnvoyes[v.id])); }).sort(function (a, b) { return (a.retenue ? 1 : 0) - (b.retenue ? 1 : 0) || (a.cree < b.cree ? -1 : 1); });
       var suite = Promise.resolve();
       l.forEach(function (v) {
         suite = suite.then(function () {
           if (v.retenue) return envoyer(v).catch(function () {});
-          return envoyer(v).then(function (rep) { noterMsg((rep && rep.mail === false) ? 'vidéo reçue par le site, mais e-mail non parti : ' + (rep.mailErreur || '') : ''); v.envoye = true; v.envoyeLe = new Date().toISOString(); v.mail = !(rep && rep.mail === false); return ajouter(v); }).catch(function (e) { noterMsg('envoi impossible (' + (e.message || 'réseau') + '), nouvel essai automatique'); v.essais = (v.essais || 0) + 1; return ajouter(v); });
+          if (v.envoye) return envoyerComplement(v);
+          return envoyer(v).then(function (rep) { noterMsg((rep && rep.mail === false) ? 'vidéo reçue par le site, mais e-mail non parti : ' + (rep.mailErreur || '') : ''); return majVideo(v.id, function (cur) { cur.envoye = true; cur.envoyeLe = new Date().toISOString(); cur.mail = !(rep && rep.mail === false); if (cur.complement && v.email && cur.complement.email === v.email && !cur.complement.plusEmail) delete cur.complement; }, v); }).catch(function (e) { noterMsg('envoi impossible (' + (e.message || 'réseau') + '), nouvel essai automatique'); v.essais = (v.essais || 0) + 1; return ajouter(v); });
         });
       });
       return suite;

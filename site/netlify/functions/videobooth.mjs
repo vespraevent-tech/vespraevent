@@ -225,7 +225,7 @@ async function traiter(request) {
   const cle = process.env.VIDEOBOOTH_CLE;
 
   /* ── appels de la tablette : seule l'application Vespra Vidéobooth (qui porte la clé d'application) est acceptée ── */
-  const deLaTablette = (request.method === 'POST' && /\/api\/videobooth\/(acces|sessions|session|chunk|etat|relance)$/.test(url.pathname))
+  const deLaTablette = (request.method === 'POST' && /\/api\/videobooth\/(acces|sessions|session|chunk|etat|relance|complement)$/.test(url.pathname))
     || (request.method === 'GET' && /\/api\/videobooth\/(ma-session|ping)$/.test(url.pathname));
   if (deLaTablette && !appOk(request, 'videobooth')) {
     return rep({ ok: false, appli: true, erreur: 'Ce vidéobooth fonctionne uniquement dans l’application Vespra Vidéobooth (à jour).' }, 403);
@@ -479,6 +479,35 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
       return new Response(buf.slice(d1, f1 + 1), { status: 206, headers: { ...hd, 'Content-Range': `bytes ${d1}-${f1}/${total}`, 'Content-Length': String(f1 - d1 + 1) } });
     }
     return new Response(buf, { headers: { ...hd, 'Content-Length': String(total) } });
+  }
+
+  /* ── complément d'une vidéo déjà reçue : l'invité a ajouté son e-mail (ou celui d'un proche) APRÈS l'envoi de la vidéo.
+        La vidéo part dès l'écran QR code ; seule l'adresse arrive ensuite, et l'e-mail part à ce moment-là. ── */
+  if (request.method === 'POST' && /\/api\/videobooth\/complement$/.test(url.pathname)) {
+    if (!cle || (request.headers.get('x-appareil') !== cle && !lireJeton(request.headers.get('x-appareil'), 'session'))) return rep({ ok: false, erreur: 'Clé de la tablette refusée' }, 403);
+    let d = {}; try { d = await request.json(); } catch {}
+    const id = String(d.id || ''), email = String(d.email || '').trim(), plusEmail = String(d.plusEmail || '').trim();
+    const mailOk = (x) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(x) && x.length <= 200;
+    if (!idOk(id)) return rep({ ok: false, erreur: 'Paramètres invalides' }, 400);
+    if ((email && !mailOk(email)) || (plusEmail && !mailOk(plusEmail))) return rep({ ok: false, erreur: 'Adresse e-mail invalide' }, 400);
+    const st = store();
+    const m = await st.get('meta/' + id, { type: 'json', consistency: 'strong' }).catch(() => null);
+    if (!m) return rep({ ok: false, erreur: 'Vidéo pas encore reçue', attendre: true }, 409);
+    if (!email && !plusEmail) return rep({ ok: true, mail: true });
+    const site = (process.env.URL || `${url.protocol}//${url.host}`).replace(/\/$/, '');
+    const buf = await binLire(st, 'video/' + id);
+    let okTout = true, err = '';
+    if (email && email !== m.email) {
+      m.email = email; m.pour = d.pour === 'autre' ? 'autre' : 'moi'; m.dest = m.pour === 'autre' ? String(d.dest || '').replace(/[<>\r\n]+/g, ' ').trim().slice(0, 60) : '';
+      const r1 = await envoyerMail(m, buf, site); m.mail = r1.ok ? 'envoye' : 'erreur'; m.mailErreur = r1.erreur || ''; m.pj = !!r1.pj; if (!r1.ok) { okTout = false; err = r1.erreur || ''; }
+    }
+    if (plusEmail && !(m.autres || []).some((a) => a.email === plusEmail)) {
+      const a = { email: plusEmail, dest: String(d.plusDest || '').replace(/[<>\r\n]+/g, ' ').trim().slice(0, 60), mail: 'attente' };
+      const r2 = await envoyerMail({ ...m, email: a.email, pour: 'autre', dest: a.dest }, buf, site); a.mail = r2.ok ? 'envoye' : 'erreur'; a.mailErreur = r2.erreur || ''; a.essais = 1;
+      (m.autres = m.autres || []).push(a); if (!r2.ok) { okTout = false; err = err || r2.erreur || ''; }
+    }
+    await metaEcrireSure(st, m);
+    return rep({ ok: true, mail: okTout, mailErreur: err });
   }
 
   /* ── réception d'un morceau ── */
