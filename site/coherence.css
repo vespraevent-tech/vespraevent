@@ -233,6 +233,9 @@ html body :is(.cat-hero,.article-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero){
   margin:12px 16px 0;border-radius:32px;overflow:hidden}
 @media(max-width:960px){html body :is(.cat-hero,.article-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero){margin:10px 10px 0;border-radius:24px}}
 @media(max-width:560px){html body :is(.cat-hero,.article-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero){margin:8px 8px 0;border-radius:20px}}
+/* En-têtes de page (catalogue, FAQ, blog, zones de livraison…) en pleine largeur, comme l'accueil, sauf si le back-office demande la version arrondie.
+   Les en-têtes d'articles gardent leur cadre. */
+html:not(.hero-arrondi) body :is(.cat-hero,.faq-hero,.blog-hero,.lg-hero,.res-hero){margin:0!important;border-radius:0!important}
 
 /* ===== Sémantique : titres de section en <h2> sans changer leur aspect ===== */
 h2.sec-h{margin-top:0;font-weight:400}

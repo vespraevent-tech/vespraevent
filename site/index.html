@@ -14,7 +14,7 @@ try{window.__VESPRA_SITE=fetch('/api/site',{headers:{accept:'application/json'},
 <script src="/images.js"></script>
 <script src="/mise-en-page.js"></script>
 <script src="/theme.js"></script>
-<script src="/avis-google.js" defer></script>
+<script src="/avis-google.js"></script>
 <meta name="description" content="Vespra Event, spécialiste de l&#x27;événementiel, organise vos événements de A à Z : mariage, anniversaire, événements pro, association… Devis gratuit sous 24 h.">
 <meta property="og:title" content="Location de matériel événementiel à Vitré | Vespra Event">
 <meta property="og:description" content="Vespra Event, spécialiste de l&#x27;événementiel, organise vos événements de A à Z : mariage, anniversaire, événements pro, association… Devis gratuit sous 24 h.">
@@ -2212,7 +2212,11 @@ const GOOGLE_REVIEWS=(window.VESPRA_AVIS_GOOGLE||[]).slice();
         else ajouts.push({id:it.id,n:it.nom||'',i:(it.nom||'?').slice(0,1).toUpperCase(),
                           c:'#2B4A6B',s:parseInt(it.note,10)||5,d:it.date||'',t:it.texte||''});
       });
-      const liste=GOOGLE_REVIEWS.filter(a=>!masques[a.id]).concat(ajouts);
+      /* un avis ajouté depuis le back-office qui figure déjà dans la liste de base (même personne) n'est pas montré deux fois */
+      const nn=x=>String(x||'').toLowerCase().replace(/\s+/g,' ').trim();
+      const connus=new Set(GOOGLE_REVIEWS.filter(a=>!masques[a.id]).map(a=>nn(a.n)));
+      const ajoutsUniques=ajouts.filter((a,i)=>a.n&&!connus.has(nn(a.n))&&ajouts.findIndex(b=>nn(b.n)===nn(a.n))===i);
+      const liste=GOOGLE_REVIEWS.filter(a=>!masques[a.id]).concat(ajoutsUniques);
       if(liste.length) rendre(liste);
     })
     .catch(()=>{});
@@ -3408,7 +3412,7 @@ html:root:root:root:root:root body .lnk-fl{font-size:10.2px!important}
  html:root:root:root:root:root body .cart-btn,html:root:root:root:root:root body .reserver-btn{font-size:9.4px!important}
 }
 </style>
-<link rel="stylesheet" href="/coherence.css?v=32"><script>(function(){var e=document.getElementById("anti-saut");e&&e.remove()})()</script>
+<link rel="stylesheet" href="/coherence.css?v=33"><script>(function(){var e=document.getElementById("anti-saut");e&&e.remove()})()</script>
 <script src="/coherence.js?v=7" defer></script>
 
 <script>
