@@ -138,7 +138,9 @@
      Deux appareils qui modifient la configuration en même temps ne
      s'écrasent plus : chaque ajout, modification ou suppression est
      conservé. */
-  function egal(x, y) { return JSON.stringify(x) === JSON.stringify(y); }
+  /* comparaison indépendante de l'ordre des clés (sinon deux copies identiques passent pour différentes) */
+  function canon(v) { return v && typeof v === 'object' ? (Array.isArray(v) ? '[' + v.map(canon).join(',') + ']' : '{' + Object.keys(v).sort().map(function (k) { return JSON.stringify(k) + ':' + canon(v[k]); }).join(',') + '}') : JSON.stringify(v === undefined ? null : v); }
+  function egal(x, y) { return canon(x) === canon(y); }
   function clef(x) {
     if (x && typeof x === 'object') {
       if (x.id !== undefined && x.id !== null) return 'i:' + x.id;
@@ -228,7 +230,8 @@
       var srv = null;
       items.forEach(function (it) { if (it && it.id === 'cfg' && it.d) { try { srv = JSON.parse(it.d); } catch (e) {} } });
       var r = fusionnerConfig(srv);
-      if (!r.aEnvoyer) { ecrireBase(r.cfg); return r; }
+      /* rien de nouveau par rapport au site : on n'écrit pas (évite qu'une copie ancienne d'un autre appareil écrase la bonne) */
+      if (!r.aEnvoyer || (srv && egal(srv, r.cfg))) { ecrireBase(r.cfg); return r; }
       return api('/data', {
         method: 'POST',
         body: JSON.stringify({ collection: 'reservations', item: { id: 'cfg', d: JSON.stringify(r.cfg) } }),

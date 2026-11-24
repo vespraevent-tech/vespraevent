@@ -159,7 +159,7 @@
   var invite = null;
 
   /* ───────── caméra ───────── */
-  var decompte = null, flux = null, rec = null, morceaux = [], blobFinal = null, mime = '', enregistrement = false, minuteur = null, t0 = 0;
+  var dureeRec = 0, decompte = null, flux = null, rec = null, morceaux = [], blobFinal = null, mime = '', enregistrement = false, minuteur = null, t0 = 0;
   function meilleurMime() {
     var l = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
     for (var i = 0; i < l.length; i++) { try { if (window.MediaRecorder && MediaRecorder.isTypeSupported(l[i])) return l[i]; } catch (e) {} }
@@ -357,6 +357,7 @@
     mime = rec.mimeType || mime || 'video/webm';
     rec.ondataavailable = function (e) { if (e.data && e.data.size) morceaux.push(e.data); };
     rec.onstop = function () {
+      dureeRec = Math.max(1, Math.round((Date.now() - t0) / 1000));
       enregistrement = false; clearInterval(minuteur);
       blobFinal = new Blob(morceaux, { type: mime.split(';')[0] });
       sonNiveau = Math.round(niveauMax * 100); var faible = sonNiveau < 3;
@@ -427,7 +428,7 @@ $('b-stop').onclick = arreterRec;
     if (!blobFinal || !invite) return;
     var bt = $('f-suite'); bt.disabled = true;
     var v = { id: 'v' + Date.now() + Math.random().toString(36).slice(2, 7), rk: cleRecup(), event: cfg.event, nom: invite.nom, prenom: invite.prenom, email: '', consent: true,
-      son: sonNiveau, pour: 'moi', dest: '', fichier: nomFichier(), type: blobFinal.type, duree: Math.round((Date.now() - t0) / 1000), cree: new Date().toISOString(), essais: 0, mode: mode, qs: questionsMode.slice(), retenue: true, blob: blobFinal };
+      son: sonNiveau, pour: 'moi', dest: '', fichier: nomFichier(), type: blobFinal.type, duree: dureeRec || Math.round((Date.now() - t0) / 1000), cree: new Date().toISOString(), essais: 0, mode: mode, qs: questionsMode.slice(), retenue: true, blob: blobFinal };
     ajouter(v).then(function () {
       try { if (urlRevoir) URL.revokeObjectURL(urlRevoir); } catch (e) {} urlRevoir = null; blobFinal = null; invite = null; bt.disabled = false;
       videoEnCours = v; choix = { qr: false, mail: false, autre: false };
