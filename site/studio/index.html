@@ -5123,22 +5123,22 @@ function ficheDemande(id, relu){
         ETIQ_CADRE[cadre] + '</span>' : '') +
       '<select class="dm-sel fd-st dm-sel-' + d.statut + '" aria-label="Statut" onchange="changerStatut(\'' + escAttr(d.id) + '\', this.value)">' + choixStatut + '</select>' +
     '</div>' +
-    '<div class="fd-sous">Demande reçue le ' + dateLisible(d.recue) + '</div>' +
+    '<div class="fd-sous">Demande reçue le ' + dateLisible(d.recue) + (function(){ try{ const p = JSON.parse(d.panier || '[]').map(x => x.short || x.name).filter(Boolean).join(' · '); return p ? ' · ' + esc(p) : ''; }catch(e){ return ''; } })() + '</div>' +
 
     modifsBloc(['d:' + d.id].concat(d.resaId ? ['r:' + d.resaId] : [])) +
+    blocProHTML(piD, champ) +
+    bloc('Contact', champ('Téléphone', tel) + champ('Email', mail, String(d.email||'').length > 17)) +
     bloc('Événement',
       champ('Date', d.date ? esc(d.date) : '<span class="fd-manque">à préciser</span>') +
       /* toujours affichée, même si le client n'a rien coché : l'absence de
          réponse vaut retrait sur place, et c'est cela qu'il faut savoir */
       champ('Livraison', badgeLivraison(d.livraison, d.livraisonRetour)) +
-      champ('Adresse', adresse, true)) +
-    bloc('Contact', champ('Téléphone', tel) + champ('Email', mail, String(d.email||'').length > 17)) +
-    blocProHTML(piD, champ) +
+      champ('Adresse de l\u2019événement', adresse, true)) +
+
+    acompteBlocHTML(d, resaLiee) +
 
     /* les montants ne se saisissent plus ici : ils se lisent, et se changent en cliquant sur « Modifier » */
     bloc('', lignesChiffrageLecture(d, null)) +
-
-    acompteBlocHTML(d, resaLiee) +
 
     voirPlusHTML('d', bloc('Détails', champ('Convives', esc(d.convives)) + champ('Type', esc(d.type)) + champ('Source', esc(d.source || d.origine || ''))) +
       bloc('Parrainage', parrainBlocHTML(d)) +
@@ -5324,17 +5324,17 @@ function ficheResa(id, relu){
     '</div>' +
     '<div class="fd-sous">Réservation' + (produits ? ' · ' + esc(produits) : '') + '</div>' +
     modifsBloc(['r:' + r.id]) +
+    blocProHTML(piR, champ) +
+    bloc('Contact', champ('Téléphone', tel) + champ('Email', mail, String(mailV||'').length > 17)) +
     bloc('Événement',
       champ('Date', esc(dates)) +
       champ('Livraison', badgeLivraison(r.livraison, r.livraisonRetour)) +
-      champ('Adresse', lieu, true)) +
-    bloc('Contact', champ('Téléphone', tel) + champ('Email', mail, String(mailV||'').length > 17)) +
-    blocProHTML(piR, champ) +
+      champ('Adresse de l\u2019événement', lieu, true)) +
+
+    acompteBlocHTML(dem || null, r, 'resa') +
 
     /* les montants se lisent ici ; pour les changer : « Modifier » */
     bloc('', lignesChiffrageLecture(null, r)) +
-
-    acompteBlocHTML(dem || null, r, 'resa') +
 
     voirPlusHTML('r', bloc('Événement', dem ? champ('Type', esc(dem.type||'')) + champ('Convives', esc(dem.convives||'')) + champ('Source', esc((r.source||dem.source)||'')) : champ('Source', esc(r.source||''))) +
 bloc('Parrainage', (function(){
@@ -7808,7 +7808,7 @@ async function supprimerDemande(id){
 const RE_PRO_BO = /entreprise|association|mairie|collectivit/i;
 function proInfosDe(x){
   const fc = (x && x.factureClient) || {};
-  const o = { societe: String((x && x.societe) || fc.societe || '').trim(), siret: String((x && x.siret) || fc.siret || '').trim(), rna: String((x && x.rna) || fc.rna || '').trim(), tva: String((x && x.tva) || fc.tvaClient || '').trim() };
+  const o = { societe: String((x && x.societe) || fc.societe || '').trim(), siret: String((x && x.siret) || fc.siret || '').trim(), rna: String((x && x.rna) || fc.rna || '').trim(), tva: String((x && x.tva) || fc.tvaClient || '').trim(), adresse: String(fc.adresse || (x && (x.billAdresse || x.adresseFacturation)) || '').trim() };
   o.pro = RE_PRO_BO.test(String((x && x.clientType) || '')) || fc.pro === true || !!(o.societe || o.siret || o.rna || o.tva);
   return o;
 }
@@ -7816,7 +7816,7 @@ function proInfosDe(x){
 function proPourFiche(r, dem, nom, tel){
   const a = proInfosDe(r || {}), b = proInfosDe(dem || {}), c = ficheClientPro(nom, tel) || {};
   const pick = k => a[k] || b[k] || c[k] || '';
-  const o = { societe: pick('societe'), siret: pick('siret'), rna: pick('rna'), tva: pick('tva') };
+  const o = { societe: pick('societe'), siret: pick('siret'), rna: pick('rna'), tva: pick('tva'), adresse: pick('adresse') };
   o.pro = !!(a.pro || b.pro || c.pro || o.societe || o.siret || o.rna || o.tva);
   return o;
 }
@@ -7828,7 +7828,8 @@ function entetePro(pi, nomPersonne){
 function blocProHTML(pi, champ){
   if(!pi.pro) return '';
   const c = champ('Société / association', esc(pi.societe)) + champ('SIRET', esc(pi.siret)) + champ('N° RNA', esc(pi.rna)) + champ('N° de TVA', esc(pi.tva));
-  return '<div class="fd-bloc"><div class="fd-t">Client professionnel</div><div class="fd-grille">' + (c || '<div class="fd-c large"><span class="fd-v"><span class="fd-manque">Aucun numéro renseigné — « Modifier » pour les ajouter</span></span></div>') + '</div></div>';
+  const adr = champ('Adresse de facturation', esc(pi.adresse).replace(/\n/g, '<br>'), true);
+  return '<div class="fd-bloc"><div class="fd-t">Client professionnel</div><div class="fd-grille">' + (c ? c + adr : adr || '<div class="fd-c large"><span class="fd-v"><span class="fd-manque">Aucun numéro renseigné — « Modifier » pour les ajouter</span></span></div>') + '</div></div>';
 }
 /* la fiche client déjà connue (par nom + téléphone, sinon par nom) : un client qui revient est reconnu avec ses numéros */
 function ficheClientPro(nom, tel){
