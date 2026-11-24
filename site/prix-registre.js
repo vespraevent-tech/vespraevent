@@ -361,8 +361,8 @@ window.VESPRA_PRIX_REGISTRE = [
   {
     "i": "boite-de-nuit-gonflable-1",
     "n": "Boîte de nuit gonflable",
-    "v": "Pack Essential",
-    "p": 195,
+    "v": "Boîte seule",
+    "p": 125,
     "pg": "produit-boite-nuit.html",
     "vi": 0,
     "ci": "p9",
@@ -371,8 +371,8 @@ window.VESPRA_PRIX_REGISTRE = [
   {
     "i": "boite-de-nuit-gonflable-2",
     "n": "Boîte de nuit gonflable",
-    "v": "Pack Ultimate",
-    "p": 275,
+    "v": "Avec sono",
+    "p": 195,
     "pg": "produit-boite-nuit.html",
     "vi": 1,
     "ci": "p9",
@@ -2233,20 +2233,20 @@ window.VESPRA_PRODUITS = [
     "img": "boite-nuit-situation.webp",
     "imgCat": "boite-nuit-situation.webp",
     "page": "produit-boite-nuit.html",
-    "prix": 195,
+    "prix": 125,
     "prixId": null,
     "variantes": [
       {
         "prixId": "boite-de-nuit-gonflable-1",
-        "label": "Pack Essential",
-        "labelCat": "Pack Essential",
-        "prix": 195
+        "label": "Boîte seule",
+        "labelCat": "Boîte seule",
+        "prix": 125
       },
       {
         "prixId": "boite-de-nuit-gonflable-2",
-        "label": "Pack Ultimate",
-        "labelCat": "Pack Ultimate",
-        "prix": 275
+        "label": "Avec sono",
+        "labelCat": "Avec sono",
+        "prix": 195
       }
     ],
     "notices": [],
