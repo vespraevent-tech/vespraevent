@@ -2131,7 +2131,8 @@ const gestionnaire = async (request) => {
           : (url.searchParams.has('adresse') ? url.searchParams.get('adresse') : ((r.factureClient && r.factureClient.adresse) || r.adresseFact || '')))
         .split(/\s*\|\s*|\s*\n\s*/).map((s) => s.trim()).filter(Boolean);
 
-      const fiche = await numeroDeFacture(id, r, type);
+      /* aperçu (tests, relecture) : même document, sans numéro définitif ni compteur consommé */
+      const fiche = url.searchParams.get('apercu') === '1' ? { numero: 'APERÇU', resaId: String(id), client: r.client || '', emiseLe: new Date().toISOString() } : await numeroDeFacture(id, r, type);
 
       const emission = new Date();
       const dateEmission = `${String(emission.getDate()).padStart(2, '0')}/${String(emission.getMonth() + 1).padStart(2, '0')}/${emission.getFullYear()}`;

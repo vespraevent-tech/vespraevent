@@ -276,14 +276,14 @@
     api('maj?v=' + encodeURIComponent(etat.evt.maj || '')).then(function (r) { return r.json(); }).then(function (d) {
       etat.derniereVerif = Date.now(); etat.cadresServeur = d.cadres;
       if (!d.ok) { if (d.supprime) return lireConfig(false).catch(function () {}); return; }
-      if (d.maj === etat.evt.maj) return;                     /* rien de nouveau : réponse minuscule toutes les 2 s */
+      if (d.maj === etat.evt.maj) return;                     /* rien de nouveau : réponse minuscule toutes les 10 s */
       return api('config').then(function (r) { return r.json(); }).then(function (c) {
         if (!c.ok) return; etat.stats = c.stats; etat.lien = c.lien || '';
         return precharger(c.evenement, true).then(function () { etat.evt = c.evenement; LS.set('cfg.' + c.evenement.id, c.evenement); if (etat.ecran === 's-accueil') afficherAccueil(); else ouvrirPanneau(panneauActif); });
       });
     }).catch(function () {}).then(function () { majOccupee = false; });
   }
-  setInterval(verifierMaj, 2000);
+  setInterval(verifierMaj, 10000);   /* toutes les 10 s : 5 fois moins d'appels au site qu'avant (2 s) */
   /* écran des événements : la liste et les aperçus se rafraîchissent aussi tout seuls */
   setInterval(function () {
     if (etat.ecran !== 's-liste' || !etat.appareil) return;
