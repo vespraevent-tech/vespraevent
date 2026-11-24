@@ -5110,9 +5110,10 @@ function ficheDemande(id, relu){
     ? '<div class="fd-bloc">' + (titre ? '<div class="fd-t">' + titre + '</div>' : '') + '<div class="fd-grille">' + contenu + '</div></div>'
     : '';
 
+  const piD = proPourFiche(d.resaId ? (cache.resas||[]).find(x => String(x.id) === String(d.resaId)) : null, d, d.nom, d.telephone);
   document.getElementById('contenuFicheDemande').innerHTML =
     '<div class="fd-h">' +
-      '<span class="fd-nom">' + lienFicheClient(d.nom || 'Sans nom', d.telephone, d.email) + '</span>' + badgeNumero(d) +
+      '<span class="fd-nom">' + (piD.pro && piD.societe ? esc(piD.societe) : lienFicheClient(d.nom || 'Sans nom', d.telephone, d.email)) + entetePro(piD, d.nom) + '</span>' + badgeNumero(d) +
       '<span class="dm-et ' + d.statut + '">' + ETIQ[d.statut] + '</span>' +
       (suitCadre ? '<span class="dm-et cadre' + (cadre === 'termine' ? ' fait' : '') + '">' +
         ETIQ_CADRE[cadre] + '</span>' : '') +
@@ -5123,8 +5124,8 @@ function ficheDemande(id, relu){
 
     modifsBloc(['d:' + d.id].concat(d.resaId ? ['r:' + d.resaId] : [])) +
     bloc('', champ('Téléphone', tel) + champ('Email', mail) +
-      (d.clientType === 'Entreprise ou association' ? champ('Société', esc(d.societe)) + champ('SIRET', esc(d.siret)) + champ('N° RNA', esc(d.rna)) + champ('N° de TVA', esc(d.tva)) : '') +
       champ('Date', d.date ? esc(d.date) : '<span class="fd-manque">à préciser</span>')) +
+    blocProHTML(piD, champ) +
 
     bloc('Logistique',
       /* toujours affichée, même si le client n'a rien coché : l'absence de
@@ -5292,6 +5293,7 @@ function ficheResa(id, relu){
   /* la demande d'origine porte souvent des coordonnées que la réservation
      du planning n'a pas : on les complète depuis elle */
   const dem = (cache.demandes||[]).find(x => x.resaId && String(x.resaId) === String(r.id)) || (cache.demandes||[]).find(x => x.statut === 'validee' && String(x.nom||'').trim().toLowerCase() === String(r.client||'').trim().toLowerCase() && (isoDepuisFr(x.date) === r.dateStart)) || null;
+  const piR = proPourFiche(r, dem, r.client, r.phone || (dem && dem.telephone));
   const telV = r.phone || (dem && dem.telephone) || '';
   const mailV = r.email || (dem && dem.email) || '';
   const placeV = r.place || (dem && dem.adresse) || '';
@@ -5315,12 +5317,13 @@ function ficheResa(id, relu){
     : '';
 
   document.getElementById('contenuFicheResa').innerHTML =
-    '<div class="fd-h"><span class="fd-nom">' + lienFicheClient(r.client || 'Client', r.phone, r.email) + '</span>' + badgeNumero(r) + '</div>' +
+    '<div class="fd-h"><span class="fd-nom">' + (piR.pro && piR.societe ? esc(piR.societe) : lienFicheClient(r.client || 'Client', r.phone, r.email)) + entetePro(piR, r.client) + '</span>' + badgeNumero(r) + '</div>' +
     '<div class="fd-recue">' + esc(dates) + '</div>' +
     (function(){ const st = r.statutSuivi || 'validee'; return '<div class="fd-statut"><span class="dm-champ"><label>Statut</label><select class="dm-sel dm-sel-' + escAttr(st) + '" aria-label="Statut" onchange="changerStatut(\'__planning__' + escAttr(r.id) + '\', this.value)">' +
         ['nouvelle','en-cours','validee'].map(v => '<option value="' + v + '"' + (st===v ? ' selected' : '') + '>' + ETIQ[v] + '</option>').join('') + '</select></span></div>'; })() +
     modifsBloc(['r:' + r.id]) +
     bloc('', champ('Téléphone', tel) + champ('Email', mail)) +
+    blocProHTML(piR, champ) +
 
     bloc('Logistique', '<div class="fd-c large"><span class="fd-v">' + badgeLivraison(r.livraison, r.livraisonRetour) + '</span></div>' + champ('Adresse de l\u2019événement', lieu, true)) +
 
@@ -7804,6 +7807,24 @@ function proInfosDe(x){
   const o = { societe: String((x && x.societe) || fc.societe || '').trim(), siret: String((x && x.siret) || fc.siret || '').trim(), rna: String((x && x.rna) || fc.rna || '').trim(), tva: String((x && x.tva) || fc.tvaClient || '').trim() };
   o.pro = RE_PRO_BO.test(String((x && x.clientType) || '')) || fc.pro === true || !!(o.societe || o.siret || o.rna || o.tva);
   return o;
+}
+/* Informations « client professionnel » à afficher sur une fiche : la réservation d'abord, puis la demande, puis la fiche client (compte déjà connu) */
+function proPourFiche(r, dem, nom, tel){
+  const a = proInfosDe(r || {}), b = proInfosDe(dem || {}), c = ficheClientPro(nom, tel) || {};
+  const pick = k => a[k] || b[k] || c[k] || '';
+  const o = { societe: pick('societe'), siret: pick('siret'), rna: pick('rna'), tva: pick('tva') };
+  o.pro = !!(a.pro || b.pro || c.pro || o.societe || o.siret || o.rna || o.tva);
+  return o;
+}
+/* en-tête d'une fiche : le nom de l'entreprise ou de l'association, avec le contact en dessous */
+function entetePro(pi, nomPersonne){
+  return pi.pro && pi.societe ? '<span style="display:block;font-size:12.5px;font-weight:500;color:#6b7280;margin-top:2px">Contact : ' + esc(nomPersonne || '') + '</span>' : '';
+}
+/* bloc « Entreprise / association » : société, SIRET, RNA, TVA */
+function blocProHTML(pi, champ){
+  if(!pi.pro) return '';
+  const c = champ('Société / association', esc(pi.societe)) + champ('SIRET', esc(pi.siret)) + champ('N° RNA', esc(pi.rna)) + champ('N° de TVA', esc(pi.tva));
+  return '<div class="fd-bloc"><div class="fd-t">Client professionnel</div><div class="fd-grille">' + (c || '<div class="fd-c large"><span class="fd-v"><span class="fd-manque">Aucun numéro renseigné — « Modifier » pour les ajouter</span></span></div>') + '</div></div>';
 }
 /* la fiche client déjà connue (par nom + téléphone, sinon par nom) : un client qui revient est reconnu avec ses numéros */
 function ficheClientPro(nom, tel){
