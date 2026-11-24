@@ -536,6 +536,11 @@ select.dpc-q::-ms-expand{display:none}
 .fd-plus-c{display:none}.fd-plus.ouvert .fd-plus-c{display:block}
 .fd-plus-b{border:0;background:none;color:#2B4A6B;font:600 12px Inter,system-ui,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:12px 28px 6px;display:block}
 .fd-sous{display:block;font:400 11px Inter,system-ui,sans-serif;color:#9aa0ab;margin-top:2px}
+.fd-st{margin-left:auto;flex:0 0 auto}
+.fd-sous{padding:0 28px 14px;border-bottom:1px solid #eef0f4;font:500 13px Inter,system-ui,sans-serif;color:var(--g2);line-height:1.4}
+#contenuFicheDemande .fd-sous,#contenuFicheResa .fd-sous{padding:10px 28px 14px}
+.fd-grille.duo{grid-template-columns:1fr 1fr!important}
+.fd-grille.duo .fd-v{overflow-wrap:anywhere}
 .fd-statut{padding:10px 28px 4px}.fd-statut .dm-champ{display:inline-flex;align-items:center;gap:10px}.fd-statut .dm-champ label{margin:0}
 .dpc-txt{font-weight:600}.dpc-qt{font-size:12px;color:#6b7280;margin-left:6px}
 /* « Ajouter une réservation » depuis la liste : la fenêtre s'ouvre par-dessus la liste, sans afficher le planning derrière */
@@ -5107,32 +5112,28 @@ function ficheDemande(id, relu){
   /* La fiche est rangée par sujet — contact, événement, logistique,
      matériel — plutôt qu'en une seule grille où tout se vaut. */
   const bloc = (titre, contenu) => contenu.trim()
-    ? '<div class="fd-bloc">' + (titre ? '<div class="fd-t">' + titre + '</div>' : '') + '<div class="fd-grille">' + contenu + '</div></div>'
+    ? '<div class="fd-bloc">' + (titre ? '<div class="fd-t">' + titre + '</div>' : '') + '<div class="fd-grille' + (titre === 'Événement' || titre === 'Contact' ? ' duo' : '') + '">' + contenu + '</div></div>'
     : '';
 
   const piD = proPourFiche(d.resaId ? (cache.resas||[]).find(x => String(x.id) === String(d.resaId)) : null, d, d.nom, d.telephone);
   document.getElementById('contenuFicheDemande').innerHTML =
     '<div class="fd-h">' +
       '<span class="fd-nom">' + (piD.pro && piD.societe ? esc(piD.societe) : lienFicheClient(d.nom || 'Sans nom', d.telephone, d.email)) + entetePro(piD, d.nom) + '</span>' + badgeNumero(d) +
-      '<span class="dm-et ' + d.statut + '">' + ETIQ[d.statut] + '</span>' +
       (suitCadre ? '<span class="dm-et cadre' + (cadre === 'termine' ? ' fait' : '') + '">' +
         ETIQ_CADRE[cadre] + '</span>' : '') +
+      '<select class="dm-sel fd-st dm-sel-' + d.statut + '" aria-label="Statut" onchange="changerStatut(\'' + escAttr(d.id) + '\', this.value)">' + choixStatut + '</select>' +
     '</div>' +
-    '<div class="fd-recue">Demande reçue le ' + dateLisible(d.recue) + '</div>' +
-    '<div class="fd-statut"><span class="dm-champ"><label>Statut</label>' +
-      '<select class="dm-sel dm-sel-' + d.statut + '" onchange="changerStatut(\'' + escAttr(d.id) + '\', this.value)">' + choixStatut + '</select></span></div>' +
+    '<div class="fd-sous">Demande reçue le ' + dateLisible(d.recue) + '</div>' +
 
     modifsBloc(['d:' + d.id].concat(d.resaId ? ['r:' + d.resaId] : [])) +
-    bloc('', champ('Téléphone', tel) + champ('Email', mail) +
-      champ('Date', d.date ? esc(d.date) : '<span class="fd-manque">à préciser</span>')) +
-    blocProHTML(piD, champ) +
-
-    bloc('Logistique',
+    bloc('Événement',
+      champ('Date', d.date ? esc(d.date) : '<span class="fd-manque">à préciser</span>') +
       /* toujours affichée, même si le client n'a rien coché : l'absence de
          réponse vaut retrait sur place, et c'est cela qu'il faut savoir */
-      '<div class="fd-c large"><span class="fd-v">' +
-        badgeLivraison(d.livraison, d.livraisonRetour) + '</span></div>' +
-      champ('Adresse de l\u2019événement', adresse, true)) +
+      champ('Livraison', badgeLivraison(d.livraison, d.livraisonRetour)) +
+      champ('Adresse', adresse, true)) +
+    bloc('Contact', champ('Téléphone', tel) + champ('Email', mail, String(d.email||'').length > 17)) +
+    blocProHTML(piD, champ) +
 
     /* les montants ne se saisissent plus ici : ils se lisent, et se changent en cliquant sur « Modifier » */
     bloc('', lignesChiffrageLecture(d, null)) +
@@ -5313,19 +5314,22 @@ function ficheResa(id, relu){
   const total = (r.products||[]).reduce((t,p) => t + (Number(p.price)||0), 0);
 
   const bloc = (titre, contenu) => contenu.trim()
-    ? '<div class="fd-bloc">' + (titre ? '<div class="fd-t">' + titre + '</div>' : '') + '<div class="fd-grille">' + contenu + '</div></div>'
+    ? '<div class="fd-bloc">' + (titre ? '<div class="fd-t">' + titre + '</div>' : '') + '<div class="fd-grille' + (titre === 'Événement' || titre === 'Contact' ? ' duo' : '') + '">' + contenu + '</div></div>'
     : '';
 
   document.getElementById('contenuFicheResa').innerHTML =
-    '<div class="fd-h"><span class="fd-nom">' + (piR.pro && piR.societe ? esc(piR.societe) : lienFicheClient(r.client || 'Client', r.phone, r.email)) + entetePro(piR, r.client) + '</span>' + badgeNumero(r) + '</div>' +
-    '<div class="fd-recue">' + esc(dates) + '</div>' +
-    (function(){ const st = r.statutSuivi || 'validee'; return '<div class="fd-statut"><span class="dm-champ"><label>Statut</label><select class="dm-sel dm-sel-' + escAttr(st) + '" aria-label="Statut" onchange="changerStatut(\'__planning__' + escAttr(r.id) + '\', this.value)">' +
-        ['nouvelle','en-cours','validee'].map(v => '<option value="' + v + '"' + (st===v ? ' selected' : '') + '>' + ETIQ[v] + '</option>').join('') + '</select></span></div>'; })() +
+    '<div class="fd-h"><span class="fd-nom">' + (piR.pro && piR.societe ? esc(piR.societe) : lienFicheClient(r.client || 'Client', r.phone, r.email)) + entetePro(piR, r.client) + '</span>' + badgeNumero(r) +
+    (function(){ const st = r.statutSuivi || 'validee'; return '<select class="dm-sel fd-st dm-sel-' + escAttr(st) + '" aria-label="Statut" onchange="changerStatut(\'__planning__' + escAttr(r.id) + '\', this.value)">' +
+        ['nouvelle','en-cours','validee'].map(v => '<option value="' + v + '"' + (st===v ? ' selected' : '') + '>' + ETIQ[v] + '</option>').join('') + '</select>'; })() +
+    '</div>' +
+    '<div class="fd-sous">Réservation' + (produits ? ' · ' + esc(produits) : '') + '</div>' +
     modifsBloc(['r:' + r.id]) +
-    bloc('', champ('Téléphone', tel) + champ('Email', mail)) +
+    bloc('Événement',
+      champ('Date', esc(dates)) +
+      champ('Livraison', badgeLivraison(r.livraison, r.livraisonRetour)) +
+      champ('Adresse', lieu, true)) +
+    bloc('Contact', champ('Téléphone', tel) + champ('Email', mail, String(mailV||'').length > 17)) +
     blocProHTML(piR, champ) +
-
-    bloc('Logistique', '<div class="fd-c large"><span class="fd-v">' + badgeLivraison(r.livraison, r.livraisonRetour) + '</span></div>' + champ('Adresse de l\u2019événement', lieu, true)) +
 
     /* les montants se lisent ici ; pour les changer : « Modifier » */
     bloc('', lignesChiffrageLecture(null, r)) +

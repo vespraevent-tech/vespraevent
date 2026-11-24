@@ -361,7 +361,7 @@ window.VESPRA_PRIX_REGISTRE = [
   {
     "i": "boite-de-nuit-gonflable-1",
     "n": "Boîte de nuit gonflable",
-    "v": "Boîte seule",
+    "v": "Boîte de nuit seule",
     "p": 125,
     "pg": "produit-boite-nuit.html",
     "vi": 0,
@@ -371,7 +371,7 @@ window.VESPRA_PRIX_REGISTRE = [
   {
     "i": "boite-de-nuit-gonflable-2",
     "n": "Boîte de nuit gonflable",
-    "v": "Avec sono",
+    "v": "Boîte de nuit avec son et lumière",
     "p": 195,
     "pg": "produit-boite-nuit.html",
     "vi": 1,
@@ -2238,14 +2238,14 @@ window.VESPRA_PRODUITS = [
     "variantes": [
       {
         "prixId": "boite-de-nuit-gonflable-1",
-        "label": "Boîte seule",
-        "labelCat": "Boîte seule",
+        "label": "Boîte de nuit seule",
+        "labelCat": "Boîte de nuit seule",
         "prix": 125
       },
       {
         "prixId": "boite-de-nuit-gonflable-2",
-        "label": "Avec sono",
-        "labelCat": "Avec sono",
+        "label": "Boîte de nuit avec son et lumière",
+        "labelCat": "Boîte de nuit avec son et lumière",
         "prix": 195
       }
     ],

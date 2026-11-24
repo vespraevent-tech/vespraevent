@@ -1188,8 +1188,8 @@ var P=[
   ['Tente étoile 14m','barnum',270,['14m'],'Tente étoile 14'],
   ['Tente étoile 22m','barnum',590,['22m'],'Tente étoile'],
   ['Buvette 4x4m','barnum',265,['4x4m'],'Buvette'],
-  ['Boîte de nuit gonflable seule','barnum',125,['seule'],'Boîte seule'],
-  ['Boîte de nuit gonflable avec sono','barnum',195,['avec sono'],'Boîte + sono'],
+  ['Boîte de nuit gonflable seule','barnum',125,['seule'],'Boîte de nuit seule'],
+  ['Boîte de nuit gonflable avec son et lumière','barnum',195,['avec sono'],'Boîte + son et lumière'],
   ['Installation et démontage','barnum',0,['Barnum 3x3 / 4x8'],'Installation'],
   ['Installation et démontage','barnum',0,['Barnum 6x10'],'Installation'],
   ['Installation et démontage','barnum',0,['Tente étoile'],'Installation'],
@@ -5532,7 +5532,7 @@ var PK_OPT = {
 var OPTIONS_PRODUIT = {};
 ['Photobooth 1','Photobooth 2','Photobooth 3','Photobooth 4'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.cadre,PK_OPT.deguis,PK_OPT.usb];});
 ['Barnum 3x3m','Barnum 4x6m','Barnum 4x8m','Barnum 6x10m'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.install,PK_OPT.lestage,PK_OPT.eclair,PK_OPT.guir10,PK_OPT.guir20];});
-['Buvette 4x4m','Boîte de nuit gonflable seule','Boîte de nuit gonflable avec sono','Boîte de nuit gonflable Essential','Boîte de nuit gonflable Ultimate'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.install];});
+['Buvette 4x4m','Boîte de nuit gonflable seule','Boîte de nuit gonflable avec son et lumière','Boîte de nuit gonflable Essential','Boîte de nuit gonflable Ultimate'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.install];});
 OPTIONS_PRODUIT['Buvette 4x4m']=[PK_OPT.install,PK_OPT.guir10,PK_OPT.guir20];
 ['Tente étoile 10m','Tente étoile 14m','Tente étoile 22m'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.install,PK_OPT.eclair,PK_OPT.guir10,PK_OPT.guir20];});
 ['Sono 20 personnes','Sono 40/60 personnes','Sono 80/100 personnes','Sonorisation — 120 à 150 personnes','Sonorisation — 180 à 250 personnes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.caisson,PK_OPT.microFil,PK_OPT.microSF];});
