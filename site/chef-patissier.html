@@ -785,39 +785,6 @@ textarea.pr-i{resize:vertical;min-height:96px}
   <article class="pr-card" id="prCard" aria-live="polite"></article>
   <div class="pr-more" id="prMore"></div>
 </div></section>
-<section class="rdv" id="rdv">
-  <div class="rdv-in">
-    <div class="rdv-txt">
-      <p class="rdv-eye">Parlez-nous de votre projet</p>
-      <h2 class="rdv-h">NOUS ORGANISONS,<br>VOUS PROFITEZ DE VOTRE ÉVÉNEMENT !</h2>
-      <p class="rdv-p">Matériel, prestations et intervenants : nous pouvons organiser votre événement avec vous, de A à Z. Passez nous voir à Vitré : vous voyez le matériel, vous posez toutes vos questions, et nous préparons votre projet et votre devis ensemble. Sur rendez-vous, sans engagement.</p>
-      <ul class="rdv-l">
-        <li>Parler de votre événement et de son organisation</li>
-        <li>Voir le matériel et valider l'installation</li>
-        <li>Réponse sous 24 h pour fixer le créneau</li>
-      </ul>
-    </div>
-    <form class="rdv-f" name="rendez-vous" action="/merci.html" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="rdvForm">
-      <p hidden><label>Ne pas remplir : <input name="bot-field"></label></p>
-      <input type="hidden" name="form-name" value="rendez-vous">
-      <input type="hidden" name="demande" value="Rendez-vous : visite du matériel à Vitré"><input type="hidden" name="date_evenement"><input type="hidden" name="type"><input type="hidden" name="convives"><input type="hidden" name="prestataire">
-      <h2 class="rdv-fh">Nous contacter</h2>
-      <div class="rdv-row">
-        <input class="rdv-i" type="text" name="nom" placeholder="Prénom et nom *" required autocomplete="name">
-        <input class="rdv-i" type="tel" name="telephone" placeholder="Téléphone *" required autocomplete="tel" pattern="[0-9+\(\)\.\s\-]{9,20}" title="Indiquez un numéro de téléphone valide">
-      </div>
-      <input class="rdv-i" type="email" name="email" placeholder="Adresse email *" required autocomplete="email">
-      <div class="rdv-row">
-        <label class="rdv-lab">Jour souhaité *<input class="rdv-i" type="text" name="date" id="rdvDate" data-date-fr required aria-label="Jour souhaité" placeholder="JJ/MM/AAAA" autocomplete="off"></label>
-        <label class="rdv-lab">Heure souhaitée (facultatif)<input class="rdv-i" type="text" name="heure" id="rdvHeure" aria-label="Heure souhaitée, facultatif" placeholder="ex. 14h" maxlength="20" autocomplete="off"></label>
-      </div>
-      <textarea class="rdv-i" name="message" rows="4">Bonjour, je souhaiterais prendre rendez-vous pour parler de l'organisation de mon événement et voir le matériel.</textarea>
-      <label class="rdv-chk"><input type="checkbox" name="louer_materiel" value="Oui"> Je souhaite aussi louer du matériel pour cet événement</label>
-      <button class="rdv-b" type="submit">Envoyer ma demande</button>
-      <p class="rdv-n">Vos coordonnées servent uniquement à vous répondre. Ou appelez-nous : <a href="tel:+33650836828">06 50 83 68 28</a></p>
-    </form>
-  </div>
-</section>
 </main>
 <script>
 (function(){
