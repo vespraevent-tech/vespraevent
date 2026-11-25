@@ -4,8 +4,8 @@
 (function(){
   var css='.vf{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity 1.2s ease}'+
   '.vf.on{opacity:1}'+
-  '.vf-lien{position:absolute;right:18px;bottom:16px;z-index:3;display:inline-flex;align-items:center;gap:8px;font:500 12px/1 Inter,system-ui,sans-serif;letter-spacing:.06em;color:rgba(255,255,255,.82);text-decoration:none;padding:8px 12px;border:1px solid rgba(255,255,255,.28);border-radius:999px;background:rgba(10,16,26,.35);backdrop-filter:blur(4px);opacity:0;transition:opacity .6s}'+
-  '.vf-lien.on{opacity:1}.vf-lien:hover{color:#fff;border-color:rgba(255,255,255,.6)}.vf-lien svg{width:9px;height:9px;fill:currentColor}'+
+  '.vf-lien{position:absolute;right:14px;bottom:10px;z-index:3;display:inline-flex;align-items:center;gap:5px;font:400 10.5px/1 Inter,system-ui,sans-serif;letter-spacing:.04em;color:rgba(255,255,255,.6);text-decoration:none;padding:4px 2px;opacity:0;transition:opacity .6s,color .2s}'+
+  '.vf-lien.on{opacity:1}.vf-lien:hover{color:#fff}.vf-lien svg{width:6px;height:7px;fill:currentColor}'+
   '.vfilm{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#0c0f14;margin:0 0 22px}'+
   '.vfilm video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#0c0f14}'+
   '.vfilm.lit video{object-fit:contain}'+
@@ -27,7 +27,7 @@
     v.addEventListener('playing',function(){clearTimeout(delai)});
     var img=el.querySelector('picture,.ev-hero-img');if(img&&img.parentNode===el)img.after(v);else el.insertBefore(v,el.firstChild);
     var lien=null;
-    if(el.getAttribute('data-video-lien')){lien=document.createElement('a');lien.className='vf-lien';lien.href=el.getAttribute('data-video-lien');lien.innerHTML=JOUER+'Film de notre vidéaste partenaire';el.appendChild(lien);
+    if(el.getAttribute('data-video-lien')){lien=document.createElement('a');lien.className='vf-lien';lien.href=el.getAttribute('data-video-lien');lien.innerHTML=JOUER+'Film de notre vidéaste';el.appendChild(lien);
       lien.addEventListener('click',function(e){var t=[].slice.call(document.querySelectorAll('.pr-tab')).filter(function(b){return /vid[ée]aste/i.test(b.textContent)})[0];if(!t)return;e.preventDefault();t.click();var h=document.getElementById('prHero')||t;h.scrollIntoView({behavior:'smooth',block:'start'});});}
     v.addEventListener('playing',function(){v.classList.add('on');if(lien)lien.classList.add('on');});
     v.addEventListener('error',function(){v.remove();if(lien)lien.remove();});
@@ -38,6 +38,9 @@
     boite.classList.add('vfilm');
     boite.innerHTML='<video preload="metadata" playsinline'+(poster?' poster="'+poster+'"':'')+' src="'+src+'"></video><button type="button" class="vj" aria-label="Lire le film"><i>'+JOUER+'</i>'+(legende?'<span>'+legende+'</span>':'')+'</button>';
     var v=boite.querySelector('video'),b=boite.querySelector('.vj');
+    /* le bloc n'apparaît qu'une fois la vidéo trouvée : jamais de bloc qui s'affiche puis disparaît */
+    boite.style.display='none';
+    v.addEventListener('loadedmetadata',function(){boite.style.display=''});
     v.addEventListener('error',function(){boite.remove()});
     b.addEventListener('click',function(){b.remove();boite.classList.add('lit');v.controls=true;v.play().catch(function(){})});
   };

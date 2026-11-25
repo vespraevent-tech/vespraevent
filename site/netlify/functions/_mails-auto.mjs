@@ -52,7 +52,7 @@ export function htmlAccuse({ txt, prenom, site, emetteur, recap, avecDevis }) {
 ${para(txt.message)}
 ${bloc}${pj}${dispo}
 ${boutons(btn(mailtoRep(emetteur), 'Répondre'))}
-<p style="margin:0 0 12px;font-size:12px;color:#646D7C">Un chèque de caution est demandé le jour de la remise du matériel. Ouvert sans rendez-vous le mercredi et le samedi, sur rendez-vous les autres jours.</p>
+<p style="margin:0 0 12px;font-size:12px;color:#646D7C">Un chèque de caution est demandé le jour de la remise du matériel. Disponible du lundi au samedi.</p>
 <p style="margin:14px 0 0">À très bientôt,</p>`, site);
 }
 
