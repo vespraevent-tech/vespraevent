@@ -10,7 +10,8 @@
 - Positionnement : haut de gamme / premium. Pas d'éléments qui font « cheap » (promos agressives, gros boutons, croix énormes, listes déroulantes basiques).
 
 ## Livraison
-- Site statique dans `site/`, déployé à la main sur Netlify (zip dont la racine = contenu de `site/`). Zips : `/tmp/claude-0/vespra-site-vNNNN.zip`.
+- Site statique dans `site/`. Depuis le 25/11/2026, Thomas a autorisé Claude à publier lui-même : outil MCP Netlify `deploy-site` (siteId `1c257de3-2d43-4a2d-891c-a0e4758e4961`), puis lancer la commande `npx @netlify/mcp …` qu'il renvoie depuis `site/`, avec `NODE_USE_ENV_PROXY=1`. Vérifier ensuite `https://www.vespraevent.fr/api/version` et tester en réel. Les zips (`/tmp/claude-0/vespra-site-vNNNN.zip`) restent en secours.
+- Vidéos du site : Cloudflare R2 (préfixe `site-medias/`), servies par `/videos/<nom>`, envoyées par l'onglet Vidéos du back-office ou par l'API `/api/admin/medias` (morceaux de 3 Mo assemblés par deux).
 - Fonctions Netlify dans `site/netlify/functions/`, stockage Netlify Blobs.
 - Back-office : `site/studio/`. Appli des bornes photobooth : `site/photobooth/app/` + appli Windows `photobooth-windows/` (mise à jour via `node photobooth-windows/publier-maj.js`).
 - Vidéobooth (tablette) : `site/videobooth/`.
