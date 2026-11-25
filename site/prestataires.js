@@ -60,13 +60,13 @@ window.VESPRA_PRESTATAIRES = [
   {
     metier: "Photographe", nom: "Photographe partenaire", type: "Reportage photo de votre événement",
     commune: "Vitré",
-    mot: "Reportage photo de votre mariage ou de votre événement : moments forts, portraits, photos de groupe, remises en haute définition.",
+    mot: "Reportage photo de votre mariage ou de votre événement : moments forts, portraits, photos de groupe. Retouche personnalisée selon votre thème et vos envies.",
     site: "", tel: "", lien: "/evenements.html#photographe", exemple: false
   },
   {
     metier: "Vidéaste", nom: "Vidéaste partenaire", type: "Film souvenir de votre événement",
     commune: "Vitré",
-    mot: "Tournage et montage d'un film souvenir de votre événement, avec une version courte à partager.",
+    mot: "Tournage et film souvenir de votre événement, monté selon votre thème et vos envies : musique, rythme, style. Version courte à partager.",
     site: "", tel: "", lien: "/evenements.html#videaste", exemple: false
   },
 
