@@ -26,6 +26,18 @@ const nb = (v, min, max, def) => { const x = Math.round(Number(v)); return Numbe
 const oui = (v, def) => (v === true || v === false ? v : def);
 const hex = (v, def) => (/^#[0-9a-fA-F]{6}$/.test(String(v || '')) ? String(v).toUpperCase() : def);
 const idOk = (v, p) => (new RegExp('^' + p + '[0-9a-f]{12}$').test(String(v || '')) ? String(v) : '');
+/* calques libres de l'écran Bienvenue (images, textes, formes) : positions = CENTRE de l'élément, en pixels de l'écran 1920 × 1080 */
+const reel = (v, min, max, def) => { const x = Number(v); return Number.isFinite(x) ? Math.min(max, Math.max(min, Math.round(x * 100) / 100)) : def; };
+function calquesPropres(l) {
+  return (Array.isArray(l) ? l : []).slice(0, 40).map((c) => {
+    if (!c || typeof c !== 'object') return null;
+    const base = { id: String(c.id || '').replace(/[^a-z0-9]/gi, '').slice(0, 16) || ('c' + Math.random().toString(36).slice(2, 9)), x: nb(c.x, -2000, 4000, 960), y: nb(c.y, -2000, 4000, 540), r: nb(c.r, -360, 360, 0), o: reel(c.o, 0.05, 1, 1), cache: c.cache === true };
+    if (c.type === 'image') { const im = idOk(c.image, 'im'); return im ? { ...base, type: 'image', image: im, w: nb(c.w, 20, 4000, 400) } : null; }
+    if (c.type === 'texte') return { ...base, type: 'texte', texte: String(c.texte == null ? '' : c.texte).replace(/\r/g, '').split('\n').slice(0, 6).join('\n').slice(0, 200), police: POLICES_OK.includes(c.police) ? c.police : 'elegante', couleur: hex(c.couleur, '#231F1C'), taille: nb(c.taille, 8, 400, 110) };
+    if (c.type === 'forme') return { ...base, type: 'forme', forme: c.forme === 'cercle' ? 'cercle' : 'rect', w: nb(c.w, 10, 4000, 600), h: nb(c.h, 10, 4000, 240), couleur: hex(c.couleur, '#FFFFFF'), rayon: nb(c.rayon, 0, 1000, 0), bord: hex(c.bord, '#B8862F'), ep: nb(c.ep, 0, 60, 0) };
+    return null;
+  }).filter(Boolean);
+}
 
 /* formats d'impression (pixels à 300 dpi) */
 export const FORMATS = {
@@ -115,6 +127,7 @@ export function evenementPropre(e, ancien) {
       fond: idOk(ac.fond, 'im'), couleur: hex(ac.couleur, '#FFFFFF'),
       bouton: { x: nb(ac.bouton && ac.bouton.x, 0, 1920, 960), y: nb(ac.bouton && ac.bouton.y, 0, 1080, 540), taille: nb(ac.bouton && ac.bouton.taille, 80, 600, 230), couleur: hex(ac.bouton && ac.bouton.couleur, '#1F3B5A'), icone: hex(ac.bouton && ac.bouton.icone, '#FFFFFF') },
       galerie: oui(ac.galerie, true),
+      calques: Array.isArray(ac.calques) ? calquesPropres(ac.calques) : undefined,
       texte: { contenu: txt(ac.texte && ac.texte.contenu, 80), police: ['elegante', 'manuscrite', 'moderne', 'festive'].includes(ac.texte && ac.texte.police) ? ac.texte.police : 'elegante', couleur: hex(ac.texte && ac.texte.couleur, '#231F1C'), taille: nb(ac.texte && ac.texte.taille, 24, 260, 110), x: nb(ac.texte && ac.texte.x, 0, 1920, 960), y: nb(ac.texte && ac.texte.y, 0, 1080, 200) },
       logo: { image: idOk(ac.logo && ac.logo.image, 'im'), x: nb(ac.logo && ac.logo.x, 0, 1920, 960), y: nb(ac.logo && ac.logo.y, 0, 1080, 900), largeur: nb(ac.logo && ac.logo.largeur, 40, 1920, 360) },
     },

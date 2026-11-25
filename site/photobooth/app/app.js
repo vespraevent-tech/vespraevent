@@ -55,6 +55,7 @@
   }
   function imagesDe(e) {
     var l = [e.accueil && e.accueil.fond, e.accueil && e.accueil.logo && e.accueil.logo.image];
+    ((e.accueil && e.accueil.calques) || []).forEach(function (c) { if (c && c.type === 'image') l.push(c.image); });
     (e.misesEnPage || []).forEach(function (m) { l.push(m.cadre); });
     return l.filter(Boolean);
   }
@@ -218,6 +219,16 @@
     if (a.fond) p.push(chargerImage(e.id, a.fond, viaBorne).then(function (im) { if (im) { var i = im.cloneNode(); i.className = 'fond'; sc.insertBefore(i, sc.firstChild); } }));
     if (a.texte && a.texte.contenu) { var t = document.createElement('div'); t.className = 'txt'; t.textContent = a.texte.contenu; t.style.cssText += ';left:' + a.texte.x + 'px;top:' + a.texte.y + 'px;font-family:' + (POLICES[a.texte.police] || POLICES.elegante) + ';font-size:' + a.texte.taille + 'px;color:' + a.texte.couleur; sc.appendChild(t); }
     if (a.logo && a.logo.image) p.push(chargerImage(e.id, a.logo.image, viaBorne).then(function (im) { if (im) { var i = im.cloneNode(); i.className = 'logo'; i.style.cssText = 'left:' + a.logo.x + 'px;top:' + a.logo.y + 'px;width:' + a.logo.largeur + 'px'; sc.appendChild(i); } }));
+    /* calques libres (images, textes, formes), dans l'ordre : le premier est le plus en arrière ; positions = centre de l'élément */
+    (a.calques || []).forEach(function (c) {
+      if (!c || c.cache) return;
+      var d = document.createElement('div'); d.className = 'calq';
+      d.style.cssText = 'position:absolute;left:' + c.x + 'px;top:' + c.y + 'px;transform:translate(-50%,-50%) rotate(' + (c.r || 0) + 'deg);opacity:' + (c.o == null ? 1 : c.o) + ';pointer-events:none';
+      if (c.type === 'texte') { var pt = POLICES[c.police] || POLICES.elegante, gr = { elegante: 700, moderne: 700, festive: 700 }[c.police] || 400; d.style.cssText += ';white-space:pre;line-height:1.1;text-align:center;color:' + c.couleur + ';font-family:' + pt + ';font-weight:' + gr + ';font-size:' + c.taille + 'px'; d.textContent = c.texte || ''; }
+      else if (c.type === 'forme') { var f = document.createElement('div'); f.style.cssText = 'width:' + c.w + 'px;height:' + c.h + 'px;background:' + c.couleur + ';border-radius:' + (c.forme === 'cercle' ? '50%' : (c.rayon || 0) + 'px') + (c.ep ? ';box-sizing:border-box;border:' + c.ep + 'px solid ' + c.bord : ''); d.appendChild(f); }
+      else if (c.type === 'image') p.push(chargerImage(e.id, c.image, viaBorne).then(function (im) { if (im) { var i = im.cloneNode(); i.style.cssText = 'display:block;width:' + c.w + 'px'; d.appendChild(i); } }));
+      sc.appendChild(d);
+    });
     var b = a.bouton || { x: 960, y: 540, taille: 230, couleur: '#1F3B5A', icone: '#fff' };
     var bt = document.createElement('button'); bt.className = 'declic'; bt.innerHTML = ICONE; bt.setAttribute('aria-label', 'Prendre une photo');
     bt.style.cssText = 'left:' + b.x + 'px;top:' + b.y + 'px;width:' + b.taille + 'px;height:' + b.taille + 'px;background:' + b.couleur;

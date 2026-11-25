@@ -238,21 +238,26 @@
     points: '<circle cx="9" cy="9" r="1.4" fill="currentColor"/><circle cx="15" cy="9" r="1.4" fill="currentColor"/><circle cx="9" cy="15" r="1.4" fill="currentColor"/><circle cx="15" cy="15" r="1.4" fill="currentColor"/>',
     dupli: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
     crayon: '<path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/>',
+    main: '<path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11M11 10.5V4a1.5 1.5 0 0 1 3 0v6.5M14 10.5V5.5a1.5 1.5 0 0 1 3 0V13M17 11a1.5 1.5 0 0 1 3 0v3a7 7 0 0 1-7 7h-1a7 7 0 0 1-5.6-2.8L4 15.2a1.5 1.5 0 0 1 2.4-1.8L8 15"/>',
+    photo: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
     haut: '<path d="M12 19V5M6 11l6-6 6 6"/>', bashaut: '<path d="M12 5v14M6 13l6 6 6-6"/>',
     premier: '<path d="M5 4h14M12 20V9M7 14l5-5 5 5"/>', dernier: '<path d="M5 20h14M12 4v11M7 10l5 5 5-5"/>'
   };
   function ic(k) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (IC[k] || '') + '</svg>'; }
-  var SECTIONS = [['tableau', 'Tableau de bord', ''], ['experience', 'Expérience photobooth', 'Basique'], ['capture', 'Paramètres de capture', ''], ['accueil', 'Écran d’accueil', 'Avancé'], ['ecran', 'Écran de partage', ''], ['partage', 'Paramètres de partage', 'Impression et partage'], ['impression', 'Paramètres d’impression', ''], ['galerie', 'Galerie en ligne', '']];
+  var GROUPE_ECRANS = ['accueil', 'capture', 'ecran'];
+  var SECTIONS = [['tableau', 'Tableau de bord', ''], ['experience', 'Expérience photobooth', 'Basique'], ['accueil', 'Écrans', 'Avancé'], ['partage', 'Paramètres de partage', 'Impression et partage'], ['impression', 'Paramètres d’impression', ''], ['galerie', 'Galerie en ligne', '']];
   function rendreEvt(z) {
-    var nav = SECTIONS.map(function (x) { return (x[2] ? '<div class="g">' + x[2] + '</div>' : (x[0] === 'tableau' ? '' : '')) + '<button type="button" class="' + (PB.section === x[0] ? 'on' : '') + '" onclick="pbSection(\'' + x[0] + '\')">' + ic(x[0]) + '<span>' + x[1] + '</span></button>'; }).join('');
+    var nav = SECTIONS.map(function (x) { return (x[2] ? '<div class="g">' + x[2] + '</div>' : (x[0] === 'tableau' ? '' : '')) + '<button type="button" class="' + (PB.section === x[0] || (x[0] === 'accueil' && GROUPE_ECRANS.indexOf(PB.section) >= 0) ? 'on' : '') + '" onclick="pbSection(\'' + x[0] + '\')">' + ic(x[0]) + '<span>' + x[1] + '</span></button>'; }).join('');
     var e = PB.evt;
     z.innerHTML = '<div class="pbx-bar"><button type="button" class="pbx-retour" onclick="pbRetour()">' + ic('retour') + 'Événements</button>'
       + '<div class="pbx-nom" title="' + esc(e.nom) + '">' + esc(e.nom) + '</div>' + (e.date ? '<div class="pbx-date">' + dateFr(e.date) + '</div>' : '')
       + '<span class="pbx-etat' + (PB.etatSync ? ' ' + PB.etatSync[0] : '') + '" id="pbxEtat"' + (PB.etatSync ? '' : ' hidden') + '>' + (PB.etatSync ? PB.etatSync[1] : '') + '</span>'
       + '<div class="pbx-act"><button type="button" class="pbx-b" onclick="pbLienCopier()">' + ic('partage') + 'Partager</button><button type="button" class="pbx-b p" onclick="pbLienOuvrir()">' + ic('oeil') + 'Prévisualiser</button></div></div>'
-      + '<div class="pbx-corps"><nav class="pbx-nav">' + nav + '</nav><div id="pbContenu" class="pbx-main"></div></div>';
+      + '<div class="pbx-corps"><nav class="pbx-nav">' + nav + '</nav>'
+      /* les trois écrans de la borne réunis : Bienvenue · Capture · Partage */
+      + (GROUPE_ECRANS.indexOf(PB.section) >= 0 ? '<div class="pbx-main ecx-main"><div class="ecx-tabs">' + [['accueil', 'Bienvenue', 'main'], ['capture', 'Capture', 'photo'], ['ecran', 'Partage', 'partage']].map(function (t) { return '<button type="button" class="' + (PB.section === t[0] ? 'on' : '') + '" onclick="pbSection(\'' + t[0] + '\')">' + ic(t[2]) + t[1] + '</button>'; }).join('') + '</div><div id="pbContenu"></div></div>' : '<div id="pbContenu" class="pbx-main"></div>') + '</div>';
     var c = $('pbContenu');
-    ({ tableau: secTableau, experience: secExperience, capture: secCapture, accueil: secAccueil, ecran: secEcran, partage: secPartage, impression: secImpression, galerie: secGalerie })[PB.section](c);
+    ({ tableau: secTableau, experience: secExperience, capture: secCapture, accueil: window.pbSecBienvenue || secAccueil, ecran: secEcran, partage: secPartage, impression: secImpression, galerie: secGalerie })[PB.section](c);
   }
   window.pbSection = function (s) { if (modifsPerdues()) return; PB.section = s; PB.edit = null; PB.modeles = false; rendre(); };
 
@@ -969,4 +974,5 @@
   window.pbGalOuverte = function () { lireGalerie(); PB.evt.galerie.ouverte = !PB.evt.galerie.ouverte; enregistrer(PB.evt.galerie.ouverte ? 'Galerie ouverte' : 'Galerie fermée').then(rendre); };
   window.pbCouverture = async function (inp) { var f = inp.files && inp.files[0]; if (!f) return; lireGalerie(); try { PB.evt.galerie.couverture = await envoyerImage(f); await enregistrer('Couverture enregistrée'); rendre(); } catch (e) { toast('Échec : ' + e.message, true); } };
   window.pbGalSauver = function () { lireGalerie(); enregistrer('Galerie enregistrée').then(rendre); };
+  window.PBX = { get PB() { return PB; }, POLICES: POLICES, esc: esc, $: $, urlImage: function (id) { return urlImage(id); }, envoyerImage: envoyerImage, enregistrer: enregistrer, toast: toast, rendre: function () { rendre(); }, ic: ic };
 })();
