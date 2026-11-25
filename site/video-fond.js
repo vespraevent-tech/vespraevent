@@ -20,7 +20,11 @@
     var src=el.getAttribute('data-video');if(!src||sobre())return;
     var v=document.createElement('video');v.className='vf';v.muted=true;v.defaultMuted=true;v.loop=true;v.autoplay=true;v.playsInline=true;
     v.setAttribute('muted','');v.setAttribute('playsinline','');v.setAttribute('aria-hidden','true');v.preload='auto';v.disablePictureInPicture=true;
+    var ph=el.querySelector('.ev-hero-img');if(ph&&ph.currentSrc)v.poster=ph.currentSrc;else if(ph&&ph.src)v.poster=ph.src;
     v.src=src;
+    /* connexion trop lente : si la vidéo ne démarre pas en 8 s, on garde la photo */
+    var delai=setTimeout(function(){if(!v.classList.contains('on')){v.pause();v.remove();if(lien)lien.remove();}},8000);
+    v.addEventListener('playing',function(){clearTimeout(delai)});
     var img=el.querySelector('picture,.ev-hero-img');if(img&&img.parentNode===el)img.after(v);else el.insertBefore(v,el.firstChild);
     var lien=null;
     if(el.getAttribute('data-video-lien')){lien=document.createElement('a');lien.className='vf-lien';lien.href=el.getAttribute('data-video-lien');lien.innerHTML=JOUER+'Film de notre vidéaste partenaire';el.appendChild(lien);
