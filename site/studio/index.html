@@ -306,7 +306,7 @@ img{display:block;max-width:100%}
 #contenuFicheDemande .fd-recue,#contenuFicheResa .fd-recue{margin:0;padding:2px 28px 16px;border-bottom:1px solid #eef0f4;font:600 13.5px Inter,system-ui,sans-serif;color:#14304f}
 #contenuFicheDemande .fd-bloc,#contenuFicheResa .fd-bloc{margin:0;padding:14px 28px;border-bottom:1px solid #eef0f4}
 #contenuFicheDemande .fd-bloc:last-of-type,#contenuFicheResa .fd-bloc:last-of-type{border-bottom:0}
-#contenuFicheDemande .fd-t,#contenuFicheResa .fd-t{border:0;padding:0;margin:0 0 8px;font:600 11px Inter,system-ui,sans-serif;letter-spacing:.5px;color:var(--g2)}
+#contenuFicheDemande .fd-t,#contenuFicheResa .fd-t{border:0;padding:0;margin:0 0 9px;font:800 11.5px Inter,system-ui,sans-serif;letter-spacing:.6px;color:#14304f}
 #contenuFicheDemande .fd-l,#contenuFicheResa .fd-l{font:600 11px Inter,system-ui,sans-serif;letter-spacing:.5px;color:var(--g2)}
 #contenuFicheDemande .fd-v,#contenuFicheResa .fd-v,#contenuFicheDemande .fd-lien,#contenuFicheResa .fd-lien{font:600 14.5px Inter,system-ui,sans-serif;color:#14304f}
 #contenuFicheDemande .fd-grille,#contenuFicheResa .fd-grille{gap:14px 28px}
@@ -544,8 +544,11 @@ select.dpc-q::-ms-expand{display:none}
 .fd-badges .dm-nums{display:flex;flex-wrap:wrap;gap:6px}.fd-badges .dm-num{margin:0}
 @media(max-width:620px){.fd-badges .dm-num{font-size:11.5px;padding:2px 6px}.fd-badges,.fd-badges .dm-nums{gap:4px}#contenuFicheDemande .fd-h,#contenuFicheResa .fd-h{gap:10px}}
 .fd-livr{white-space:nowrap}
+#contenuFicheDemande .fd-livr,#contenuFicheResa .fd-livr{background:none!important;padding:0;border-radius:0;font-size:14px;font-weight:700}
+#contenuFicheDemande .fd-livr.oui,#contenuFicheResa .fd-livr.oui{color:#2F7A3A}#contenuFicheDemande .fd-livr.non,#contenuFicheResa .fd-livr.non{color:#A8432B}
 #contenuFicheDemande .fd-quand,#contenuFicheResa .fd-quand{display:flex;align-items:center;gap:8px;padding:10px 28px 16px;border-bottom:1px solid #eef0f4;font:600 14px Inter,system-ui,sans-serif;color:#14304f}
 .fd-quand svg{flex:0 0 auto;color:#b8862f}
+@media(max-width:620px){.fd-q2{display:none}}
 .fd-grille.duo{grid-template-columns:1fr 1fr!important}
 @media(max-width:620px){.fd-grille.duo.contact{grid-template-columns:1fr!important}}
 .fd-grille.duo .fd-v{overflow-wrap:anywhere}
@@ -4831,20 +4834,20 @@ function acompteBlocHTML(d, r, modeForce){
       '<span style="position:absolute;top:3px;' + (recu ? 'left:19px' : 'left:3px') + ';width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .2s"></span></span>' +
       '<span>' + (recu ? 'Acompte reçu' : 'Acompte non reçu') + (montant > 0 ? ' — ' + eur(montant) : '') + '</span></button>';
 
-  const blocAcompte = '<div class="fd-bloc"><div class="fd-t">Acompte</div><div class="fd-grille"><div class="fd-c large">' +
+  const blocAcompte = '<div class="fd-bloc"><div class="fd-t">Paiement</div><div class="fd-grille"><div class="fd-c large">' +
     (demande > 0 ? '<div style="font:400 11px Inter,system-ui,sans-serif;color:#9aa0ab;margin:0 0 6px">(devis généré avec une demande d\u2019acompte)</div>' : '') +
-    interrupteur + '</div></div></div>';
+    interrupteur + '</div>__VIREMENT__</div></div>';
 
   /* Virement reçu : le client a tout réglé d'un coup. Petit interrupteur discret, gris tant que rien n'est reçu. */
   const virementOk = !!r && r.virementRecu === true;
   const blocVirement = r
-    ? '<div class="fd-bloc"><div class="fd-grille"><div class="fd-c large">' +
+    ? '<div class="fd-c large">' +
       '<button type="button" role="switch" aria-checked="' + virementOk + '" aria-label="Virement reçu" ' +
         'onclick="basculerVirementRecu(\'' + escAttr(r.id) + '\',\'' + mode + '\',' + (!virementOk) + ')" ' +
         'style="cursor:pointer;display:inline-flex;align-items:center;gap:9px;background:none;border:0;padding:0;font:500 12px Inter,system-ui,sans-serif;color:' + (virementOk ? '#2f7a3a' : '#6b7280') + '">' +
         '<span style="position:relative;width:34px;height:20px;border-radius:10px;flex-shrink:0;transition:background .2s;background:' + (virementOk ? '#3fa653' : '#c9ced6') + '">' +
         '<span style="position:absolute;top:3px;' + (virementOk ? 'left:17px' : 'left:3px') + ';width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s"></span></span>' +
-        '<span>' + (virementOk ? 'Virement reçu — règlement complet' : 'Virement reçu') + '</span></button></div></div></div>'
+        '<span>' + (virementOk ? 'Virement reçu — règlement complet' : 'Virement reçu') + '</span></button></div>'
     : '';
 
   cartes.forEach(c => { if(c.qteHtml == null) c.qteHtml = ''; });
@@ -4874,7 +4877,7 @@ function acompteBlocHTML(d, r, modeForce){
            '<div class="dpr t r"><span class="dpr-n">Reste à payer</span><span class="dpr-v">' + eur(total - montant) + '</span></div>';
   }
   const blocPrix = '<div class="fd-bloc"><div class="fd-t">Détail du prix</div><div>' + cartesHtml + lignes + bas + '</div></div>';
-  return blocAcompte + blocVirement + blocPrix;
+  return blocAcompte.replace('__VIREMENT__', blocVirement) + blocPrix;
 }
 
 /* « Barnum 4×6 m ×2 » → titre sans la quantité (elle a sa propre case) */
@@ -5134,7 +5137,7 @@ function ficheDemande(id, relu){
         ETIQ_CADRE[cadre] + '</span>' : '') + '</span></div>' +
       '<select class="dm-sel fd-st dm-sel-' + d.statut + '" aria-label="Statut" onchange="changerStatut(\'' + escAttr(d.id) + '\', this.value)">' + choixStatut + '</select>' +
     '</div>' +
-    '<div class="fd-quand">' + ICONE_CAL + (d.date ? 'Événement le ' + esc(minus(jourLisible(isoDepuisFr(d.date))) + (d.dateFin && d.dateFin !== d.date ? ' → ' + minus(jourLisible(isoDepuisFr(d.dateFin))) : '')) : 'Date de l’événement à préciser') + '</div>' +
+    '<div class="fd-quand">' + ICONE_CAL + (d.date ? 'Événement le ' + esc(minus(jourLisible(isoDepuisFr(d.date)))) + (d.dateFin && d.dateFin !== d.date ? '<span class="fd-q2"> → ' + esc(minus(jourLisible(isoDepuisFr(d.dateFin)))) + '</span>' : '') : 'Date de l’événement à préciser') + '</div>' +
 
     modifsBloc(['d:' + d.id].concat(d.resaId ? ['r:' + d.resaId] : [])) +
     bloc('Contact', champ('Téléphone', tel) + champ('Email', mail)) +
@@ -5334,7 +5337,7 @@ function ficheResa(id, relu){
     (function(){ const st = r.statutSuivi || 'validee'; return '<select class="dm-sel fd-st dm-sel-' + escAttr(st) + '" aria-label="Statut" onchange="changerStatut(\'__planning__' + escAttr(r.id) + '\', this.value)">' +
         ['nouvelle','en-cours','validee'].map(v => '<option value="' + v + '"' + (st===v ? ' selected' : '') + '>' + ETIQ[v] + '</option>').join('') + '</select>'; })() +
     '</div>' +
-    '<div class="fd-quand">' + ICONE_CAL + 'Événement le ' + esc(minus(dates).replace(' → ', ' → ')) + '</div>' +
+    '<div class="fd-quand">' + ICONE_CAL + 'Événement le ' + (function(){ const p = minus(dates).split(' → '); return esc(p[0]) + (p[1] ? '<span class="fd-q2"> → ' + esc(p[1]) + '</span>' : ''); })() + '</div>' +
     modifsBloc(['r:' + r.id]) +
     bloc('Contact', champ('Téléphone', tel) + champ('Email', mail)) +
     bloc('Événement',
