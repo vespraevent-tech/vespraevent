@@ -533,7 +533,7 @@ footer ::-webkit-scrollbar-thumb,.drawer ::-webkit-scrollbar-thumb{background:rg
 .pr-tab:hover{background:rgba(12,15,20,.78)}
 .pr-tab[aria-selected=true]{background:var(--g4);color:var(--navy);font-weight:600}
 .pr{background:var(--g4);padding:24px 24px 40px}
-.pr-in{max-width:1080px;margin:0 auto}
+.pr-in{max-width:1080px;margin:0 auto}@media(min-width:821px){.pr-hero{max-width:1080px;margin:0 auto;border-radius:20px 20px 0 0;overflow:hidden}.pr-hero~.pr{padding-top:0}.pr-hero~.pr .pr-card{border-top-left-radius:0;border-top-right-radius:0}}
 .pr-card{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
 .pr-box{background:var(--white);border-radius:var(--rl);padding:26px;box-shadow:0 10px 34px rgba(12,15,20,.07);display:flex;flex-direction:column}.pr-pane{flex:1;display:flex;flex-direction:column;gap:18px}.pr-pane ul{gap:13px}.pr-evt{margin-top:auto;padding-top:18px;border-top:1px solid var(--g4)}.pr-evt h4{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--g2);font-weight:600;margin:0 0 6px}.pr-evt p{font-size:14px;line-height:1.65;color:var(--g1)}
 .pr-sub{display:flex;gap:6px;margin:0 0 16px;border-bottom:1px solid var(--g4)}
@@ -828,7 +828,7 @@ textarea.pr-i{resize:vertical;min-height:96px}
 <section class="ev-sec"><div class="ev-in ev-svc"><div class="ev-svc-t"><p class="ev-k">Cocktail et service</p><h2 class="ev-t">UN COCKTAIL <em>SOIGNÉ</em></h2><p>Pour une soirée d'entreprise, le cocktail donne le ton. Notre serveuse privée assure l'accueil, le service et la présentation, pendant que vous recevez vos invités.</p><p>Bouchées, plateaux, buffet ou découpe devant les invités : nous coordonnons avec vous les prestataires adaptés à votre soirée. Ces prestations se font sur devis.</p><a class="ev-lien" href="#prestataires">Découvrir nos prestataires →</a></div><div class="ev-svc-i"><img src="cocktail-service-bouchees.webp" alt="Serveur en gilet qui présente un plateau de bouchées lors d'un cocktail en extérieur" loading="lazy" decoding="async" width="1600" height="1067"><img src="cocktail-decoupe-jambon.webp" alt="Découpe de jambon devant les invités lors d'un cocktail en extérieur" loading="lazy" decoding="async" width="1600" height="1067"></div></div></section>
 <section class="ev-sec ev-sec-sombre"><div class="ev-in"><p class="ev-k">Comment ça se passe</p><h2 class="ev-t">DU PREMIER MESSAGE <em>À L'ÉVÉNEMENT</em></h2><div class="ev-steps" data-evcar><div class="ev-st"><span class="ev-sn">1</span><h3>Vous nous parlez de la soirée</h3><p>Thème, date, nombre d'invités, lieu.</p></div><div class="ev-st"><span class="ev-sn">2</span><h3>Nous en discutons à Vitré</h3><p>Vous voyez le matériel et nous imaginons l'ambiance.</p></div><div class="ev-st"><span class="ev-sn">3</span><h3>Nous composons la soirée</h3><p>Ambiance, effets, animations, prestataires.</p></div><div class="ev-st"><span class="ev-sn">4</span><h3>Un devis, une seule facture</h3><p>Un devis clair, sans engagement.</p></div><div class="ev-st"><span class="ev-sn">5</span><h3>Le jour J, nous sommes là</h3><p>Livraison, installation, coordination, reprise.</p></div></div><div class="ev-dots ev-dots-clair" data-evdots aria-hidden="true"></div></div></section>
 <section class="ev-sec ev-prod"><div class="ev-in"><div class="pr-sec pr-sec-b"><span class="pr-lab">Le matériel pour votre événement</span><h3 class="pr-t">À louer <em class="ac">pour votre projet</em></h3><div class="bests pr-bests" id="prB" data-vcar="prB" data-add data-img-origine data-img-map="p3=photobooth-salle-hd.webp" data-ids="p3,p46,p9,p12,p13,p42,p40,p41,p35,p32,p23"><div class="bests-shell"><button class="bests-arrow bests-arrow-prev" id="prBPrev" aria-label="Produits précédents">‹</button><div class="bests-carousel" id="prBWrap"><div class="bests-track" id="prBTrack"></div></div><button class="bests-arrow bests-arrow-next" id="prBNext" aria-label="Produits suivants">›</button></div><div class="bests-dots" id="prBDots"></div></div></div></div></section>
-<section class="ev-sec ev-presta" id="prestataires"><div class="ev-in"><p class="ev-k">Nos prestataires partenaires</p><h2 class="ev-t">DES PROFESSIONNELS <em>QUI TRAVAILLENT AVEC NOUS</em></h2><p class="ev-sub">Choisissez une prestation pour en savoir plus et nous envoyer votre demande.</p></div></section>
+<section class="ev-sec ev-presta" id="prestataires"><div class="ev-in"><p class="ev-k">Nos prestataires</p><h2 class="ev-t">NOS PRESTATAIRES <em>À VOTRE SERVICE</em></h2><p class="ev-sub">Serveuse privée, chef pâtissier, photographe et vidéaste : choisissez une prestation pour en savoir plus et nous envoyer votre demande.</p></div></section>
 <header class="pr-hero" id="prHero"><div class="pr-hero-in"><p class="pr-kicker">Prestataire partenaire</p><h2 id="prHT"></h2><p id="prHA"></p><div class="pr-nav" role="tablist" aria-label="Choisir une prestation" id="prNav"></div></div></header>
 <section class="pr"><div class="pr-in">
   <article class="pr-card" id="prCard" aria-live="polite"></article>
@@ -921,7 +921,17 @@ var PR=[
   titre:'Chef pâtissier — Emmanuel',accroche:'Emmanuel, chef pâtissier partenaire, réalise sur mesure : tout est possible en pâtisserie. Gâteau, desserts ou buffet de douceurs, selon vos envies et le nombre d\'invités.',
   service:['Création sur mesure : tout est possible en pâtisserie, selon vos envies et votre thème','Gâteaux à étages, pièces montées, entremets, mignardises et buffets de douceurs','Choix des saveurs, des textures et du décor avec vous, étape par étape','Prise en compte des allergies et des régimes particuliers','Un rendez-vous pour goûter les pâtisseries d\'Emmanuel peut être organisé : vous goûtez avant de choisir','Emmanuel est un chef expert, avec une dizaine d\'années d\'expérience'],
   infos:['Prestation réalisée par Emmanuel, prestataire partenaire. Vespra Event encaisse pour son compte et assure la coordination.','Prestation sur devis : selon le nombre de parts, le thème et la complexité','Indiquez vos envies, allergies et contraintes dans les précisions','Prévoyez de commander plusieurs semaines à l\'avance'],
-  champs:'parts'}
+  champs:'parts'},
+ {id:'photographe',nom:'Photographe',court:'Photographe',img:'nous-organisons.webp',photo:true,
+  titre:'Photographe',accroche:'Un photographe partenaire immortalise votre événement : les moments forts, les émotions, vos invités, avec un regard de professionnel.',
+  service:['Reportage photo de votre événement : préparatifs, cérémonie, vin d\'honneur, soirée','Photos de groupe et portraits, organisés sans perdre de temps','Retouche et sélection des meilleures photos','Remise des photos en haute définition, en galerie en ligne'],
+  infos:['Prestation réalisée par un photographe partenaire. Vespra Event encaisse pour son compte et assure la coordination.','Prestation sur devis : le prix dépend de la durée et des moments à couvrir','Précisez l\'horaire de début et de fin souhaité','Vous pouvez la combiner avec le photobooth et le vidéobooth'],
+  champs:'heures',rdv:'Un rendez-vous sera organisé avec le photographe partenaire : vous échangez sur vos envies, le déroulé et les moments à ne pas manquer.'},
+ {id:'videaste',nom:'Vidéaste',court:'Vidéaste',img:'pack-mariage.webp',photo:true,
+  titre:'Vidéaste',accroche:'Un vidéaste partenaire filme votre événement et en fait un film souvenir à revoir et à partager.',
+  service:['Tournage de votre événement : cérémonie, discours, première danse, soirée','Film souvenir monté, avec musique, et une version courte à partager','Prises de vue soignées, discrètes pour vos invités','Remise des vidéos en haute définition'],
+  infos:['Prestation réalisée par un vidéaste partenaire. Vespra Event encaisse pour son compte et assure la coordination.','Prestation sur devis : le prix dépend de la durée de tournage et du montage souhaité','Précisez l\'horaire de début et de fin souhaité','Vous pouvez la combiner avec le photobooth et le vidéobooth'],
+  champs:'heures',rdv:'Un rendez-vous sera organisé avec le vidéaste partenaire : vous échangez sur le film que vous souhaitez et le déroulé de la journée.'}
 ];
 
 var MORE={
@@ -980,7 +990,7 @@ function fiche(sub){
  }else{
    champ=''+NB+'<div class="pr-row">'+sel('prH','Arrivée sur place',horaires('arrivee'))+sel('prF','Fin souhaitée',horaires('fin'))+'</div>';
  }
- var rdvTxt=p.champs==='parts'?'Un rendez-vous dégustation sera organisé : tests de pâtisserie, vous venez goûter et on affine ensemble la création.':'Un rendez-vous sera organisé avec la serveuse privée partenaire : on échange sur sa façon de faire et sur la meilleure préparation de votre événement.';
+ var rdvTxt=p.rdv?p.rdv:p.champs==='parts'?'Un rendez-vous dégustation sera organisé : tests de pâtisserie, vous venez goûter et on affine ensemble la création.':'Un rendez-vous sera organisé avec la serveuse privée partenaire : on échange sur sa façon de faire et sur la meilleure préparation de votre événement.';
  var hero=document.getElementById('prHero'); hero.style.backgroundImage='url('+p.img+')'; document.getElementById('prHT').textContent=p.titre; document.getElementById('prHA').textContent=p.accroche;
  card.innerHTML='<div class="pr-box">'+
  '<div class="pr-sub" role="tablist"><button role="tab" data-s="service" aria-selected="'+(sub==='service')+'">Le service</button><button role="tab" data-s="infos" aria-selected="'+(sub==='infos')+'">Bon à savoir</button></div>'+
@@ -1188,6 +1198,6 @@ function toggleNav(){
 <script src="/reprise.js" defer></script>
 <script src="/adresse-auto.js" defer></script>
 <script src="/centrer.js?v=5" defer></script>
-<link rel="stylesheet" href="/coherence.css?v=33"><script>(function(){var e=document.getElementById("anti-saut");e&&e.remove()})()</script>
+<link rel="stylesheet" href="/coherence.css?v=34"><script>(function(){var e=document.getElementById("anti-saut");e&&e.remove()})()</script>
 <script src="/coherence.js?v=7" defer></script>
 <script src="/panier-coche.js" defer></script>

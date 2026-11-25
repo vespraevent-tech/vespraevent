@@ -428,3 +428,13 @@ html body .art-meta-ligne i{font-style:normal;margin:0 7px;opacity:.6}
 /* Fiches produit : photo principale et miniatures aux bords bien arrondis */
 html body .prod-img-main{border-radius:24px;overflow:hidden;box-shadow:0 22px 46px -30px rgba(15,34,55,.55)}
 html body .prod-thumb,html body .prod-thumbs button,html body .prod-thumbs img{border-radius:14px}
+
+/* Grand écran (≥ 1440 px) : les carrousels restent dans la même colonne que leurs titres (plus de rangée collée au bord de l'écran sous un titre centré) */
+@media(min-width:1440px){
+  html body .bests-shell,html body .evs-wrap{max-width:1312px;margin-left:auto!important;margin-right:auto!important;overflow:hidden}
+  html body .blog-wrap,html body .reviews-wrap{max-width:1312px;margin-left:auto!important;margin-right:auto!important;padding-left:0!important;overflow:hidden}
+  html body .bests-arrow-prev{left:8px}html body .bests-arrow-next{right:8px}
+  /* la rangée s'arrête toujours sur le début d'une carte : pas de carte coupée au bord gauche */
+  html body .bests-carousel,html body .blog-wrap,html body .evs-wrap{scroll-snap-type:x mandatory}
+  html body .bests-track>*,html body .blog-grid>*,html body .evs-track>*{scroll-snap-align:start}
+}

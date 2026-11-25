@@ -3291,6 +3291,17 @@ html body .powder-picker.open .powder-picker-card{transform:translateY(0);}
 .az-l p{font-size:13.5px;line-height:1.6;color:var(--g2);margin:0}
 @media(max-width:900px){.az{padding:64px 16px}.az-in{grid-template-columns:1fr;gap:40px}.az-l li{padding:22px 18px}}
 @media(max-width:520px){.az-l{gap:8px}.az-l li{padding:16px 14px;gap:8px;border-radius:16px}.az-l span{font-size:24px}.az-l h3{font-size:13.5px}.az-l p{font-size:12.5px;line-height:1.5}.az-p{font-size:14.5px}}
+/* téléphone : titre et introduction, puis les 4 étapes en frise verticale, puis les types d'événements et les boutons */
+@media(max-width:900px){
+.az-in{display:flex;flex-direction:column;align-items:stretch;gap:0}.az-g{display:contents}
+.az-g>.sec-tag{order:1}.az-h{order:2}.az-p{order:3;margin-bottom:26px}.az-l{order:4}.az-types{order:5;margin:30px 0 22px}.az-cta{order:6}
+.az-l{display:flex;flex-direction:column;gap:0;position:relative;padding-left:0}
+.az-l::before{content:"";position:absolute;left:21px;top:22px;bottom:22px;width:2px;background:linear-gradient(#e7d3ac,#e7d3ac)}
+.az-l li{position:relative;display:grid;grid-template-columns:44px 1fr;gap:16px;align-items:start;background:none;border-radius:0;padding:0 0 22px}
+.az-l li:last-child{padding-bottom:0}
+.az-l span{position:relative;z-index:1;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#fff;border:2px solid #c9a35a;color:#9a7230;font-size:19px;line-height:1}
+.az-l h3{font-size:16px;margin:10px 0 4px}.az-l p{font-size:14px;line-height:1.55;color:var(--g1)}
+}
 .off-box{position:relative;height:480px}
 .off-s{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;transform:translateX(100%);transition:transform .5s cubic-bezier(.4,0,.2,1)}
 .off-s.nt{transition:none!important}.off-s.on{transform:none}.off-s.prev{transform:translateX(-100%)}
@@ -3412,7 +3423,7 @@ html:root:root:root:root:root body .lnk-fl{font-size:10.2px!important}
  html:root:root:root:root:root body .cart-btn,html:root:root:root:root:root body .reserver-btn{font-size:9.4px!important}
 }
 </style>
-<link rel="stylesheet" href="/coherence.css?v=33"><script>(function(){var e=document.getElementById("anti-saut");e&&e.remove()})()</script>
+<link rel="stylesheet" href="/coherence.css?v=34"><script>(function(){var e=document.getElementById("anti-saut");e&&e.remove()})()</script>
 <script src="/coherence.js?v=7" defer></script>
 
 <script>

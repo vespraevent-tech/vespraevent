@@ -56,6 +56,20 @@ window.VESPRA_PRESTATAIRES = [
     site: "", tel: "", lien: "/evenements.html#patissier", exemple: false
   },
 
+  /* ——— Photo et vidéo ——— */
+  {
+    metier: "Photographe", nom: "Photographe partenaire", type: "Reportage photo de votre événement",
+    commune: "Vitré",
+    mot: "Reportage photo de votre mariage ou de votre événement : moments forts, portraits, photos de groupe, remises en haute définition.",
+    site: "", tel: "", lien: "/evenements.html#photographe", exemple: false
+  },
+  {
+    metier: "Vidéaste", nom: "Vidéaste partenaire", type: "Film souvenir de votre événement",
+    commune: "Vitré",
+    mot: "Tournage et montage d'un film souvenir de votre événement, avec une version courte à partager.",
+    site: "", tel: "", lien: "/evenements.html#videaste", exemple: false
+  },
+
   /* ——— Vaisselle, tables, chaises ——— */
   {
     metier: "Location de vaisselle", nom: "Passion Réception", type: "Vaisselle, mobilier et décoration",
