@@ -541,6 +541,8 @@ select.dpc-q::-ms-expand{display:none}
 .fd-id{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:6px}
 .fd-id .fd-nom{line-height:1.2;overflow-wrap:anywhere}
 .fd-badges{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.fd-badges:empty{display:none}
+.fd-badges .dm-nums{display:flex;flex-wrap:wrap;gap:6px}.fd-badges .dm-num{margin:0}
+@media(max-width:620px){.fd-badges .dm-num{font-size:11.5px;padding:2px 6px}.fd-badges,.fd-badges .dm-nums{gap:4px}#contenuFicheDemande .fd-h,#contenuFicheResa .fd-h{gap:10px}}
 .fd-livr{white-space:nowrap}
 .fd-sous{padding:0 28px 14px;border-bottom:1px solid #eef0f4;font:500 13px Inter,system-ui,sans-serif;color:var(--g2);line-height:1.4}
 #contenuFicheDemande .fd-sous,#contenuFicheResa .fd-sous{padding:10px 28px 14px}
