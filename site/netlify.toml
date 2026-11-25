@@ -25,6 +25,11 @@
 # Un cache « immutable » d'un an garderait une photo remplacée sous le même
 # nom de fichier pendant un an dans le navigateur des visiteurs.
 [[headers]]
+  for = "/videos/*"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+[[headers]]
   for = "/*.webp"
   [headers.values]
     Cache-Control = "public, max-age=3600, stale-while-revalidate=86400"
@@ -55,7 +60,7 @@
     Strict-Transport-Security = "max-age=31536000; includeSubDomains"
     Permissions-Policy = "camera=(self), microphone=(self), geolocation=(), payment=(), usb=(), browsing-topics=()"
     Cross-Origin-Opener-Policy = "same-origin"
-    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.instagram.com https://www.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.netlify.app https://api-adresse.data.gouv.fr; frame-src 'self' https://www.youtube-nocookie.com https://www.instagram.com https://www.google.com https://maps.google.com; media-src 'self' blob: https:;"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.instagram.com https://www.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.netlify.app https://api-adresse.data.gouv.fr; frame-src 'self' https://www.instagram.com https://www.google.com https://maps.google.com; media-src 'self' blob: https:;"
 
 [[headers]]
   for = "/*.html"
@@ -70,7 +75,7 @@
     Strict-Transport-Security = "max-age=31536000; includeSubDomains"
     Permissions-Policy = "camera=(self), microphone=(self), geolocation=(), payment=(), usb=(), browsing-topics=()"
     Cross-Origin-Opener-Policy = "same-origin"
-    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.instagram.com https://www.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.netlify.app https://api-adresse.data.gouv.fr; frame-src 'self' https://www.youtube-nocookie.com https://www.instagram.com https://www.google.com https://maps.google.com; media-src 'self' blob: https:;"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.instagram.com https://www.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.netlify.app https://api-adresse.data.gouv.fr; frame-src 'self' https://www.instagram.com https://www.google.com https://maps.google.com; media-src 'self' blob: https:;"
 
 # Scripts et feuilles de style : toujours revérifiés, sans quoi un visiteur
 # pouvait exécuter l'ancienne version (ordre, photos, prix) avant la nouvelle.
