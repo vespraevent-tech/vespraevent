@@ -829,6 +829,7 @@ textarea.pr-i{resize:vertical;min-height:96px}
 <section class="ev-sec ev-prod"><div class="ev-in"><div class="pr-sec pr-sec-b"><span class="pr-lab">Le matériel pour votre événement</span><h3 class="pr-t">À louer <em class="ac">pour votre projet</em></h3><div class="bests pr-bests" id="prB" data-vcar="prB" data-add data-img-origine data-img-map="p3=photobooth-salle-hd.webp" data-ids="p9,p12,p3,p11,p23,p34,p32,p35,p56"><div class="bests-shell"><button class="bests-arrow bests-arrow-prev" id="prBPrev" aria-label="Produits précédents">‹</button><div class="bests-carousel" id="prBWrap"><div class="bests-track" id="prBTrack"></div></div><button class="bests-arrow bests-arrow-next" id="prBNext" aria-label="Produits suivants">›</button></div><div class="bests-dots" id="prBDots"></div></div></div></div></section>
 <section class="ev-sec ev-presta" id="prestataires"><div class="ev-in"><p class="ev-k">Nos prestataires</p><h2 class="ev-t">NOS PRESTATAIRES <em>À VOTRE SERVICE</em></h2><p class="ev-sub">Serveuse privée, chef pâtissier, photographe et vidéaste : choisissez une prestation pour en savoir plus et nous envoyer votre demande.</p></div></section>
 <header class="pr-hero" id="prHero"><div class="pr-hero-in"><p class="pr-kicker">Prestataire partenaire</p><h2 id="prHT"></h2><p id="prHA"></p><div class="pr-nav" role="tablist" aria-label="Choisir une prestation" id="prNav"></div></div></header>
+<style>.pr-page{display:inline-block;margin:14px 0 0;font-size:13.5px;font-weight:600;color:#14304f;text-decoration:none}.pr-page:hover{text-decoration:underline}</style>
 <section class="pr"><div class="pr-in">
   <article class="pr-card" id="prCard" aria-live="polite"></article>
   <div class="pr-more" id="prMore"></div>
@@ -1006,6 +1007,7 @@ function fiche(sub){
  '<label class="pr-chk"><input type="checkbox" id="prMat"> Je souhaite aussi louer du matériel pour cet événement</label>'+
  '<button class="pr-add" type="submit">Envoyer ma demande</button><p class="pr-n" id="prMsg">Sans engagement. Les prix des prestations sont donnés sur devis, après échange avec vous.</p></form>';
  if(p.id==='videaste'&&window.vespraFilm){var fb=document.createElement('div'),bx=card.querySelector('.pr-box');if(bx){bx.insertBefore(fb,bx.firstChild);vespraFilm(fb,'/videos/film-mariage-lucie.mp4','/videos/film-mariage-lucie.jpg','Mariage de Lucie · film de notre vidéaste partenaire');}}
+ (function(){var PG={serveuse:'serveuse-privee',patissier:'chef-patissier',photographe:'photographe',videaste:'videaste'};var bx=card.querySelector('.pr-box');if(!window.__PR_SEUL&&PG[p.id]&&bx){var a=document.createElement('a');a.className='pr-page';a.href='/'+PG[p.id]+'.html';a.textContent='Voir la page '+p.nom+' →';bx.appendChild(a)}})();
 // activer calendrier/listes sur les nouveaux champs
  var d=card.querySelector('[data-date-fr]'); if(d)d.dfrPret=false;
  if(window.__dfrInit)window.__dfrInit(); else { var s=document.createElement('script'); s.src='/date-fr.js'; document.body.appendChild(s); }
