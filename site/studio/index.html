@@ -544,9 +544,10 @@ select.dpc-q::-ms-expand{display:none}
 .fd-badges .dm-nums{display:flex;flex-wrap:wrap;gap:6px}.fd-badges .dm-num{margin:0}
 @media(max-width:620px){.fd-badges .dm-num{font-size:11.5px;padding:2px 6px}.fd-badges,.fd-badges .dm-nums{gap:4px}#contenuFicheDemande .fd-h,#contenuFicheResa .fd-h{gap:10px}}
 .fd-livr{white-space:nowrap}
-.fd-sous{padding:0 28px 14px;border-bottom:1px solid #eef0f4;font:500 13px Inter,system-ui,sans-serif;color:var(--g2);line-height:1.4}
-#contenuFicheDemande .fd-sous,#contenuFicheResa .fd-sous{padding:10px 28px 14px}
+#contenuFicheDemande .fd-quand,#contenuFicheResa .fd-quand{display:flex;align-items:center;gap:8px;padding:10px 28px 16px;border-bottom:1px solid #eef0f4;font:600 14px Inter,system-ui,sans-serif;color:#14304f}
+.fd-quand svg{flex:0 0 auto;color:#b8862f}
 .fd-grille.duo{grid-template-columns:1fr 1fr!important}
+@media(max-width:620px){.fd-grille.duo.contact{grid-template-columns:1fr!important}}
 .fd-grille.duo .fd-v{overflow-wrap:anywhere}
 .fd-statut{padding:10px 28px 4px}.fd-statut .dm-champ{display:inline-flex;align-items:center;gap:10px}.fd-statut .dm-champ label{margin:0}
 .dpc-txt{font-weight:600}.dpc-qt{font-size:12px;color:#6b7280;margin-left:6px}
@@ -5121,7 +5122,7 @@ function ficheDemande(id, relu){
   /* La fiche est rangée par sujet — contact, événement, logistique,
      matériel — plutôt qu'en une seule grille où tout se vaut. */
   const bloc = (titre, contenu) => contenu.trim()
-    ? '<div class="fd-bloc">' + (titre ? '<div class="fd-t">' + titre + '</div>' : '') + '<div class="fd-grille' + (titre === 'Événement' || titre === 'Contact' ? ' duo' : '') + '">' + contenu + '</div></div>'
+    ? '<div class="fd-bloc">' + (titre ? '<div class="fd-t">' + titre + '</div>' : '') + '<div class="fd-grille' + (titre === 'Événement' ? ' duo' : titre === 'Contact' ? ' duo contact' : '') + '">' + contenu + '</div></div>'
     : '';
 
   const piD = proPourFiche(d.resaId ? (cache.resas||[]).find(x => String(x.id) === String(d.resaId)) : null, d, d.nom, d.telephone);
@@ -5133,24 +5134,23 @@ function ficheDemande(id, relu){
         ETIQ_CADRE[cadre] + '</span>' : '') + '</span></div>' +
       '<select class="dm-sel fd-st dm-sel-' + d.statut + '" aria-label="Statut" onchange="changerStatut(\'' + escAttr(d.id) + '\', this.value)">' + choixStatut + '</select>' +
     '</div>' +
-    '<div class="fd-sous">Demande reçue le ' + dateLisible(d.recue) + (function(){ try{ const p = JSON.parse(d.panier || '[]').map(x => x.short || x.name).filter(Boolean).join(' · '); return p ? ' · ' + esc(p) : ''; }catch(e){ return ''; } })() + '</div>' +
+    '<div class="fd-quand">' + ICONE_CAL + (d.date ? 'Événement le ' + esc(minus(jourLisible(isoDepuisFr(d.date))) + (d.dateFin && d.dateFin !== d.date ? ' → ' + minus(jourLisible(isoDepuisFr(d.dateFin))) : '')) : 'Date de l’événement à préciser') + '</div>' +
 
     modifsBloc(['d:' + d.id].concat(d.resaId ? ['r:' + d.resaId] : [])) +
-    blocProHTML(piD, champ) +
-    bloc('Contact', champ('Téléphone', tel) + champ('Email', mail, String(d.email||'').length > 17)) +
+    bloc('Contact', champ('Téléphone', tel) + champ('Email', mail)) +
     bloc('Événement',
-      champ('Date', d.date ? esc(d.date) : '<span class="fd-manque">à préciser</span>') +
       /* toujours affichée, même si le client n'a rien coché : l'absence de
          réponse vaut retrait sur place, et c'est cela qu'il faut savoir */
       champ('Livraison', badgeLivraison(d.livraison, d.livraisonRetour)) +
-      champ('Adresse de l\u2019événement', adresse, true)) +
+      champ('Adresse de l\u2019événement', adresse)) +
 
     acompteBlocHTML(d, resaLiee) +
 
     /* les montants ne se saisissent plus ici : ils se lisent, et se changent en cliquant sur « Modifier » */
     bloc('', lignesChiffrageLecture(d, null)) +
 
-    voirPlusHTML('d', bloc('Détails', champ('Convives', esc(d.convives)) + champ('Type', esc(d.type)) + champ('Source', esc(d.source || d.origine || ''))) +
+    voirPlusHTML('d', bloc('Détails', champ('Demande reçue le', esc(dateLisible(d.recue))) + champ('Convives', esc(d.convives)) + champ('Type', esc(d.type)) + champ('Source', esc(d.source || d.origine || ''))) +
+      blocProHTML(piD, champ) +
       bloc('Parrainage', parrainBlocHTML(d)) +
       bloc('Message du client',
         d.message ? '<div class="fd-c large"><span class="fd-msg">' + esc(d.message) + '</span></div>' : '') +
@@ -5225,6 +5225,8 @@ function nomCourtOption(x){
 }
 /* ── fiches : lecture seule, « Voir plus », chiffrage ── */
 var _plusOuvert = {d:false, r:false};
+const minus = t => String(t || '').replace(/(^|→ )([A-ZÉ])/g, (m, a, b) => a + b.toLowerCase());
+const ICONE_CAL = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>';
 function voirPlusHTML(genre, contenu){
   if(!String(contenu||'').trim()) return '';
   const o = !!_plusOuvert[genre];
@@ -5324,7 +5326,7 @@ function ficheResa(id, relu){
   const total = (r.products||[]).reduce((t,p) => t + (Number(p.price)||0), 0);
 
   const bloc = (titre, contenu) => contenu.trim()
-    ? '<div class="fd-bloc">' + (titre ? '<div class="fd-t">' + titre + '</div>' : '') + '<div class="fd-grille' + (titre === 'Événement' || titre === 'Contact' ? ' duo' : '') + '">' + contenu + '</div></div>'
+    ? '<div class="fd-bloc">' + (titre ? '<div class="fd-t">' + titre + '</div>' : '') + '<div class="fd-grille' + (titre === 'Événement' ? ' duo' : titre === 'Contact' ? ' duo contact' : '') + '">' + contenu + '</div></div>'
     : '';
 
   document.getElementById('contenuFicheResa').innerHTML =
@@ -5332,21 +5334,20 @@ function ficheResa(id, relu){
     (function(){ const st = r.statutSuivi || 'validee'; return '<select class="dm-sel fd-st dm-sel-' + escAttr(st) + '" aria-label="Statut" onchange="changerStatut(\'__planning__' + escAttr(r.id) + '\', this.value)">' +
         ['nouvelle','en-cours','validee'].map(v => '<option value="' + v + '"' + (st===v ? ' selected' : '') + '>' + ETIQ[v] + '</option>').join('') + '</select>'; })() +
     '</div>' +
-    '<div class="fd-sous">Réservation' + (produits ? ' · ' + esc(produits) : '') + '</div>' +
+    '<div class="fd-quand">' + ICONE_CAL + 'Événement le ' + esc(minus(dates).replace(' → ', ' → ')) + '</div>' +
     modifsBloc(['r:' + r.id]) +
-    blocProHTML(piR, champ) +
-    bloc('Contact', champ('Téléphone', tel) + champ('Email', mail, String(mailV||'').length > 17)) +
+    bloc('Contact', champ('Téléphone', tel) + champ('Email', mail)) +
     bloc('Événement',
-      champ('Date', esc(dates)) +
       champ('Livraison', badgeLivraison(r.livraison, r.livraisonRetour)) +
-      champ('Adresse de l\u2019événement', lieu, true)) +
+      champ('Adresse de l\u2019événement', lieu)) +
 
     acompteBlocHTML(dem || null, r, 'resa') +
 
     /* les montants se lisent ici ; pour les changer : « Modifier » */
     bloc('', lignesChiffrageLecture(null, r)) +
 
-    voirPlusHTML('r', bloc('Détails', dem ? champ('Type', esc(dem.type||'')) + champ('Convives', esc(dem.convives||'')) + champ('Source', esc((r.source||dem.source)||'')) : champ('Source', esc(r.source||''))) +
+    voirPlusHTML('r', bloc('Détails', (dem && dem.recue ? champ('Demande reçue le', esc(dateLisible(dem.recue))) : '') + (dem ? champ('Type', esc(dem.type||'')) + champ('Convives', esc(dem.convives||'')) + champ('Source', esc((r.source||dem.source)||'')) : champ('Source', esc(r.source||'')))) +
+    blocProHTML(piR, champ) +
 bloc('Parrainage', (function(){
       const lg = parrainLigneResa(r);
       if(dem && parrainCode(dem)) return parrainBlocHTML(dem);
