@@ -66,7 +66,7 @@ window.VESPRA_PRESTATAIRES = [
   {
     metier: "Vidéaste", nom: "Vidéaste partenaire", type: "Film souvenir de votre événement",
     commune: "Vitré",
-    mot: "Tournage et film souvenir de votre événement, monté selon votre thème et vos envies : musique, rythme, style. Version courte à partager.",
+    mot: "Tournage et film souvenir de votre événement, monté selon votre thème et vos envies, avec une version courte à partager.",
     site: "", tel: "", lien: "/evenements.html#videaste", exemple: false
   },
 
