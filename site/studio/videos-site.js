@@ -1,4 +1,4 @@
-/* Back-office : vidéos du site, envoyées en morceaux de 5 Mo directement dans Cloudflare R2.
+/* Back-office : vidéos du site, envoyées en morceaux de 3 Mo (assemblés par deux côté serveur) directement dans Cloudflare R2.
    Adresse publique : https://www.vespraevent.fr/videos/<nom> */
 (function(){
   var st=document.createElement('style');
@@ -10,7 +10,7 @@
   '.vs-b{padding:10px 12px;display:flex;align-items:center;gap:8px}.vs-b b{flex:1;font-weight:500;font-size:13.5px;color:#1f2a37;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}'+
   '.vs-b small{color:#8a929e;font-size:12px}.vs-b button{border:0;background:none;color:#8a929e;cursor:pointer;font-size:12.5px;padding:4px 6px;border-radius:6px}.vs-b button:hover{background:#f2f4f7;color:#1f2a37}';
   document.head.appendChild(st);
-  var MORCEAU=5*1024*1024, BASE='/api/admin/medias';
+  var MORCEAU=3*1024*1024, BASE='/api/admin/medias';
   function mo(n){return n>=1048576?(n/1048576).toFixed(1).replace('.',',')+' Mo':Math.round(n/1024)+' Ko'}
   function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   async function req(chemin,opts){var r=await fetch(BASE+chemin,Object.assign({credentials:'same-origin'},opts||{}));var d=null;try{d=await r.json()}catch(e){}if(!r.ok)throw new Error((d&&d.error)||('Erreur '+r.status));return d}
@@ -35,9 +35,10 @@
     try{
       var d=await req('/debut?nom='+encodeURIComponent(f.name),{method:'POST'}),nom=d.nom,id=d.id,n=Math.max(1,Math.ceil(f.size/MORCEAU)),parts=[],faits=0;
       var q='&nom='+encodeURIComponent(nom)+'&id='+encodeURIComponent(id);
-      async function envoyer(i){for(var essai=0;essai<4;essai++){try{var r=await req('/morceau?n='+i+q,{method:'POST',headers:{'content-type':'application/octet-stream'},body:f.slice((i-1)*MORCEAU,Math.min(f.size,i*MORCEAU))});parts.push({n:i,etag:r.etag});faits++;barre.style.width=Math.round(faits/n*100)+'%';etat.textContent='Envoi : '+faits+' / '+n+' morceaux';return}catch(x){if(essai===3)throw x;await new Promise(function(ok){setTimeout(ok,1500*(essai+1))})}}}
-      var file=[];for(var i=1;i<=n;i++)file.push(i);
-      async function ouvrier(){while(file.length)await envoyer(file.shift())}
+      async function envoyer(i){for(var essai=0;essai<4;essai++){try{var r=await req('/morceau?n='+i+q+(i===n?'&dernier=1':''),{method:'POST',headers:{'content-type':'application/octet-stream'},body:f.slice((i-1)*MORCEAU,Math.min(f.size,i*MORCEAU))});if(r.etag)parts.push({n:r.n,etag:r.etag});faits++;barre.style.width=Math.round(faits/n*100)+'%';etat.textContent='Envoi : '+faits+' / '+n+' morceaux';return}catch(x){if(essai===3)throw x;await new Promise(function(ok){setTimeout(ok,1500*(essai+1))})}}}
+      /* les morceaux vont par paires (1-2, 3-4…) : le premier de chaque paire doit arriver avant le second */
+      var file=[];for(var i=1;i<=n;i+=2)file.push(i);
+      async function ouvrier(){while(file.length){var k=file.shift();await envoyer(k);if(k+1<=n)await envoyer(k+1)}}
       await Promise.all([ouvrier(),ouvrier(),ouvrier()]);
       await req('/fin?nom='+encodeURIComponent(nom)+'&id='+encodeURIComponent(id),{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({parts:parts})});
       etat.textContent='Vidéo enregistrée.';setTimeout(function(){bx.hidden=true},2500);vsCharger();

@@ -2491,8 +2491,21 @@ const gestionnaire = async (request) => {
       if (path === '/medias/morceau' && request.method === 'POST') {
         const n = Number(url.searchParams.get('n')), id = String(url.searchParams.get('id') || '');
         if (!id || !(n >= 1 && n <= 1000)) return json({ error: 'Morceau invalide' }, 400);
+        /* Netlify limite chaque envoi à ~4,5 Mo, Cloudflare exige des parts de 5 Mo minimum (sauf la dernière) :
+           le navigateur envoie des morceaux de 3 Mo, le serveur les assemble deux par deux. */
         const o = Buffer.from(await request.arrayBuffer());
-        return json({ etag: await r2MultiPart(cle, id, n, o), n });
+        const tmp = 'site-medias-tmp/' + createHash('sha256').update(id).digest('hex').slice(0, 24) + '/';
+        const dernier = url.searchParams.get('dernier') === '1';
+        if (n % 2 === 1 && !dernier) { await r2Put(tmp + n, o); return json({ attente: true, n }); }
+        let corps = o;
+        if (n % 2 === 0) {
+          const avant = await r2Get(tmp + (n - 1));
+          if (!avant) return json({ error: 'Morceau ' + (n - 1) + ' manquant' }, 409);
+          corps = Buffer.concat([Buffer.from(avant), o]);
+          await r2Delete(tmp + (n - 1)).catch(() => {});
+        }
+        const part = Math.ceil(n / 2);
+        return json({ etag: await r2MultiPart(cle, id, part, corps), n: part });
       }
       if (path === '/medias/fin' && request.method === 'POST') {
         const b = await request.json().catch(() => ({}));
