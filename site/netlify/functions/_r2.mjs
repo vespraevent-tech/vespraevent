@@ -156,3 +156,29 @@ export async function r2Plage(cle, enteteRange, typeMime, enTetes = {}) {
   if (!partiel && corps.length === total) return new Response(corps, { status: 200, headers: hd });
   return new Response(corps, { status: 206, headers: { ...hd, 'Content-Range': 'bytes ' + d1 + '-' + (d1 + corps.length - 1) + '/' + total } });
 }
+
+/* ── envoi en plusieurs morceaux (gros fichiers : vidéos du site) ──
+   Chaque morceau fait au moins 5 Mo (sauf le dernier) : aucune fonction n'a à recoller le fichier. */
+export async function r2MultiDebut(cle, typeMime) {
+  const r = await appel('POST', cle, { query: { uploads: '' }, entetes: typeMime ? { 'Content-Type': typeMime } : {} });
+  const x = await r.text();
+  const id = (/<UploadId>([^<]+)<\/UploadId>/.exec(x) || [])[1];
+  if (!r.ok || !id) throw new Error('R2 : envoi impossible à démarrer (' + r.status + ')');
+  return id;
+}
+export async function r2MultiPart(cle, uploadId, numero, octets) {
+  const r = await appel('PUT', cle, { query: { partNumber: String(numero), uploadId }, corps: octets });
+  if (!r.ok) throw new Error('R2 : morceau ' + numero + ' refusé (' + r.status + ')');
+  return String(r.headers.get('etag') || '').replace(/"/g, '');
+}
+export async function r2MultiFin(cle, uploadId, parts) {
+  const corps = '<CompleteMultipartUpload>' + parts.map((p) => '<Part><PartNumber>' + p.n + '</PartNumber><ETag>"' + p.etag + '"</ETag></Part>').join('') + '</CompleteMultipartUpload>';
+  const r = await appel('POST', cle, { query: { uploadId }, corps: Buffer.from(corps), entetes: { 'Content-Type': 'application/xml' } });
+  const x = await r.text();
+  if (!r.ok || /<Error>/.test(x)) throw new Error('R2 : assemblage refusé (' + r.status + ') ' + x.slice(0, 160));
+  return true;
+}
+export async function r2Taille(cle) {
+  const r = await appel('HEAD', cle);
+  return r.ok ? Number(r.headers.get('content-length')) || 0 : 0;
+}

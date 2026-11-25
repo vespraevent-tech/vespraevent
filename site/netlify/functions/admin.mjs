@@ -42,7 +42,7 @@ import { createHmac, timingSafeEqual, createHash, randomUUID, randomBytes, rando
 import { getStore, stockageActif, stats as stockStats } from './_stockage.mjs';
 import { evenementLire as pbLire, evenementEcrire as pbEcrire, evenementsLister as pbLister, evenementSupprimer as pbSupprimer, imageAjouter as pbImageAjouter, imageLire as pbImageLire, FORMATS as PB_FORMATS, vuLire as pbVuLire, compteurs as pbCompteurs, prisesLister as pbPrises, photoLire as pbPhoto, priseSupprimer as pbPriseSuppr } from './_photobooth.mjs';
 import { jetonGalerie as pbJetonGalerie } from './photobooth.mjs';
-import { binLire, binSupprimer, r2Actif, r2Put, r2Get, r2Delete } from './_r2.mjs';
+import { binLire, binSupprimer, r2Actif, r2Put, r2Get, r2Delete, r2Lister, r2Plage, r2MultiDebut, r2MultiPart, r2MultiFin, r2Taille } from './_r2.mjs';
 import { appliEtat, appliNouveauMdp } from './appli.mjs';
 import { codeLire, codeEcrire } from './_appli.mjs';
 import { getStore as blobsVb } from './_blobs.mjs';
@@ -2468,6 +2468,41 @@ const gestionnaire = async (request) => {
     const r = await pbImageLire(url.searchParams.get('evt'), url.searchParams.get('id'));
     if (!r) return json({ error: 'Image introuvable' }, 404);
     return new Response(r.octets, { headers: { 'Content-Type': r.info.mime, 'Cache-Control': 'private, max-age=86400' } });
+  }
+  /* ── Vidéos et médias du site, stockés dans Cloudflare R2 (servis en public par /videos/…) ── */
+  if (path === '/medias' || path.startsWith('/medias/')) {
+    if (!r2Actif()) return json({ error: 'Cloudflare R2 n’est pas configuré' }, 400);
+    const PREF = 'site-medias/';
+    const nomPropre = (n) => String(n || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 90);
+    const TYPES = { mp4: 'video/mp4', webm: 'video/webm', mov: 'video/quicktime', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', png: 'image/png' };
+    const nom = nomPropre(url.searchParams.get('nom'));
+    const ext = (nom.split('.').pop() || '');
+    try {
+      if (path === '/medias' && request.method === 'GET') {
+        const cles = await r2Lister(PREF);
+        const l = await Promise.all(cles.map(async (k) => ({ nom: k.slice(PREF.length), taille: await r2Taille(k) })));
+        return json({ medias: l.filter((x) => x.nom) });
+      }
+      if (!nom || !TYPES[ext]) return json({ error: 'Nom de fichier invalide (mp4, webm, mov, jpg, webp, png)' }, 400);
+      const cle = PREF + nom;
+      if (path === '/medias' && request.method === 'DELETE') { await r2Delete(cle); return json({ ok: true }); }
+      if (path === '/medias/fichier' && request.method === 'GET') return r2Plage(cle, request.headers.get('range'), TYPES[ext], { 'Cache-Control': 'private, no-store' });
+      if (path === '/medias/debut' && request.method === 'POST') return json({ id: await r2MultiDebut(cle, TYPES[ext]), nom });
+      if (path === '/medias/morceau' && request.method === 'POST') {
+        const n = Number(url.searchParams.get('n')), id = String(url.searchParams.get('id') || '');
+        if (!id || !(n >= 1 && n <= 1000)) return json({ error: 'Morceau invalide' }, 400);
+        const o = Buffer.from(await request.arrayBuffer());
+        return json({ etag: await r2MultiPart(cle, id, n, o), n });
+      }
+      if (path === '/medias/fin' && request.method === 'POST') {
+        const b = await request.json().catch(() => ({}));
+        const parts = (Array.isArray(b.parts) ? b.parts : []).map((x) => ({ n: Number(x.n), etag: String(x.etag || '').replace(/[^A-Za-z0-9-]/g, '') })).filter((x) => x.n >= 1 && x.etag).sort((a, c) => a.n - c.n);
+        if (!parts.length) return json({ error: 'Aucun morceau' }, 400);
+        await r2MultiFin(cle, String(url.searchParams.get('id') || ''), parts);
+        return json({ ok: true, nom, taille: await r2Taille(cle), lien: '/videos/' + nom });
+      }
+    } catch (e) { return json({ error: e.message }, 502); }
+    return json({ error: 'Route inconnue' }, 404);
   }
   if (path === '/videobooth/config' && request.method === 'GET') {
     const st = videoStore(); const a = await vbAccesLire(st);

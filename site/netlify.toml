@@ -25,11 +25,6 @@
 # Un cache « immutable » d'un an garderait une photo remplacée sous le même
 # nom de fichier pendant un an dans le navigateur des visiteurs.
 [[headers]]
-  for = "/videos/*"
-  [headers.values]
-    Cache-Control = "public, max-age=2592000"
-
-[[headers]]
   for = "/*.webp"
   [headers.values]
     Cache-Control = "public, max-age=3600, stale-while-revalidate=86400"

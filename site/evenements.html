@@ -776,7 +776,7 @@ textarea.pr-i{resize:vertical;min-height:96px}
 .rdv-b:hover{background:var(--navy-h)}.rdv-b:disabled{opacity:.6;cursor:wait}
 .rdv-n{font-size:12.5px;color:var(--g2);line-height:1.5}.rdv-n a{color:var(--navy);font-weight:600}
 @media(max-width:820px){.rdv{padding:40px 16px 64px}.rdv-in{grid-template-columns:1fr;gap:28px}.rdv-row{grid-template-columns:1fr}.rdv-f{padding:22px 18px}}</style>
-<section class="ev-hero" id="evHero" data-video="/videos/film-mariage-fond.mp4" data-video-lien="#videaste">
+<section class="ev-hero" id="evHero" data-video="/videos/fond-organisation.mp4" data-video-lien="#videaste">
   <picture><img class="ev-hero-img" src="vous-hesitez-fete.webp" alt="Mariés heureux qui dansent avec leurs invités pendant leur soirée de mariage" width="1500" height="999" fetchpriority="high" decoding="async"></picture>
   <div class="ev-hero-in">
     <p class="ev-eye">Vitré · Rennes · Grand Ouest</p>
@@ -1031,7 +1031,7 @@ function fiche(sub){
  '<div class="pr-rdv"><p>'+rdvTxt+'</p><div class="pr-row"><input class="pr-i" id="prRD" type="text" data-date-fr placeholder="Jour souhaité (facultatif)">'+sel('prRH','Moment de la journée',['Matin','Midi','Après-midi','Fin de journée'])+'</div></div>'+
  '<label class="pr-chk"><input type="checkbox" id="prMat"> Je souhaite aussi louer du matériel pour cet événement</label>'+
  '<button class="pr-add" type="submit">Envoyer ma demande</button><p class="pr-n" id="prMsg">Sans engagement. Les prix des prestations sont donnés sur devis, après échange avec vous.</p></form>';
- if(p.id==='videaste'&&window.vespraFilm){var fb=document.createElement('div'),bx=card.querySelector('.pr-box');if(bx){bx.insertBefore(fb,bx.firstChild);vespraFilm(fb,'/videos/film-mariage.mp4','/videos/film-mariage.webp','Mariage de Lucie · film de notre vidéaste partenaire');}}
+ if(p.id==='videaste'&&window.vespraFilm){var fb=document.createElement('div'),bx=card.querySelector('.pr-box');if(bx){bx.insertBefore(fb,bx.firstChild);vespraFilm(fb,'/videos/film-mariage-lucie.mp4','/videos/film-mariage-lucie.jpg','Mariage de Lucie · film de notre vidéaste partenaire');}}
 // activer calendrier/listes sur les nouveaux champs
  var d=card.querySelector('[data-date-fr]'); if(d)d.dfrPret=false;
  if(window.__dfrInit)window.__dfrInit(); else { var s=document.createElement('script'); s.src='/date-fr.js'; document.body.appendChild(s); }

@@ -1239,6 +1239,7 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
         </div>
         <button class="tab" data-tab="textes" onclick="switchTab('textes')">Textes</button>
         <button class="tab" data-tab="images" onclick="switchTab('images')">Images</button>
+        <button class="tab" data-tab="videos" onclick="switchTab('videos')">Vidéos</button>
         <button class="tab" data-tab="apparence" onclick="switchTab('apparence')">Apparence</button>
         <button class="tab" data-tab="ambiance" onclick="switchTab('ambiance')">Ambiance</button>
         <button class="tab" data-tab="bandeau" onclick="switchTab('bandeau')">Bandeau</button>
@@ -1616,6 +1617,14 @@ html body .modal-actions .btn.btn-corbeille:hover{background:#FEF2F2!important}
       </div>
       <div class="hint" style="margin-bottom:16px">Les changements sont enregistrés dans Netlify Blobs et appliqués aux pages du site sans redéploiement. « Changer » remplace la photo, « Supprimer » la retire du site et « Réinitialiser » restaure la photo d’origine.</div>
       <div id="listImagesSite"><div class="empty">Chargement…</div></div>
+    </div>
+
+    <!-- ── VIDÉOS DU SITE (Cloudflare R2) ── -->
+    <div class="panel" id="panel-videos">
+      <div class="toolbar"><div><h2>Vidéos du site</h2></div>
+        <label class="btn btn-primary" style="cursor:pointer">Envoyer une vidéo<input type="file" id="vsFichier" accept="video/mp4,video/quicktime,video/webm,image/jpeg,image/webp,image/png" hidden></label></div>
+      <div id="vsEnvoi" class="vs-envoi" hidden><div class="vs-nom" id="vsNom"></div><div class="vs-barre"><i id="vsBarre"></i></div><div class="vs-etat" id="vsEtat"></div></div>
+      <div id="vsListe"><div class="empty">Chargement…</div></div>
     </div>
 
     <!-- ── AMBIANCE ── -->
@@ -2540,7 +2549,7 @@ const NOMS_PAGES = {
   blog:'Blog', avis:'Avis', textes:'Textes', notices:'Notices', bandeau:'Bandeau du haut', offres:'Offres',
   salles:'Ajouter lieux', 'salles-demandes':'Demandes reçues',
   prestataires:'Ajouter prestataire', 'pages-reco':'Page lieux', 'pages-presta':'Page prestataires', rdv:'Rendez-vous',
-  apparence:'Apparence', ambiance:'Ambiance', images:'Images', demandes:'Liste des réservations',
+  apparence:'Apparence', ambiance:'Ambiance', images:'Images', videos:'Vidéos', demandes:'Liste des réservations',
   logistique:'Départs & retours', auto:'Automatisation', 'resa-planning':'Planning',
   'resa-ca':"Chiffre d'affaires", 'resa-documents':'Documents', notesfrais:'Frais',
   parrainage:'Parrainage', videobooth:'Vidéobooth', photobooth:'Photobooth', logiciels:'Logiciels · réglages communs', espace:'Espace client', settings:'Paramètres'
@@ -3279,6 +3288,7 @@ function switchTabBase(name){
   if(name==='prestations-site') presAdminCharger();
   if(name==='apparence' && !document.getElementById('ap-iframe').src) chargerApercu();
   if(name==='images') loadImagesSite();
+  if(name==='videos' && typeof vsCharger==='function') vsCharger();
   if(name==='ambiance') loadAmbiance();
   if(name==='bandeau') bdCharger();
   if(name==='offres') ofCharger();
@@ -10563,6 +10573,7 @@ checkSession();
   });
 })();
 </script>
+<script src="videos-site.js?v=1"></script>
 </body>
 </html>
 
