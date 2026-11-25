@@ -6738,12 +6738,13 @@ function verrouillerDetail(zone){
   zone.querySelectorAll('button.dp-b.sup').forEach(function(b){b.remove();});
 }
 
+try{ if(window.top===window && !/[?&]seul=1/.test(location.search)) location.replace('/studio/#resa-planning'); }catch(e){}
 function openDetail(id) {
   var r = R.find(function(x){return String(x.id)===String(id);});
   if(!r) return;
   /* une seule fiche pour toutes les réservations : celle du back-office */
   if(!window.__ancienForce && !document.getElementById('detailMb').classList.contains('open')){
-    try{ var P=window.parent; if(P && P!==window && typeof P.ouvrirFicheDepuisPlanning==='function' && P.ouvrirFicheDepuisPlanning(id)) return; }catch(err){}
+    try{ var P=window.parent; if(P && P!==window && typeof P.ouvrirFicheDepuisPlanning==='function' && P.ouvrirFicheDepuisPlanning(id, r)) return; }catch(err){}
   }
   currentDetailId = id;
 
@@ -7061,7 +7062,7 @@ if(true){
 }else{showLoginScreen();}
 </script>
 <script src="/studio/modal-garde.js"></script>
-<script src="/studio/reservation-pont.js?v=708"></script>
+<script src="/studio/reservation-pont.js?v=709"></script>
 <script src="/studio/reservation-plus.js?v=2"></script>
 <script src="/studio/mandats.js?v=1"></script>
 <script src="/studio/reservation-excel.js"></script>

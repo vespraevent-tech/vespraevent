@@ -4836,7 +4836,7 @@ function acompteBlocHTML(d, r, modeForce){
 
   const blocAcompte = '<div class="fd-bloc"><div class="fd-t">Paiement</div><div class="fd-grille"><div class="fd-c large">' +
     (demande > 0 ? '<div style="font:400 11px Inter,system-ui,sans-serif;color:#9aa0ab;margin:0 0 6px">(devis généré avec une demande d\u2019acompte)</div>' : '') +
-    interrupteur + '</div>__VIREMENT__</div></div>';
+    ((r && r.virementRecu === true) ? '<span style="font:500 14px Inter,system-ui,sans-serif;color:#2f7a3a">Acompte compris dans le règlement complet</span>' : interrupteur) + '</div>__VIREMENT__</div></div>';
 
   /* Virement reçu : le client a tout réglé d'un coup. Petit interrupteur discret, gris tant que rien n'est reçu. */
   const virementOk = !!r && r.virementRecu === true;
@@ -5424,8 +5424,10 @@ function modifierDepuisResa(resaId){
 }
 
 /* le planning (cadre) ouvre cette même fiche : vrai si la réservation est connue ici */
-window.ouvrirFicheDepuisPlanning = function(id){
+window.ouvrirFicheDepuisPlanning = function(id, rPlan){
   const connue = () => (cache.resas||[]).some(x => String(x.id) === String(id));
+  /* le planning transmet sa réservation : la fiche du back-office s'ouvre toujours, même si la liste n'est pas encore relue */
+  if(!connue() && rPlan && rPlan.id){ try{ const c = JSON.parse(JSON.stringify(rPlan)); figerAcompteResa(c); cache.resas = (cache.resas||[]).concat([c]); }catch(e){} }
   if(connue()){
     window._depuisPlanning = true;
     ficheResa(id);
