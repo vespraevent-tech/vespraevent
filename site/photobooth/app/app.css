@@ -224,3 +224,22 @@ label.champ{display:block;margin:.9em 0 .3em;font-weight:600;color:var(--navy);f
 #m-nav.reg-nav{display:flex;border-right:0;padding:8px 16px;background:#fff;overflow-x:auto}
 #m-nav.reg-nav button{display:block;width:auto;flex:none;text-align:center;padding:.6em 1.05em;border-radius:99px;font:600 14px system-ui}
 #m-nav.reg-nav button.sel{background:#1F3B5A;color:#fff}
+
+/* ── réglages de la borne façon « Lumabooth » : bandeau, menu en colonnes repliable, puis la page de la rubrique en grand ── */
+#s-menu.reg{inset:0;bottom:0;pointer-events:auto;background:#F4F2EE}
+#s-menu .reg-tiroir{position:relative;height:100%;max-height:none;border-radius:0;box-shadow:none;transform:none;background:#F4F2EE}
+#s-menu .barre{background:#14243A;color:#fff;border-bottom:0;position:relative;z-index:3}
+#s-menu .barre .evt-nom{color:#fff;background:transparent;border-color:rgba(255,255,255,.25)}
+#s-menu .barre .icone{color:#fff;border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.06)}
+#s-menu #m-nav.reg-nav{position:absolute;left:0;right:0;z-index:2;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px 28px;align-items:start;padding:26px 48px 46px;background:#1B2D45;border:0;overflow:visible;box-shadow:0 26px 50px -20px rgba(0,0,0,.55)}
+#s-menu.menu-ferme #m-nav.reg-nav{display:none}
+#s-menu #m-nav .col{display:flex;flex-direction:column;gap:4px;min-width:0}
+#s-menu #m-nav .col h3{margin:0 0 8px;font:700 12px system-ui;letter-spacing:.09em;text-transform:uppercase;color:#C9A35A}
+#s-menu #m-nav.reg-nav button{display:block;width:100%;text-align:left;padding:.55em .2em;border-radius:8px;background:none;color:#E8EDF3;font:500 16px system-ui;white-space:normal}
+#s-menu #m-nav.reg-nav button:hover{color:#fff;background:rgba(255,255,255,.06)}
+#s-menu #m-nav.reg-nav button.sel{background:none;color:#C9A35A;font-weight:700}
+#s-menu .panneau{flex:1;min-height:0;overflow:auto;padding:34px 48px 48px;background:#F4F2EE}
+#s-menu .reg-fleche{position:absolute;top:auto;bottom:auto;left:50%;transform:translateX(-50%);z-index:4;width:54px;height:54px;border-radius:50%;margin:0;background:#C9A35A;box-shadow:0 8px 22px rgba(0,0,0,.3)}
+#s-menu .reg-fleche svg{transform:none}
+#s-menu.menu-ferme .reg-fleche svg{transform:rotate(180deg)}
+#s-menu .barre .icone{color:#fff!important;background:rgba(255,255,255,.1)!important;border-color:rgba(255,255,255,.28)!important}#s-menu .barre .icone svg{stroke:#fff!important;fill:none}

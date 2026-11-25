@@ -603,11 +603,23 @@
     if (etat.ecran !== 's-accueil') afficherAccueil();
     var m = $('s-menu'); m.hidden = false; m.classList.remove('ferme');
     majCamera(); $('m-evt').textContent = etat.evt.nom; $('m-pop').hidden = true; $('m-evt-liste').hidden = true;
-    $('m-nav').innerHTML = PANNEAUX.map(function (x) { return '<button data-p="' + x[0] + '">' + x[1] + '</button>'; }).join('');
-    $('m-nav').querySelectorAll('button').forEach(function (b) { b.onclick = function () { ouvrirPanneau(b.dataset.p); }; });
+    /* menu en colonnes ; une rubrique choisie : le menu se replie (seule la flèche reste) et sa page s'affiche en grand */
+    var nom = {}; PANNEAUX.forEach(function (x) { nom[x[0]] = x[1]; });
+    $('m-nav').innerHTML = GROUPES.map(function (g) { return '<div class="col"><h3>' + g[0] + '</h3>' + g[1].filter(function (k) { return nom[k]; }).map(function (k) { return '<button data-p="' + k + '">' + nom[k] + '</button>'; }).join('') + '</div>'; }).join('');
+    $('m-nav').querySelectorAll('button').forEach(function (b) { b.onclick = function () { ouvrirPanneau(b.dataset.p); menuReplier(true); }; });
     ouvrirPanneau(typeof p === 'string' && PANNEAUX.some(function (x) { return x[0] === p; }) ? p : panneauActif);
+    menuReplier(false);
   }
-  $('m-fleche').onclick = function () { $('s-menu').classList.toggle('ferme'); };
+  var GROUPES = [['Configurer', ['general', 'capture', 'appareil']], ['Écrans', ['ecrans', 'mise']], ['Partage', ['partage', 'impression']], ['Événement', ['dossier']], ['Autres', ['maj']]];
+  /* replie / déplie le menu des rubriques ; la flèche se place sous le bandeau (menu replié) ou sous le menu (déplié) */
+  function menuReplier(ferme) {
+    var m = $('s-menu'), nav = $('m-nav'), barre = m.querySelector('.barre'), f = $('m-fleche');
+    m.classList.toggle('menu-ferme', !!ferme); m.classList.remove('ferme');
+    var h = barre ? barre.offsetHeight : 64; nav.style.top = h + 'px';
+    f.style.top = (ferme ? h - 27 : h + nav.offsetHeight - 27) + 'px';
+  }
+  $('m-fleche').onclick = function () { menuReplier(!$('s-menu').classList.contains('menu-ferme')); };
+  addEventListener('resize', function () { var m = $('s-menu'); if (m && !m.hidden) menuReplier(m.classList.contains('menu-ferme')); });
   $('m-lancer').onclick = function () { $('s-menu').hidden = true; afficherAccueil(); if (opts.pleinEcran) pleinEcran(); };
   $('m-evt').onclick = function () {
     var d = $('m-evt-liste'); if (!d.hidden) { d.hidden = true; return; }
