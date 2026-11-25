@@ -267,6 +267,7 @@
         toast(e.message || 'Ouverture impossible');
       });
   }
+  function quitterPleinEcran() { try { if (Pont && Pont.pleinEcran) return Pont.pleinEcran(false); if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {}); } catch (e) {} }
   function pleinEcran() { if (Pont && Pont.pleinEcran) return Pont.pleinEcran(true); var d = document.documentElement; if (!document.fullscreenElement && d.requestFullscreen) d.requestFullscreen().catch(function () {}); }
 
   /* ── mise à jour en direct : tout changement du back-office arrive en quelques secondes ── */
@@ -562,11 +563,11 @@
     }
   };
   $('pin-annuler').onclick = function () { $('pin').hidden = true; };
-  /* accès aux réglages : flèche discrète en haut à droite, puis le code */
+  /* accès aux réglages : cadenas invisible en haut à droite, puis le code */
   (function () {
     var c = $('a-coin'), n = 0, t0 = 0, long = null;
-    /* petite flèche discrète en haut à droite : le code est demandé avant d'ouvrir les réglages (un invité ne peut pas y entrer) */
-    c.onclick = function () { demanderPin(ouvrirMenu); };
+    /* cadenas invisible en haut à droite : le code, puis la borne quitte le plein écran et ouvre les réglages (la flèche du tiroir n'apparaît qu'à ce moment) */
+    c.onclick = function () { demanderPin(function () { quitterPleinEcran(); ouvrirMenu(); }); };
   })();
   $('l-reg').onclick = function () { ecran('s-borne'); panneauBorne($('b-panneau')); };
   $('b-retour').onclick = function () { afficherListe(); };

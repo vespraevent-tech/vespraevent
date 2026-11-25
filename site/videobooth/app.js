@@ -330,7 +330,7 @@
     }).catch(function () { return ''; });
   }
   function memoCam(x) { cfg.cam = x.deviceId; cfg.camLabel = x.label || ''; ecrireCfg(cfg); }
-  var angleEssaye = false;
+  var angleEssaye = false, reouvertePref = false;
   function grandAngle(s) {
     try {
       var tr = s.getVideoTracks()[0], caps = tr && tr.getCapabilities ? tr.getCapabilities() : {};
@@ -338,7 +338,17 @@
       var pousser = function () { try { var c3 = tr.getCapabilities ? tr.getCapabilities() : {}; if (!(c3.zoom && c3.zoom.min < 1)) { [0.6, 0.5, 0.7].some(function (z) { tr.applyConstraints({ advanced: [{ zoom: z }] }).catch(function () {}); return false; }); } } catch (e) {} };
       larg(); pousser(); setTimeout(larg, 600); setTimeout(larg, 2000);   /* certaines tablettes n'acceptent le zoom qu'une fois la caméra lancée */
     } catch (e) {}
-    if (angleEssaye || cfg.cam || !navigator.mediaDevices.enumerateDevices) return;
+    if (!navigator.mediaDevices.enumerateDevices) return;
+    /* caméra mémorisée (ex. l'ultra grand-angle) : une fois la caméra ouverte, les noms sont connus ; si ce n'est pas la bonne, on bascule (une seule fois) */
+    if (cfg.cam || cfg.camLabel) {
+      navigator.mediaDevices.enumerateDevices().then(function (d) {
+        var cur = (s.getVideoTracks()[0].getSettings() || {}).deviceId, v = d.filter(function (x) { return x.kind === 'videoinput'; });
+        var t = v.filter(function (x) { return x.deviceId === cfg.cam; })[0] || (cfg.camLabel ? v.filter(function (x) { return x.label === cfg.camLabel; })[0] : null);
+        if (t && t.deviceId !== cur && !reouvertePref) { reouvertePref = true; memoCam(t); setTimeout(ouvrirCam, 300); } else reouvertePref = false;
+      }).catch(function () {});
+      return;
+    }
+    if (angleEssaye) return;
     angleEssaye = true;
     /* tablette à deux caméras avant : la dernière (ex. « camera 2 ») est l'ultra grand-angle ; on la choisit une fois pour toutes (modifiable dans Réglages › Caméra) */
     navigator.mediaDevices.enumerateDevices().then(function (d) {
