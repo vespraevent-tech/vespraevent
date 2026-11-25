@@ -213,7 +213,9 @@
   }
 
   /* ── 3. écran d'accueil (même rendu que l'aperçu du back-office) ── */
+  var GAL_PARENT = null;
   function dessinerAccueil(sc, e, viaBorne) {
+    var gal = $('a-gal'); if (gal && !GAL_PARENT) GAL_PARENT = gal.parentNode; if (gal && gal.parentNode === sc) GAL_PARENT.appendChild(gal);   /* l'icône galerie survit au redessin */
     var a = e.accueil || {}; sc.innerHTML = ''; sc.style.background = a.couleur || '#fff';
     var p = [];
     if (a.fond) p.push(chargerImage(e.id, a.fond, viaBorne).then(function (im) { if (im) { var i = im.cloneNode(); i.className = 'fond'; sc.insertBefore(i, sc.firstChild); } }));
@@ -233,6 +235,12 @@
     var bt = document.createElement('button'); bt.className = 'declic'; bt.innerHTML = ICONE; bt.setAttribute('aria-label', 'Prendre une photo');
     bt.style.cssText = 'left:' + b.x + 'px;top:' + b.y + 'px;width:' + b.taille + 'px;height:' + b.taille + 'px;background:' + b.couleur;
     bt.querySelector('svg').style.stroke = b.icone; sc.appendChild(bt);
+    /* icône galerie placée sur l'écran (position, taille et couleurs choisies dans le back-office) */
+    if (gal && sc.id === 'a-scene' && a.galerieBt) {
+      var g = a.galerieBt; gal.style.cssText = 'position:absolute;left:' + g.x + 'px;top:' + g.y + 'px;transform:translate(-50%,-50%);width:' + g.taille + 'px;height:' + g.taille + 'px;border-radius:24%;background:' + g.couleur + ';color:' + g.icone + ';border:0;box-shadow:0 6px 20px rgba(0,0,0,.18)';
+      var sv = gal.querySelector('svg'); if (sv) { sv.style.width = sv.style.height = Math.round(g.taille * 0.52) + 'px'; }
+      sc.appendChild(gal);
+    } else if (gal && gal.parentNode !== GAL_PARENT && sc.id === 'a-scene') { gal.style.cssText = ''; GAL_PARENT.appendChild(gal); }
     return Promise.all(p);
   }
   function ajusterScene() { var sc = $('a-scene'), k = Math.min(innerWidth / 1920, innerHeight / 1080); sc.style.transformOrigin = 'center'; sc.style.transform = 'translate(-50%,-50%) scale(' + k + ')'; }

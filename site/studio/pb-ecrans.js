@@ -32,7 +32,8 @@
     oeil: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
     suppr: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/>',
     copie: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
-    centre: '<path d="M12 3v18M3 12h18"/><rect x="8" y="8" width="8" height="8" rx="1"/>'
+    centre: '<path d="M12 3v18M3 12h18"/><rect x="8" y="8" width="8" height="8" rx="1"/>',
+    disque: '<path d="M5 3h11l3 3v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M7 3v5h8V3M7 21v-7h10v7"/>'
   };
   function ic(k, t) { return '<svg viewBox="0 0 24 24" width="' + (t || 22) + '" height="' + (t || 22) + '" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (IC[k] || '') + '</svg>'; }
   var ICONE_APP = '<svg viewBox="0 0 24 24" width="52%" height="52%" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
@@ -55,7 +56,7 @@
   /* ── annuler / rétablir ── */
   function memoriser() { E.histo.push(JSON.stringify(A())); if (E.histo.length > 60) E.histo.shift(); E.futur = []; E.sale = true; }
   function restaurer(json) { X().PB.evt.accueil = JSON.parse(json); }
-  window.pbxAnnuler = function () { if (!E.histo.length) return; E.futur.push(JSON.stringify(A())); restaurer(E.histo.pop()); E.sale = true; if (E.sel && E.sel !== '__bouton' && !calque(E.sel)) E.sel = null; scene(); panneau(); };
+  window.pbxAnnuler = function () { if (!E.histo.length) return; E.futur.push(JSON.stringify(A())); restaurer(E.histo.pop()); E.sale = true; if (E.sel && E.sel !== '__bouton' && E.sel !== '__galerie' && !calque(E.sel)) E.sel = null; scene(); panneau(); };
   window.pbxRetablir = function () { if (!E.futur.length) return; E.histo.push(JSON.stringify(A())); restaurer(E.futur.pop()); E.sale = true; scene(); panneau(); };
 
   /* ── styles ── */
@@ -98,6 +99,7 @@
       + '.ecx-theme:hover{border-color:#b8862f}.ecx-theme b{width:34px;height:22px;border-radius:6px;display:block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}'
       + '.ecx-aide{font-size:12px;color:#8a929e;margin:0 0 10px;line-height:1.45}'
       + '.ecx-sauver{display:inline-flex;align-items:center;gap:7px;border:0;background:#14304f;color:#fff;font:600 13.5px Inter,system-ui,sans-serif;padding:10px 16px;border-radius:10px;cursor:pointer}.ecx-sauver.sale{background:#b8862f}'
+      + '.ecx-disque.sale{background:#b8862f;border-color:#b8862f;color:#fff;box-shadow:0 6px 16px -8px rgba(184,134,47,.9)}'
       + '@media(max-width:900px){.ecx{grid-template-columns:1fr}.ecx-pal{position:static}.ecx-outils{grid-template-columns:repeat(4,1fr)}}';
     document.head.appendChild(st);
   }
@@ -111,7 +113,7 @@
       + '<input type="file" id="ecxFichier" accept="image/png,image/jpeg,image/webp" hidden onchange="pbxImage(this)"></div><div class="ecx-prop" id="ecxProp"></div></aside>'
       + '<section class="ecx-zone"><div class="ecx-barre"><button type="button" class="ecx-rond" id="ecxAnn" title="Annuler" onclick="pbxAnnuler()">' + ic('annuler', 18) + '</button><button type="button" class="ecx-rond" id="ecxRet" title="Rétablir" onclick="pbxRetablir()">' + ic('retablir', 18) + '</button>'
       + '<span class="ecx-aide" style="margin:0 0 0 6px">Cliquez sur un élément pour le modifier · glissez pour le déplacer · le rond doré l’agrandit</span><span class="esp"></span>'
-      + '<button type="button" class="ecx-sauver" id="ecxSauver" onclick="pbxSauver()">Enregistrer</button></div>'
+      + '<button type="button" class="ecx-rond ecx-disque" id="ecxSauver" title="Enregistrer" aria-label="Enregistrer" onclick="pbxSauver()">' + ic('disque', 19) + '</button></div>'
       + '<div class="ecx-cadre" id="ecxCadre"><div class="ecx-scene" id="ecxScene"></div></div></section></div>';
     var l = Math.max(300, (document.getElementById('ecxCadre').parentNode.clientWidth || 900));
     E.k = l / 1920; var cadre = document.getElementById('ecxCadre'); cadre.style.width = Math.round(1920 * E.k) + 'px'; cadre.style.height = Math.round(1080 * E.k) + 'px';
@@ -133,13 +135,16 @@
     z.innerHTML = (a.fond ? '<img class="fond" alt="" src="' + esc(x.urlImage(a.fond)) + '">' : '')
       + (a.calques || []).map(htmlCalque).join('')
       + '<div class="ecx-el ecx-bt' + (E.sel === '__bouton' ? ' sel' : '') + '" data-id="__bouton" style="left:' + b.x + 'px;top:' + b.y + 'px;width:' + b.taille + 'px;height:' + b.taille + 'px;transform:translate(-50%,-50%);background:' + esc(b.couleur) + '">' + ICONE_APP.replace('<svg', '<svg stroke="' + esc(b.icone) + '"') + (E.sel === '__bouton' ? '<span class="ecx-poignee" data-poignee="1"></span>' : '') + '</div>'
-      + (a.galerie ? '<div class="ecx-coin" style="left:1.5%;background:rgba(0,0,0,.35)">' + ic('image', 40).replace('stroke="currentColor"', 'stroke="#fff"') + '</div>' : '');
+      + (a.galerie ? (function () { var g = galBt(), on = E.sel === '__galerie';
+          return '<div class="ecx-el' + (on ? ' sel' : '') + '" data-id="__galerie" style="left:' + g.x + 'px;top:' + g.y + 'px;width:' + g.taille + 'px;height:' + g.taille + 'px;transform:translate(-50%,-50%);border-radius:24%;display:grid;place-items:center;background:' + esc(g.couleur) + ';color:' + esc(g.icone) + ';box-shadow:0 6px 20px rgba(0,0,0,.18)">'
+            + ic('image', Math.round(g.taille * 0.52)) + (on ? '<span class="ecx-poignee" data-poignee="1"></span>' : '') + '</div>'; })() : '');
     var an = document.getElementById('ecxAnn'), re = document.getElementById('ecxRet'), sv = document.getElementById('ecxSauver');
-    if (an) an.disabled = !E.histo.length; if (re) re.disabled = !E.futur.length; if (sv) { sv.classList.toggle('sale', E.sale); sv.textContent = E.sale ? 'Enregistrer les modifications' : 'Enregistré'; }
+    if (an) an.disabled = !E.histo.length; if (re) re.disabled = !E.futur.length; if (sv) { sv.classList.toggle('sale', E.sale); sv.title = E.sale ? 'Enregistrer les modifications' : 'Tout est enregistré'; }
   }
 
   /* ── déplacer, agrandir, choisir ── */
-  function cible(id) { return id === '__bouton' ? A().bouton : calque(id); }
+  function galBt() { var a = A(); if (!a.galerieBt) a.galerieBt = { x: 90, y: 90, taille: 96, couleur: '#FFFFFF', icone: '#1F3B5A' }; return a.galerieBt; }
+  function cible(id) { return id === '__bouton' ? A().bouton : id === '__galerie' ? galBt() : calque(id); }
   function brancher() {
     var z = document.getElementById('ecxScene'); if (!z) return;
     z.onpointerdown = function (ev) {
@@ -157,6 +162,7 @@
         if (poignee) {
           var f = Math.max(0.1, (demi + (dx + dy) / Math.SQRT2) / demi);
           if (id === '__bouton') o.taille = Math.round(Math.max(80, Math.min(600, d.taille * f)));
+          else if (id === '__galerie') o.taille = Math.round(Math.max(50, Math.min(300, d.taille * f)));
           else if (o.type === 'texte') o.taille = Math.round(Math.max(8, Math.min(400, d.taille * f)));
           else if (o.type === 'image') o.w = Math.round(Math.max(20, Math.min(4000, d.w * f)));
           else if (o.type === 'forme') { o.w = Math.round(Math.max(10, Math.min(4000, d.w + dx * 2))); o.h = o.forme === 'cercle' ? o.w : Math.round(Math.max(10, Math.min(4000, d.h + dy * 2))); }
@@ -164,7 +170,7 @@
           o.x = Math.round(d.x + dx); o.y = Math.round(d.y + dy);
           guides(o);
         }
-        var n = z.querySelector('[data-id="' + id + '"]'); var h = id === '__bouton' ? null : htmlCalque(o);
+        var n = z.querySelector('[data-id="' + id + '"]'); var h = (id === '__bouton' || id === '__galerie') ? null : htmlCalque(o);
         if (h) { var t = document.createElement('div'); t.innerHTML = h; n.replaceWith(t.firstChild); } else { n.style.left = o.x + 'px'; n.style.top = o.y + 'px'; n.style.width = n.style.height = o.taille + 'px'; }
       };
       var fin = function () {
@@ -182,7 +188,7 @@
         var t = e.target; if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
         var o = cible(E.sel); if (!o) return; var p = e.shiftKey ? 10 : 1, ok = true;
         if (e.key === 'ArrowLeft') { memoriser(); o.x -= p; } else if (e.key === 'ArrowRight') { memoriser(); o.x += p; } else if (e.key === 'ArrowUp') { memoriser(); o.y -= p; } else if (e.key === 'ArrowDown') { memoriser(); o.y += p; }
-        else if ((e.key === 'Delete' || e.key === 'Backspace') && E.sel !== '__bouton') { window.pbxSuppr(E.sel); return e.preventDefault(); }
+        else if ((e.key === 'Delete' || e.key === 'Backspace') && E.sel !== '__bouton' && E.sel !== '__galerie') { window.pbxSuppr(E.sel); return e.preventDefault(); }
         else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.shiftKey ? window.pbxRetablir() : window.pbxAnnuler(); return e.preventDefault(); }
         else ok = false;
         if (ok) { e.preventDefault(); scene(); }
@@ -220,7 +226,11 @@
     var z = document.getElementById('ecxProp'); if (!z) return; var a = A(), h = '';
     if (E.sel) {
       var o = cible(E.sel); if (!o) { E.sel = null; return panneau(); }
-      if (E.sel === '__bouton') {
+      if (E.sel === '__galerie') {
+        h = '<h4>Icône galerie</h4><p class="ecx-aide">Les invités ouvrent la galerie de l’événement. Elle apparaît dès la première photo.</p>' + champ('Couleur du fond', '<input type="color" data-p="couleur" value="' + esc(o.couleur) + '">') + champ('Couleur de l’icône', '<input type="color" data-p="icone" value="' + esc(o.icone) + '">')
+          + champ('Taille (' + o.taille + ' px)', '<input type="range" min="50" max="300" step="2" data-p="taille" data-n="1" value="' + o.taille + '">')
+          + '<div class="ecx-rang"><button type="button" class="ecx-mini rouge" onclick="pbxGalerieOff()">' + ic('suppr') + 'Masquer l’icône</button></div>';
+      } else if (E.sel === '__bouton') {
         h = '<h4>Bouton photo</h4>' + champ('Couleur du bouton', '<input type="color" data-p="couleur" value="' + esc(o.couleur) + '">') + champ('Couleur de l’icône', '<input type="color" data-p="icone" value="' + esc(o.icone) + '">')
           + champ('Taille (' + o.taille + ' px)', '<input type="range" min="80" max="600" step="5" data-p="taille" data-n="1" value="' + o.taille + '">')
           + '<div class="ecx-rang"><button type="button" class="ecx-mini" onclick="pbxCentrer()">' + ic('centre') + 'Centrer</button></div>';
@@ -251,7 +261,7 @@
       h = '<h4>Arrière-plan</h4>' + champ('Couleur', '<input type="color" id="ecxCoul" value="' + esc(a.couleur || '#FFFFFF') + '">')
         + '<p class="ecx-aide">Image de fond conseillée : 1920 × 1080 px.</p><div class="ecx-rang"><label class="ecx-mini" style="margin:0;color:#33404f">' + (a.fond ? 'Remplacer l’image' : 'Choisir une image') + '<input type="file" accept="image/png,image/jpeg,image/webp" hidden onchange="pbxFond(this)"></label>' + (a.fond ? '<button type="button" class="ecx-mini rouge" onclick="pbxFondRetirer()">' + ic('suppr') + 'Retirer</button>' : '') + '</div>';
     } else if (E.panneau === 'reglages') {
-      h = '<h4>Réglages</h4><label style="display:flex;align-items:center;gap:10px;color:#1f2a37"><input type="checkbox" id="ecxGal" style="width:auto;margin:0"' + (a.galerie ? ' checked' : '') + '>Bouton galerie (en haut à gauche)</label><p class="ecx-aide">Les invités ouvrent la galerie de l’événement sur la borne. Le cadenas des réglages de la borne reste en haut à droite.</p>';
+      h = '<h4>Réglages</h4><label style="display:flex;align-items:center;gap:10px;color:#1f2a37"><input type="checkbox" id="ecxGal" style="width:auto;margin:0"' + (a.galerie ? ' checked' : '') + '>Icône galerie</label><p class="ecx-aide">Les invités ouvrent la galerie de l’événement sur la borne. Cliquez sur l’icône dans l’aperçu pour la déplacer, l’agrandir ou changer ses couleurs.</p>';
     } else {
       h = '<h4>Écran Bienvenue</h4><p class="ecx-aide">Ajoutez une image, un texte ou une forme avec la palette, ou cliquez sur un élément de l’aperçu pour le modifier. Ce que vous voyez est exactement ce que la borne affiche (1920 × 1080).</p>';
     }
@@ -269,6 +279,7 @@
     var gl = document.getElementById('ecxGal'); if (gl) gl.addEventListener('change', function () { memoriser(); A().galerie = gl.checked; scene(); });
   }
 
+  window.pbxGalerieOff = function () { memoriser(); A().galerie = false; E.sel = null; scene(); panneau(); };
   window.pbxChoisir = function (id) { E.sel = id; scene(); panneau(); };
   window.pbxCentrer = function () { var o = cible(E.sel); if (!o) return; memoriser(); o.x = 960; scene(); };   /* centré horizontalement (la hauteur ne bouge pas) */
   window.pbxOrdre = function (sens, id) {

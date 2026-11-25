@@ -128,6 +128,7 @@ export function evenementPropre(e, ancien) {
       bouton: { x: nb(ac.bouton && ac.bouton.x, 0, 1920, 960), y: nb(ac.bouton && ac.bouton.y, 0, 1080, 540), taille: nb(ac.bouton && ac.bouton.taille, 80, 600, 230), couleur: hex(ac.bouton && ac.bouton.couleur, '#1F3B5A'), icone: hex(ac.bouton && ac.bouton.icone, '#FFFFFF') },
       galerie: oui(ac.galerie, true),
       calques: Array.isArray(ac.calques) ? calquesPropres(ac.calques) : undefined,
+      galerieBt: ac.galerieBt ? { x: nb(ac.galerieBt.x, 0, 1920, 90), y: nb(ac.galerieBt.y, 0, 1080, 90), taille: nb(ac.galerieBt.taille, 50, 300, 96), couleur: hex(ac.galerieBt.couleur, '#FFFFFF'), icone: hex(ac.galerieBt.icone, '#1F3B5A') } : undefined,
       texte: { contenu: txt(ac.texte && ac.texte.contenu, 80), police: ['elegante', 'manuscrite', 'moderne', 'festive'].includes(ac.texte && ac.texte.police) ? ac.texte.police : 'elegante', couleur: hex(ac.texte && ac.texte.couleur, '#231F1C'), taille: nb(ac.texte && ac.texte.taille, 24, 260, 110), x: nb(ac.texte && ac.texte.x, 0, 1920, 960), y: nb(ac.texte && ac.texte.y, 0, 1080, 200) },
       logo: { image: idOk(ac.logo && ac.logo.image, 'im'), x: nb(ac.logo && ac.logo.x, 0, 1920, 960), y: nb(ac.logo && ac.logo.y, 0, 1080, 900), largeur: nb(ac.logo && ac.logo.largeur, 40, 1920, 360) },
     },
