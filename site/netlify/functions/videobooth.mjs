@@ -282,7 +282,7 @@ async function traiter(request) {
     let d = {}; try { d = await request.json(); } catch {}
     const n = (x, a, b) => Math.min(b, Math.max(a, Math.round(Number(x) || 0)));
     const mot = (x) => String(x || '').replace(/[^a-z]/g, '').slice(0, 12);
-    await noter('tablette', { batt: d.batt == null ? null : n(d.batt, 0, 100), charge: !!d.charge, att: n(d.att, 0, 100000), tot: n(d.tot, 0, 100000), usage: n(d.usage, 0, 1e13), quota: n(d.quota, 0, 1e13), cam: mot(d.cam), mic: mot(d.mic), ver: n(d.ver, 0, 9999), enreg: !!d.enreg, reco: n(d.reco, 0, 100000), mut: n(d.mut, 0, 100000), pinUsine: d.pinUsine === true });
+    await noter('tablette', { batt: d.batt == null ? null : n(d.batt, 0, 100), charge: !!d.charge, att: n(d.att, 0, 100000), tot: n(d.tot, 0, 100000), usage: n(d.usage, 0, 1e13), quota: n(d.quota, 0, 1e13), cam: mot(d.cam), mic: mot(d.mic), ver: n(d.ver, 0, 9999), codec: String(d.codec || '').replace(/[^a-zA-Z0-9.,;=\/ -]/g, '').slice(0, 60), enreg: !!d.enreg, reco: n(d.reco, 0, 100000), mut: n(d.mut, 0, 100000), pinUsine: d.pinUsine === true });
     return rep({ ok: true });
   }
 
