@@ -9,6 +9,8 @@
      NOTIFY_FROM      expéditeur, ex. "Vespra Event <devis@vespraevent.fr>"
    ============================================================ */
 
+import { estSpam } from './_spam.mjs';
+
 const NAVY = '#2B4A6B', GOLD = '#F59E0B', DARK = '#0C0F14';
 const G1 = '#3D4452', G2 = '#646D7C', G3 = '#C8CDD8', G4 = '#F0F2F5';
 
@@ -501,6 +503,8 @@ export default {
       console.log('Enregistrement interne d’un avis publié — pas de notification');
       return;
     }
+    const spam = estSpam(data);
+    if (spam) { console.log('Demande de robot ignorée (' + spam + ') — ni notification ni accusé'); return; }
     await notify(name, data);
     /* accusé de réception automatique (délai réglé dans le back-office) (demandes de devis / réservation seulement) */
     try {

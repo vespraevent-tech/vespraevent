@@ -60,6 +60,7 @@ import { htmlRelance, htmlAvis, htmlAccuse, pageProduit } from './_mails-auto.mj
    elle sait les retrouver même quand le parcours du préfixe est en
    retard, grâce à l'index qu'elle tient à jour. */
 import { tousLesCodes, supprimerCode } from './parrainage.mjs';
+import { estSpam } from './_spam.mjs';
 
 const COOKIE_NAME = 'vespra_admin';
 const SESSION_HOURS = 12;
@@ -3064,7 +3065,9 @@ const gestionnaire = async (request) => {
       const vus = new Set();
       const subs = lectures.flat().filter((s) => {
         if (!s || vus.has(s.id)) return false;
-        vus.add(s.id); return true;
+        vus.add(s.id);
+        /* demandes de robots écartées (nom « …sap », message en lettres au hasard, envoi en moins de 3 s) */
+        return !estSpam(s.data || {});
       });
       const parId = new Map(suivis.map((x) => [x.id, x]));
       /* Une demande envoyée par un client n'est jamais réécrite : ce qu'il
