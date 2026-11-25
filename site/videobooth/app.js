@@ -165,7 +165,8 @@
   /* ───────── caméra ───────── */
   var dureeRec = 0, decompte = null, flux = null, rec = null, morceaux = [], blobFinal = null, mime = '', enregistrement = false, minuteur = null, t0 = 0;
   function meilleurMime() {
-    var l = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
+    /* H.264 profil High niveau 5.1 / 4.0 d'abord (image nettement plus fine que le profil Baseline 3.0, prévu pour du 720p), puis les profils plus simples */
+    var l = ['video/mp4;codecs=avc1.640033,mp4a.40.2', 'video/mp4;codecs=avc1.640028,mp4a.40.2', 'video/mp4;codecs=avc1.4D0033,mp4a.40.2', 'video/mp4;codecs=avc1.42E033,mp4a.40.2', 'video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
     for (var i = 0; i < l.length; i++) { try { if (window.MediaRecorder && MediaRecorder.isTypeSupported(l[i])) return l[i]; } catch (e) {} }
     return '';
   }
@@ -258,7 +259,7 @@
   function ouvrirCam() {
     montrer('s-cam'); $('s-cam').classList.remove('flou'); $('cam-err').hidden = true; $('compte').hidden = true; $('rec').hidden = true; $('barre').hidden = true;
     $('b-go').hidden = true; $('b-stop').hidden = true; $('fmt').hidden = true; enregistrement = false;
-    var contraintes = { audio: Object.assign({ echoCancellation: false, noiseSuppression: true, autoGainControl: true, channelCount: { ideal: 1 } }, cfg.mic ? { deviceId: { exact: cfg.mic } } : {}), video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, (paysage() ? { width: { ideal: 1920 }, height: { ideal: 1440 }, aspectRatio: { ideal: 4 / 3 }, frameRate: { ideal: 30 } } : { width: { ideal: 1440 }, height: { ideal: 1920 }, aspectRatio: { ideal: 3 / 4 }, frameRate: { ideal: 30 } })) };   /* 4:3 : tout le capteur, donc le champ de vision le plus large */
+    var contraintes = { audio: Object.assign({ echoCancellation: false, noiseSuppression: false, autoGainControl: true, channelCount: { ideal: 1 }, sampleRate: { ideal: 48000 } }, cfg.mic ? { deviceId: { exact: cfg.mic } } : {}), video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, (paysage() ? { width: { ideal: 1920 }, height: { ideal: 1440 }, aspectRatio: { ideal: 4 / 3 }, frameRate: { ideal: 30 } } : { width: { ideal: 1440 }, height: { ideal: 1920 }, aspectRatio: { ideal: 3 / 4 }, frameRate: { ideal: 30 } })) };   /* 4:3 : tout le capteur, donc le champ de vision le plus large */
     arreterCam();
     var garde = !camSuspecte && fluxGarde && fluxGarde.getTracks().length && fluxGarde.getTracks().every(function (t) { return t.readyState === 'live'; }) ? fluxGarde : null;
     if (garde) { fluxGarde = null; clearTimeout(minuteurGarde); } else libererCamera();
@@ -353,11 +354,15 @@
     var n = 3; $('compte-n').textContent = n; decompte = setInterval(function () { n--; if (n > 0) { $('compte-n').textContent = n; } else { clearInterval(decompte); decompte = null; $('compte').hidden = true; $('s-cam').classList.remove('flou'); demarrer(); } }, 1000);
   };
   /* qualité choisie sur la session : haute 3,5 Mbit/s, standard 2,5, économique 1,8 (vidéos plus légères, moins de stockage et de données mobiles) */
-  function debitVideo() { return { eco: 3500000, haute: 9000000 }[cfg.qualite] || 6000000; }
+  /* débit vidéo : standard 10 Mbit/s (net en 1080 × 1920), haute 16, économique 5 */
+  function debitVideo() { return { eco: 5000000, haute: 16000000 }[cfg.qualite] || 10000000; }
   function demarrer() {
     morceaux = []; blobFinal = null; mime = meilleurMime(); niveauMax = 0;
-    var flot = new MediaStream(cv.captureStream(30).getVideoTracks().concat(flux.getAudioTracks()));
-    try { rec = mime ? new MediaRecorder(flot, { mimeType: mime, videoBitsPerSecond: debitVideo(), audioBitsPerSecond: 192000 }) : new MediaRecorder(flot); } catch (e) { rec = new MediaRecorder(flot); }
+    var pisteV = cv.captureStream(30).getVideoTracks();
+    /* « detail » : l'encodeur garde la finesse de l'image (visages, textes) plutôt que de la sacrifier */
+    pisteV.forEach(function (t) { try { t.contentHint = 'detail'; } catch (e) {} });
+    var flot = new MediaStream(pisteV.concat(flux.getAudioTracks()));
+    try { rec = mime ? new MediaRecorder(flot, { mimeType: mime, videoBitsPerSecond: debitVideo(), audioBitsPerSecond: 256000 }) : new MediaRecorder(flot); } catch (e) { rec = new MediaRecorder(flot); }
     mime = rec.mimeType || mime || 'video/webm';
     rec.ondataavailable = function (e) { if (e.data && e.data.size) morceaux.push(e.data); };
     rec.onstop = function () {
@@ -564,7 +569,7 @@ $('b-stop').onclick = arreterRec;
   /* ── état de la tablette, envoyé toutes les 2 minutes au back-office (batterie, vidéos en attente, caméra, micro, place) ── */
   function battement() {
     if (!(cfg.jeton || cfg.cle)) return;
-    var etat = { cam: camEtat, mic: micEtat, ver: 41, pinUsine: cfg.pin === PIN_USINE, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
+    var etat = { cam: camEtat, mic: micEtat, ver: 42, codec: meilleurMime(), pinUsine: cfg.pin === PIN_USINE, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
     var fin = function () {
       toutes().then(function (l) { etat.att = l.filter(function (v) { return !v.envoye; }).length; etat.tot = l.length; }).catch(function () {}).then(function () {
         return (navigator.storage && navigator.storage.estimate) ? navigator.storage.estimate().then(function (e) { etat.usage = e.usage || 0; etat.quota = e.quota || 0; }).catch(function () {}) : null;

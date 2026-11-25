@@ -536,7 +536,12 @@ select.dpc-q::-ms-expand{display:none}
 .fd-plus-c{display:none}.fd-plus.ouvert .fd-plus-c{display:block}
 .fd-plus-b{border:0;background:none;color:#2B4A6B;font:600 12px Inter,system-ui,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:12px 28px 6px;display:block}
 .fd-sous{display:block;font:400 11px Inter,system-ui,sans-serif;color:#9aa0ab;margin-top:2px}
-.fd-st{margin-left:auto;flex:0 0 auto}
+.fd-st{margin-left:auto;flex:0 0 auto;align-self:flex-start}
+#contenuFicheDemande .fd-h,#contenuFicheResa .fd-h{display:flex;flex-wrap:nowrap;align-items:flex-start;gap:14px}
+.fd-id{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:6px}
+.fd-id .fd-nom{line-height:1.2;overflow-wrap:anywhere}
+.fd-badges{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.fd-badges:empty{display:none}
+.fd-livr{white-space:nowrap}
 .fd-sous{padding:0 28px 14px;border-bottom:1px solid #eef0f4;font:500 13px Inter,system-ui,sans-serif;color:var(--g2);line-height:1.4}
 #contenuFicheDemande .fd-sous,#contenuFicheResa .fd-sous{padding:10px 28px 14px}
 .fd-grille.duo{grid-template-columns:1fr 1fr!important}
@@ -2830,7 +2835,7 @@ function vbFormSession(){
     '<div class="ssT">Carte sur l’écran d’accueil</div>'+t('m1n','Nom du mode')+t('m1d','Description')+
     '<div class="ssT">Enregistrement (valable pour tous les modes)</div>'+
     f('max','Durée maximale (secondes)',e.max,'30','number')+
-    sel('qualite','Qualité de la vidéo',[['haute','Haute (≈ 68 Mo/min)'],['standard','Standard (≈ 45 Mo/min)'],['eco','Économique (≈ 26 Mo/min)']],e.qualite||'standard')+
+    sel('qualite','Qualité de la vidéo',[['haute','Haute (≈ 120 Mo/min)'],['standard','Standard (≈ 75 Mo/min)'],['eco','Économique (≈ 38 Mo/min)']],e.qualite||'standard')+
     sel('format','Format de la vidéo',[['auto','Automatique'],['16:9','Paysage 16:9'],['4:3','Paysage 4:3'],['9:16','Story 9:16'],['3:4','Portrait 3:4']],e.format)+
     '<div class="ligne" style="align-self:end;padding-bottom:8px">'+sw('vs-choixformat',e.choixFormat!==false)+'<span>L’invité peut choisir vertical ou horizontal</span></div>'+
     '<div class="ssT">Avant d’enregistrer</div>'+t('pretT','Titre')+t('pretB','Bouton pour lancer')+f('cadrage','Message de cadrage',e.cadrage,'Vous pouvez incliner doucement la tablette pour vous cadrer','text','plein')+
@@ -5120,9 +5125,10 @@ function ficheDemande(id, relu){
   const piD = proPourFiche(d.resaId ? (cache.resas||[]).find(x => String(x.id) === String(d.resaId)) : null, d, d.nom, d.telephone);
   document.getElementById('contenuFicheDemande').innerHTML =
     '<div class="fd-h">' +
-      '<span class="fd-nom">' + (piD.pro && piD.societe ? esc(piD.societe) : lienFicheClient(d.nom || 'Sans nom', d.telephone, d.email)) + entetePro(piD, d.nom) + '</span>' + badgeNumero(d) +
+      '<div class="fd-id"><span class="fd-nom">' + (piD.pro && piD.societe ? esc(piD.societe) : lienFicheClient(d.nom || 'Sans nom', d.telephone, d.email)) + entetePro(piD, d.nom) + '</span>' +
+      '<span class="fd-badges">' + badgeNumero(d) +
       (suitCadre ? '<span class="dm-et cadre' + (cadre === 'termine' ? ' fait' : '') + '">' +
-        ETIQ_CADRE[cadre] + '</span>' : '') +
+        ETIQ_CADRE[cadre] + '</span>' : '') + '</span></div>' +
       '<select class="dm-sel fd-st dm-sel-' + d.statut + '" aria-label="Statut" onchange="changerStatut(\'' + escAttr(d.id) + '\', this.value)">' + choixStatut + '</select>' +
     '</div>' +
     '<div class="fd-sous">Demande reçue le ' + dateLisible(d.recue) + (function(){ try{ const p = JSON.parse(d.panier || '[]').map(x => x.short || x.name).filter(Boolean).join(' · '); return p ? ' · ' + esc(p) : ''; }catch(e){ return ''; } })() + '</div>' +
@@ -5320,7 +5326,7 @@ function ficheResa(id, relu){
     : '';
 
   document.getElementById('contenuFicheResa').innerHTML =
-    '<div class="fd-h"><span class="fd-nom">' + (piR.pro && piR.societe ? esc(piR.societe) : lienFicheClient(r.client || 'Client', r.phone, r.email)) + entetePro(piR, r.client) + '</span>' + badgeNumero(r) +
+    '<div class="fd-h"><div class="fd-id"><span class="fd-nom">' + (piR.pro && piR.societe ? esc(piR.societe) : lienFicheClient(r.client || 'Client', r.phone, r.email)) + entetePro(piR, r.client) + '</span><span class="fd-badges">' + badgeNumero(r) + '</span></div>' +
     (function(){ const st = r.statutSuivi || 'validee'; return '<select class="dm-sel fd-st dm-sel-' + escAttr(st) + '" aria-label="Statut" onchange="changerStatut(\'__planning__' + escAttr(r.id) + '\', this.value)">' +
         ['nouvelle','en-cours','validee'].map(v => '<option value="' + v + '"' + (st===v ? ' selected' : '') + '>' + ETIQ[v] + '</option>').join('') + '</select>'; })() +
     '</div>' +
