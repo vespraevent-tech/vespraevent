@@ -17,7 +17,7 @@
    ════════════════════════════════════════════════════ */
 import { createHmac, createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { binEcrire } from './_r2.mjs';
-import { pbStore, vuEcrire, evenementEcrire, evenementLire, evenementsLister, imageLire, priseOk, priseEvenement, priseLire, priseEcrire, prisesLister, photoLire, compteurs, NOMS_FICHIERS } from './_photobooth.mjs';
+import { pbStore, vuEcrire, evenementEcrire, imageAjouter, evenementLire, evenementsLister, imageLire, priseOk, priseEvenement, priseLire, priseEcrire, prisesLister, photoLire, compteurs, NOMS_FICHIERS } from './_photobooth.mjs';
 import { accesLire } from './videobooth.mjs';
 import { codeLire } from './_appli.mjs';
 import { getStore as blobStore } from './_blobs.mjs';
@@ -156,7 +156,7 @@ async function traiter(request) {
     let d = {}; try { d = await request.json(); } catch {}
     const e = await evenementLire(jt.evt); if (!e) return rep({ ok: false }, 404);
     const n = { ...e };
-    for (const k of ['capture', 'partage', 'impression']) if (d[k] && typeof d[k] === 'object') n[k] = { ...e[k], ...d[k] };
+    for (const k of ['capture', 'partage', 'impression', 'accueil']) if (d[k] && typeof d[k] === 'object') n[k] = { ...e[k], ...d[k] };   /* accueil : éditeur d'écrans de la borne */
     if (Array.isArray(d.misesEnPage)) n.misesEnPage = (e.misesEnPage || []).map((m) => { const x = d.misesEnPage.find((y) => y && y.id === m.id); return x && Array.isArray(x.cases) ? { ...m, cases: x.cases } : m; });
     const r = await evenementEcrire(n);
     return rep({ ok: true, evenement: vueEvt(r) });
@@ -166,6 +166,12 @@ async function traiter(request) {
     const e = await evenementLire(jt.evt); if (!e) return rep({ ok: false, supprime: true }, 404);
     await vuEcrire(jt.evt, url.searchParams.get('v') || '', e.maj).catch(() => {});
     return rep({ ok: true, maj: e.maj, cadres: (e.misesEnPage || []).length });
+  }
+  /* image ajoutée depuis l'éditeur d'écrans de la borne (même contrôle que le back-office : PNG, JPEG ou WebP, 5,5 Mo au plus) */
+  if (parts[0] === 'img' && request.method === 'POST') {
+    if (!jt) return rep({ ok: false }, 403);
+    try { const b = new Uint8Array(await request.arrayBuffer()); const r = await imageAjouter(jt.evt, String(request.headers.get('content-type') || '').split(';')[0], b, url.searchParams.get('nom') || ''); return rep({ ok: true, id: r.id }); }
+    catch (err) { return rep({ ok: false, erreur: err.message }, 400); }
   }
   if (parts[0] === 'img' && request.method === 'GET') {
     if (!jt) return rep({ ok: false }, 403);

@@ -80,7 +80,8 @@ label.champ{display:block;margin:.9em 0 .3em;font-weight:600;color:var(--navy);f
 .scene .declic svg{width:46%;height:46%;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .scene .gal{position:absolute;right:40px;bottom:36px;font-size:28px;padding:.5em 1em;border-radius:99px;border:0;background:rgba(255,255,255,.92);color:var(--navy);font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.15)}
 @keyframes pulse{50%{transform:translate(-50%,-50%) scale(1.05)}}
-.coin{position:absolute;top:0;right:0;width:90px;height:90px;opacity:0;border:0;background:none}
+.coin{position:absolute;top:14px;right:14px;z-index:7;width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(20,48,79,.28);color:#fff;display:grid;place-items:center;opacity:.55;cursor:pointer;backdrop-filter:blur(4px);transition:opacity .2s}
+.coin:hover,.coin:active{opacity:1}.coin svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 
 /* cadres */
 .cadres{display:flex;gap:32px;flex-wrap:wrap;justify-content:center;margin:20px 0}

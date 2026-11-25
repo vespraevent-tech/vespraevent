@@ -562,12 +562,11 @@
     }
   };
   $('pin-annuler').onclick = function () { $('pin').hidden = true; };
-  /* accès aux réglages : appui long (3 s) ou 5 appuis rapides dans le coin en haut à droite */
+  /* accès aux réglages : flèche discrète en haut à droite, puis le code */
   (function () {
     var c = $('a-coin'), n = 0, t0 = 0, long = null;
-    c.onpointerdown = function () { long = setTimeout(function () { demanderPin(ouvrirMenu); }, 3000); };
-    c.onpointerup = c.onpointerleave = function () { clearTimeout(long); };
-    c.onclick = function () { var t = Date.now(); n = t - t0 < 600 ? n + 1 : 1; t0 = t; if (n >= 5) { n = 0; demanderPin(ouvrirMenu); } };
+    /* petite flèche discrète en haut à droite : le code est demandé avant d'ouvrir les réglages (un invité ne peut pas y entrer) */
+    c.onclick = function () { demanderPin(ouvrirMenu); };
   })();
   $('l-reg').onclick = function () { ecran('s-borne'); panneauBorne($('b-panneau')); };
   $('b-retour').onclick = function () { afficherListe(); };
@@ -575,8 +574,29 @@
   $('l-modal').onclick = function (ev) { if (ev.target === $('l-modal')) $('l-modal').hidden = true; };
 
   /* ── menu de l'événement (comme l'appli PC) ── */
-  var PANNEAUX = [['capture', 'Paramètres de capture'], ['appareil', 'Paramètres de l’appareil photo'], ['mise', 'Mise en page des photos'], ['partage', 'Paramètres de partage'], ['impression', 'Paramètres d’impression'], ['dossier', 'Dossier d’événement']];
+  var PANNEAUX = [['ecrans', 'Éditeur d’écrans'], ['general', 'Général'], ['capture', 'Paramètres de capture'], ['appareil', 'Paramètres de l’appareil photo'], ['mise', 'Mise en page des photos'], ['partage', 'Paramètres de partage'], ['impression', 'Paramètres d’impression'], ['dossier', 'Dossier d’événement'], ['maj', 'Mise à jour']];
   var panneauActif = 'capture';
+  /* éditeur d'écrans du back-office, chargé à la demande ; la borne lui fournit l'événement, ses images et l'enregistrement */
+  var POL_EDIT = { elegante: [POLICES.elegante, 700, 'Élégante'], manuscrite: [POLICES.manuscrite, 400, 'Manuscrite'], moderne: [POLICES.moderne, 700, 'Moderne'], festive: [POLICES.festive, 700, 'Festive'] };
+  window.PBX = {
+    get PB() { return { evt: etat.evt }; }, POLICES: POL_EDIT, esc: esc, $: $, ic: function () { return ''; }, rendre: function () {},
+    urlImage: function (id) { var im = etat.evt && etat.images[etat.evt.id + '/' + id]; return im ? im.src : ''; },
+    toast: function (m) { toast(m); },
+    envoyerImage: function (f) {
+      var ev = etat.evt;
+      return fetch(API + 'img?nom=' + encodeURIComponent(f.name || ''), { method: 'POST', headers: { 'content-type': f.type || 'application/octet-stream', 'x-borne': etat.appareil, 'x-appareil': etat.jeton }, body: f })
+        .then(function (r) { return r.json(); }).then(function (d) { if (!d.ok) throw new Error(d.erreur || 'Envoi impossible'); return chargerImage(ev.id, d.id, false).then(function () { return d.id; }); });
+    },
+    enregistrer: function (msg) {
+      return api('reglages', { json: { accueil: etat.evt.accueil } }).then(function (r) { return r.json(); }).then(function (d) { if (!d.ok) throw new Error(); etat.evt = d.evenement; LS.set('cfg.' + d.evenement.id, d.evenement); toast((msg || 'Enregistré') + ' · envoyé au site'); return true; })
+        .catch(function () { toast('Enregistrement impossible : vérifiez la connexion'); return false; });
+    }
+  };
+  var editeurPret = null;
+  function chargerEditeur() {
+    if (window.pbSecBienvenue) return Promise.resolve();
+    return editeurPret || (editeurPret = new Promise(function (ok, ko) { var sc = document.createElement('script'); sc.src = '/studio/pb-ecrans.js?v=6'; sc.onload = ok; sc.onerror = function () { editeurPret = null; ko(); }; document.head.appendChild(sc); }));
+  }
   function ouvrirMenu(p) {
     if (!etat.evt) { afficherListe(); return; }
     if (etat.ecran !== 's-accueil') afficherAccueil();
@@ -648,6 +668,15 @@
   function ouvrirPanneau(p) {
     panneauActif = p; var e = etat.evt, P = $('m-panneau'), h = '';
     $('m-nav').querySelectorAll('button').forEach(function (b) { b.classList.toggle('sel', b.dataset.p === p); });
+    /* éditeur d'écrans : le même que dans le back-office, enregistré sur le site et synchronisé partout */
+    /* Général : réglages de la borne ; Mise à jour : uniquement la mise à jour du logiciel Windows */
+    if (p === 'general') { panneauBorne(P); P.querySelector('h2').textContent = 'Général'; return; }
+    if (p === 'maj') {
+      panneauBorne(P); P.querySelector('h2').textContent = 'Mise à jour';
+      P.querySelectorAll('.bloc').forEach(function (b) { if (!/Mise à jour/.test((b.querySelector('b') || {}).textContent || '')) b.style.display = 'none'; else { var t = b.querySelector('b'); if (t) t.style.display = 'none'; } });
+      return;
+    }
+    if (p === 'ecrans') { P.innerHTML = '<div id="ecx-borne">Chargement de l’éditeur…</div>'; chargerEditeur().then(function () { window.pbSecBienvenue($('ecx-borne')); }).catch(function () { P.innerHTML = '<h2>Éditeur d’écrans</h2><p class="aide">Éditeur indisponible : vérifiez la connexion internet.</p>'; }); return; }
     if (p === 'capture') {
       var c = e.capture || {};
       P.innerHTML = '<h2>Paramètres de capture</h2><div class="bloc">' + nombre('c-1', c.premier, 'Compte à rebours de la première photo', 's', 1, 30) + nombre('c-2', c.suivants, 'Compte à rebours entre les photos', 's', 1, 30) + '</div><button class="btn plein" id="c-enr">Enregistrer</button>';

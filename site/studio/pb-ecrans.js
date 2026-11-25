@@ -116,9 +116,12 @@
       + '<section class="ecx-zone">'
       + '<div class="ecx-cadre" id="ecxCadre"><div class="ecx-scene" id="ecxScene"></div></div></section></div>';
     /* annuler · rétablir · enregistrer : à droite du bandeau Bienvenue · Capture · Partage */
-    var tabs = document.querySelector('.ecx-tabs'); if (tabs) { var v = tabs.querySelector('.ecx-act'); if (v) v.remove(); tabs.insertAdjacentHTML('beforeend', '<div class="ecx-act"><button type="button" class="ecx-rond" id="ecxAnn" title="Annuler" aria-label="Annuler" onclick="pbxAnnuler()">' + ic('annuler', 18) + '</button><button type="button" class="ecx-rond" id="ecxRet" title="Rétablir" aria-label="Rétablir" onclick="pbxRetablir()">' + ic('retablir', 18) + '</button><button type="button" class="ecx-rond ecx-disque" id="ecxSauver" title="Enregistrer" aria-label="Enregistrer" onclick="pbxSauver()">' + ic('disque', 19) + '</button></div>'); }
+    var tabs = document.querySelector('.ecx-tabs');
+    if (!tabs) { c.insertAdjacentHTML('afterbegin', '<div class="ecx-tabs ecx-seul"><span style="color:#fff;font:600 15px Inter,system-ui,sans-serif">Écran Bienvenue</span></div>'); tabs = c.querySelector('.ecx-tabs'); }
+    if (tabs) { var v = tabs.querySelector('.ecx-act'); if (v) v.remove(); tabs.insertAdjacentHTML('beforeend', '<div class="ecx-act"><button type="button" class="ecx-rond" id="ecxAnn" title="Annuler" aria-label="Annuler" onclick="pbxAnnuler()">' + ic('annuler', 18) + '</button><button type="button" class="ecx-rond" id="ecxRet" title="Rétablir" aria-label="Rétablir" onclick="pbxRetablir()">' + ic('retablir', 18) + '</button><button type="button" class="ecx-rond ecx-disque" id="ecxSauver" title="Enregistrer" aria-label="Enregistrer" onclick="pbxSauver()">' + ic('disque', 19) + '</button></div>'); }
     var l = Math.max(300, (document.getElementById('ecxCadre').parentNode.clientWidth || 900));
-    E.k = l / 1920; var cadre = document.getElementById('ecxCadre'); cadre.style.width = Math.round(1920 * E.k) + 'px'; cadre.style.height = Math.round(1080 * E.k) + 'px';
+    var cadreHaut = document.getElementById('ecxCadre').getBoundingClientRect().top, tiroir = c.closest('.reg-tiroir'), bas = tiroir ? Math.min(window.innerHeight, tiroir.getBoundingClientRect().bottom) - 24 : window.innerHeight - 70, hDispo = bas - Math.max(0, cadreHaut);
+    E.k = Math.min(l / 1920, hDispo > 220 ? hDispo / 1080 : 1);   /* l'aperçu tient en entier dans la hauteur disponible (tiroir de la borne) */ var cadre = document.getElementById('ecxCadre'); cadre.style.width = Math.round(1920 * E.k) + 'px'; cadre.style.height = Math.round(1080 * E.k) + 'px';
     document.getElementById('ecxScene').style.transform = 'scale(' + E.k + ')';
     scene(); panneau(); brancher();
   };
