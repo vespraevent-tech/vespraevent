@@ -45,7 +45,7 @@ window.VESPRA_PRESTATAIRES = [
     metier: "Serveuse privée", nom: "Candice", type: "Service lors de votre événement",
     commune: "Vitré",
     mot: "Candice vous accompagne pour le service lors de votre événement : présentation, service et mise en place.",
-    site: "", tel: "", lien: "/evenements.html#serveuse", exemple: false
+    site: "", tel: "", lien: "/serveuse-privee.html", exemple: false
   },
 
   /* ——— Pâtisserie ——— */
@@ -53,7 +53,7 @@ window.VESPRA_PRESTATAIRES = [
     metier: "Pâtisserie & wedding cake", nom: "Emmanuel", type: "Chef pâtissier, création sur mesure",
     commune: "Vitré",
     mot: "Emmanuel crée sur mesure : gâteaux, desserts, mignardises pour tous vos événements. Un rendez-vous dégustation peut être organisé.",
-    site: "", tel: "", lien: "/evenements.html#patissier", exemple: false
+    site: "", tel: "", lien: "/chef-patissier.html", exemple: false
   },
 
   /* ——— Photo et vidéo ——— */
@@ -61,13 +61,13 @@ window.VESPRA_PRESTATAIRES = [
     metier: "Photographe", nom: "Photographe partenaire", type: "Reportage photo de votre événement",
     commune: "Vitré",
     mot: "Reportage photo de votre mariage ou de votre événement : moments forts, portraits, photos de groupe. Une retouche sur mesure, à l'image de vos envies.",
-    site: "", tel: "", lien: "/evenements.html#photographe", exemple: false
+    site: "", tel: "", lien: "/photographe.html", exemple: false
   },
   {
     metier: "Vidéaste", nom: "Vidéaste partenaire", type: "Film souvenir de votre événement",
     commune: "Vitré",
     mot: "Le film souvenir de votre événement, monté sur mesure selon vos envies, avec une version courte à partager.",
-    site: "", tel: "", lien: "/evenements.html#videaste", exemple: false
+    site: "", tel: "", lien: "/videaste.html", exemple: false
   },
 
   /* ——— Vaisselle, tables, chaises ——— */
