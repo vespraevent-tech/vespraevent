@@ -65,7 +65,8 @@
     var st = document.createElement('style'); st.id = 'ecxCss';
     st.textContent = ''
       + '.ecx-main{display:flex;flex-direction:column;min-width:0}'
-      + '.ecx-tabs{display:flex;gap:6px;justify-content:center;padding:10px;margin:0 0 14px;background:#14304f;border-radius:14px}'
+      + '.ecx-tabs{position:relative;display:flex;gap:6px;justify-content:center;align-items:center;padding:10px;margin:0 0 14px;background:#14304f;border-radius:14px}'
+      + '.ecx-act{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;gap:6px}.ecx-act .ecx-rond{width:36px;height:36px;padding:0;border-radius:10px;border:1px solid;border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff}.ecx-act .ecx-rond:disabled{opacity:.3}.ecx-act .ecx-disque.sale{background:#b8862f;border-color:#b8862f}'
       + '.ecx-tabs button{display:inline-flex;align-items:center;gap:8px;border:0;background:transparent;color:#cfd8e3;font:600 14px Inter,system-ui,sans-serif;padding:9px 18px;border-radius:999px;cursor:pointer}'
       + '.ecx-tabs button svg{width:18px;height:18px}.ecx-tabs button.on{background:#b8862f;color:#fff}.ecx-tabs button:not(.on):hover{background:rgba(255,255,255,.08);color:#fff}'
       + '.ecx{display:grid;grid-template-columns:236px minmax(0,1fr);gap:18px;align-items:start}'
@@ -92,6 +93,7 @@
       + '.ecx-bt{border-radius:50%;display:grid;place-items:center;box-shadow:0 12px 40px rgba(0,0,0,.25)}'
       + '.ecx-coin{position:absolute;top:2.5%;width:78px;height:78px;border-radius:18px;display:grid;place-items:center;pointer-events:none}'
       + '.ecx-guide{position:absolute;background:#e5484d;pointer-events:none;z-index:50}'
+      + '.ecx-prop:empty{display:none}'
       + '.ecx-calq{display:flex;align-items:center;gap:6px;padding:6px 6px 6px 8px;border:1px solid #e7e9ee;border-radius:9px;margin:0 0 6px;cursor:pointer;background:#fff}'
       + '.ecx-calq.on{border-color:#b8862f;background:#fbf6ec}.ecx-calq span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:#1f2a37}'
       + '.ecx-calq button{border:0;background:none;padding:3px;cursor:pointer;color:#6b7280}.ecx-calq button:hover{color:#14304f}.ecx-calq button svg{width:15px;height:15px}'
@@ -111,10 +113,10 @@
     c.innerHTML = '<div class="ecx"><aside class="ecx-pal"><div class="ecx-outils">'
       + outils.map(function (o) { return '<button type="button" class="ecx-outil' + (o[2] ? ' plein' : '') + (E.panneau === o[0] ? ' on' : '') + '" onclick="pbxOutil(\'' + o[0] + '\')"><i>' + ic(o[0]) + '</i>' + o[1] + '</button>'; }).join('')
       + '<input type="file" id="ecxFichier" accept="image/png,image/jpeg,image/webp" hidden onchange="pbxImage(this)"></div><div class="ecx-prop" id="ecxProp"></div></aside>'
-      + '<section class="ecx-zone"><div class="ecx-barre"><button type="button" class="ecx-rond" id="ecxAnn" title="Annuler" onclick="pbxAnnuler()">' + ic('annuler', 18) + '</button><button type="button" class="ecx-rond" id="ecxRet" title="Rétablir" onclick="pbxRetablir()">' + ic('retablir', 18) + '</button>'
-      + '<span class="ecx-aide" style="margin:0 0 0 6px">Cliquez sur un élément pour le modifier · glissez pour le déplacer · le rond doré l’agrandit</span><span class="esp"></span>'
-      + '<button type="button" class="ecx-rond ecx-disque" id="ecxSauver" title="Enregistrer" aria-label="Enregistrer" onclick="pbxSauver()">' + ic('disque', 19) + '</button></div>'
+      + '<section class="ecx-zone">'
       + '<div class="ecx-cadre" id="ecxCadre"><div class="ecx-scene" id="ecxScene"></div></div></section></div>';
+    /* annuler · rétablir · enregistrer : à droite du bandeau Bienvenue · Capture · Partage */
+    var tabs = document.querySelector('.ecx-tabs'); if (tabs) { var v = tabs.querySelector('.ecx-act'); if (v) v.remove(); tabs.insertAdjacentHTML('beforeend', '<div class="ecx-act"><button type="button" class="ecx-rond" id="ecxAnn" title="Annuler" aria-label="Annuler" onclick="pbxAnnuler()">' + ic('annuler', 18) + '</button><button type="button" class="ecx-rond" id="ecxRet" title="Rétablir" aria-label="Rétablir" onclick="pbxRetablir()">' + ic('retablir', 18) + '</button><button type="button" class="ecx-rond ecx-disque" id="ecxSauver" title="Enregistrer" aria-label="Enregistrer" onclick="pbxSauver()">' + ic('disque', 19) + '</button></div>'); }
     var l = Math.max(300, (document.getElementById('ecxCadre').parentNode.clientWidth || 900));
     E.k = l / 1920; var cadre = document.getElementById('ecxCadre'); cadre.style.width = Math.round(1920 * E.k) + 'px'; cadre.style.height = Math.round(1080 * E.k) + 'px';
     document.getElementById('ecxScene').style.transform = 'scale(' + E.k + ')';
@@ -238,7 +240,7 @@
         if (o.type === 'texte') h = '<h4>Texte</h4>' + champ('Texte', '<textarea id="ecxTx" data-p="texte" maxlength="200">' + esc(o.texte) + '</textarea>')
           + champ('Police', '<select data-p="police">' + Object.keys(X().POLICES).map(function (k) { return '<option value="' + k + '"' + (k === o.police ? ' selected' : '') + '>' + X().POLICES[k][2] + '</option>'; }).join('') + '</select>')
           + champ('Couleur', '<input type="color" data-p="couleur" value="' + esc(o.couleur) + '">') + champ('Taille (' + o.taille + ' px)', '<input type="range" min="16" max="400" data-p="taille" data-n="1" value="' + o.taille + '">');
-        else if (o.type === 'image') h = '<h4>Image</h4>' + champ('Largeur (' + o.w + ' px)', '<input type="range" min="20" max="1920" step="2" data-p="w" data-n="1" value="' + o.w + '">');
+        else if (o.type === 'image') h = '<h4>Image</h4><div class="ecx-rang" style="margin:0 0 10px"><label class="ecx-mini" style="margin:0;color:#33404f">' + ic('image') + 'Remplacer l’image<input type="file" accept="image/png,image/jpeg,image/webp" hidden onchange="pbxRemplacer(this)"></label></div>' + champ('Largeur (' + o.w + ' px)', '<input type="range" min="20" max="1920" step="2" data-p="w" data-n="1" value="' + o.w + '">');
         else if (o.type === 'forme') h = '<h4>Forme</h4>' + champ('Forme', '<select data-p="forme"><option value="rect"' + (o.forme === 'rect' ? ' selected' : '') + '>Rectangle</option><option value="cercle"' + (o.forme === 'cercle' ? ' selected' : '') + '>Cercle</option></select>')
           + champ('Couleur', '<input type="color" data-p="couleur" value="' + esc(o.couleur) + '">')
           + champ('Largeur (' + o.w + ' px)', '<input type="range" min="10" max="1920" step="2" data-p="w" data-n="1" value="' + o.w + '">')
@@ -263,7 +265,7 @@
     } else if (E.panneau === 'reglages') {
       h = '<h4>Réglages</h4><label style="display:flex;align-items:center;gap:10px;color:#1f2a37"><input type="checkbox" id="ecxGal" style="width:auto;margin:0"' + (a.galerie ? ' checked' : '') + '>Icône galerie</label><p class="ecx-aide">Les invités ouvrent la galerie de l’événement sur la borne. Cliquez sur l’icône dans l’aperçu pour la déplacer, l’agrandir ou changer ses couleurs.</p>';
     } else {
-      h = '<h4>Écran Bienvenue</h4><p class="ecx-aide">Ajoutez une image, un texte ou une forme avec la palette, ou cliquez sur un élément de l’aperçu pour le modifier. Ce que vous voyez est exactement ce que la borne affiche (1920 × 1080).</p>';
+      h = '';
     }
     z.innerHTML = h;
     z.querySelectorAll('[data-p]').forEach(function (inp) {
@@ -279,6 +281,7 @@
     var gl = document.getElementById('ecxGal'); if (gl) gl.addEventListener('change', function () { memoriser(); A().galerie = gl.checked; scene(); });
   }
 
+  window.pbxRemplacer = async function (inp) { var f = inp.files && inp.files[0]; inp.value = ''; var o = calque(E.sel); if (!f || !o) return; try { X().toast('Envoi de l’image…'); var id = await X().envoyerImage(f); memoriser(); o.image = id; scene(); X().toast('Image remplacée'); } catch (e) { X().toast('Échec : ' + e.message, true); } };
   window.pbxGalerieOff = function () { memoriser(); A().galerie = false; E.sel = null; scene(); panneau(); };
   window.pbxChoisir = function (id) { E.sel = id; scene(); panneau(); };
   window.pbxCentrer = function () { var o = cible(E.sel); if (!o) return; memoriser(); o.x = 960; scene(); };   /* centré horizontalement (la hauteur ne bouge pas) */
