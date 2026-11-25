@@ -14,3 +14,16 @@
 
 /* Fenêtre (pop-up produit, panier, devis) ouverte : les défilements automatiques se mettent en pause. */
 window.__vespraPopup=function(){return !!document.querySelector('.vm-ov.open,.c-overlay.open,.devis-popup.open');};
+
+/* Onglets des prestataires : l'onglet choisi reste visible, le fondu de droite disparaît en fin de défilement */
+(function(){
+  function suivre(nav){
+    function maj(){nav.classList.toggle('fin',nav.scrollLeft+nav.clientWidth>=nav.scrollWidth-4)}
+    function centrer(){var t=nav.querySelector('.pr-tab[aria-selected="true"]');if(t&&nav.scrollWidth>nav.clientWidth){nav.scrollTo({left:Math.max(0,t.offsetLeft-16),behavior:'smooth'})}maj()}
+    nav.addEventListener('scroll',maj,{passive:true});
+    new MutationObserver(centrer).observe(nav,{childList:true,subtree:true,attributes:true,attributeFilter:['aria-selected']});
+    centrer();
+  }
+  function init(){document.querySelectorAll('.pr-nav').forEach(suivre)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
