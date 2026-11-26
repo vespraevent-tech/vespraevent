@@ -8159,7 +8159,7 @@ function renderProduits(){
       ? Math.min.apply(null, p.variantes.map(v=>{ const m = mp[v.prixId]; return parseFloat(m!==undefined?m:v.prix); })) + ' € et +'
       : (mp[p.prixId]!==undefined ? mp[p.prixId] : p.prix) + ' €';
     return '<div draggable="true" data-produit-id="' + escVal(p.id) + '" class="pcard" role="button" tabindex="0" onclick="ouvrirFiche(\'' + escAttr(p.id) + '\')">'
-      + '<div class="pcard-img">' + (img ? '<img src="' + escVal(urlImage(img)) + '" alt="" loading="lazy"'
+      + '<div class="pcard-img">' + (img ? '<img src="' + escVal(vign(urlImage(img), 320)) + '" alt="" loading="lazy" decoding="async"'
         /* une photo corrigée qui ne se charge pas laissait une carte vide :
            on revient alors à la photo d'origine du site */
         + ' onerror="this.onerror=null;this.src=\'' + escAttr(/^https?:/.test(p.img) ? p.img : '/' + p.img) + '\'">'
