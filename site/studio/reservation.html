@@ -764,6 +764,7 @@ html body input, html body select, html body textarea { max-width: 100%; }
           <button type="button" class="toggle-btn active" id="virNon" onclick="toggleVirement(false)">Non</button>
         </div>
       </div>
+      <div class="field" id="virMontantWrap" style="display:none"><label>Virement déjà reçu (€)</label><input id="virMontant" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Montant reçu"><div class="hint" style="font-size:12px;color:#8a929e;margin-top:4px">Un produit ajouté ensuite reste à payer.</div></div>
       <div class="field full"><label>Lieu</label><textarea id="place" rows="2" data-adresse-autocomplete placeholder="N° et rue&#10;Code postal Ville" style="resize:vertical;min-height:58px;line-height:1.45"></textarea></div>
       <div class="field"><label>Validé par</label><select id="validated-by" style="font:14px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;padding:9px 10px;border:1px solid #dcd5c8;border-radius:9px;width:100%;background:#fff"><option value="Thomas">Thomas</option><option value="Damien">Damien</option></select></div>
       <div class="field source-wrap">
@@ -6203,7 +6204,14 @@ document.getElementById('saveM').onclick=function(){
     /* le montant reçu a pu être saisi dans la fiche du back-office après l'ouverture du planning : on le reprend avant d'enregistrer */
     try{var pr=(window.parent&&window.parent!==window&&window.parent.cache&&window.parent.cache.resas||[]).find(function(y){return String(y.id)===String(x.id)});
       if(pr&&pr.virementRecu===true&&Number(pr.virementMontant)>0&&x.virementRecu===true)x.virementMontant=Number(pr.virementMontant);}catch(e){}
-    if(x.virementRecu===true){if(!(Number(x.virementMontant)>0)){try{x.virementMontant=Math.round(calcResTotal(x)*100)/100}catch(e){}}}else delete x.virementMontant;})();
+    if(x.virementRecu===true){
+      var saisi=parseFloat(String((document.getElementById('virMontant')||{}).value||'').replace(',','.'));
+      if(editMode&&saisi>=0&&(document.getElementById('virMontantWrap')||{style:{}}).style.display!=='none'&&String((document.getElementById('virMontant')||{}).value||'').trim()!=='')x.virementMontant=Math.round(saisi*100)/100;
+      else if(!(Number(x.virementMontant)>0)){
+        /* réservation marquée reçue avant l'enregistrement du montant : on fige le total d'avant la modification, pas celui d'après */
+        try{x.virementMontant=(editMode&&window._totalAvantEdition>0)?window._totalAvantEdition:Math.round(calcResTotal(x)*100)/100}catch(e){}
+      }
+    }else delete x.virementMontant;})();
   localStorage.setItem('vespraR',JSON.stringify(R));
   var _sv=editMode?R.find(function(x){return String(x.id)===String(currentDetailId);}):R[R.length-1];
   if(_sv)fbPutRes(_sv);
@@ -6933,6 +6941,10 @@ function openModalEdit(id) {
   // Restaurer acompte
   acompte = r.acompte === true;
   window.toggleVirement(r.virementRecu === true);
+  (function(){var w=document.getElementById('virMontantWrap'),i=document.getElementById('virMontant');if(!w||!i)return;
+    window._totalAvantEdition=null;try{window._totalAvantEdition=Math.round(calcResTotal(r)*100)/100}catch(e){}
+    w.style.display=r.virementRecu===true?'':'none';i.value=Number(r.virementMontant)>0?String(r.virementMontant):'';
+    i.placeholder=r.virementRecu===true&&window._totalAvantEdition?('Total avant modification : '+window._totalAvantEdition+' €'):'Montant reçu';})();
   var aoui2=document.getElementById('acompteOui'),anon2=document.getElementById('acompteNon');
   if(aoui2&&anon2){
     aoui2.classList.toggle('active',acompte);

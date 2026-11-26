@@ -4884,7 +4884,7 @@ function acompteBlocHTML(d, r, modeForce){
     /* montant réellement reçu : figé quand le virement a été marqué (modifiable ici) ; sans montant enregistré, le total de l'époque n'est pas connu, on prend le total */
     const paye = Number(r.virementMontant) > 0 ? Number(r.virementMontant) : total;
     const reste = Math.round((total - paye) * 100) / 100;
-    bas += '<div class="dpr a"><span class="dpr-n">Virement reçu</span><span class="dpr-v">− <input type="text" inputmode="decimal" class="dpc-in" value="' + escVal(String(Math.round(paye * 100) / 100).replace('.', ',')) + '" aria-label="Montant du virement reçu" onfocus="this.select()" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}" onchange="changerMontantVirement(\'' + escAttr(r.id) + '\',this.value)"> €</span></div>' +
+    bas += '<div class="dpr a"><span class="dpr-n">Virement reçu</span><span class="dpr-v">− ' + eur(paye) + '</span></div>' +
            '<div class="dpr t r' + (reste > 0 ? ' du' : '') + '"><span class="dpr-n">Reste à payer</span><span class="dpr-v">' + eur(Math.max(0, reste)) + '</span></div>';
   }
   else if(recu && total > 0 && montant > 0){
