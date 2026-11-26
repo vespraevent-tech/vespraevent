@@ -247,6 +247,19 @@
       '.hs-sug a+a{border-top:1px solid #f0f1f4}.hs-sug a:hover,.hs-sug a.sel{background:#f4f5f7}.hs-sug small{color:#8a8f9b;margin-left:8px;font-size:12px}.hs-sug div{color:#8a8f9b}';
     document.head.appendChild(css2);
     var liste = null, chargement = null;
+  function litJS(src){
+    var i=0,n=src.length;
+    function blanc(){for(;;){while(i<n&&/\s/.test(src[i]))i++;if(src[i]==='/'&&src[i+1]==='/'){while(i<n&&src[i]!=='\n')i++;continue}if(src[i]==='/'&&src[i+1]==='*'){i=src.indexOf('*/',i+2);i=i<0?n:i+2;continue}break}}
+    function chaine(){var q=src[i++],o='';while(i<n&&src[i]!==q){if(src[i]==='\\'){var c=src[i+1];if(c==='u'){o+=String.fromCharCode(parseInt(src.substr(i+2,4),16));i+=6;continue}o+=({n:'\n',t:'\t',r:'\r'}[c]||c);i+=2;continue}o+=src[i++]}i++;return o}
+    function valeur(){blanc();var c=src[i];
+      if(c==='{'){i++;var o={};blanc();while(src[i]!=='}'){blanc();var k;if(src[i]==='"'||src[i]==="'")k=chaine();else{var m=/^[A-Za-z_$][\w$]*/.exec(src.slice(i,i+80));k=m[0];i+=k.length}blanc();i++;o[k]=valeur();blanc();if(src[i]===',')i++;blanc()}i++;return o}
+      if(c==='['){i++;var a=[];blanc();while(src[i]!==']'){a.push(valeur());blanc();if(src[i]===',')i++;blanc()}i++;return a}
+      if(c==='"'||c==="'")return chaine();
+      var m=/^(-?\d+(\.\d+)?([eE][+-]?\d+)?|true|false|null|undefined)/.exec(src.slice(i,i+40));
+      if(!m)throw new Error('litJS '+i);i+=m[0].length;return m[0]==='true'?true:m[0]==='false'?false:(m[0]==='null'||m[0]==='undefined')?null:Number(m[0]);}
+    return valeur();
+  }
+
     function norm(t) { return String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
     function produits() {
       if (liste) return Promise.resolve(liste);
@@ -254,7 +267,8 @@
       if (!chargement) chargement = fetch('/catalogue.html', { credentials: 'omit' }).then(function (r) { return r.text(); }).then(function (t) {
         var d = t.indexOf('const PRODUCTS=['); if (d < 0) return [];
         var fin = t.indexOf('\n];', d); if (fin < 0) return [];
-        try { return (new Function('return ' + t.slice(d + 'const PRODUCTS='.length, fin + 2)))(); } catch (e) { return []; }
+        /* lecture sans eval : la politique de sécurité du site (CSP) interdit new Function */
+        try { return litJS(t.slice(d + 'const PRODUCTS='.length, fin + 2)); } catch (e) { return []; }
       }).then(function (l) { liste = l; return l; }).catch(function () { liste = []; return liste; });
       return chargement;
     }
