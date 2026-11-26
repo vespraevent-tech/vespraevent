@@ -34,7 +34,7 @@
       const token=++current;
       clearTimeout(timer);
       timer=setTimeout(function(){
-        fetch(ENDPOINT+'?q='+encodeURIComponent(q)+'&limit=5&autocomplete=1')
+        fetch(ENDPOINT+'?q='+encodeURIComponent(q)+'&limit=5&autocomplete=1&lat=48.1236&lon=-1.2089')
           .then(r=>r.ok?r.json():Promise.reject(new Error('adresse')))
           .then(data=>{
             if(token!==current)return;

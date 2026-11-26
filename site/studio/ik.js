@@ -70,7 +70,7 @@
       clearTimeout(t); var q = inp.value.replace(/\s+/g, ' ').trim(); if (q.length < 3) { fermer(); return; }
       var mon = ++jeton;
       t = setTimeout(function () {
-        fetch(ENDPOINT + '?q=' + encodeURIComponent(q) + '&limit=5&autocomplete=1').then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (d) {
+        fetch(ENDPOINT + '?q=' + encodeURIComponent(q) + '&limit=5&autocomplete=1&lat=48.1236&lon=-1.2089').then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (d) {
           if (mon !== jeton) return;
           var f = (d && d.features) || []; if (!f.length) { fermer(); return; }
           liste.innerHTML = f.map(function (x, i) { var p = x.properties || {}; return '<button type="button" data-i="' + i + '"><b>' + esc2(p.name || p.label) + '</b><small>' + esc2([p.postcode, p.city].filter(Boolean).join(' ')) + '</small></button>'; }).join('');

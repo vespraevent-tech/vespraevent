@@ -4830,7 +4830,7 @@ function acompteBlocHTML(d, r, modeForce){
   }
   cartes.forEach(c => { total += c.total; });
   autres.forEach(x => { total += x.prix; });
-  let montant = total > 0 ? Math.round(total*(Number(d.devisAcomptePct)>=1&&Number(d.devisAcomptePct)<=100?Number(d.devisAcomptePct):30))/100 : (demande > 0 ? demande : 0);
+  let montant = total > 0 ? Math.round(total*(Number(d && d.devisAcomptePct)>=1&&Number(d && d.devisAcomptePct)<=100?Number(d.devisAcomptePct):30))/100 : (demande > 0 ? demande : 0);
   /* acompte déjà reçu : le montant est figé, il ne suit plus les ajouts faits ensuite */
   const _fige = r && r.acompte === true ? (Number(r.acompteMontant) || (Number(r.devisAcompte) > 0 ? Number(r.devisAcompte) : 0)) : 0;
   window._acMontantFiche = {id: String((r && r.id) || (d && d.id) || ''), montant: montant};
@@ -6292,14 +6292,14 @@ async function reporterAuPlanning(d, avant, chg){
     const r = JSON.parse(ligne.d);
     figerAcompteResa(r);
     const av = avant || {};
-    const norm = (k, v) => k === 'livraison' ? (/oui/i.test(String(v||'')) ? 'oui' : 'non') : String(v||'').replace(/\r\n?/g,'\n').trim();
+    const norm = (k, v) => k === 'livraison' ? ((v === true || /^(oui|true)/i.test(String(v||'').trim())) ? 'oui' : 'non') : String(v||'').replace(/\r\n?/g,'\n').trim();
     const change = (k) => !avant || norm(k, av[k]) !== norm(k, d[k]);
 
     if(change('nom') && d.nom) r.client = d.nom;
     if(change('telephone')) r.phone = d.telephone || '';
     if(change('email')) r.email = d.email || '';
     if(change('adresse')) r.place = d.adresse || '';
-    if(change('livraison')) r.livraison = /oui/i.test(String(d.livraison||''));
+    if(change('livraison')) r.livraison = d.livraison === true || /^(oui|true)/i.test(String(d.livraison||'').trim());
     if(change('date') || (chg && chg.debut)){
       const jour = (chg && chg.debut && chg.valeurs.debut) || isoDepuisFr(d.date);
       if(jour){ r.dateStart = jour; if(!r.dateEnd || r.dateEnd < jour) r.dateEnd = jour; }
