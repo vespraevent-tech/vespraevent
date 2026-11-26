@@ -8104,6 +8104,14 @@ function modifsPrix(){
 /* Une photo remplacée dans l'onglet « Images » l'est partout sur le site :
    le back-office l'affiche de la même façon (sinon la liste des produits
    montrerait encore l'ancienne photo). */
+/* vignette du back-office : la photo est demandée réduite au service d'images de Netlify (une photo d'origine de téléphone pèse plusieurs mégaoctets) ; en cas d'échec, la photo d'origine reprend sa place */
+function vign(src, w){
+  const s = String(src || '');
+  if(!s || !/^\/(?!\/)/.test(s) || !/(\.(webp|jpe?g|png)(\?|$)|^\/api\/media\/)/i.test(s) || s.indexOf('/.netlify/images') === 0) return s;
+  const d = Math.min(window.devicePixelRatio || 1, 2);
+  return '/.netlify/images?url=' + encodeURIComponent(s.split('?')[0]) + '&w=' + Math.round((w || 160) * d) + '&fm=webp&q=75';
+}
+document.addEventListener('error', function(e){ const t = e.target; if(t && t.tagName === 'IMG' && t.src.indexOf('/.netlify/images') > -1 && !t.dataset.vo){ t.dataset.vo = '1'; try{ t.src = decodeURIComponent((t.src.match(/[?&]url=([^&]+)/) || [])[1] || ''); }catch(x){} } }, true);
 function urlImage(src){
   src = String(src||'');
   const cle = src.replace(/^\//,'');
@@ -8211,7 +8219,7 @@ function renderBests(){
     const img = imagePrincipale(f, p.img);
     return '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid #eef0f4">'
       + '<span style="width:20px;text-align:right;color:#7a8494;font-size:12px">' + (i+1) + '</span>'
-      + '<img src="' + escVal(urlImage(img)) + '" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:8px;flex:none">'
+      + '<img loading="lazy" decoding="async" src="' + escVal(vign(urlImage(img), 88)) + '" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:8px;flex:none">'
       + '<span style="flex:1;min-width:0;overflow-wrap:break-word;font-size:14px">' + esc(p.nom) + '</span>'
       + '<button type="button" class="btn btn-ghost btn-sm" title="Monter" onclick="bestsDeplacer(' + i + ',-1)">↑</button>'
       + '<button type="button" class="btn btn-ghost btn-sm" title="Descendre" onclick="bestsDeplacer(' + i + ',1)">↓</button>'
@@ -8305,7 +8313,7 @@ function renderEvt(){
     const img=imagePrincipale(f,p.img);
     return '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid '+(i===5?'#c8cdd8':'#eef0f4')+'">'
       +'<span style="width:20px;text-align:right;color:#7a8494;font-size:12px">'+(i+1)+'</span>'
-      +'<img src="'+escVal(urlImage(img))+'" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:8px;flex:none">'
+      +'<img loading="lazy" decoding="async" src="'+escVal(vign(urlImage(img),88))+'" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:8px;flex:none">'
       +'<span style="flex:1;min-width:0;overflow-wrap:break-word;font-size:14px">'+esc(p.nom)+'</span>'
       +'<button type="button" class="btn btn-ghost btn-sm" title="Monter" onclick="evtDeplacer('+i+',-1)">↑</button>'
       +'<button type="button" class="btn btn-ghost btn-sm" title="Descendre" onclick="evtDeplacer('+i+',1)">↓</button>'
@@ -8447,13 +8455,13 @@ function catAdminAfficher(){
     return '<section class="cat-admin-item '+(ouverte?'is-open':'')+'">'
      +'<div class="cat-admin-head">'
      +'<button type="button" class="cat-admin-main" aria-expanded="'+ouverte+'" onclick="catAdminToggle('+i+')">'
-     +(c.image?'<img class="cat-admin-thumb" src="'+escVal(photo)+'" alt="" onerror="this.style.opacity=.2">':'<span class="cat-admin-thumb cat-admin-empty">＋</span>')
+     +(c.image?'<img loading="lazy" decoding="async" class="cat-admin-thumb" src="'+escVal(vign(photo,160))+'" alt="" onerror="this.style.opacity=.2">':'<span class="cat-admin-thumb cat-admin-empty">＋</span>')
      +'<span class="cat-admin-title"><strong>'+esc(c.nom||'Nouvelle catégorie')+'</strong><small>'+dedans.length+' produit'+(dedans.length>1?'s':'')+'</small></span></button>'
      +'<span class="cat-admin-order"><button type="button" title="Monter" aria-label="Monter" onclick="catAdminMonter('+i+',-1)" '+(i===0?'disabled':'')+'>↑</button><button type="button" title="Descendre" aria-label="Descendre" onclick="catAdminMonter('+i+',1)" '+(i===catAdminData.length-1?'disabled':'')+'>↓</button></span>'
      +'</div>'
      +(ouverte?'<div class="cat-admin-body">'
        +'<label class="field"><span>Nom de la catégorie</span><input value="'+escVal(c.nom||'')+'" oninput="catAdminData['+i+'].nom=this.value;catAdminTitre('+i+')" placeholder="Nom de la catégorie"></label>'
-       +'<div class="cat-admin-photo"><div><span class="field-label">Photo affichée dans le catalogue</span>'+(c.image?'<img class="cat-admin-preview" src="'+escVal(photo)+'" alt="" onerror="this.style.display=\'none\'">':'<div class="cat-admin-no-photo">Aucune photo</div>')+'</div>'
+       +'<div class="cat-admin-photo"><div><span class="field-label">Photo affichée dans le catalogue</span>'+(c.image?'<img loading="lazy" decoding="async" class="cat-admin-preview" src="'+escVal(photo)+'" alt="" onerror="this.style.display=\'none\'">':'<div class="cat-admin-no-photo">Aucune photo</div>')+'</div>'
        +'<div class="cat-admin-photo-actions"><label class="btn btn-primary btn-sm">Choisir une photo<input type="file" accept="image/*" hidden onchange="catAdminImageUpload('+i+',this)"></label>'
        +(c.image?'<button type="button" class="btn btn-sm" onclick="catAdminData['+i+'].image=\'\';catAdminAfficher()">Retirer la photo</button>':'')+'</div></div>'
        +'<div class="field"><span>Produits de cette catégorie</span>'
@@ -8502,7 +8510,7 @@ function presAdminAfficher(){
     const o=presAdminOuverte===i,photo=c.img?urlImage(c.img):'';
     return '<section class="cat-admin-item '+(o?'is-open':'')+'"><div class="cat-admin-head">'
      +'<button type="button" class="cat-admin-main" aria-expanded="'+o+'" onclick="presAdminOuverte=presAdminOuverte===('+i+')?null:'+i+';presAdminAfficher()">'
-     +(c.img?'<img class="cat-admin-thumb" src="'+escVal(photo)+'" alt="" onerror="this.style.opacity=.2">':'<span class="cat-admin-thumb cat-admin-empty">＋</span>')
+     +(c.img?'<img loading="lazy" decoding="async" class="cat-admin-thumb" src="'+escVal(vign(photo,160))+'" alt="" onerror="this.style.opacity=.2">':'<span class="cat-admin-thumb cat-admin-empty">＋</span>')
      +'<span class="cat-admin-title"><strong>'+esc(c.nom||'Nouvelle prestation')+'</strong><small>sur devis</small></span></button>'
      +'<span class="cat-admin-order"><button type="button" title="Monter" onclick="presAdminMonter('+i+',-1)" '+(i===0?'disabled':'')+'>↑</button><button type="button" title="Descendre" onclick="presAdminMonter('+i+',1)" '+(i===presAdminData.length-1?'disabled':'')+'>↓</button></span></div>'
      +(o?'<div class="cat-admin-body">'
@@ -8511,7 +8519,7 @@ function presAdminAfficher(){
       +'<label class="field"><span>Texte d’introduction</span><textarea rows="3" oninput="presAdminData['+i+'].accroche=this.value">'+esc(c.accroche||'')+'</textarea></label>'
       +'<label class="field"><span>Le service (une ligne par point)</span><textarea rows="4" oninput="presAdminData['+i+'].service=this.value.split(/\\n/).map(x=>x.trim()).filter(Boolean)">'+esc((c.service||[]).join('\n'))+'</textarea></label>'
       +'<label class="field"><span>Bon à savoir (une ligne par point)</span><textarea rows="4" oninput="presAdminData['+i+'].infos=this.value.split(/\\n/).map(x=>x.trim()).filter(Boolean)">'+esc((c.infos||[]).join('\n'))+'</textarea></label>'
-      +'<div class="cat-admin-photo"><div><span class="field-label">Photo</span>'+(c.img?'<img class="cat-admin-preview" src="'+escVal(photo)+'" alt="" onerror="this.style.display=\'none\'">':'<div class="cat-admin-no-photo">Aucune photo</div>')+'</div>'
+      +'<div class="cat-admin-photo"><div><span class="field-label">Photo</span>'+(c.img?'<img loading="lazy" decoding="async" class="cat-admin-preview" src="'+escVal(photo)+'" alt="" onerror="this.style.display=\'none\'">':'<div class="cat-admin-no-photo">Aucune photo</div>')+'</div>'
       +'<div class="cat-admin-photo-actions"><label class="btn btn-primary btn-sm">Choisir une photo<input type="file" accept="image/*" hidden onchange="presAdminImage('+i+',this)"></label></div></div>'
       +'<div class="cat-admin-foot"><span class="hint"></span><button type="button" class="btn btn-danger btn-sm" onclick="presAdminSupprimer('+i+')">Supprimer</button></div>'
       +'</div>':'')+'</section>';
@@ -8660,7 +8668,7 @@ function ouvrirFiche(id, silencieux){
     '<button class="back" onclick="fermerFiche()">← Tous les produits</button>'
     + '<div class="fiche">'
     + '<div class="fiche-h">'
-    + '<div class="fiche-img">' + (img ? '<img src="' + escVal(urlImage(img)) + '" alt="">' : '') + '</div>'
+    + '<div class="fiche-img">' + (img ? '<img loading="lazy" decoding="async" src="' + escVal(urlImage(img)) + '" alt="">' : '') + '</div>'
     + '<div class="fiche-t"><h3>' + esc(f.titre || p.nom) + '</h3><div class="sub">' + esc(p.cat)
     + (p.page ? ' · <a href="/' + escVal(p.page) + '" target="_blank" style="color:var(--navy);font-weight:600;text-decoration:none">voir la fiche sur le site ↗</a>' : '')
     + '</div></div></div>'
@@ -8767,7 +8775,7 @@ function dessinerPhotosFiche(){
   if(!c) return;
   c.innerHTML = fichePhotos.map((ph, i) =>
     '<div class="ph-row" style="display:flex;gap:10px;align-items:center;margin-bottom:8px;padding:8px;border:1px solid var(--g3);border-radius:10px;background:#fff">'
-    + '<img src="' + escVal(srcPhoto(ph.s)) + '" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px;background:var(--g4);flex-shrink:0">'
+    + '<img loading="lazy" decoding="async" src="' + escVal(vign(srcPhoto(ph.s), 128)) + '" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px;background:var(--g4);flex-shrink:0">'
     + '<div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:700;color:var(--g1);margin-bottom:3px">' + (i === 0 ? 'Photo principale' : 'Photo ' + (i+1)) + '</div>'
     + '<input id="ph-alt-' + i + '" value="' + escVal(ph.a||'') + '" placeholder="Description de la photo (accessibilité, référencement)" style="width:100%;font-size:12.5px"></div>'
     + '<div style="display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">'
@@ -9027,7 +9035,7 @@ function renderImagesSite(){
     const url=m&&m.image?m.image:'/'+src;
     const visuel=supprimee
       ? '<div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:var(--g4);border-radius:9px;flex-shrink:0;color:var(--red);font-size:10px;font-weight:800;letter-spacing:.05em">SUPPRIMÉE</div>'
-      : '<img src="'+escVal(url)+'" alt="" style="width:96px;height:72px;object-fit:contain;background:var(--g4);border-radius:9px;flex-shrink:0">';
+      : '<img loading="lazy" decoding="async" src="'+escVal(vign(url,192))+'" alt="" style="width:96px;height:72px;object-fit:contain;background:var(--g4);border-radius:9px;flex-shrink:0">';
     const etat=supprimee?'Image supprimée du site':(m?'Image remplacée sur le site':'Image d’origine');
     const actions=supprimee
       ? '<label class="btn btn-ghost btn-sm">Changer<input type="file" accept="image/*" hidden onchange="changerImageSite(this,\''+escAttr(src)+'\')"></label>'
@@ -9095,7 +9103,7 @@ function renderBlogSite(){
     const masque = !!masques[a.url];
     return '<div class="card"' + (masque ? ' style="opacity:.55"' : '') + '>'
       + '<div class="card-main" style="display:flex;gap:14px;align-items:flex-start">'
-      + (a.img ? '<img src="/' + escVal(a.img) + '" alt="" style="width:74px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0">' : '')
+      + (a.img ? '<img loading="lazy" decoding="async" src="' + escVal(vign('/' + a.img, 148)) + '" alt="" style="width:74px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0">' : '')
       + '<div style="min-width:0">'
       + '<div class="card-title">' + esc(a.titre) + (masque ? '<span class="tagline warn">masqué</span>' : '')
       + (a.une ? '<span class="tagline">à la une</span>' : '') + '</div>'
