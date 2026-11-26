@@ -60,7 +60,7 @@
   window.ikLocalSauver = function () { loc('local', el('ikLocal').value.trim()); };
 
   /* ── suggestions d'adresses (Base Adresse Nationale), sur une seule ligne ── */
-  var ENDPOINT = 'https://api-adresse.data.gouv.fr/search/';
+  var ENDPOINT = 'https://data.geopf.fr/geocodage/search/';
   function suggere(inp, choisir) {
     if (!inp || inp._sug) return; inp._sug = 1;
     var liste = document.createElement('div'); liste.className = 'ik-ad'; liste.hidden = true; inp.parentNode.appendChild(liste);

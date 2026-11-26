@@ -4,7 +4,7 @@
 */
 (function(){
   'use strict';
-  const ENDPOINT='https://api-adresse.data.gouv.fr/search/';
+  const ENDPOINT='https://data.geopf.fr/geocodage/search/';
   let seq=0;
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   function format(p){
