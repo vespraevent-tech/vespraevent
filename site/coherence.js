@@ -27,3 +27,19 @@ window.__vespraPopup=function(){return !!document.querySelector('.vm-ov.open,.c-
   function init(){document.querySelectorAll('.pr-nav').forEach(suivre)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
+
+/* Pages d'organisation : l'image du prestataire (et un double-clic sur son onglet) ouvre sa page complète */
+(function(){
+  var PAGES=[[/serveuse/i,'/serveuse-privee.html'],[/p[âa]tissier/i,'/chef-patissier.html'],[/photographe/i,'/photographe.html'],[/vid[ée]aste/i,'/videaste.html']];
+  function page(t){t=String(t||'');for(var i=0;i<PAGES.length;i++)if(PAGES[i][0].test(t))return PAGES[i][1];return ''}
+  function init(){
+    var hero=document.getElementById('prHero');if(!hero||!document.querySelector('.pr-tab'))return;
+    var lien=document.createElement('a');lien.className='pr-voir';lien.textContent='Voir la page complète';hero.appendChild(lien);
+    function cible(){var t=document.querySelector('.pr-tab[aria-selected="true"]');return page(t&&t.textContent)}
+    function maj(){var u=cible();lien.href=u||'#';lien.hidden=!u;hero.classList.toggle('pr-cliquable',!!u)}
+    maj();new MutationObserver(maj).observe(document.getElementById('prNav')||hero,{subtree:true,attributes:true,attributeFilter:['aria-selected'],childList:true});
+    hero.addEventListener('click',function(e){if(e.target.closest('.pr-tab,.pr-nav,a'))return;var u=cible();if(u)location.href=u});
+    document.addEventListener('dblclick',function(e){var t=e.target.closest('.pr-tab');if(!t)return;var u=page(t.textContent);if(u)location.href=u});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();

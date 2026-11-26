@@ -5154,7 +5154,7 @@ function ficheDemande(id, relu){
     bloc('Événement',
       /* toujours affichée, même si le client n'a rien coché : l'absence de
          réponse vaut retrait sur place, et c'est cela qu'il faut savoir */
-      champ('Livraison', badgeLivraison(d.livraison, d.livraisonRetour)) +
+      champ('Livraison', (function(){ const rl = d.resaId && (cache.resas||[]).find(x => String(x.id) === String(d.resaId)); return rl ? badgeLivraison(rl.livraison, rl.livraisonRetour) : badgeLivraison(d.livraison, d.livraisonRetour); })()) +
       champ('Adresse de l\u2019événement', adresse)) +
 
     acompteBlocHTML(d, resaLiee) +
@@ -5211,7 +5211,11 @@ function ficheDemande(id, relu){
 async function relireFiche(genre, id){
   try{
     const change = await loadDemandes('fiche');
-    if(!change) return;
+    /* la réservation liée a pu être modifiée au planning (livraison, dates…) : on la relit aussi */
+    const avantR = JSON.stringify(cache.resas || []);
+    try{ await chargerResasCache(); }catch(e){}
+    const changeR = JSON.stringify(cache.resas || []) !== avantR;
+    if(!change && !changeR) return;
     const el = document.activeElement;
     if(el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) return;
     const fc = window._ficheCourante;
@@ -5506,7 +5510,7 @@ function modifierDemande(id){
   const champ = (cle, libelle, contenu, large) =>
     '<div class="pm-f' + (large ? ' full' : '') + '"><label for="m-' + cle + '">' + libelle + '</label>' + contenu + '</div>';
   const saisie = (cle, libelle, valeur, aide, type, large) =>
-    champ(cle, libelle, '<input id="m-' + cle + '" type="' + (type || 'text') + '" value="' + escVal(valeur || '') + '"' + (aide ? ' placeholder="' + escVal(aide) + '"' : '') + '>', large);
+    champ(cle, libelle, '<input id="m-' + cle + '" type="' + (type || 'text') + '" value="' + escVal(valeur || '') + '"' + (aide ? ' placeholder="' + escVal(aide) + '"' : '') + (type === 'date' ? ' data-date-joli' + (cle === 'datefin' ? ' data-apres="m-date"' : '') : '') + '>', large);
   const liste = (cle, libelle, valeur, choix, large) => {
     const v = String(valeur || '').trim();
     const tous = (v && choix.indexOf(v) === -1) ? [v].concat(choix) : choix;
@@ -5529,7 +5533,7 @@ function modifierDemande(id){
         saisie('siret', 'SIRET (entreprise)', ini_siret, '123 456 789 00012') +
         saisie('rna', 'N° RNA (association)', ini_rna, 'W123456789') +
         saisie('tva', 'N° de TVA (facultatif)', ini_tva, 'FR00123456789') +
-        saisie('adrfact', 'Adresse de facturation (si différente de l\u2019adresse de l\u2019événement)', ini_adrfact, 'Rue, code postal, ville', 'text', true) +
+        champ('adrfact', 'Adresse de facturation (si différente de l\u2019adresse de l\u2019événement)', '<textarea id="m-adrfact" rows="2" data-adresse-autocomplete placeholder="N° et rue&#10;Code postal Ville">' + esc(ini_adrfact) + '</textarea>', true) +
       '</div>' +
       saisie('date', 'Date de début', iniDebut, '', 'date') +
       saisie('datefin', 'Date de fin', iniFin, '', 'date') +
@@ -10627,6 +10631,7 @@ checkSession();
 <script src="/studio/notefrais.js"></script>
 <script src="/studio/ik.js"></script>
 <script src="/adresse-autocomplete.js"></script>
+<script src="/studio/dates-jolies.js?v=4"></script>
 <script src="/studio/facture.js?v=6"></script>
 <script>
 /* ── Accueil ── */

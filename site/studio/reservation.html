@@ -752,9 +752,9 @@ html body input, html body select, html body textarea { max-width: 100%; }
       <div class="field"><label>Téléphone</label><input id="phone" type="tel" placeholder="06 00 00 00 00"></div>
       <div class="field"><label>Email</label><input id="email" type="email" placeholder="client@email.com"></div>
       <div class="field"><label>Type de client</label><select id="clientType" onchange="window._typeTouche=true;majTypeClient()"><option value="">Particulier</option><option value="pro">Entreprise, association, mairie…</option></select></div>
-      <div class="field" id="proWrap" style="display:none;grid-column:1/-1"><label>Nom de l’entreprise ou de l’association</label><input id="societe" oninput="window._typeTouche=true" placeholder="Ex : Comité des fêtes de Vitré" autocomplete="off"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px"><div><label>SIRET <small style="font-weight:400">(entreprise)</small></label><input id="siret" oninput="window._typeTouche=true" placeholder="123 456 789 00012" autocomplete="off"></div><div><label>N° RNA <small style="font-weight:400">(association)</small></label><input id="rna" oninput="window._typeTouche=true" placeholder="W123456789" autocomplete="off"></div><div><label>N° de TVA (facultatif)</label><input id="tvaClient" oninput="window._typeTouche=true" placeholder="FR00123456789" autocomplete="off"></div></div><label style="margin-top:10px">Adresse de facturation <small style="font-weight:400">(si différente de l’adresse de l’événement)</small></label><input id="adresseFact" oninput="window._typeTouche=true" placeholder="Rue, code postal, ville" autocomplete="off"></div>
-      <div class="field"><label>Date de début</label><input id="dateStart" type="date"></div>
-      <div class="field"><label>Date de fin</label><input id="dateEnd" type="date"></div>
+      <div class="field" id="proWrap" style="display:none;grid-column:1/-1"><label>Nom de l’entreprise ou de l’association</label><input id="societe" oninput="window._typeTouche=true" placeholder="Ex : Comité des fêtes de Vitré" autocomplete="off"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px"><div><label>SIRET <small style="font-weight:400">(entreprise)</small></label><input id="siret" oninput="window._typeTouche=true" placeholder="123 456 789 00012" autocomplete="off"></div><div><label>N° RNA <small style="font-weight:400">(association)</small></label><input id="rna" oninput="window._typeTouche=true" placeholder="W123456789" autocomplete="off"></div><div><label>N° de TVA (facultatif)</label><input id="tvaClient" oninput="window._typeTouche=true" placeholder="FR00123456789" autocomplete="off"></div></div><label style="margin-top:10px">Adresse de facturation <small style="font-weight:400">(si différente de l’adresse de l’événement)</small></label><textarea id="adresseFact" rows="2" data-adresse-autocomplete oninput="window._typeTouche=true" placeholder="N° et rue&#10;Code postal Ville" autocomplete="off" style="resize:vertical;min-height:58px;line-height:1.45"></textarea></div>
+      <div class="field"><label>Date de début</label><input id="dateStart" type="date" data-date-joli></div>
+      <div class="field"><label>Date de fin</label><input id="dateEnd" type="date" data-date-joli data-apres="dateStart"></div>
       <div class="field"><label>Nombre de convives</label><select id="convives"></select></div>
       <div class="field"><label>Type d'événement</label><select id="typeEvt"></select></div>
       <div class="field" style="display:none" aria-hidden="true">
@@ -7069,6 +7069,7 @@ if(true){
 <script src="/studio/reservation-import.js"></script>
 <script src="/studio/reservation-vue.js?v=2"></script>
 <script src="/adresse-autocomplete.js"></script>
+<script src="/studio/dates-jolies.js?v=4"></script>
 <script src="/studio/securite.js?v=2"></script>
 <script src="nbsp-euro.js"></script>
 </body>

@@ -211,7 +211,10 @@
         if(img&&(img.id==='prodMainImg'||img.id==='pgImg'))w=1400;
         else if(img&&img.closest&&img.closest('#prodThumbs'))w=300;
         else if(/ (prod-img|bc-img|pc-img|blog-thumb|c-item-img|vm-img|evc-img) /.test(cl))w=640;
-        else{var r=img&&img.getBoundingClientRect?img.getBoundingClientRect().width:0;if(r>0)w=Math.max(300,Math.min(1400,Math.ceil(r/100)*100));}
+        else{var bx=img&&img.getBoundingClientRect?img.getBoundingClientRect():null,r=bx?bx.width:0;
+          /* photo recadrée (object-fit: cover) dans un cadre plus haut que large : il faut assez de pixels pour la hauteur, sinon elle est agrandie et floue */
+          try{if(bx&&bx.height>0&&getComputedStyle(img).objectFit==='cover')r=Math.max(r,bx.height*16/9);}catch(e){}
+          if(r>0)w=Math.max(300,Math.min(1600,Math.ceil(r/100)*100));}
       }catch(e){}
       return window.VESPRA_IMG(src,w);
     }
@@ -242,7 +245,7 @@
     function corrige(img){
       if(!img||img.nodeName!=='IMG')return;
       /* pages d'organisation d'événements : photos servies telles quelles (nettes, sans nouvelle compression) */
-      if(img.closest&&img.closest('.ev-hero,.ev-pc,.ev-pan,.ev-bur-img,.ev-svc-i'))return;
+      if(img.closest&&img.closest('.ev-hero,.ev-pc,.ev-pan,.ev-bur-img,.ev-svc-i,.pp,.cat-presta,.pr-hero'))return;
       var src=img.getAttribute('src')||'',key=basename(src);
       if(deleted[key])return;
       var rep=map[key];

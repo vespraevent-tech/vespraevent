@@ -434,9 +434,7 @@ html body .prod-thumb,html body .prod-thumbs button,html body .prod-thumbs img{b
   html body .bests-shell,html body .evs-wrap{max-width:1312px;margin-left:auto!important;margin-right:auto!important;overflow:hidden}
   html body .blog-wrap,html body .reviews-wrap{max-width:1312px;margin-left:auto!important;margin-right:auto!important;padding-left:0!important;overflow:hidden}
   html body .bests-arrow-prev{left:8px}html body .bests-arrow-next{right:8px}
-  /* la rangée s'arrête toujours sur le début d'une carte : pas de carte coupée au bord gauche */
-  html body .bests-carousel,html body .blog-wrap,html body .evs-wrap{scroll-snap-type:x mandatory}
-  html body .bests-track>*,html body .blog-grid>*,html body .evs-track>*{scroll-snap-align:start}
+  /* pas d'aimantation (scroll-snap) : elle bloquait le défilement automatique des carrousels */
 }
 
 /* Onglets des prestataires (pages d'organisation) : une seule ligne qui défile au doigt, jamais de mot coupé */
@@ -449,3 +447,9 @@ html body .pr-tab{flex:none;white-space:nowrap;scroll-snap-align:start}
 }
 /* pages d'organisation : paragraphes plus compacts sur téléphone */
 @media(max-width:620px){html body .ev-txt p,html body .ev-svc-t p{font-size:15px;line-height:1.65;margin-bottom:12px}}
+/* image du prestataire cliquable vers sa page complète */
+html body .pr-hero.pr-cliquable{cursor:pointer}
+html body .pr-voir{position:absolute;right:20px;top:18px;z-index:3;display:inline-flex;align-items:center;gap:6px;font:600 12.5px/1 Inter,system-ui,sans-serif;letter-spacing:.03em;color:#fff;text-decoration:none;padding:9px 14px;border-radius:999px;background:rgba(10,16,26,.45);border:1px solid rgba(255,255,255,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:background .2s}
+html body .pr-voir::after{content:"→"}
+html body .pr-voir:hover{background:rgba(10,16,26,.7)}
+@media(max-width:620px){html body .pr-voir{right:12px;top:12px;font-size:11.5px;padding:8px 12px}}
