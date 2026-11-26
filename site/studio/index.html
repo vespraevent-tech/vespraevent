@@ -5068,6 +5068,7 @@ async function basculerVirementRecu(id, mode, val){
   /* le montant reçu est figé maintenant : un produit ajouté ensuite apparaît en « reste à payer » */
   if(val){ const tf = window._totalFiche; if(tf && tf.id === String(r.id) && tf.total > 0) r.virementMontant = Math.round(tf.total * 100) / 100; }
   else delete r.virementMontant;
+  virementVersPlanning(r);
   redessiner();
   try{
     await api('/data', {method:'POST', body: JSON.stringify({collection:'reservations', item:{id:String(r.id), d:JSON.stringify(r)}})});
@@ -5079,6 +5080,13 @@ async function basculerVirementRecu(id, mode, val){
     alert("Impossible d'enregistrer le virement : " + e.message);
   }
 }
+/* le planning (cadre intégré) garde sa propre copie des réservations : on lui transmet le virement modifié ici */
+function virementVersPlanning(r){
+  try{ document.querySelectorAll('iframe').forEach(f => { const w = f.contentWindow; if(!w || !w.R || !Array.isArray(w.R)) return;
+    const x = w.R.find(y => String(y.id) === String(r.id)); if(!x) return;
+    x.virementRecu = r.virementRecu; if(r.virementMontant === undefined) delete x.virementMontant; else x.virementMontant = r.virementMontant;
+    try{ w.localStorage.setItem('vespraR', JSON.stringify(w.R)); }catch(e){} }); }catch(e){}
+}
 /* montant du virement reçu, corrigé à la main sur la fiche */
 async function changerMontantVirement(id, valeur){
   const r = (cache.resas||[]).find(x => String(x.id) === String(id));
@@ -5087,6 +5095,7 @@ async function changerMontantVirement(id, valeur){
   if(!(n >= 0)){ alert('Montant invalide'); return; }
   const avant = r.virementMontant;
   r.virementMontant = Math.round(n * 100) / 100;
+  virementVersPlanning(r);
   const d = (cache.demandes||[]).find(x => x.resaId && String(x.resaId) === String(id)) || null;
   const redessiner = () => { const fc = window._ficheCourante; if(fc && fc.genre === 'd' && d) ficheDemande(d.id); else ficheResa(id); };
   redessiner();

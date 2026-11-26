@@ -6200,6 +6200,9 @@ document.getElementById('saveM').onclick=function(){
   }
   /* virement reçu : le montant encaissé est figé au moment où il est marqué ; un ajout fait ensuite reste à payer */
   (function(){var x=editMode?R.find(function(y){return String(y.id)===String(currentDetailId);}):R[R.length-1];if(!x)return;
+    /* le montant reçu a pu être saisi dans la fiche du back-office après l'ouverture du planning : on le reprend avant d'enregistrer */
+    try{var pr=(window.parent&&window.parent!==window&&window.parent.cache&&window.parent.cache.resas||[]).find(function(y){return String(y.id)===String(x.id)});
+      if(pr&&pr.virementRecu===true&&Number(pr.virementMontant)>0&&x.virementRecu===true)x.virementMontant=Number(pr.virementMontant);}catch(e){}
     if(x.virementRecu===true){if(!(Number(x.virementMontant)>0)){try{x.virementMontant=Math.round(calcResTotal(x)*100)/100}catch(e){}}}else delete x.virementMontant;})();
   localStorage.setItem('vespraR',JSON.stringify(R));
   var _sv=editMode?R.find(function(x){return String(x.id)===String(currentDetailId);}):R[R.length-1];
