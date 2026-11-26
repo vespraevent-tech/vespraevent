@@ -751,7 +751,7 @@ html body input, html body select, html body textarea { max-width: 100%; }
       <div class="field ac-wrap"><label>Prénom &amp; Nom du client</label><input id="client" placeholder="Ex : Jean Dupuis" autocomplete="off" oninput="acSearch(this.value)"><div class="ac-list" id="ac-list"></div></div>
       <div class="field"><label>Téléphone</label><input id="phone" type="tel" placeholder="06 00 00 00 00"></div>
       <div class="field"><label>Email</label><input id="email" type="email" placeholder="client@email.com"></div>
-      <div class="field"><label>Type de client</label><select id="clientType" onchange="window._typeTouche=true;majTypeClient()"><option value="">Particulier</option><option value="pro">Entreprise, association, mairie…</option></select></div>
+      <div class="field"><label>Type de client</label><select id="clientType" onchange="window._typeTouche=true;majTypeClient()"><option value="">Particulier</option><option value="pro">Professionnel</option></select></div>
       <div class="field" id="proWrap" style="display:none;grid-column:1/-1"><label>Nom de l’entreprise ou de l’association</label><input id="societe" oninput="window._typeTouche=true" placeholder="Ex : Comité des fêtes de Vitré" autocomplete="off"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px"><div><label>SIRET <small style="font-weight:400">(entreprise)</small></label><input id="siret" oninput="window._typeTouche=true" placeholder="123 456 789 00012" autocomplete="off"></div><div><label>N° RNA <small style="font-weight:400">(association)</small></label><input id="rna" oninput="window._typeTouche=true" placeholder="W123456789" autocomplete="off"></div><div><label>N° de TVA (facultatif)</label><input id="tvaClient" oninput="window._typeTouche=true" placeholder="FR00123456789" autocomplete="off"></div></div><label style="margin-top:10px">Adresse de facturation <small style="font-weight:400">(si différente de l’adresse de l’événement)</small></label><textarea id="adresseFact" rows="2" data-adresse-autocomplete oninput="window._typeTouche=true" placeholder="N° et rue&#10;Code postal Ville" autocomplete="off" style="resize:vertical;min-height:58px;line-height:1.45"></textarea></div>
       <div class="field"><label>Date de début</label><input id="dateStart" type="date" data-date-joli></div>
       <div class="field"><label>Date de fin</label><input id="dateEnd" type="date" data-date-joli data-apres="dateStart"></div>
@@ -1646,7 +1646,7 @@ function encaisseEntre(deb,fin,sansVirements,horsFrais,horsTiers){
   var auj=caIso(new Date()),t=0,n=0;
   R.forEach(function(r){
     if(r._deleted||enSuivi(r))return;
-    if(sansVirements&&r.virementRecu===true)return;   /* déjà réglé par virement : plus rien à encaisser */
+    if(sansVirements&&r.virementRecu===true&&!(Number(r.virementMontant)>0&&calcResTotal(r)>Number(r.virementMontant)+0.009))return;   /* déjà réglé par virement : plus rien à encaisser (sauf un ajout fait après le virement) */
     var a=0,b=0;
     if(r.acompte===true){var d=acompteDateRes(r);if(d&&d>=deb&&d<=fin)a=acompteRes(r)-(horsFrais?fraisLMAcompte(r):0)-((horsFrais||horsTiers)?tiersAcompte(r):0);}
     if(r.dateStart&&r.dateStart>=deb&&r.dateStart<=fin)b=resteRes(r)-(horsFrais?fraisLMSolde(r):0)-((horsFrais||horsTiers)?tiersSolde(r):0);
@@ -3418,6 +3418,7 @@ window.basculerVirement=function(id){
   var r=R.find(function(x){return String(x.id)===String(id);});
   if(!r)return;
   r.virementRecu=!(r.virementRecu===true);
+  if(r.virementRecu){try{r.virementMontant=Math.round(calcResTotal(r)*100)/100}catch(e){}}else delete r.virementMontant;
   localStorage.setItem('vespraR',JSON.stringify(R));
   if(typeof fbPutRes==='function')fbPutRes(r);
   var b=document.getElementById('virBadge');
@@ -6197,6 +6198,9 @@ document.getElementById('saveM').onclick=function(){
     pkSuppSave(R[R.length-1]);
     appliquerTypeClient(R[R.length-1]);
   }
+  /* virement reçu : le montant encaissé est figé au moment où il est marqué ; un ajout fait ensuite reste à payer */
+  (function(){var x=editMode?R.find(function(y){return String(y.id)===String(currentDetailId);}):R[R.length-1];if(!x)return;
+    if(x.virementRecu===true){if(!(Number(x.virementMontant)>0)){try{x.virementMontant=Math.round(calcResTotal(x)*100)/100}catch(e){}}}else delete x.virementMontant;})();
   localStorage.setItem('vespraR',JSON.stringify(R));
   var _sv=editMode?R.find(function(x){return String(x.id)===String(currentDetailId);}):R[R.length-1];
   if(_sv)fbPutRes(_sv);

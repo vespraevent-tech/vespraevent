@@ -295,7 +295,9 @@
         filet(img,depart);
         var nb=+(img.getAttribute('data-vi')||0);if(nb>=3)return;   /* garde-fou anti-boucle */
         img.setAttribute('data-vi',String(nb+1));
-        img.removeAttribute('srcset');img.setAttribute('src',final);
+        /* photo déjà affichée : la nouvelle version est chargée à part puis échangée d'un coup, sans passage par un carré blanc */
+        if(img.complete&&img.naturalWidth>0){var pre=new Image();pre.decoding='async';pre.onload=function(){img.removeAttribute('srcset');img.setAttribute('src',final)};pre.src=final;}
+        else{img.removeAttribute('srcset');img.setAttribute('src',final);}
       }
     }
     /* la passe tourne toujours : même sans remplacement, les photos du

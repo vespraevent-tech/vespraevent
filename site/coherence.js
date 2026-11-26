@@ -45,3 +45,22 @@ window.__vespraPopup=function(){return !!document.querySelector('.vm-ov.open,.c-
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
+
+/* Images affichées sans attente : celles qui vont entrer à l'écran (jusqu'à environ 2 écrans plus bas)
+   commencent à se charger en avance, et celles des carrousels se chargent dès que la page est prête,
+   au lieu d'attendre le dernier moment (sinon des carrés blancs apparaissent pendant le défilement). */
+(function(){
+  function avance(i){if(i.loading==='lazy'){i.loading='eager'}}
+  function carrousels(){document.querySelectorAll('.bests-track img,.evs-track img,.blog-grid img,.blog-wrap img,.reviews-wrap img,.evc-ph img,.pr-cs img,[data-evcar] img,.ev-car img').forEach(avance)}
+  function init(){
+    if('IntersectionObserver' in window){
+      var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){avance(e.target);io.unobserve(e.target)}})},{rootMargin:'1800px 1200px'});
+      var vus=new WeakSet();
+      var suivre=function(){document.querySelectorAll('img[loading="lazy"]').forEach(function(i){if(!vus.has(i)){vus.add(i);io.observe(i)}})};
+      suivre();new MutationObserver(function(){suivre()}).observe(document.body,{childList:true,subtree:true});
+    }
+    var go=function(){carrousels()};
+    if(document.readyState==='complete')setTimeout(go,300);else window.addEventListener('load',function(){setTimeout(go,300)});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();

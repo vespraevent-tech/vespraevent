@@ -18,6 +18,8 @@
   function sobre(){try{return matchMedia('(prefers-reduced-motion: reduce)').matches||(navigator.connection&&navigator.connection.saveData)}catch(e){return false}}
   function fond(el){
     var src=el.getAttribute('data-video');if(!src||sobre())return;
+    /* grand écran : version haute qualité ; téléphone : version légère (la différence ne se voit pas sur un petit écran) */
+    try{var hd=el.getAttribute('data-video-hd');if(hd&&window.innerWidth>900&&!(navigator.connection&&/(^|-)2g|3g/.test(navigator.connection.effectiveType||'')))src=hd;}catch(e){}
     var v=document.createElement('video');v.className='vf';v.muted=true;v.defaultMuted=true;v.loop=true;v.autoplay=true;v.playsInline=true;
     v.setAttribute('muted','');v.setAttribute('playsinline','');v.setAttribute('aria-hidden','true');v.preload='auto';v.disablePictureInPicture=true;
     var ph=el.querySelector('.ev-hero-img');if(ph&&ph.currentSrc)v.poster=ph.currentSrc;else if(ph&&ph.src)v.poster=ph.src;

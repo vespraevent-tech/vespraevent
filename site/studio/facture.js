@@ -294,6 +294,24 @@
       }
       if (vu.adresse === undefined && fclient.billAdresse) vu.adresse = fclient.billAdresse;
     }
+    /* chaque champ vide est complété avec ce qui est déjà connu : réservation, demande, puis fiche client */
+    (function () {
+      vu = Object.assign({}, vu);
+      var t = function (x) { return String(x == null ? '' : x).trim(); };
+      var sources = [
+        { siret: r.siret, rna: r.rna, tvaClient: r.tva, adresse: r.adresseFact, type: r.clientType },
+        demandeLiee && demandeLiee !== r ? { siret: demandeLiee.siret, rna: demandeLiee.rna, tvaClient: demandeLiee.tva, adresse: demandeLiee.adresseFact, type: demandeLiee.clientType } : null,
+        fclient ? { siret: fclient.siret, rna: fclient.rna, tvaClient: fclient.tva, adresse: fclient.billAdresse, type: fclient.pro ? 'pro' : '' } : null
+      ].filter(Boolean);
+      var trouve = false;
+      ['siret', 'rna', 'tvaClient'].forEach(function (k) {
+        if (t(vu[k])) return;
+        for (var i = 0; i < sources.length; i++) { if (t(sources[i][k])) { vu[k] = t(sources[i][k]); trouve = true; break; } }
+      });
+      if (vu.adresse === undefined) { for (var j = 0; j < sources.length; j++) { if (t(sources[j].adresse)) { vu.adresse = t(sources[j].adresse); break; } } }
+      var typePro = sources.some(function (x) { return /entreprise|association|mairie|collectivit|^pro$/i.test(t(x.type)); });
+      if (vu.pro === undefined && (typePro || trouve)) vu.pro = true;   /* un choix « particulier » fait sur le devis est respecté */
+    })();
     /* ancienne saisie : un numéro RNA (W + 9 chiffres) rangé dans le champ SIRET est remis dans son propre champ */
     vu = Object.assign({}, vu);
     if (/^w\d{9}$/i.test(String(vu.siret || '').replace(/\s+/g, '')) && !vu.rna) { vu.rna = String(vu.siret).replace(/\s+/g, '').toUpperCase(); vu.siret = ''; }
@@ -348,7 +366,7 @@
         '<span class="fc-l">Type de client</span>' +
         '<div class="fc-choix">' +
           '<label><input type="radio" name="fcType" value="part"' + (pro ? '' : ' checked') + '> Particulier</label>' +
-          '<label><input type="radio" name="fcType" value="pro"' + (pro ? ' checked' : '') + '> Entreprise, mairie, association</label>' +
+          '<label><input type="radio" name="fcType" value="pro"' + (pro ? ' checked' : '') + '> Professionnel</label>' +
         '</div>' +
         '<p class="fc-aide" id="fcAideType"></p>' +
       '</div>' +

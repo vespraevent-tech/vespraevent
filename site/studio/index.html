@@ -326,6 +326,7 @@ img{display:block;max-width:100%}
 .dpc-b{border:1px solid #dcd5c8;background:#fff;border-radius:8px;padding:4px 10px;font:600 11px Inter,system-ui,sans-serif;color:#14304f;cursor:pointer;white-space:nowrap}
 .dpc-b:hover{border-color:#14304f}
 .dpr{display:flex;align-items:baseline;gap:12px;padding:9px 0;border-bottom:1px solid #eef0f4}
+.dpr.du .dpr-n,.dpr.du .dpr-v{color:#A63F35}.dpr.a .dpc-in{width:84px}
 .dpr-n{flex:1;min-width:0;font:13px Inter,system-ui,sans-serif;color:#2f2b25}
 .dpr-n i{display:block;font-style:normal;font-size:11.5px;color:#8a7a52;margin-top:2px}
 .dpr-v{font:600 14px Inter,system-ui,sans-serif;color:#14304f;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -4834,6 +4835,7 @@ function acompteBlocHTML(d, r, modeForce){
   /* acompte déjà reçu : le montant est figé, il ne suit plus les ajouts faits ensuite */
   const _fige = r && r.acompte === true ? (Number(r.acompteMontant) || (Number(r.devisAcompte) > 0 ? Number(r.devisAcompte) : 0)) : 0;
   window._acMontantFiche = {id: String((r && r.id) || (d && d.id) || ''), montant: montant};
+  window._totalFiche = {id: String((r && r.id) || ''), total: total};
   if(_fige > 0) montant = _fige;
 
   const interrupteur =
@@ -4879,8 +4881,11 @@ function acompteBlocHTML(d, r, modeForce){
     '<div class="dpr"><span class="dpr-n">' + esc(x.nom) + (x.note ? '<i>' + esc(x.note) + '</i>' : '') + '</span><span class="dpr-v">' + (x.texte || (x.prix < 0 ? '− ' + eur(-x.prix) : eur(x.prix))) + '</span></div>').join('');
   let bas = '<div class="dpr t"><span class="dpr-n">Total</span><span class="dpr-v">' + eur(total) + '</span></div>';
   if(virementOk && total > 0){
-    bas += '<div class="dpr a"><span class="dpr-n">Virement reçu</span><span class="dpr-v">− ' + eur(total) + '</span></div>' +
-           '<div class="dpr t r"><span class="dpr-n">Reste à payer</span><span class="dpr-v">' + eur(0) + '</span></div>';
+    /* montant réellement reçu : figé quand le virement a été marqué (modifiable ici) ; sans montant enregistré, le total de l'époque n'est pas connu, on prend le total */
+    const paye = Number(r.virementMontant) > 0 ? Number(r.virementMontant) : total;
+    const reste = Math.round((total - paye) * 100) / 100;
+    bas += '<div class="dpr a"><span class="dpr-n">Virement reçu</span><span class="dpr-v">− <input type="text" inputmode="decimal" class="dpc-in" value="' + escVal(String(Math.round(paye * 100) / 100).replace('.', ',')) + '" aria-label="Montant du virement reçu" onfocus="this.select()" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}" onchange="changerMontantVirement(\'' + escAttr(r.id) + '\',this.value)"> €</span></div>' +
+           '<div class="dpr t r' + (reste > 0 ? ' du' : '') + '"><span class="dpr-n">Reste à payer</span><span class="dpr-v">' + eur(Math.max(0, reste)) + '</span></div>';
   }
   else if(recu && total > 0 && montant > 0){
     bas += '<div class="dpr a"><span class="dpr-n">Acompte versé</span><span class="dpr-v">− ' + eur(montant) + '</span></div>' +
@@ -5058,15 +5063,39 @@ async function basculerVirementRecu(id, mode, val){
   const avant = r.virementRecu;
   const d = (cache.demandes||[]).find(x => x.resaId && String(x.resaId) === String(id)) || null;
   const redessiner = () => { if(mode === 'resa') ficheResa(id); else if(d) ficheDemande(d.id); };
+  const montantAvant = r.virementMontant;
   r.virementRecu = val;
+  /* le montant reçu est figé maintenant : un produit ajouté ensuite apparaît en « reste à payer » */
+  if(val){ const tf = window._totalFiche; if(tf && tf.id === String(r.id) && tf.total > 0) r.virementMontant = Math.round(tf.total * 100) / 100; }
+  else delete r.virementMontant;
   redessiner();
   try{
     await api('/data', {method:'POST', body: JSON.stringify({collection:'reservations', item:{id:String(r.id), d:JSON.stringify(r)}})});
     if(typeof rafraichirPlanning === 'function') rafraichirPlanning();
   }catch(e){
     if(avant === undefined) delete r.virementRecu; else r.virementRecu = avant;
+    if(montantAvant === undefined) delete r.virementMontant; else r.virementMontant = montantAvant;
     redessiner();
     alert("Impossible d'enregistrer le virement : " + e.message);
+  }
+}
+/* montant du virement reçu, corrigé à la main sur la fiche */
+async function changerMontantVirement(id, valeur){
+  const r = (cache.resas||[]).find(x => String(x.id) === String(id));
+  if(!r) return;
+  const n = parseFloat(String(valeur).replace(/\s/g, '').replace(',', '.'));
+  if(!(n >= 0)){ alert('Montant invalide'); return; }
+  const avant = r.virementMontant;
+  r.virementMontant = Math.round(n * 100) / 100;
+  const d = (cache.demandes||[]).find(x => x.resaId && String(x.resaId) === String(id)) || null;
+  const redessiner = () => { const fc = window._ficheCourante; if(fc && fc.genre === 'd' && d) ficheDemande(d.id); else ficheResa(id); };
+  redessiner();
+  try{
+    await api('/data', {method:'POST', body: JSON.stringify({collection:'reservations', item:{id:String(r.id), d:JSON.stringify(r)}})});
+    if(typeof rafraichirPlanning === 'function') rafraichirPlanning();
+  }catch(e){
+    if(avant === undefined) delete r.virementMontant; else r.virementMontant = avant;
+    redessiner(); alert("Impossible d'enregistrer le montant : " + e.message);
   }
 }
 async function basculerAcompte(id, mode, val){
@@ -5527,7 +5556,7 @@ function modifierDemande(id){
       saisie('nom', 'Prénom & Nom du client', d.nom, 'Ex : Jean Dupuis', 'text', true) +
       saisie('telephone', 'Téléphone', d.telephone, '06 00 00 00 00', 'tel') +
       saisie('email', 'Email', d.email, 'client@email.com', 'email') +
-      champ('clienttype', 'Type de client', '<select id="m-clienttype" onchange="mdPro()"><option value="Particulier"' + (iniPro ? '' : ' selected') + '>Particulier</option><option value="Entreprise ou association"' + (iniPro ? ' selected' : '') + '>Entreprise, association, mairie…</option></select>', true) +
+      champ('clienttype', 'Type de client', '<select id="m-clienttype" onchange="mdPro()"><option value="Particulier"' + (iniPro ? '' : ' selected') + '>Particulier</option><option value="Entreprise ou association"' + (iniPro ? ' selected' : '') + '>Professionnel</option></select>', true) +
       '<div class="pm-cond" id="m-proWrap"' + (iniPro ? '' : ' style="display:none"') + '>' +
         saisie('societe', 'Nom de l\u2019entreprise ou de l\u2019association', ini_societe, 'Ex : Comité des fêtes de Vitré', 'text', true) +
         saisie('siret', 'SIRET (entreprise)', ini_siret, '123 456 789 00012') +
@@ -8109,7 +8138,7 @@ function vign(src, w){
   const s = String(src || '');
   if(!s || !/^\/(?!\/)/.test(s) || !/(\.(webp|jpe?g|png)(\?|$)|^\/api\/media\/)/i.test(s) || s.indexOf('/.netlify/images') === 0) return s;
   const d = Math.min(window.devicePixelRatio || 1, 2);
-  return '/.netlify/images?url=' + encodeURIComponent(s.split('?')[0]) + '&w=' + Math.round((w || 160) * d) + '&fm=webp&q=75';
+  return '/.netlify/images?url=' + encodeURIComponent(s.split('?')[0]) + '&w=' + Math.round((w || 160) * d) + '&fm=webp&q=82';
 }
 document.addEventListener('error', function(e){ const t = e.target; if(t && t.tagName === 'IMG' && t.src.indexOf('/.netlify/images') > -1 && !t.dataset.vo){ t.dataset.vo = '1'; try{ t.src = decodeURIComponent((t.src.match(/[?&]url=([^&]+)/) || [])[1] || ''); }catch(x){} } }, true);
 function urlImage(src){
@@ -10640,7 +10669,7 @@ checkSession();
 <script src="/studio/ik.js?v=2"></script>
 <script src="/adresse-autocomplete.js?v=2"></script>
 <script src="/studio/dates-jolies.js?v=4"></script>
-<script src="/studio/facture.js?v=6"></script>
+<script src="/studio/facture.js?v=8"></script>
 <script>
 /* ── Accueil ── */
 function acFr(iso){ if(!iso) return ''; const d=new Date(iso+'T12:00:00'); return isNaN(d)?'':d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); }
@@ -10673,7 +10702,7 @@ function accueilRender2(){
     w.R.filter(r=>r&&!r._deleted&&r.dateStart&&!(typeof w.enSuivi==='function'&&w.enSuivi(r))).forEach(r=>{
       let t=0; try{ t=(w.calcResTotal(r)||0)-(typeof w.caTiers==='function'?w.caTiers(r):0); }catch(e){}   /* fonds de tiers hors CA */
       if(r.dateStart.slice(0,4)===an){ caA+=t; nA++; }
-      if(r.dateStart.slice(0,7)===mois){ caM+=t; let a=0; try{ a=w.acompteRes(r)||0; }catch(e){} acM+=a; if(r.virementRecu!==true){ let lm=0; try{ lm=w.fraisLMSolde(r)||0; }catch(e){} resteM+=t-a-lm; } }
+      if(r.dateStart.slice(0,7)===mois){ caM+=t; let a=0; try{ a=w.acompteRes(r)||0; }catch(e){} acM+=a; if(r.virementRecu!==true){ let lm=0; try{ lm=w.fraisLMSolde(r)||0; }catch(e){} resteM+=t-a-lm; } else if(Number(r.virementMontant)>0 && t>Number(r.virementMontant)){ resteM+=t-Number(r.virementMontant); } }
       if((r.dateEnd||r.dateStart)>=iso) evts.push(r);
     });
     evts.sort((a,b)=>a.dateStart<b.dateStart?-1:1);
