@@ -39,7 +39,9 @@ window.__vespraPopup=function(){return !!document.querySelector('.vm-ov.open,.c-
     function maj(){var u=cible();lien.href=u||'#';lien.hidden=!u;hero.classList.toggle('pr-cliquable',!!u)}
     maj();new MutationObserver(maj).observe(document.getElementById('prNav')||hero,{subtree:true,attributes:true,attributeFilter:['aria-selected'],childList:true});
     hero.addEventListener('click',function(e){if(e.target.closest('.pr-tab,.pr-nav,a'))return;var u=cible();if(u)location.href=u});
-    document.addEventListener('dblclick',function(e){var t=e.target.closest('.pr-tab');if(!t)return;var u=page(t.textContent);if(u)location.href=u});
+    /* deux clics rapprochés sur le même onglet (l'onglet est redessiné au premier clic : l'événement dblclick ne suffit pas) */
+    var dernier={t:'',h:0};
+    document.addEventListener('click',function(e){var t=e.target.closest('.pr-tab');if(!t)return;var x=t.textContent,n=Date.now();if(x===dernier.t&&n-dernier.h<450){var u=page(x);if(u)location.href=u}dernier={t:x,h:n}},true);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
