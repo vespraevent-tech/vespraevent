@@ -4884,7 +4884,7 @@ function acompteBlocHTML(d, r, modeForce){
     /* montant réellement reçu : figé quand le virement a été marqué (modifiable ici) ; sans montant enregistré, le total de l'époque n'est pas connu, on prend le total */
     const paye = Number(r.virementMontant) > 0 ? Number(r.virementMontant) : total;
     const reste = Math.round((total - paye) * 100) / 100;
-    bas += '<div class="dpr a"><span class="dpr-n">Virement reçu</span><span class="dpr-v">− ' + eur(paye) + '</span></div>' +
+    bas += '<div class="dpr a"><span class="dpr-n">Virement reçu</span><span class="dpr-v"><button type="button" aria-label="Modifier le montant du virement reçu" onclick="demanderMontantVirement(' + paye + ', function(m){ changerMontantVirement(\'' + escAttr(r.id) + '\', m); })" style="all:unset;cursor:pointer;border-bottom:1px dashed #9aa3af">− ' + eur(paye) + '</button></span></div>' +
            '<div class="dpr t r' + (reste > 0 ? ' du' : '') + '"><span class="dpr-n">Reste à payer</span><span class="dpr-v">' + eur(Math.max(0, reste)) + '</span></div>';
   }
   else if(recu && total > 0 && montant > 0){
@@ -5057,7 +5057,35 @@ async function poserPrixResa(r, idx, n){
     alert("Impossible d'enregistrer le prix : " + e.message);
   }
 }
-async function basculerVirementRecu(id, mode, val){
+/* petite fenêtre « Montant reçu » : le virement peut être partiel (le reste à payer s'affiche ensuite sur la fiche) */
+function demanderMontantVirement(defaut, quandOk){
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(12,15,20,.5);display:flex;align-items:center;justify-content:center;padding:20px';
+  ov.innerHTML = '<div role="dialog" aria-modal="true" aria-label="Montant du virement reçu" style="background:#fff;border-radius:16px;padding:22px 22px 18px;width:100%;max-width:340px;box-shadow:0 24px 60px rgba(12,15,20,.3);font-family:Inter,system-ui,sans-serif">' +
+    '<div style="font:700 16px Inter,system-ui,sans-serif;color:#14304f;margin:0 0 4px">Virement reçu</div>' +
+    '<div style="font-size:13px;color:#6b7280;margin:0 0 14px">Quel montant avez-vous reçu ? Un ajout fait ensuite restera à payer.</div>' +
+    '<div style="display:flex;align-items:center;gap:8px;border:1px solid #d8dde4;border-radius:10px;padding:0 12px;height:48px"><input id="vmMontant" type="text" inputmode="decimal" value="' + escVal(String(defaut).replace('.', ',')) + '" style="flex:1;border:0;outline:0;font:600 18px Inter,system-ui,sans-serif;color:#1f2a37;min-width:0;background:none"><span style="color:#8a929e;font-weight:600">€</span></div>' +
+    '<div style="display:flex;gap:10px;margin-top:16px"><button type="button" id="vmAnnuler" style="flex:1;height:44px;border-radius:10px;border:1px solid #d8dde4;background:#fff;font:600 14px Inter,system-ui,sans-serif;color:#3d4452;cursor:pointer">Annuler</button>' +
+    '<button type="button" id="vmOk" style="flex:1;height:44px;border-radius:10px;border:0;background:#14304f;color:#fff;font:600 14px Inter,system-ui,sans-serif;cursor:pointer">Enregistrer</button></div></div>';
+  document.body.appendChild(ov);
+  const champ = ov.querySelector('#vmMontant'); champ.focus(); champ.select();
+  const ferme = () => ov.remove();
+  const valide = () => { const n = parseFloat(String(champ.value).replace(/\s/g, '').replace(',', '.')); if(!(n >= 0)){ champ.style.color = '#A63F35'; return; } ferme(); quandOk(Math.round(n * 100) / 100); };
+  ov.querySelector('#vmOk').onclick = valide;
+  ov.querySelector('#vmAnnuler').onclick = ferme;
+  ov.addEventListener('click', e => { if(e.target === ov) ferme(); });
+  champ.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); valide(); } if(e.key === 'Escape') ferme(); });
+}
+function basculerVirementRecu(id, mode, val, montantChoisi){
+  const r0 = (cache.resas||[]).find(x => String(x.id) === String(id));
+  if(!r0) return;
+  if(val && montantChoisi === undefined){
+    const tf = window._totalFiche, defaut = (tf && tf.id === String(r0.id) && tf.total > 0) ? tf.total : 0;
+    return demanderMontantVirement(defaut, m => basculerVirementRecu(id, mode, true, m));
+  }
+  return basculerVirementRecuOk(id, mode, val, montantChoisi);
+}
+async function basculerVirementRecuOk(id, mode, val, montantChoisi){
   const r = (cache.resas||[]).find(x => String(x.id) === String(id));
   if(!r) return;
   const avant = r.virementRecu;
@@ -5066,7 +5094,7 @@ async function basculerVirementRecu(id, mode, val){
   const montantAvant = r.virementMontant;
   r.virementRecu = val;
   /* le montant reçu est figé maintenant : un produit ajouté ensuite apparaît en « reste à payer » */
-  if(val){ const tf = window._totalFiche; if(tf && tf.id === String(r.id) && tf.total > 0) r.virementMontant = Math.round(tf.total * 100) / 100; }
+  if(val){ r.virementMontant = montantChoisi; }
   else delete r.virementMontant;
   virementVersPlanning(r);
   redessiner();
@@ -10624,6 +10652,24 @@ checkSession();
 })();
 </script>
 <script src="videos-site.js?v=2"></script>
+<script>
+/* Nouvelle version du back-office disponible : une bannière discrète propose d'actualiser (jamais de rechargement forcé, pour ne rien perdre d'une saisie en cours) */
+(function(){
+  var v0=null,vue=false;
+  function lire(){return fetch('/api/version',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(j){return j&&j.zip}).catch(function(){return null})}
+  function bandeau(){
+    if(vue)return;vue=true;var b=document.createElement('div');
+    b.setAttribute('role','status');
+    b.style.cssText='position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:99999;display:flex;align-items:center;gap:12px;background:#14304f;color:#fff;border-radius:999px;padding:10px 12px 10px 18px;box-shadow:0 12px 36px rgba(12,15,20,.3);font:500 13.5px Inter,system-ui,sans-serif;max-width:calc(100vw - 24px)';
+    b.innerHTML='<span>Nouvelle version disponible</span><button type="button" style="border:0;border-radius:999px;background:#fff;color:#14304f;font:700 13px Inter,system-ui,sans-serif;padding:8px 14px;cursor:pointer">Actualiser</button>';
+    b.querySelector('button').onclick=function(){location.reload()};document.body.appendChild(b);
+  }
+  function verifie(){lire().then(function(v){if(v==null)return;if(v0==null){v0=v;return}if(v!==v0)bandeau()})}
+  lire().then(function(v){v0=v});
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)verifie()});
+  setInterval(verifie,300000);
+})();
+</script>
 </body>
 </html>
 
