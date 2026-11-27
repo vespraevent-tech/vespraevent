@@ -755,6 +755,11 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
     <span style="font-weight:700;color:var(--navy);margin-left:auto;flex-shrink:0;white-space:nowrap">+&nbsp;40&nbsp;€</span>
   </label>
 <label class="prod-option-check" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:2px solid var(--g3);border-radius:var(--r);cursor:pointer;font-size:14px;transition:border-color .18s;margin-top:10px">
+    <input type="checkbox" id="optionFumeePuissante" style="width:18px;height:18px;margin-top:2px;accent-color:var(--navy);flex-shrink:0" onchange="updateFumee()">
+    <span><strong>Machine à fumée plus puissante (M-Fog 1500)</strong><br><span style="color:var(--g2);font-size:12px">Vient s'ajouter à la machine à fumée déjà comprise dans votre pack : un effet plus immersif, façon soirée discothèque. 10 € seulement, car la machine de base est déjà payée (20 € − 10 €).</span></span>
+    <span id="optionFumeePrix" style="font-weight:700;color:var(--navy);margin-left:auto;flex-shrink:0;white-space:nowrap">+&nbsp;10&nbsp;€</span>
+  </label>
+  <label class="prod-option-check" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:2px solid var(--g3);border-radius:var(--r);cursor:pointer;font-size:14px;transition:border-color .18s;margin-top:10px">
     <input type="checkbox" id="optionMicroFil" style="width:18px;height:18px;margin-top:2px;accent-color:var(--navy);flex-shrink:0">
     <span><strong>Micro filaire (Shure SM58)</strong><br><span style="color:var(--g2);font-size:12px">Le micro de scène de référence, avec câble. Il a sa propre ligne sur votre devis.</span>
       <span id="optionMicroFilStep" style="display:none;align-items:center;gap:10px;margin-top:10px" onclick="event.preventDefault()">
@@ -1385,10 +1390,12 @@ function toggleNav(){
 }
 let _selectedVariant={label:'Pack 20 personnes',price:50,img:'pack-vespra-20-v2.webp'};
 let _caissonOpt=false;
+let _fumeeOpt=false;
+function pxFumee(){ return (window.VESPRA_OPT?window.VESPRA_OPT('optionFumeePack',10):10); }
 function caissonInclus(){ return /180 à 250/.test(_selectedVariant.label); }
 function pxCaisson(){ return (window.VESPRA_OPT?window.VESPRA_OPT('optionCaissonPack',40):40); }
 function majPrixHaut(){
-  const sup=(_caissonOpt&&!caissonInclus())?pxCaisson():0;
+  const sup=((_caissonOpt&&!caissonInclus())?pxCaisson():0)+(_fumeeOpt?pxFumee():0);
   document.getElementById('prodPriceDisplay').innerHTML=(_selectedVariant.price+sup+(window.microSupplement?window.microSupplement():0))+' € <small>/ événement</small>';
   const cb=document.getElementById('optionCaisson');
   if(cb){
@@ -1403,6 +1410,13 @@ function majPrixHaut(){
   }
 }
 window.majPrixHaut=majPrixHaut;
+function updateFumee(){
+  const cb=document.getElementById('optionFumeePuissante');
+  _fumeeOpt=!!(cb&&cb.checked);
+  const l=cb&&cb.closest('label'); if(l) l.style.borderColor=_fumeeOpt?'var(--navy)':'var(--g3)';
+  const p=document.getElementById('optionFumeePrix'); if(p) p.innerHTML='+&nbsp;'+pxFumee()+'&nbsp;€';
+  majPrixHaut();
+}
 function updateCaisson(){
   const cb=document.getElementById('optionCaisson');
   _caissonOpt=!!(cb&&cb.checked&&!cb.disabled);
@@ -1421,8 +1435,8 @@ function addToCartProduct(){
   addToCart({
     id:'p8',
     name:'Pack Vespra',
-    label:_selectedVariant.label+(avecCaisson?' + caisson de basse ('+pxCaisson()+' €)':''),
-    price:_selectedVariant.price+(avecCaisson?pxCaisson():0),
+    label:_selectedVariant.label+(avecCaisson?' + caisson de basse ('+pxCaisson()+' €)':'')+(_fumeeOpt?' + machine à fumée plus puissante M-Fog 1500 ('+pxFumee()+' €)':''),
+    price:_selectedVariant.price+(avecCaisson?pxCaisson():0)+(_fumeeOpt?pxFumee():0),
     img:_selectedVariant.img||'pack-vespra-60-v2.webp'
   });
   if(window.ajouterMicros)ajouterMicros();

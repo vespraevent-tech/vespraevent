@@ -149,6 +149,8 @@
       var actif = document.querySelector('.prod-vbtn.active') || btns[0];
       var t = actif && actif.querySelector('.prod-vbtn-price');
       var v = t && nombre(t.textContent);
+      /* la variante retenue en mémoire par la fiche repart du prix corrigé */
+      try { if (v && typeof _selectedVariant !== 'undefined' && _selectedVariant && typeof _selectedVariant.price === 'number') _selectedVariant.price = v; } catch (e9) {}
       if (v) majPrixPrincipal(v);
     }
   }
@@ -420,9 +422,10 @@
         if (cible[1] >= 0 && prod.variants && prod.variants[cible[1]]) {
           prod.variants[cible[1]].price = np;
           modifies[prod.id] = true;
-        } else {
+        } else if (!(cible[1] >= 0)) {
           prod.price = np;
         }
+        /* une taille sans variante dans le catalogue (ex. 6 canons) ne doit pas remplacer le « à partir de » du produit */
       });
     });
 

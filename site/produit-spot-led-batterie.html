@@ -1231,7 +1231,7 @@ function majQte(){
   document.getElementById('mqN').textContent=_qte;
   document.getElementById('mqMoins').disabled=_qte<=1;
   document.getElementById('mqPlus').disabled=_qte>=dispo;
-  document.getElementById('prodPriceDisplay').innerHTML=(20*_qte)+' € <small>/ événement'+(_qte>1?' · '+_qte+' spots':'')+'</small>';
+  document.getElementById('prodPriceDisplay').innerHTML=((window.VESPRA_PRIX_BASE||20)*_qte)+' € <small>/ événement'+(_qte>1?' · '+_qte+' spots':'')+'</small>';
 }
 window.majPrixPrincipalHook=majQte;
 document.addEventListener('DOMContentLoaded',function(){

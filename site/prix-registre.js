@@ -179,6 +179,15 @@ window.VESPRA_PRIX_REGISTRE = [
     "champ": "optionCaissonPack"
   },
   {
+    "i": "pack-vespra-opt-2",
+    "n": "Pack Vespra",
+    "v": "Option : Machine à fumée plus puissante (M-Fog 1500)",
+    "p": 10,
+    "pg": "produit-pack-vespra.html",
+    "opt": 1,
+    "champ": "optionFumeePack"
+  },
+  {
     "i": "barnums-1",
     "n": "Barnums",
     "v": "3×3 m — 8 à 12 pers. assises",
