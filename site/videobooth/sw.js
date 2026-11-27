@@ -1,6 +1,6 @@
 /* Vidéobooth : l'appli s'ouvre même sans réseau (les vidéos, elles, vivent dans la tablette jusqu'à leur envoi). */
-const V = 'vb-64';
-const FICHIERS = ['/videobooth/', '/videobooth/index.html', '/videobooth/app.js?v=69', '/videobooth/app.css?v=42', '/videobooth/qr.js?v=1', '/videobooth/polices/playfair-700.woff2', '/videobooth/polices/great-vibes-400.woff2', '/videobooth/polices/montserrat-700.woff2', '/videobooth/polices/mountains-700.woff2', '/videobooth/manifest.webmanifest', '/videobooth/icones/icon-192.png', '/videobooth/icones/favicon-32.png', '/videobooth/icones/apple-touch-icon.png', '/polices.css?v=1'];
+const V = 'vb-65';
+const FICHIERS = ['/videobooth/', '/videobooth/index.html', '/videobooth/app.js?v=70', '/videobooth/app.css?v=43', '/videobooth/qr.js?v=1', '/videobooth/polices/playfair-700.woff2', '/videobooth/polices/great-vibes-400.woff2', '/videobooth/polices/montserrat-700.woff2', '/videobooth/polices/mountains-700.woff2', '/videobooth/manifest.webmanifest', '/videobooth/icones/icon-192.png', '/videobooth/icones/favicon-32.png', '/videobooth/icones/apple-touch-icon.png', '/polices.css?v=1'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(V).then((c) => Promise.all(FICHIERS.map((u) => c.add(u).catch(() => {})))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((k) => Promise.all(k.filter((x) => x !== V).map((x) => caches.delete(x)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', (e) => {

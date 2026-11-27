@@ -674,9 +674,9 @@ $('b-stop').onclick = arreterRec;
         '<polygon points="' + x + ',' + (y0 - h * 0.55) + ' ' + (x + w * 0.5) + ',' + (y0 - h * 0.1) + ' ' + (x - w * 0.5) + ',' + (y0 - h * 0.1) + '" fill="#2a9058"/>' + lum +
         '<polygon points="' + x + ',' + (y0 - h - 7) + ' ' + (x + 2.6) + ',' + (y0 - h - 1.5) + ' ' + (x + 8) + ',' + (y0 - h - 1.5) + ' ' + (x + 3.6) + ',' + (y0 - h + 2) + ' ' + (x + 5.4) + ',' + (y0 - h + 8) + ' ' + x + ',' + (y0 - h + 4.5) + ' ' + (x - 5.4) + ',' + (y0 - h + 8) + ' ' + (x - 3.6) + ',' + (y0 - h + 2) + ' ' + (x - 8) + ',' + (y0 - h - 1.5) + ' ' + (x - 2.6) + ',' + (y0 - h - 1.5) + '" fill="#F59E0B"/></g>';
     }
-    var arbres = '', hs = [70, 96, 58, 84, 104, 62, 90, 72, 100, 64], k;
-    for (k = 0; k < 10; k++) arbres += sapin(40 + k * 80, hs[k], k);
-    var sol = '<svg viewBox="0 0 800 120" preserveAspectRatio="xMidYMax meet" width="100%" height="100%"><rect x="0" y="114" width="800" height="6" rx="3" fill="#ffffffd9"/>' + arbres + '</svg>';
+    var arbres = '', hs = [70, 96, 58, 84, 104, 62, 90, 72, 100, 64, 80, 98, 60, 88, 102, 66, 92, 74, 96, 62, 86, 100, 58, 94], k;
+    for (k = 0; k < 24; k++) arbres += sapin(36 + k * 72, hs[k], k);   /* de gauche à droite sur toute la largeur */
+    var sol = '<svg viewBox="0 0 1728 120" preserveAspectRatio="xMidYMax slice" width="100%" height="100%"><rect x="0" y="114" width="1728" height="6" rx="3" fill="#ffffffd9"/>' + arbres + '</svg>';
     Array.prototype.forEach.call(document.querySelectorAll('.noel-haut'), function (n) { n.innerHTML = guirlande; });
     Array.prototype.forEach.call(document.querySelectorAll('.noel-bas'), function (n) { n.innerHTML = sol; });
   })();
