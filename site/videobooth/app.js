@@ -580,9 +580,25 @@ $('b-stop').onclick = arreterRec;
     }).then(function () { envoiEnCours = false; return liberer(false); }).then(function () { majEtat(); if (synchroRepasse) { synchroRepasse = false; setTimeout(synchro, 300); } }, function () { envoiEnCours = false; if (synchroRepasse) { synchroRepasse = false; setTimeout(synchro, 300); } });
   }
   /* ── état de la tablette, envoyé toutes les 2 minutes au back-office (batterie, vidéos en attente, caméra, micro, place) ── */
+  /* mise à jour automatique : si le site propose une version plus récente de l'appli, la tablette se recharge toute seule, uniquement quand elle est sur l'écran d'accueil et ne filme pas */
+  var BUILD = 71;
+  function verifierMaj() {
+    try {
+      if (enregistrement) return;
+      var ac = $('s-accueil'); if (!ac || !ac.classList.contains('on')) return;
+      fetch('/videobooth/index.html', { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
+        var m = /app\.js\?v=(\d+)/.exec(t || '');
+        if (m && Number(m[1]) > BUILD) {
+          try { if (window.caches) caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); }); } catch (e) {}
+          setTimeout(function () { location.reload(); }, 400);
+        }
+      }).catch(function () {});
+    } catch (e) {}
+  }
   function battement() {
     if (!(cfg.jeton || cfg.cle)) return;
-    var etat = { cam: camEtat, mic: micEtat, ver: 42, codec: meilleurMime(), pinUsine: cfg.pin === PIN_USINE, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
+    verifierMaj();
+    var etat = { cam: camEtat, mic: micEtat, ver: 42, build: BUILD, codec: meilleurMime(), pinUsine: cfg.pin === PIN_USINE, enreg: !!enregistrement, reco: nbReco, mut: nbSilence };
     var fin = function () {
       toutes().then(function (l) { etat.att = l.filter(function (v) { return !v.envoye; }).length; etat.tot = l.length; }).catch(function () {}).then(function () {
         return (navigator.storage && navigator.storage.estimate) ? navigator.storage.estimate().then(function (e) { etat.usage = e.usage || 0; etat.quota = e.quota || 0; }).catch(function () {}) : null;
