@@ -1156,8 +1156,8 @@ var P=[
   ['Déguisement','photobooth',20,['Standard'],'Déguisement'],
   ['Pack Vespra 60 personnes','sono',70,['60 personnes'],'Pack 60'],
   ['Pack Vespra 100 personnes','sono',80,['100 personnes'],'Pack 100'],
-  ['Pack Vespra 150 personnes','sono',100,['150 personnes'],'Pack 150'],
-  ['Pack Vespra 200 personnes','sono',130,['200 personnes'],'Pack 200'],
+  ['Pack Vespra 150 personnes','sono',125,['150 personnes'],'Pack 150'],
+  ['Pack Vespra 200 personnes','sono',150,['200 personnes'],'Pack 200'],
   ['Pack Vespra 20 personnes','sono',50,['20 personnes'],'Pack 20'],
   ['Pack Vespra 40 à 60 personnes','sono',70,['40 à 60 personnes'],'Pack 40-60'],
   ['Pack Vespra 80 à 100 personnes','sono',80,['80 à 100 personnes'],'Pack 80-100'],
@@ -1402,7 +1402,8 @@ var VARIANT_PRICES={
 var ANCIENS_PRIX={
   'Pack Vespra 60 personnes':60,'Pack Vespra 100 personnes':70,'Pack Vespra 150 personnes':110,
   'Sono 40/60 personnes':30,'Sono 80/100 personnes':40,'Machine à bulles':5,
-  'Barnum 6x10m':165,'Buvette 4x4m':250,'Sac de lestage':35
+  'Barnum 6x10m':165,'Buvette 4x4m':250,'Sac de lestage':35,
+  'Baby-foot':90,'Spot LED sur batterie':20,'Machine à fumée lourde effet nuage':150,'Machine à glaçons':20
 };
 
 /* Titre d'une ligne de location : la taille se lit toujours dans le titre
@@ -7100,7 +7101,6 @@ if(true){
     var pr={};((d&&d.produits)||[]).forEach(function(x){if(x&&x.type==='prix'){var n=nb(x.prix);if(n)pr[x.id]=n;}});
     var simple={'baby-foot':'Baby-foot','spot-led-batterie':'Spot LED sur batterie','fumee-lourde-nuage':'Machine à fumée lourde effet nuage','machine-glacons':'Machine à glaçons'};
     Object.keys(simple).forEach(function(k){var l=ligne(simple[k]);if(l&&pr[k]) l[2]=pr[k];});
-    if(pr['baby-foot']){var j=ligne('Jeux en bois');if(j&&j[5]) j[5]['Baby-foot']=pr['baby-foot'];}
     if(pr['fumee-lourde-nuage']&&window.PK_OPT&&PK_OPT.fumeeP) PK_OPT.fumeeP.prix=pr['fumee-lourde-nuage'];
     var e=ligne('Machine à étincelles froides');
     if(e&&e[5]){if(pr['etincelles-froides-1'])e[5]['1 machine']=pr['etincelles-froides-1'];if(pr['etincelles-froides-2'])e[5]['2 machines']=pr['etincelles-froides-2'];}
