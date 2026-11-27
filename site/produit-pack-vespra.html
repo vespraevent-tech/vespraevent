@@ -756,7 +756,7 @@ document.addEventListener('DOMContentLoaded',function(){f();var p=document.getEl
   </label>
 <label class="prod-option-check" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:2px solid var(--g3);border-radius:var(--r);cursor:pointer;font-size:14px;transition:border-color .18s;margin-top:10px">
     <input type="checkbox" id="optionFumeePuissante" style="width:18px;height:18px;margin-top:2px;accent-color:var(--navy);flex-shrink:0" onchange="updateFumee()">
-    <span><strong>Machine à fumée plus puissante (M-Fog 1500)</strong><br><span style="color:var(--g2);font-size:12px">Vient s'ajouter à la machine à fumée déjà comprise dans votre pack : un effet plus immersif, façon soirée discothèque. 10 € seulement, car la machine de base est déjà payée (20 € − 10 €).</span></span>
+    <span><strong>Machine à fumée plus puissante (M-Fog 1500) à la place de la petite</strong><br><span style="color:var(--g2);font-size:12px">Remplace la petite machine à fumée comprise dans votre pack par la M-Fog 1500, bien plus puissante : un effet plus immersif, façon soirée discothèque. 10 € seulement, car la petite machine est déjà payée dans le pack (20 € − 10 €). Sans cette option, vous gardez la petite machine.</span></span>
     <span id="optionFumeePrix" style="font-weight:700;color:var(--navy);margin-left:auto;flex-shrink:0;white-space:nowrap">+&nbsp;10&nbsp;€</span>
   </label>
   <label class="prod-option-check" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:2px solid var(--g3);border-radius:var(--r);cursor:pointer;font-size:14px;transition:border-color .18s;margin-top:10px">
@@ -1435,7 +1435,7 @@ function addToCartProduct(){
   addToCart({
     id:'p8',
     name:'Pack Vespra',
-    label:_selectedVariant.label+(avecCaisson?' + caisson de basse ('+pxCaisson()+' €)':'')+(_fumeeOpt?' + machine à fumée plus puissante M-Fog 1500 ('+pxFumee()+' €)':''),
+    label:_selectedVariant.label+(avecCaisson?' + caisson de basse ('+pxCaisson()+' €)':'')+(_fumeeOpt?' + M-Fog 1500 à la place de la petite machine à fumée ('+pxFumee()+' €)':''),
     price:_selectedVariant.price+(avecCaisson?pxCaisson():0)+(_fumeeOpt?pxFumee():0),
     img:_selectedVariant.img||'pack-vespra-60-v2.webp'
   });
