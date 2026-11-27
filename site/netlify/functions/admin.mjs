@@ -2408,6 +2408,14 @@ const gestionnaire = async (request) => {
   if (path === '/appli/code' && request.method === 'GET') return json({ code: await codeLire(blobsVb('videobooth')) });
   if (path === '/appli/code' && request.method === 'POST') { try { const b = await request.json().catch(() => ({})); return json({ ok: true, code: await codeEcrire(blobsVb('videobooth'), b.code) }); } catch (e) { return json({ ok: false, erreur: e.message }, 400); } }
   if (path === '/appli/mdp' && request.method === 'POST') return json(await appliNouveauMdp());
+  /* diagnostic : ce que le site voit réellement (fiches, vidéos et morceaux sur Cloudflare R2) */
+  if (path === '/videobooth/diag' && request.method === 'GET') {
+    const st = videoStore();
+    const fiches = (await st.list({ prefix: 'meta/' }).catch((e) => ({ blobs: [], erreur: e.message }))).blobs || [];
+    const videosR2 = r2Actif() ? await r2Lister('video/').catch((e) => ({ erreur: e.message })) : [];
+    const morceauxR2 = r2Actif() ? await r2Lister('chunk/').catch((e) => ({ erreur: e.message })) : [];
+    return json({ fiches: fiches.map((b) => b.key), videosR2, morceauxR2 });
+  }
   /* essai complet de la chaîne d'envoi vidéo côté serveur : 3 morceaux (4+4+1 Mo) écrits, relus, assemblés, vidéo écrite, relue puis tout est supprimé */
   if (path === '/videobooth/autotest' && request.method === 'POST') {
     const t0 = Date.now(), st = videoStore(), id = 'vautotest' + Date.now().toString(36), etapes = [];
