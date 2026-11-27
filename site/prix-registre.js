@@ -179,9 +179,9 @@ window.VESPRA_PRIX_REGISTRE = [
     "champ": "optionCaissonPack"
   },
   {
-    "i": "pack-vespra-opt-2",
+    "i": "pack-vespra-opt-fumee",
     "n": "Pack Vespra",
-    "v": "Option : Machine à fumée plus puissante (M-Fog 1500)",
+    "v": "Option : M-Fog 1500 à la place de la petite machine à fumée",
     "p": 10,
     "pg": "produit-pack-vespra.html",
     "opt": 1,
@@ -1849,6 +1849,13 @@ window.VESPRA_PRODUITS = [
         "devis": false,
         "champ": "optionMicroSF",
         "id": "pack-vespra-opt-3"
+      },
+      {
+        "nom": "M-Fog 1500 à la place de la petite machine à fumée",
+        "prix": 10,
+        "devis": false,
+        "champ": "optionFumeePack",
+        "id": "pack-vespra-opt-fumee"
       }
     ]
   },
