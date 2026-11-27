@@ -148,7 +148,7 @@ html,body,#app{height:100dvh}
 .amp{animation:vbLum 2s ease-in-out infinite}
 @keyframes vbLum{0%,100%{opacity:1}50%{opacity:.42}}
 @media (prefers-reduced-motion:reduce){.amp{animation:none}}
-.noel-haut{top:0;height:clamp(60px,7vw,110px)}
+.noel-haut{top:0;height:clamp(76px,9vw,140px)}
 .noel-bas{bottom:0;height:min(15vh,150px)}
 .noel-on #s-accueil .marque,.noel-on #s-merci .marque{bottom:calc(min(15vh,150px) + 1.5vh)}
 .noel-on #s-merci,.noel-on #s-accueil{padding-bottom:calc(min(15vh,150px) + 3vh)}
@@ -354,7 +354,7 @@ html,body{background:var(--bg1)}
 .inv .adm-chk input{accent-color:var(--acc)}
 .inv .err{color:var(--err,#b3392b)}
 /* un seul mode : le gros bouton « Commencer » prend la place des cartes, au centre de l'écran */
-#s-accueil #b-commencer:not([hidden]){padding:clamp(26px,4.2vh,40px) clamp(80px,14vw,170px);font-size:clamp(26px,3.6vw,40px);border-radius:22px;box-shadow:0 22px 44px -22px var(--ombre)}
+#s-accueil #b-commencer:not([hidden]){padding:clamp(15px,2.4vh,21px) clamp(44px,6.5vw,78px);font-size:clamp(18px,2.1vw,23px);border-radius:15px;box-shadow:0 22px 44px -22px var(--ombre)}
 .inv .adm-c h3{color:var(--acc)}
 
 /* seul le gros titre de l'accueil prend la police choisie pour l'événement ; tout le reste (autres titres, réglages, connexion) garde la police standard */
@@ -374,8 +374,8 @@ html[data-ori="portrait"] .mode{min-height:0}
 html[data-ori="portrait"] .mode .in{padding-top:0}
 html[data-ori="portrait"] .mode{justify-content:center}
 /* un seul mode : « Commencer » exactement au milieu de l'écran */
-#s-accueil #b-commencer:not([hidden]){position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0}
-#s-accueil #b-commencer:not([hidden]):active{transform:translate(-50%,-50%) scale(.97)}
+#s-accueil #b-commencer:not([hidden]){position:static;transform:none;margin:0 auto}
+#s-accueil #b-commencer:not([hidden]):active{transform:scale(.97)}
 /* contenu centré dans la carte, avec des blocs de même hauteur : icônes, titres et textes restent alignés d'une carte à l'autre */
 .mode{justify-content:center;padding:clamp(22px,4vh,40px) 26px}
 .mode .in{justify-content:center;height:auto;padding-top:0}
@@ -429,3 +429,20 @@ body:not(.mode-seul) #modes{flex:0 0 auto;height:auto;grid-template-rows:auto;al
 #s-appli{align-items:center;justify-content:center;text-align:center;padding:6vh 8vw}
 .ap-gate{max-width:620px;display:flex;flex-direction:column;align-items:center}
 .ap-gate h1{font-size:clamp(28px,4vw,44px);margin:0 0 6px}.ap-gate p{font-size:clamp(16px,2vw,20px);color:var(--soft);margin:14px 0 0;line-height:1.5}
+
+/* ── Noël : scène festive (fond vert sapin, lueurs rouge et or, neige) — remplace le fond blanc quand le thème Noël est actif ── */
+.noel-scene .ecran.inv{background-color:#0B3D2E;background-image:
+  radial-gradient(circle,rgba(255,255,255,.95) 0 1.4px,transparent 2.4px),
+  radial-gradient(circle,rgba(255,255,255,.75) 0 2.2px,transparent 3.4px),
+  radial-gradient(circle,rgba(255,255,255,.6) 0 1px,transparent 1.8px),
+  radial-gradient(circle,rgba(255,236,190,.7) 0 1.6px,transparent 2.6px),
+  radial-gradient(ellipse 70% 45% at 50% -5%,rgba(226,72,60,.30),transparent 70%),
+  radial-gradient(ellipse 80% 40% at 50% 108%,rgba(242,193,78,.20),transparent 70%),
+  linear-gradient(180deg,#0F4A37 0%,#0B3D2E 52%,#072A20 100%);
+  background-size:173px 211px,257px 293px,131px 157px,347px 389px,100% 100%,100% 100%,100% 100%;
+  background-position:12px 30px,90px 140px,60px 10px,200px 80px,0 0,0 0,0 0;
+  background-repeat:repeat,repeat,repeat,repeat,no-repeat,no-repeat,no-repeat}
+.noel-scene .hero h1{text-shadow:0 2px 18px rgba(0,0,0,.35)}
+.noel-scene .filet{background:linear-gradient(90deg,transparent,#F2C14E,transparent)!important}
+.noel-scene .amp{animation-name:vbLumN}
+@keyframes vbLumN{0%,100%{opacity:1}50%{opacity:.6}}

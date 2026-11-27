@@ -3036,7 +3036,7 @@ function vbMessageEtat(d){
   const fh=x=>x?new Date(x.date).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):null;
   const et=d.etat||{}; let msg='';
     if(!d.cle) msg='La variable VIDEOBOOTH_CLE n’est pas définie dans Netlify (ou le site n’a pas été redéployé depuis) : la tablette ne peut pas envoyer ses vidéos.';
-    else if(et.refus && (!et.contact || et.refus.date>et.contact.date)) msg='La tablette a essayé d’envoyer le '+fh(et.refus)+' mais l’accès a été refusé : vérifiez les mots de passe saisis sur la tablette.';
+    else if(et.refus && (!et.contact || et.refus.date>et.contact.date)) msg='La tablette a essayé d’envoyer le '+fh(et.refus)+' mais l’accès a été refusé ('+(et.refus.detail?String(et.refus.detail):'clé de la tablette')+'). Fermez puis rouvrez l’appli Vidéobooth avec du réseau pour qu’elle se mette à jour.';
     else if(!et.contact) msg='Aucun contact de la tablette pour l’instant. Sur la tablette, ouvrez /videobooth/ et choisissez la session.';
     a.style.display=msg?'block':'none'; a.textContent=msg;
     a.style.color=(msg&&d.cle&&et.contact&&!et.refus)?'#6b7280':'#b03a2a';

@@ -25,6 +25,9 @@
   function lum(h) { var c = rvb(h).map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
   function appliquerTheme() {
     var p = AMB[cfg.amb] || AMB.blanc, fond = hexOk(cfg.fond) || p[0], acc = hexOk(cfg.accent) || p[1];
+    /* thème Noël : sans fond choisi à la main, scène de Noël (vert sapin profond, neige, or) à la place du fond blanc */
+    var scene = !!cfg.noel && !hexOk(cfg.fond); if (scene) { fond = '#0B3D2E'; acc = hexOk(cfg.accent) || '#F2C14E'; }
+    document.body.classList.toggle('noel-scene', scene);
     var clair = lum(fond) > 0.35, r = rvb(acc), st = document.documentElement.style;
     var v = { '--bg1': fond, '--acc': acc, '--acc-t': lum(acc) > 0.45 ? '#1a1612' : '#ffffff', '--glow': 'rgba(' + r.join(',') + ',.18)', '--glow2': 'rgba(' + r.join(',') + ',.12)',
       '--txt': clair ? '#231F1C' : '#ffffff', '--soft': clair ? '#6F655C' : 'rgba(255,255,255,.72)', '--card': clair ? '#ffffff' : 'rgba(255,255,255,.08)', '--champ': clair ? '#ffffff' : 'rgba(255,255,255,.1)',
@@ -641,7 +644,7 @@ $('b-stop').onclick = arreterRec;
   $('pin-in').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('pin-ok').click(); });
   /* ── décor de Noël : sapins et guirlandes fixes (rien ne bouge) ── */
   (function () {
-    var cols = ['#F59E0B', '#ffffff', '#e8564a', '#7cc4f2'];
+    var cols = ['#ff5a4f', '#ffc83d', '#5be584', '#5cc8ff', '#fff1c9'];
     /* guirlande : un fil en arcs, des douilles accrochées au fil, des ampoules allumées qui scintillent doucement */
     var guirlande = (function () {
       var H0 = 6, CY = 40, fil = 'M-10,' + H0, amp = '', k = 0;   /* motif sur 1600 de large, 54 de haut : tout reste visible, quelle que soit la largeur de l'écran */
@@ -649,30 +652,31 @@ $('b-stop').onclick = arreterRec;
       for (var x = -10; x < 1620; x += 90) {
         fil += ' Q' + (x + 45) + ',' + CY + ' ' + (x + 90) + ',' + H0;
         [0.2, 0.5, 0.8].forEach(function (t) {
-          var q = pt(x, t), c = cols[k % 4], d = ((k * 0.37) % 2.4).toFixed(2), du = (1.7 + (k % 3) * 0.45).toFixed(2);
+          var q = pt(x, t), c = cols[k % 5], d = ((k * 0.37) % 2.4).toFixed(2), du = (1.7 + (k % 3) * 0.45).toFixed(2);
           amp += '<g class="amp" style="animation-delay:-' + d + 's;animation-duration:' + du + 's">' +
-            '<circle cx="' + q[0].toFixed(1) + '" cy="' + (q[1] + 11).toFixed(1) + '" r="11" fill="' + c + '" opacity=".28"/>' +
-            '<rect x="' + (q[0] - 2.4).toFixed(1) + '" y="' + (q[1] - 0.5).toFixed(1) + '" width="4.8" height="5.5" rx="1" fill="#b9954a"/>' +
-            '<path d="M' + (q[0] - 4.2).toFixed(1) + ',' + (q[1] + 5).toFixed(1) + ' Q' + (q[0] - 5.2).toFixed(1) + ',' + (q[1] + 16).toFixed(1) + ' ' + q[0].toFixed(1) + ',' + (q[1] + 17.5).toFixed(1) + ' Q' + (q[0] + 5.2).toFixed(1) + ',' + (q[1] + 16).toFixed(1) + ' ' + (q[0] + 4.2).toFixed(1) + ',' + (q[1] + 5).toFixed(1) + ' Z" fill="' + c + '"/>' +
-            '<ellipse cx="' + (q[0] - 1.4).toFixed(1) + '" cy="' + (q[1] + 9).toFixed(1) + '" rx="1.1" ry="2.4" fill="#fff" opacity=".7"/></g>';
+            '<circle cx="' + q[0].toFixed(1) + '" cy="' + (q[1] + 13).toFixed(1) + '" r="19" fill="' + c + '" opacity=".16"/>' +
+            '<circle cx="' + q[0].toFixed(1) + '" cy="' + (q[1] + 13).toFixed(1) + '" r="12.5" fill="' + c + '" opacity=".34"/>' +
+            '<rect x="' + (q[0] - 3).toFixed(1) + '" y="' + (q[1] - 0.5).toFixed(1) + '" width="6" height="6" rx="1.2" fill="#9c7b34"/>' +
+            '<ellipse cx="' + q[0].toFixed(1) + '" cy="' + (q[1] + 13).toFixed(1) + '" rx="5.8" ry="8.4" fill="' + c + '"/>' +
+            '<ellipse cx="' + (q[0] - 1.8).toFixed(1) + '" cy="' + (q[1] + 10.5).toFixed(1) + '" rx="1.4" ry="3.2" fill="#fff" opacity=".85"/></g>';
           k++;
         });
       }
-      return '<svg viewBox="0 0 1600 54" preserveAspectRatio="xMidYMin slice" width="100%" height="100%"><path d="' + fil + '" fill="none" stroke="#3f9a6c" stroke-width="2.4" stroke-linecap="round"/>' + amp + '</svg>';
+      return '<svg viewBox="0 0 1600 72" preserveAspectRatio="xMidYMin slice" width="100%" height="100%"><path d="' + fil + '" fill="none" stroke="#2fbf7a" stroke-width="2.6" stroke-linecap="round"/>' + amp + '</svg>';
     })();
     function sapin(x, h, id) {
       var w = h * 0.62, y0 = 118, lum = '';
       var pts = [[0.28, -0.12], [0.52, 0.1], [0.74, -0.08], [0.4, 0.14], [0.62, -0.22], [0.5, 0.02]];
       pts.forEach(function (q, i) { lum += '<circle cx="' + (x + (q[1] * w)) + '" cy="' + (y0 - h * (1 - q[0]) - 0) + '" r="2.4" fill="' + cols[(i + id) % 4] + '"/>'; });
       return '<g><rect x="' + (x - w * 0.05) + '" y="' + (y0 - h * 0.1) + '" width="' + (w * 0.1) + '" height="' + (h * 0.1) + '" fill="#6b4a2f"/>' +
-        '<polygon points="' + x + ',' + (y0 - h) + ' ' + (x + w * 0.3) + ',' + (y0 - h * 0.62) + ' ' + (x - w * 0.3) + ',' + (y0 - h * 0.62) + '" fill="#2f8a5b"/>' +
-        '<polygon points="' + x + ',' + (y0 - h * 0.8) + ' ' + (x + w * 0.4) + ',' + (y0 - h * 0.32) + ' ' + (x - w * 0.4) + ',' + (y0 - h * 0.32) + '" fill="#278253"/>' +
-        '<polygon points="' + x + ',' + (y0 - h * 0.55) + ' ' + (x + w * 0.5) + ',' + (y0 - h * 0.1) + ' ' + (x - w * 0.5) + ',' + (y0 - h * 0.1) + '" fill="#1f6f47"/>' + lum +
+        '<polygon points="' + x + ',' + (y0 - h) + ' ' + (x + w * 0.3) + ',' + (y0 - h * 0.62) + ' ' + (x - w * 0.3) + ',' + (y0 - h * 0.62) + '" fill="#46b87a"/>' +
+        '<polygon points="' + x + ',' + (y0 - h * 0.8) + ' ' + (x + w * 0.4) + ',' + (y0 - h * 0.32) + ' ' + (x - w * 0.4) + ',' + (y0 - h * 0.32) + '" fill="#38a468"/>' +
+        '<polygon points="' + x + ',' + (y0 - h * 0.55) + ' ' + (x + w * 0.5) + ',' + (y0 - h * 0.1) + ' ' + (x - w * 0.5) + ',' + (y0 - h * 0.1) + '" fill="#2a9058"/>' + lum +
         '<polygon points="' + x + ',' + (y0 - h - 7) + ' ' + (x + 2.6) + ',' + (y0 - h - 1.5) + ' ' + (x + 8) + ',' + (y0 - h - 1.5) + ' ' + (x + 3.6) + ',' + (y0 - h + 2) + ' ' + (x + 5.4) + ',' + (y0 - h + 8) + ' ' + x + ',' + (y0 - h + 4.5) + ' ' + (x - 5.4) + ',' + (y0 - h + 8) + ' ' + (x - 3.6) + ',' + (y0 - h + 2) + ' ' + (x - 8) + ',' + (y0 - h - 1.5) + ' ' + (x - 2.6) + ',' + (y0 - h - 1.5) + '" fill="#F59E0B"/></g>';
     }
     var arbres = '', hs = [70, 96, 58, 84, 104, 62, 90, 72, 100, 64], k;
     for (k = 0; k < 10; k++) arbres += sapin(40 + k * 80, hs[k], k);
-    var sol = '<svg viewBox="0 0 800 120" preserveAspectRatio="xMidYMax meet" width="100%" height="100%"><rect x="0" y="116" width="800" height="4" rx="2" fill="#ffffff55"/>' + arbres + '</svg>';
+    var sol = '<svg viewBox="0 0 800 120" preserveAspectRatio="xMidYMax meet" width="100%" height="100%"><rect x="0" y="114" width="800" height="6" rx="3" fill="#ffffffd9"/>' + arbres + '</svg>';
     Array.prototype.forEach.call(document.querySelectorAll('.noel-haut'), function (n) { n.innerHTML = guirlande; });
     Array.prototype.forEach.call(document.querySelectorAll('.noel-bas'), function (n) { n.innerHTML = sol; });
   })();

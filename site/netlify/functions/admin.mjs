@@ -826,7 +826,10 @@ async function clientConnecte(request, secret) {
 const MDP_LEURRE = hashAdminPassword('leurre-' + 'vespra');
 
 const nombre = (v) => { const n = Number(v); return Number.isFinite(n) ? Math.round(n * 100) / 100 : 0; };
-const texte = (v, max = 300) => String(v == null ? '' : v).slice(0, max);
+/* texte venant d'un visiteur : les chevrons < > sont retirés (jamais de balise HTML dans un nom, un message ou une adresse) */
+const sansBalises = (v) => String(v == null ? '' : v).replace(/[<>]/g, '');
+const texte = (v, max = 300) => sansBalises(v).slice(0, max);
+const assainirDonnees = (d) => { if (!d || typeof d !== 'object') return d; const o = {}; for (const [k, v] of Object.entries(d)) o[k] = typeof v === 'string' ? sansBalises(v) : v; return o; };
 
 /* ce qu'un client a le droit de voir d'une réservation du planning */
 async function dossierResa(id, r, logi) {
@@ -1348,7 +1351,7 @@ async function espace(request, url, secret, gestionnaire) {
     const email = connecte ? emailCle(connecte.email) : emailCle(b.email);
     if (!emailValide(email)) return json({ ok: false }, 400);
     if (tropEssais(request, 5, 60 * 60 * 1000, connecte ? 'clirecue' : 'clirecuepub')) return json({ error: 'Trop de demandes.' }, 429);
-    const c = (k, n) => String(b[k] == null ? '' : b[k]).replace(/[\u0000-\u001f]/g, ' ').slice(0, n);
+    const c = (k, n) => sansBalises(b[k]).replace(/[\u0000-\u001f]/g, ' ').slice(0, n);
     let liste = (await lireRecentes(email)).filter((x) => x.rid !== rid);
     liste.push({ rid, anonyme: !connecte, cree: new Date().toISOString(), nom: c('nom', 100), date: c('date', 20), convives: c('convives', 20), type: c('type', 80),
       livraison: c('livraison', 10), adresse: c('adresse', 200), panier: c('panier', 8000), message: c('message', 600) });
@@ -3134,7 +3137,7 @@ const gestionnaire = async (request) => {
       const lectures = await Promise.all(
         FORMULAIRES_DEMANDES.map((nom) =>
           formSubmissions(nom)
-            .then((r) => (r.subs || []).map((s) => ({ ...s, _formulaire: nom })))
+            .then((r) => (r.subs || []).map((s) => ({ ...s, data: assainirDonnees(s.data), _formulaire: nom })))
             .catch((e) => {
               console.error(`Demandes « ${nom} » illisibles :`, e.message);
               return [];
