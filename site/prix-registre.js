@@ -181,7 +181,7 @@ window.VESPRA_PRIX_REGISTRE = [
   {
     "i": "pack-vespra-opt-fumee",
     "n": "Pack Vespra",
-    "v": "Option : M-Fog 1500 à la place de la petite machine à fumée",
+    "v": "Option : M-Fog 1500 (remplace la machine à fumée Eurolite du pack)",
     "p": 10,
     "pg": "produit-pack-vespra.html",
     "opt": 1,
@@ -1851,7 +1851,7 @@ window.VESPRA_PRODUITS = [
         "id": "pack-vespra-opt-3"
       },
       {
-        "nom": "M-Fog 1500 à la place de la petite machine à fumée",
+        "nom": "M-Fog 1500",
         "prix": 10,
         "devis": false,
         "champ": "optionFumeePack",
