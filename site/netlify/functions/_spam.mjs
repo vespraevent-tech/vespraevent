@@ -22,6 +22,11 @@ export function estSpam(data) {
   const noms = [val('nom'), val('prenom'), val('name'), val('client')].filter(Boolean);
   /* signature d'un robot très répandu : un prénom anglais collé à « sap » (Jasonsap, Robertsap…) */
   if (noms.some((n) => /^[A-Z][a-z]{2,}sap$/.test(n))) return 'nom de robot';
+  /* nom qui est un lien (« :https://www.exemple.fr/: ») ou ne contient aucune lettre */
+  if (noms.some((n) => /https?:|www\.|:\/\/|\.(fr|com|net|org|ru|xyz|top|io)\b|^[:\/\s.\-_0-9]+$/i.test(n))) return 'nom en forme de lien';
+  /* message qui n'est qu'un lien (une fois les adresses web retirées, il ne reste aucun mot) */
+  const brut = [val('message'), val('precisions'), val('details'), val('commentaire')].join(' ').trim();
+  if (brut && /https?:|www\./i.test(brut) && (brut.replace(/https?:\/\/\S+|www\.\S+/gi, ' ').match(/[A-Za-zÀ-ÿ]{3,}/g) || []).length < 2) return 'message en forme de lien';
   /* formulaire envoyé en moins de 3 secondes après l'ouverture de la page */
   const tps = Number(val('tps'));
   if (val('tps') !== '' && Number.isFinite(tps) && tps < 3) return 'envoi trop rapide';
