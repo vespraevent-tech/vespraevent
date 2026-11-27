@@ -152,6 +152,11 @@
       /* la variante retenue en mémoire par la fiche repart du prix corrigé */
       try { if (v && typeof _selectedVariant !== 'undefined' && _selectedVariant && typeof _selectedVariant.price === 'number') _selectedVariant.price = v; } catch (e9) {}
       if (v) majPrixPrincipal(v);
+      /* fiche qui garde sa variante dans une portée privée (étincelles froides…) : on rejoue le choix de la variante active avec le prix corrigé */
+      try {
+        var aff = document.getElementById('prodPriceDisplay'), oc2 = actif && actif.getAttribute('onclick');
+        if (v && aff && oc2 && /selectVariant/.test(oc2) && nombre(aff.textContent) !== v) actif.click();
+      } catch (e10) {}
     }
   }
 
