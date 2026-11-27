@@ -2460,9 +2460,9 @@ function acSearch(val){
   var matches=clients.filter(function(c){return c.fullName.toLowerCase().indexOf(q)>=0;}).slice(0,6);
   if(!matches.length){list.classList.remove('open');return;}
   list.innerHTML=matches.map(function(c){
-    return '<div class="ac-item" onclick="acSelect(this.dataset.cid)" data-cid="'+c.id+'">'
-      +'<b>'+c.fullName+'</b>'
-      +'<small>'+(c.phone?c.phone:'')+(c.email&&c.phone?' · ':'' )+(c.email?c.email:'')+(c.reservations?' · '+c.reservations+' résa':'')+'</small>'
+    return '<div class="ac-item" onclick="acSelect(this.dataset.cid)" data-cid="'+escAttr(c.id)+'">'
+      +'<b>'+escHtmlBo(c.fullName)+'</b>'
+      +'<small>'+escHtmlBo(c.phone?c.phone:'')+(c.email&&c.phone?' · ':'' )+escHtmlBo(c.email?c.email:'')+(c.reservations?' · '+escHtmlBo(c.reservations)+' résa':'')+'</small>'
       +'</div>';
   }).join('');
   list.classList.add('open');
@@ -2670,8 +2670,8 @@ function renderClientsTable(q){
   tbody.innerHTML=clients.length
     ?clients.map(function(c){
       return '<tr>'
-        +'<td><b>'+c.fullName+'</b><br><small style="color:var(--ink)">'+dateLisibleClient(c.firstContact)+(c.pro?' · Entreprise':'')+'</small></td>'
-        +'<td>'+( c.phone||'<span style="color:#ccc">—</span>')+'</td>'
+        +'<td><b>'+escHtmlBo(c.fullName)+'</b><br><small style="color:var(--ink)">'+escHtmlBo(dateLisibleClient(c.firstContact))+(c.pro?' · Entreprise':'')+'</small></td>'
+        +'<td>'+( c.phone?escHtmlBo(c.phone):'<span style="color:#ccc">—</span>')+'</td>'
         +'<td style="word-break:break-all">'+(c.email?'<a target="_blank" rel="noopener" style="color:inherit" href="https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(c.email)+'&su='+encodeURIComponent('Vespra Event')+'&body='+encodeURIComponent('Bonjour,\n\n\n\nCordialement,\nThomas\nÉquipe Vespra Event Vitré')+'">'+escHtmlBo(c.email)+'</a>':'<span style="color:#ccc">—</span>')+'</td>'
         +'<td style="text-align:center">'+c.reservations+'</td>'
         +'<td style="text-align:right;white-space:nowrap">'
@@ -4358,9 +4358,9 @@ function buildAcomptesHtml(){
       totalAcomptes+=acompte30;
       var d1=r.dateStart?new Date(r.dateStart).toLocaleDateString('fr-FR'):'';
       var d2=r.dateEnd&&r.dateEnd!==r.dateStart?new Date(r.dateEnd).toLocaleDateString('fr-FR'):'';
-      var prods=(r.products||[]).map(function(p){return p.short||p.name;}).join(', ');
+      var prods=escHtmlBo((r.products||[]).map(function(p){return p.short||p.name;}).join(', '));
       return '<tr style="border-bottom:1px solid #f5f0e8">'
-        +'<td style="padding:10px 8px;font:600 13px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif">'+(nomAffiche(r)||(r.client||'').split(' ')[0]||r.client||'')+'</td>'
+        +'<td style="padding:10px 8px;font:600 13px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif">'+escHtmlBo(nomAffiche(r)||(r.client||'').split(' ')[0]||r.client||'')+'</td>'
         +'<td style="padding:10px 8px;font:12px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--ink)">'+d1+(d2?' → '+d2:'')+'</td>'
         +'<td style="padding:10px 8px;font:12px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--ink);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+prods+'</td>'
         +'<td style="padding:10px 8px;text-align:right;font:13px Inter,system-ui,-apple-system,Roboto,Arial,sans-serif">'+montant.toLocaleString('fr-FR')+' €</td>'

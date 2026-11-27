@@ -514,7 +514,7 @@ $('b-stop').onclick = arreterRec;
   /* ── aucune vidéo n'est jamais effacée de la tablette : elles y restent toutes, même une fois envoyées.
         C'est vous qui videz la tablette quand vous le décidez. ── */
   function liberer() { return Promise.resolve(0); }
-  var TAILLE = 5 * 1024 * 1024, preEnvoyes = {};
+  var TAILLE = 4 * 1024 * 1024, preEnvoyes = {};
   function envoyer(v) {
     var base = (cfg.serveur || location.origin).replace(/\/+$/, '');
     var n = Math.max(1, Math.ceil(v.blob.size / TAILLE));

@@ -534,7 +534,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
       } catch (e) {}
     }
     const donnees = await request.arrayBuffer();
-    if (!donnees.byteLength || donnees.byteLength > 5.5 * 1024 * 1024) return rep({ ok: false, erreur: 'Morceau vide ou trop gros' }, 413);
+    if (!donnees.byteLength || donnees.byteLength > 4.5 * 1024 * 1024) return rep({ ok: false, erreur: 'Morceau vide ou trop gros' }, 413);
     await st.set(`chunk/${id}/${i}`, donnees);
     if (i < n - 1) return rep({ ok: true, recu: i });
 
