@@ -7098,21 +7098,64 @@ if(true){
 <script src="/studio/securite.js?v=2"></script>
 <script src="nbsp-euro.js"></script>
 <script>
-/* Prix du site : les prix modifiés dans l'onglet Prix du back-office s'appliquent aussi à la liste du planning. */
+/* Prix du site : TOUS les prix modifiés dans l'onglet Prix du back-office s'appliquent aussi à la liste du planning
+   (nouveaux ajouts uniquement : les réservations existantes gardent leur prix enregistré).
+   Table : identifiant du prix → lignes du planning [nom], variantes [nom, variante], options PK_OPT [clé]. */
 (function(){
   function nb(v){var n=parseFloat(String(v).replace(',','.'));return isFinite(n)&&n>0?n:null;}
   function ligne(nom){for(var i=0;i<P.length;i++) if(P[i][0]===nom) return P[i];return null;}
+  var PB={'photobooth-1':'Numérique','photobooth-2':'200 tirages','photobooth-3':'300 tirages','photobooth-4':'400 tirages','photobooth-5':'Illimité'};
+  var T={
+   'photobooth-opt-1':{p:['Cadre photo'],o:['cadre']},'photobooth-opt-2':{p:['Déguisement'],o:['deguis']},'photobooth-opt-3':{o:['usb']},
+   'canons-poudre-1':{v:[["Feux d'artifice de jour",'4 canons']]},'canons-poudre-2':{v:[["Feux d'artifice de jour",'6 canons']]},'canons-poudre-3':{v:[["Feux d'artifice de jour",'8 canons']]},'canons-poudre-4':{v:[["Feux d'artifice de jour",'12 canons']]},
+   'pack-vespra-1':{p:['Pack Vespra 20 personnes']},'pack-vespra-2':{p:['Pack Vespra 40 à 60 personnes']},'pack-vespra-3':{p:['Pack Vespra 80 à 100 personnes']},'pack-vespra-4':{p:['Pack Vespra 120 à 150 personnes']},'pack-vespra-5':{p:['Pack Vespra 180 à 250 personnes']},
+   'pack-vespra-opt-1':{o:['caisson']},'pack-vespra-opt-2':{o:['fumeeUp']},
+   'barnums-1':{p:['Barnum 3x3m'],o:['b3x3']},'barnums-4':{p:['Barnum 4x6m']},'barnums-2':{p:['Barnum 4x8m'],o:['b4x8']},'barnums-3':{p:['Barnum 6x10m'],o:['b6x10']},
+   'barnums-opt-2':{p:['Sac de lestage'],o:['lestage']},'barnums-opt-3':{p:['Éclairage néon (barnum)'],o:['eclair']},'barnums-opt-4':{p:['Guirlande 10 m'],o:['guir10']},'barnums-opt-5':{p:['Guirlande 20 m'],o:['guir20']},
+   'tente-etoile-opt-3':{p:['Éclairage néon (barnum)'],o:['eclair']},'tente-etoile-opt-2':{p:['Guirlande 10 m'],o:['guir10']},'tente-etoile-opt-4':{p:['Guirlande 20 m'],o:['guir20']},
+   'buvette-opt-2':{p:['Guirlande 10 m'],o:['guir10']},'buvette-opt-3':{p:['Guirlande 20 m'],o:['guir20']},
+   'boite-de-nuit-gonflable-1':{p:['Boîte de nuit gonflable seule']},'boite-de-nuit-gonflable-2':{p:['Boîte de nuit gonflable avec son et lumière']},
+   'boule-a-facettes':{p:['Boule à facettes']},'spot-led-batterie':{p:['Spot LED sur batterie']},
+   'tente-etoile-10m':{p:['Tente étoile 10m'],o:['tente10']},'tente-etoile-14m':{p:['Tente étoile 14m'],o:['tente14']},'tente-etoile-22m':{p:['Tente étoile 22m'],o:['tenteet']},
+   'panneau-direction':{p:['Panneau de direction']},'fontaine-cocktail':{p:['Fontaine à cocktail']},'citroen-traction':{p:['Citroën Traction']},'ford-mustang':{p:['Ford Mustang']},'machine-glacons':{p:['Machine à glaçons']},
+   'chateau-gonflable-1':{p:['Mini château gonflable crocodile']},'chateau-gonflable-2':{p:['Château gonflable Safari']},'chateau-gonflable-3':{p:['Château gonflable Dino World']},'chateau-gonflable-4':{p:['Château gonflable Summer Party']},
+   'panneau-de-bienvenue':{p:['Panneau de bienvenue']},'livre-d-or-audio':{p:["Livre d'or audio"],o:['livreor']},
+   'cabine-telephonique':{v:[['Cabine téléphonique','Blanche'],['Cabine téléphonique','Rouge']],o:['cabine']},'cabine-telephonique-opt-1':{p:['Néon lumineux'],o:['neon']},'cabine-telephonique-opt-2':{o:['vbint']},
+   'livre-d-or-audio-opt-2':{p:['Néon lumineux'],o:['neon']},'livre-d-or-audio-opt-3':{o:['cabine']},'livre-d-or-audio-opt-4':{o:['vbstd']},'livre-d-or-audio-opt-5':{o:['vbprem']},
+   'videobooth-1':{v:[['Vidéobooth','Standard']],o:['vbstd']},'videobooth-2':{v:[['Vidéobooth','Premium · cabine blanche']],o:['vbprem']},'videobooth-3':{v:[['Vidéobooth','Premium · cabine rouge']]},
+   'videobooth-opt-1':{p:['Néon lumineux'],o:['neon']},'videobooth-opt-2':{o:['usb']},'neon-lumineux':{p:['Néon lumineux'],o:['neon']},
+   'baby-foot':{p:['Baby-foot'],v:[['Jeux en bois','Baby-foot']]},
+   'baby-foot-opt-1':{o:['cornhole']},'baby-foot-opt-2':{o:['palet']},'baby-foot-opt-3':{o:['puiss4']},'baby-foot-opt-4':{o:['passetr']},
+   'jeux-en-bois-1':{v:[['Jeux en bois','Cornhole']],o:['cornhole']},'jeux-en-bois-2':{v:[['Jeux en bois','Palet breton']],o:['palet']},'jeux-en-bois-3':{v:[['Jeux en bois','Puissance 4 géant']],o:['puiss4']},'jeux-en-bois-4':{v:[['Jeux en bois','Baby-foot']]},'jeux-en-bois-5':{v:[['Jeux en bois','Passe-trappe']],o:['passetr']},'jeux-en-bois-6':{v:[['Jeux en bois','Pack 5 jeux']]},
+   'fumee-lourde-brouillard':{p:['Machine à fumée lourde effet brouillard'],o:['fumeeS']},'fumee-lourde-nuage':{p:['Machine à fumée lourde effet nuage'],o:['fumeeP']},
+   'machine-fumee-m-fog-1500':{p:['Machine à fumée puissante M-Fog 1500'],o:['fumeeM']},
+   'etincelles-froides-1':{v:[['Machine à étincelles froides','1 machine']]},'etincelles-froides-2':{v:[['Machine à étincelles froides','2 machines']]},'etincelles-froides-opt-1':{o:['sachet']},
+   'guirlande-lumineuse-1':{v:[['Guirlande lumineuse','10 m']],p:['Guirlande 10 m'],o:['guir10']},'guirlande-lumineuse-2':{v:[['Guirlande lumineuse','20 m']],p:['Guirlande 20 m'],o:['guir20']},'guirlande-lumineuse-3':{v:[['Guirlande lumineuse','40 m']]},
+   'guirlande-lumineuse-opt-1':{o:['b3x3']},'guirlande-lumineuse-opt-2':{o:['b4x8']},'guirlande-lumineuse-opt-3':{o:['b6x10']},'guirlande-lumineuse-opt-4':{o:['tenteet']},'guirlande-lumineuse-opt-5':{o:['buvette']},
+   'pack-karaoke':{p:['Pack karaoké']},'buvette-4-comptoirs':{p:['Buvette 4x4m'],o:['buvette']},
+   'sonorisation-1':{p:['Sono 20 personnes']},'sonorisation-2':{p:['Sono 40/60 personnes']},'sonorisation-3':{p:['Sono 80/100 personnes']},'sonorisation-4':{p:['Sonorisation — 120 à 150 personnes']},'sonorisation-5':{p:['Sonorisation — 180 à 250 personnes']},
+   'sonorisation-opt-1':{o:['caisson']},'sonorisation-opt-2':{o:['microFil']},'sonorisation-opt-3':{o:['microSF']},
+   'videoprojecteur-1':{v:[['Vidéoprojecteur','Vidéoprojecteur seul (sans écran)']],p:['Vidéoprojecteur']},'videoprojecteur-2':{v:[['Vidéoprojecteur','Vidéoprojecteur + écran de projection']]},'ecran-de-projection':{p:['Écran de projection']},
+   'jeux-de-lumieres-1':{p:['Jeux de lumières Ibiza 4 spots']},'jeux-de-lumieres-2':{p:['Jeux de lumières Eurolite']},
+   'brasero':{p:['Brasero']},'caisson-de-basse':{p:['Caisson de basse'],o:['caisson']},
+   'micro-shure-sm58-1':{v:[['Micro Shure SM58','Filaire']],p:['Micro'],o:['microFil']},'micro-shure-sm58-2':{v:[['Micro Shure SM58','Sans fil']],o:['microSF']},
+   'machine-a-pop-corn':{p:['Machine à pop-corn']},'machine-a-pop-corn-opt-1':{p:['Maïs à éclater'],o:['mais']},
+   'pyrotechnie-2':{p:['Machine à fumée'],o:['fumeeOpt','fumeeL']},'pyrotechnie-1':{p:['Machine à bulles'],o:['bulles']},'mega-ventilateur':{p:['Ventilateur événementiel']},
+   'chauffage-pyramide-1':{v:[['Chauffage pyramide à gaz','Sans bouteille de gaz']]},'chauffage-pyramide-2':{v:[['Chauffage pyramide à gaz','Avec bouteille de gaz']]},
+   'chauffage-parasol-1':{v:[['Chauffage parasol à gaz','Sans bouteille de gaz']]},'chauffage-parasol-2':{v:[['Chauffage parasol à gaz','Avec bouteille de gaz']]}
+  };
   fetch('/api/site',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
     var pr={};((d&&d.produits)||[]).forEach(function(x){if(x&&x.type==='prix'){var n=nb(x.prix);if(n)pr[x.id]=n;}});
-    var simple={'baby-foot':'Baby-foot','spot-led-batterie':'Spot LED sur batterie','fumee-lourde-nuage':'Machine à fumée lourde effet nuage','machine-glacons':'Machine à glaçons'};
-    Object.keys(simple).forEach(function(k){var l=ligne(simple[k]);if(l&&pr[k]) l[2]=pr[k];});
-    if(pr['fumee-lourde-nuage']&&window.PK_OPT&&PK_OPT.fumeeP) PK_OPT.fumeeP.prix=pr['fumee-lourde-nuage'];
-    var e=ligne('Machine à étincelles froides');
-    if(e&&e[5]){if(pr['etincelles-froides-1'])e[5]['1 machine']=pr['etincelles-froides-1'];if(pr['etincelles-froides-2'])e[5]['2 machines']=pr['etincelles-froides-2'];}
-    if(window.PK_OPT&&PK_OPT.fumeeUp&&pr['pack-vespra-opt-2']) PK_OPT.fumeeUp.prix=pr['pack-vespra-opt-2'];
-    if(window.PK_OPT&&PK_OPT.sachet&&pr['etincelles-froides-opt-1']) PK_OPT.sachet.prix=pr['etincelles-froides-opt-1'];
-    var f=ligne("Feux d'artifice de jour");
-    if(f&&f[5]){if(pr['canons-poudre-1'])f[5]['4 canons']=pr['canons-poudre-1'];if(pr['canons-poudre-2'])f[5]['6 canons']=pr['canons-poudre-2'];if(pr['canons-poudre-3'])f[5]['8 canons']=pr['canons-poudre-3'];if(pr['canons-poudre-4'])f[5]['12 canons']=pr['canons-poudre-4'];}
+    /* photobooth : tarifs par formule */
+    Object.keys(PB).forEach(function(k){if(pr[k]&&window.VARIANT_PRICES&&VARIANT_PRICES.photobooth) VARIANT_PRICES.photobooth[PB[k]]=pr[k];});
+    Object.keys(T).forEach(function(k){
+      var n=pr[k]; if(!n) return; var t=T[k];
+      (t.p||[]).forEach(function(nom){var l=ligne(nom);if(l) l[2]=n;});
+      (t.v||[]).forEach(function(c){var l=ligne(c[0]);if(l){l[5]=l[5]||{};l[5][c[1]]=n;}});
+      (t.o||[]).forEach(function(o){if(window.PK_OPT&&PK_OPT[o]) PK_OPT[o].prix=n;});
+    });
+    /* mange-debout : prix de base (sans housse) ; les housses gardent leur supplément (+3 € / +5 €) */
+    if(pr['mange-debout']){var m=ligne('Mange-debout');if(m&&m[5]){var base=10,nv=pr['mange-debout'];Object.keys(m[5]).forEach(function(v){m[5][v]=nv+(m[5][v]-base);});}}
   }).catch(function(){});
 })();
 </script>
