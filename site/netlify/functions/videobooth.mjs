@@ -535,12 +535,12 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
     }
     const donnees = await request.arrayBuffer();
     if (!donnees.byteLength || donnees.byteLength > 4.5 * 1024 * 1024) return rep({ ok: false, erreur: 'Morceau vide ou trop gros' }, 413);
-    await st.set(`chunk/${id}/${i}`, donnees);
+    await binEcrire(st, `chunk/${id}/${i}`, donnees);
     if (i < n - 1) return rep({ ok: true, recu: i });
 
     /* dernier morceau : on assemble */
     /* lecture de tous les morceaux en même temps (le dernier vient d'arriver : inutile de le relire) */
-    const lus = await Promise.all(Array.from({ length: n }, (_, k) => k === i ? Promise.resolve(donnees) : st.get(`chunk/${id}/${k}`, { type: 'arrayBuffer' }).catch(() => null)));
+    const lus = await Promise.all(Array.from({ length: n }, (_, k) => k === i ? Promise.resolve(donnees) : binLire(st, `chunk/${id}/${k}`)));
     const parts = [];
     for (let k = 0; k < n; k++) {
       if (!lus[k]) return rep({ ok: false, erreur: 'Morceau manquant : ' + k, manquant: k }, 409);
@@ -565,7 +565,7 @@ lot().catch(function(e){st.textContent='Échec : '+e.message+'. Téléchargez le
     /* durée de conservation propre à la session de cette vidéo */
     try { const ses = (await sessionsLire(st)).find((e) => labelSession(e) === m.event); if (ses) m.garde = ses.conserv || 0; } catch {}
     await binEcrire(st, 'video/' + id, tout.buffer);
-    await Promise.all(Array.from({ length: n }, (_, k) => st.delete(`chunk/${id}/${k}`).catch(() => {})));
+    await Promise.all(Array.from({ length: n }, (_, k) => binSupprimer(st, `chunk/${id}/${k}`)));
     /* la fiche est écrite AVANT l'e-mail : si l'envoi est interrompu, la vidéo reste visible dans le back-office */
     m.mail = m.email ? 'attente' : 'aucun'; m.mailErreur = '';
     await st.setJSON('meta/' + id, m);

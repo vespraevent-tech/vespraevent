@@ -42,7 +42,7 @@ import { createHmac, timingSafeEqual, createHash, randomUUID, randomBytes, rando
 import { getStore, stockageActif, stats as stockStats } from './_stockage.mjs';
 import { evenementLire as pbLire, evenementEcrire as pbEcrire, evenementsLister as pbLister, evenementSupprimer as pbSupprimer, imageAjouter as pbImageAjouter, imageLire as pbImageLire, FORMATS as PB_FORMATS, vuLire as pbVuLire, compteurs as pbCompteurs, prisesLister as pbPrises, photoLire as pbPhoto, priseSupprimer as pbPriseSuppr } from './_photobooth.mjs';
 import { jetonGalerie as pbJetonGalerie } from './photobooth.mjs';
-import { binLire, binSupprimer, r2Actif, r2Put, r2Get, r2Delete, r2Lister, r2Plage, r2MultiDebut, r2MultiPart, r2MultiFin, r2Taille } from './_r2.mjs';
+import { binEcrire, binLire, binSupprimer, r2Actif, r2Put, r2Get, r2Delete, r2Lister, r2Plage, r2MultiDebut, r2MultiPart, r2MultiFin, r2Taille } from './_r2.mjs';
 import { appliEtat, appliNouveauMdp } from './appli.mjs';
 import { codeLire, codeEcrire } from './_appli.mjs';
 import { getStore as blobsVb } from './_blobs.mjs';
@@ -2408,6 +2408,33 @@ const gestionnaire = async (request) => {
   if (path === '/appli/code' && request.method === 'GET') return json({ code: await codeLire(blobsVb('videobooth')) });
   if (path === '/appli/code' && request.method === 'POST') { try { const b = await request.json().catch(() => ({})); return json({ ok: true, code: await codeEcrire(blobsVb('videobooth'), b.code) }); } catch (e) { return json({ ok: false, erreur: e.message }, 400); } }
   if (path === '/appli/mdp' && request.method === 'POST') return json(await appliNouveauMdp());
+  /* essai complet de la chaîne d'envoi vidéo côté serveur : 3 morceaux (4+4+1 Mo) écrits, relus, assemblés, vidéo écrite, relue puis tout est supprimé */
+  if (path === '/videobooth/autotest' && request.method === 'POST') {
+    const t0 = Date.now(), st = videoStore(), id = 'vautotest' + Date.now().toString(36), etapes = [];
+    const tailles = [4 * 1024 * 1024, 4 * 1024 * 1024, 1024 * 1024];
+    const { randomBytes, createHash } = await import('node:crypto');
+    try {
+      const morceaux = tailles.map((n) => randomBytes(n));
+      const sha = createHash('sha256'); morceaux.forEach((m) => sha.update(m)); const attendu = sha.digest('hex');
+      let t = Date.now();
+      for (let i = 0; i < morceaux.length; i++) await binEcrire(st, `chunk/${id}/${i}`, morceaux[i]);
+      etapes.push({ etape: 'écriture des 3 morceaux', ms: Date.now() - t }); t = Date.now();
+      const lus = await Promise.all(morceaux.map((_, k) => binLire(st, `chunk/${id}/${k}`)));
+      if (lus.some((x) => !x)) throw new Error('morceau introuvable à la relecture');
+      const tout = Buffer.concat(lus.map((x) => Buffer.from(x)));
+      etapes.push({ etape: 'relecture et assemblage', ms: Date.now() - t }); t = Date.now();
+      await binEcrire(st, 'video/' + id, tout.buffer.slice(tout.byteOffset, tout.byteOffset + tout.byteLength));
+      const rel = await binLire(st, 'video/' + id);
+      etapes.push({ etape: 'écriture et relecture de la vidéo', ms: Date.now() - t });
+      const ok = !!rel && createHash('sha256').update(Buffer.from(rel)).digest('hex') === attendu;
+      return json({ ok, octets: tout.length, stockage: r2Actif() ? 'Cloudflare R2' : 'Netlify Blobs', etapes, totalMs: Date.now() - t0 });
+    } catch (e) {
+      return json({ ok: false, erreur: String(e && e.message || e).slice(0, 300), etapes }, 500);
+    } finally {
+      await Promise.all([0, 1, 2].map((k) => binSupprimer(st, `chunk/${id}/${k}`))).catch(() => {});
+      await binSupprimer(st, 'video/' + id).catch(() => {});
+    }
+  }
   /* contrôle du stockage Cloudflare R2 : écrit, relit et supprime un petit fichier d'essai */
   if (path === '/stockage/r2' && request.method === 'GET') {
     if (!r2Actif()) return json({ actif: false, message: 'Cloudflare R2 n’est pas configuré : les photos et vidéos restent dans Netlify.' });
