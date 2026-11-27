@@ -26,7 +26,7 @@
   function appliquerTheme() {
     var p = AMB[cfg.amb] || AMB.blanc, fond = hexOk(cfg.fond) || p[0], acc = hexOk(cfg.accent) || p[1];
     /* thème Noël : sans fond choisi à la main, scène de Noël (vert sapin profond, neige, or) à la place du fond blanc */
-    var scene = !!cfg.noel && !hexOk(cfg.fond); if (scene) { fond = '#0B3D2E'; acc = hexOk(cfg.accent) || '#F2C14E'; }
+    var scene = !!cfg.noel && !hexOk(cfg.fond) && !document.body.classList.contains('ecran-tech'); if (scene) { fond = '#0B3D2E'; acc = hexOk(cfg.accent) || '#F2C14E'; }
     document.body.classList.toggle('noel-scene', scene);
     var clair = lum(fond) > 0.35, r = rvb(acc), st = document.documentElement.style;
     var v = { '--bg1': fond, '--acc': acc, '--acc-t': lum(acc) > 0.45 ? '#1a1612' : '#ffffff', '--glow': 'rgba(' + r.join(',') + ',.18)', '--glow2': 'rgba(' + r.join(',') + ',.12)',
@@ -60,7 +60,10 @@
   function retirer(id) { return tx('readwrite', function (s) { return s.delete(id); }); }
 
   /* ───────── écrans ───────── */
+  var TECH = ['s-admin', 's-pin', 's-acces', 's-sessions', 's-sess-mdp', 's-appli'];
   function montrer(id) {
+    /* réglages et écrans techniques : fond blanc habituel, sans le décor de Noël */
+    try { var tech = TECH.indexOf(id) >= 0; if (tech !== document.body.classList.contains('ecran-tech')) { document.body.classList.toggle('ecran-tech', tech); appliquerTheme(); } } catch (e) {}
     if (id !== 's-revoir') { var vr = $('v-revoir'); try { vr.pause(); vr.removeAttribute('src'); vr.load(); } catch (e) {} } document.querySelectorAll('.ecran').forEach(function (e) { e.classList.toggle('on', e.id === id); });
     /* application Android : la barre du système n'apparaît que dans les réglages (après le code), jamais devant les invités */
     try { if (window.VespraAndroid) window.VespraAndroid.admin(id === 's-admin' || id === 's-appli'); } catch (e) {} }
@@ -79,7 +82,7 @@
     appliquerTheme(); appliquerOrientation();
     $('t-accueil').textContent = cfg.titre || CFG0.titre; $('p-accueil').textContent = (cfg.sous && cfg.sous !== 'Laissez un petit message vidéo de 30 secondes') ? cfg.sous : ''; $('b-commencer').textContent = T('go');
     $('t-qui').textContent = cfg.qui || 'Qui êtes-vous ?'; $('p-qui').textContent = cfg.quiSous == null ? 'Pour que les organisateurs sachent qui a laissé ce message' : cfg.quiSous; $('f-suite').textContent = T('quiB');
-    if (!garder) { $('form').reset(); formatInvite = null; majFormat(); } $('f-err').textContent = ''; rendreModes(); montrer('s-accueil'); majEtat();
+    if (!garder) { $('form').reset(); formatInvite = null; majFormat(); } $('f-err').textContent = ''; rendreModes(); montrer('s-accueil'); majEtat(); setTimeout(prechauffer, 400);
   }
   var sessionMaj = null;
 
@@ -250,6 +253,19 @@
   /* La caméra reste allumée entre deux invités (ouverture immédiate, sans écran noir) ; elle est coupée après 10 min sans invité,
      ou quand on va dans les réglages. L'aperçu est effacé à chaque fois : jamais l'image de l'invité précédent. */
   var fluxGarde = null, minuteurGarde = null;
+  /* caméra préchauffée : dès que l'accueil est affiché, la caméra s'ouvre en silence (rien n'est montré ni enregistré) pour que « Commencer » ouvre l'image tout de suite, sans écran noir ; libérée après 10 minutes sans invité */
+  var prechauffeP = null;
+  function prechauffer() {
+    if (flux || fluxGarde || prechauffeP || testCam || !(cfg.jeton || cfg.cle) || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    prechauffeP = resoudreCam().then(function (id) {
+      var v = Object.assign(id ? { deviceId: { exact: id } } : { facingMode: 'user' }, paysage() ? { width: { min: 1280, ideal: 1920 }, height: { min: 720, ideal: 1440 } } : { width: { min: 720, ideal: 1440 }, height: { min: 1280, ideal: 1920 } });
+      var a = { echoCancellation: false, noiseSuppression: false, autoGainControl: true, channelCount: { ideal: 1 }, sampleRate: { ideal: 48000 } }; if (cfg.mic) a.deviceId = { exact: cfg.mic };
+      return navigator.mediaDevices.getUserMedia({ audio: a, video: v });
+    }).then(function (st) {
+      if (flux || fluxGarde) { st.getTracks().forEach(function (t) { t.stop(); }); return; }
+      fluxGarde = st; clearTimeout(minuteurGarde); minuteurGarde = setTimeout(libererCamera, 10 * 60000);
+    }).catch(function () {}).then(function () { prechauffeP = null; });
+  }
   function libererCamera() { clearTimeout(minuteurGarde); minuteurGarde = null; if (fluxGarde) { fluxGarde.getTracks().forEach(function (t) { t.stop(); }); fluxGarde = null; } }
   function effacerApercu() { try { cx.setTransform(1, 0, 0, 1, 0, 0); cx.clearRect(0, 0, cv.width, cv.height); } catch (e) {} cv.classList.add('vide'); }
   function arreterCam(couper) {
@@ -259,8 +275,13 @@
     $('v-src').srcObject = null; effacerApercu();
   }
   document.addEventListener('visibilitychange', function () { if (document.hidden && !flux) libererCamera(); });
+  var attenteCam = null;
   function ouvrirCam() {
-    montrer('s-cam'); $('s-cam').classList.remove('flou'); $('cam-err').hidden = true; $('compte').hidden = true; $('rec').hidden = true; $('barre').hidden = true;
+    montrer('s-cam');
+    /* indicateur discret pendant l'ouverture de la caméra (jamais d'écran noir muet) */
+    if (!attenteCam) { attenteCam = document.createElement('div'); attenteCam.id = 'cam-attente'; attenteCam.textContent = 'Préparation de la caméra…'; $('s-cam').appendChild(attenteCam); }
+    attenteCam.hidden = false;
+    if (prechauffeP) { var pp = prechauffeP; pp.then(function () { ouvrirCam(); }); return; } $('s-cam').classList.remove('flou'); $('cam-err').hidden = true; $('compte').hidden = true; $('rec').hidden = true; $('barre').hidden = true;
     $('b-go').hidden = true; $('b-stop').hidden = true; $('fmt').hidden = true; enregistrement = false;
     var contraintes = { audio: Object.assign({ echoCancellation: false, noiseSuppression: false, autoGainControl: true, channelCount: { ideal: 1 }, sampleRate: { ideal: 48000 } }, cfg.mic ? { deviceId: { exact: cfg.mic } } : {}), video: Object.assign(cfg.cam ? { deviceId: { exact: cfg.cam } } : { facingMode: 'user' }, (paysage() ? { width: { ideal: 1920 }, height: { ideal: 1440 }, aspectRatio: { ideal: 4 / 3 }, frameRate: { ideal: 30 } } : { width: { ideal: 1440 }, height: { ideal: 1920 }, aspectRatio: { ideal: 3 / 4 }, frameRate: { ideal: 30 } })) };   /* 4:3 : tout le capteur, donc le champ de vision le plus large */
     arreterCam();
@@ -270,15 +291,31 @@
     var dur = JSON.parse(JSON.stringify(contraintes)); dur.video = Object.assign({}, dur.video, paysage() ? { width: { min: 1280, ideal: 1920 }, height: { min: 720, ideal: 1440 } } : { width: { min: 720, ideal: 1440 }, height: { min: 1280, ideal: 1920 } });
     var choisie = '';
     var viser = function (id) { [contraintes, dur].forEach(function (c) { delete c.video.deviceId; delete c.video.facingMode; if (id) c.video.deviceId = { exact: id }; else c.video.facingMode = 'user'; }); };
-    (garde ? Promise.resolve(garde) : resoudreCam().then(function (id) {
-      choisie = id; viser(id);
-      return navigator.mediaDevices.getUserMedia(dur).catch(function () { return navigator.mediaDevices.getUserMedia(contraintes); }).catch(function (e) {
-        if (!id) throw e;
-        cfg.cam = ''; cfg.camLabel = ''; ecrireCfg(cfg); viser('');
-        return navigator.mediaDevices.getUserMedia(contraintes).catch(function () { return navigator.mediaDevices.getUserMedia({ audio: contraintes.audio, video: true }); });
+    var gUM = function (c) { return navigator.mediaDevices.getUserMedia(c); };
+    /* la caméra choisie (ex. l'ultra grand-angle) est redemandée jusqu'à 3 fois : juste après la fermeture d'une autre caméra elle met parfois un instant à se libérer.
+       Le choix de l'utilisateur n'est JAMAIS effacé : en dernier recours seulement, la caméra avant par défaut s'ouvre, et le choix est retenté à l'enregistrement suivant. */
+    var acquerir = function () {
+      return resoudreCam().then(function (id) {
+        choisie = id; viser(id);
+        var essai = 0;
+        var go = function () {
+          return gUM(dur).catch(function () { return gUM(contraintes); }).catch(function (e) {
+            if (!id) throw e;
+            if (++essai < 3) return new Promise(function (r) { setTimeout(r, 450); }).then(go);
+            viser('');
+            return gUM(contraintes).catch(function () { return gUM({ audio: contraintes.audio, video: true }); });
+          });
+        };
+        return go();
       });
-    })).then(function (s) {
-      flux = s; $('b-go').hidden = false; montrerPret(); $('fmt').hidden = !(cfg.choixFormat !== false) || testCam; majFormat(); $('cadrage').textContent = cfg.cadrage || ''; $('cadrage').hidden = !cfg.cadrage; $('v-src').srcObject = s; $('v-src').play().catch(function () {}); boucle = requestAnimationFrame(dessiner);
+    };
+    (garde ? resoudreCam().then(function (id) {
+      var tr = garde.getVideoTracks()[0], cur = tr && tr.getSettings ? tr.getSettings().deviceId : '';
+      if (id && cur && cur !== id) { garde.getTracks().forEach(function (t) { t.stop(); }); return null; }   /* la caméra gardée n'est pas celle choisie */
+      return garde;
+    }).catch(function () { return garde; }) : Promise.resolve(null)).then(function (g) { return g || acquerir(); }
+    ).then(function (s) {
+      flux = s; if (attenteCam) attenteCam.hidden = true; $('b-go').hidden = false; montrerPret(); $('fmt').hidden = !(cfg.choixFormat !== false) || testCam; majFormat(); $('cadrage').textContent = cfg.cadrage || ''; $('cadrage').hidden = !cfg.cadrage; $('v-src').srcObject = s; $('v-src').play().catch(function () {}); boucle = requestAnimationFrame(dessiner);
       grandAngle(s);
       camSuspecte = false; camEtat = 'ok'; tFige = Date.now(); brancherMicro(s); $('mic').hidden = false;
       clearTimeout(minuteurStable); minuteurStable = setTimeout(function () { essaisCam = 0; }, 30000);
@@ -287,6 +324,7 @@
       if (testCam) infoCamera(s);
       boutonCameraSuivante();
     }).catch(function (e) {
+      if (attenteCam) attenteCam.hidden = true;
       camEtat = (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) ? 'refusee' : 'erreur';
       $('cam-err').textContent = testCam ? 'Impossible d’accéder à la caméra ou au micro. Autorisez-les dans les réglages de la tablette, puis réessayez.' : 'La caméra n’est pas disponible pour le moment.'; $('cam-err').hidden = false; $('b-go').hidden = true;
       setTimeout(function () { accueil(); }, 7000);
@@ -581,7 +619,7 @@ $('b-stop').onclick = arreterRec;
   }
   /* ── état de la tablette, envoyé toutes les 2 minutes au back-office (batterie, vidéos en attente, caméra, micro, place) ── */
   /* mise à jour automatique : si le site propose une version plus récente de l'appli, la tablette se recharge toute seule, uniquement quand elle est sur l'écran d'accueil et ne filme pas */
-  var BUILD = 71;
+  var BUILD = 72;
   function verifierMaj() {
     try {
       if (enregistrement) return;

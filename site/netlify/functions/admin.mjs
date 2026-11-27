@@ -542,6 +542,23 @@ function cleanFields(fields) {
 /* Mêmes règles que le planning : une option « une seule fois » (cadre photo,
    déguisements) enregistrée en double sur un même produit n'est comptée
    qu'une fois, sur la fiche comme sur le devis et la facture. */
+/* L'option « M-Fog 1500 » d'un Pack Vespra n'a pas de ligne à elle sur le devis : elle s'écrit en gris sous le pack, et son prix s'ajoute à celui du pack */
+function replierOptionsPack(list) {
+  const out = [];
+  (list || []).forEach((p) => {
+    if (!p) return;
+    const n = String(p.name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    if ((p.estOption === true || p.variant === 'Option') && /^m ?fog 1500$/.test(n) && out.length && /^pack vespra/i.test(String(out[out.length - 1].name || ''))) {
+      const par = out[out.length - 1];
+      const opts = Array.isArray(par.options) ? par.options.slice() : String(par.options || par.option || '').split(/\s*,\s*/).filter(Boolean);
+      opts.push('M-Fog 1500');
+      out[out.length - 1] = Object.assign({}, par, { options: opts, price: (Number(par.price) || 0) + (Number(p.price) || 0) });
+      return;
+    }
+    out.push(p);
+  });
+  return out;
+}
 function produitsNetsResa(list) {
   var out = [], vus = {}, parent = -1;
   var net = function (v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/^\s*(\+|option)\s*:?\s*/, '').replace(/[^a-z0-9]+/g, ' ').trim(); };
@@ -834,7 +851,7 @@ const assainirDonnees = (d) => { if (!d || typeof d !== 'object') return d; cons
 /* ce qu'un client a le droit de voir d'une réservation du planning */
 async function dossierResa(id, r, logi) {
   const lignes = [];
-  for (const p of produitsNetsResa(r.products)) {
+  for (const p of replierOptionsPack(produitsNetsResa(r.products))) {
     if (!p || !p.name) continue;
     const opts = Array.isArray(p.options) ? p.options.filter(Boolean).join(', ') : String(p.options || p.option || '').trim();
     const vr = String(p.variant || '').split(/\s+\+\s+/)[0].replace(/^(standard|option)$/i, '');
@@ -2180,7 +2197,7 @@ const gestionnaire = async (request) => {
         }
         return '';
       };
-      for (const p of (envoi ? [] : produitsNetsResa(r.products))) {
+      for (const p of (envoi ? [] : replierOptionsPack(produitsNetsResa(r.products)))) {
         if (!p || !p.name) continue;
         let formule = formuleFacture(p);
         /* « Pack Vespra 60 personnes » + « 60 personnes » : on ne répète pas la formule */
