@@ -1201,6 +1201,10 @@ var P=[
   ['Guirlande lumineuse','lumieres',null,['10 m','20 m','40 m'],'Guirlande',{'10 m':9,'20 m':18,'40 m':36,'30 m':25}],
   ['Ventilateur événementiel','barnum',10,['Standard'],'Ventilateur'],
   ['Chauffage','barnum',null,['Sur devis'],'Chauffage'],
+  ['Chauffage pyramide à gaz','barnum',null,['Sans bouteille de gaz','Avec bouteille de gaz'],'Chauffage pyramide',
+    {'Sans bouteille de gaz':50,'Avec bouteille de gaz':80}],
+  ['Chauffage parasol à gaz','barnum',null,['Sans bouteille de gaz','Avec bouteille de gaz'],'Chauffage parasol',
+    {'Sans bouteille de gaz':40,'Avec bouteille de gaz':70}],
   ['Mange-debout','barnum',null,['Sans housse','Housse blanche','Housse noire','Housse marron','Housse dorée','Housse bleu foncé','Housse bordeaux','Housse verte','Housse terracotta'],'Mange-debout',
     {'Sans housse':10,'Housse blanche':13,'Housse noire':13,'Housse marron':15,'Housse dorée':15,'Housse bleu foncé':15,'Housse bordeaux':15,'Housse verte':15,'Housse terracotta':15}],
   ['Housses de mange-debout (seules)','barnum',null,['Blanche','Noire','Marron','Dorée','Bleu foncé','Bordeaux','Verte','Terracotta'],'Housses',
@@ -5529,7 +5533,8 @@ var PK_OPT = {
   fumeeP:  {nom:'Machine à fumée lourde effet nuage', label:'Machine à fumée lourde effet nuage', prix:150},
   fumeeL:  {nom:'Machine à fumée', label:'Machine à fumée', prix:10},
   fumeeM:  {nom:'Machine à fumée puissante M-Fog 1500', label:'Machine à fumée puissante M-Fog 1500', prix:20},
-  bulles:  {nom:'Machine à bulles', label:'Machine à bulles', prix:10}
+  bulles:  {nom:'Machine à bulles', label:'Machine à bulles', prix:10},
+  fumeeUp: {nom:'Machine à fumée plus puissante (M-Fog 1500) — upgrade du pack', label:'Machine à fumée plus puissante (M-Fog 1500) — upgrade du pack', prix:10}
 };
 /* les options de chaque produit, d'après le catalogue du site */
 var OPTIONS_PRODUIT = {};
@@ -5539,9 +5544,9 @@ var OPTIONS_PRODUIT = {};
 OPTIONS_PRODUIT['Buvette 4x4m']=[PK_OPT.install,PK_OPT.guir10,PK_OPT.guir20];
 ['Tente étoile 10m','Tente étoile 14m','Tente étoile 22m'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.install,PK_OPT.eclair,PK_OPT.guir10,PK_OPT.guir20];});
 ['Sono 20 personnes','Sono 40/60 personnes','Sono 80/100 personnes','Sonorisation — 120 à 150 personnes','Sonorisation — 180 à 250 personnes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.caisson,PK_OPT.microFil,PK_OPT.microSF];});
-['Pack Vespra 60 personnes','Pack Vespra 100 personnes','Pack Vespra 150 personnes','Pack Vespra 200 personnes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.microFil,PK_OPT.microSF];});
-['Pack Vespra 20 personnes','Pack Vespra 40 à 60 personnes','Pack Vespra 80 à 100 personnes','Pack Vespra 120 à 150 personnes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.caisson,PK_OPT.microFil,PK_OPT.microSF];});
-OPTIONS_PRODUIT['Pack Vespra 180 à 250 personnes']=[PK_OPT.microFil,PK_OPT.microSF];
+['Pack Vespra 60 personnes','Pack Vespra 100 personnes','Pack Vespra 150 personnes','Pack Vespra 200 personnes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.microFil,PK_OPT.microSF,PK_OPT.fumeeUp];});
+['Pack Vespra 20 personnes','Pack Vespra 40 à 60 personnes','Pack Vespra 80 à 100 personnes','Pack Vespra 120 à 150 personnes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.caisson,PK_OPT.microFil,PK_OPT.microSF,PK_OPT.fumeeUp];});
+OPTIONS_PRODUIT['Pack Vespra 180 à 250 personnes']=[PK_OPT.microFil,PK_OPT.microSF,PK_OPT.fumeeUp];
 ['Jeux de lumières Ibiza 4 spots','Jeux de lumières Eurolite','Boule à facettes'].forEach(function(n){OPTIONS_PRODUIT[n]=[PK_OPT.fumeeOpt,PK_OPT.fumeeM,PK_OPT.fumeeS,PK_OPT.fumeeP];});
 OPTIONS_PRODUIT["Livre d'or audio"]=[PK_OPT.cabine];
 ['Cabine téléphonique','Cabine téléphonique audio / vidéo','Cabine téléphonique audio','Cabine téléphonique vidéo','Cabine téléphonique blanche','Cabine téléphonique rouge','Cabine téléphonique en bois blanc'].forEach(function(n){OPTIONS_PRODUIT[n]=(n==='Cabine téléphonique'||/blanche|rouge|bois/.test(n))?[PK_OPT.vbint,PK_OPT.neon]:[PK_OPT.neon];});
@@ -5586,7 +5591,7 @@ function pkCatsSite(p){
   if(n==='Baby-foot'||n==='Jeux en bois'||n==='Pack karaoké') return ['Animation'];
   if(/^Mange-debout/.test(n)) return ['Barnums','Restauration'];
   if(/^(Mini château|Mini bounce|Bouncedome|Multiplay|Château)/.test(n)) return ['Chateaux','Animation'];
-  if(n==='Chauffage') return ['Confort'];
+  if(n==='Chauffage'||/^Chauffage (pyramide|parasol)/.test(n)) return ['Confort'];
   if(/^(Barnum|Tente|Buvette)/.test(n)) return ['Barnums'];
   if(/^(Pack Vespra|Sono|Caisson|Micro|Vidéoprojecteur|Écran de projection)/.test(n)) return ['Son'];
   if(/^(Jeux de lumières|Boule à facettes|Guirlande lumineuse|Spot LED)/.test(n)) return ['Lumiere'];
@@ -7104,6 +7109,7 @@ if(true){
     if(pr['fumee-lourde-nuage']&&window.PK_OPT&&PK_OPT.fumeeP) PK_OPT.fumeeP.prix=pr['fumee-lourde-nuage'];
     var e=ligne('Machine à étincelles froides');
     if(e&&e[5]){if(pr['etincelles-froides-1'])e[5]['1 machine']=pr['etincelles-froides-1'];if(pr['etincelles-froides-2'])e[5]['2 machines']=pr['etincelles-froides-2'];}
+    if(window.PK_OPT&&PK_OPT.fumeeUp&&pr['pack-vespra-opt-2']) PK_OPT.fumeeUp.prix=pr['pack-vespra-opt-2'];
     if(window.PK_OPT&&PK_OPT.sachet&&pr['etincelles-froides-opt-1']) PK_OPT.sachet.prix=pr['etincelles-froides-opt-1'];
     var f=ligne("Feux d'artifice de jour");
     if(f&&f[5]){if(pr['canons-poudre-1'])f[5]['4 canons']=pr['canons-poudre-1'];if(pr['canons-poudre-2'])f[5]['6 canons']=pr['canons-poudre-2'];if(pr['canons-poudre-3'])f[5]['8 canons']=pr['canons-poudre-3'];if(pr['canons-poudre-4'])f[5]['12 canons']=pr['canons-poudre-4'];}
