@@ -468,6 +468,6 @@ body:not(.mode-seul) #modes{flex:0 0 auto;height:auto;grid-template-rows:auto;al
 #s-accueil .filet{margin:var(--esp) auto 0!important}
 #s-accueil .hero p:not(:empty){margin-top:var(--esp)}
 #s-accueil #b-commencer:not([hidden]){margin:var(--esp) auto 0!important;padding:clamp(14px,2.3vh,19px) clamp(46px,6.2vw,72px)!important;font-size:clamp(18px,2vw,22px)!important;border-radius:14px!important}
-body.mode-seul #s-accueil{padding-bottom:clamp(50px,13vh,130px)}
-body.mode-seul.noel-on #s-accueil{padding-bottom:calc(min(15vh,150px) + 11vh)}
+body.mode-seul #s-accueil{padding-bottom:clamp(8px,2vh,24px)}
+body.mode-seul.noel-on #s-accueil{padding-bottom:calc(min(15vh,150px) - 2vh)}
 .ecran-tech .noel,.ecran-tech .neige{display:none!important}

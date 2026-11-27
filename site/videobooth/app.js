@@ -619,7 +619,7 @@ $('b-stop').onclick = arreterRec;
   }
   /* ── état de la tablette, envoyé toutes les 2 minutes au back-office (batterie, vidéos en attente, caméra, micro, place) ── */
   /* mise à jour automatique : si le site propose une version plus récente de l'appli, la tablette se recharge toute seule, uniquement quand elle est sur l'écran d'accueil et ne filme pas */
-  var BUILD = 72;
+  var BUILD = 73;
   function verifierMaj() {
     try {
       if (enregistrement) return;
